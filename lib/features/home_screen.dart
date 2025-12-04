@@ -169,13 +169,7 @@ class HomeScreen extends ConsumerWidget {
                           title: 'Leaderboard',
                           subtitle: 'Top players',
                           color: colorScheme.tertiary,
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Leaderboard coming soon!'),
-                              ),
-                            );
-                          },
+                          onTap: () => context.go('/leaderboard'),
                         ),
                       ),
                       const SizedBox(width: 16),

@@ -9,6 +9,7 @@ import 'package:myapp/firebase_options.dart';
 import 'features/lobby/lobby_screen.dart';
 import 'features/game/game_screen.dart';
 import 'features/game/game_history_screen.dart';
+import 'features/leaderboard/leaderboard_screen.dart';
 import 'features/ledger/ledger_screen.dart';
 import 'features/auth/auth_gate.dart';
 import 'features/auth/auth_screen.dart';
@@ -39,6 +40,12 @@ final GoRouter _router = GoRouter(
           path: 'history',
           builder: (BuildContext context, GoRouterState state) {
             return const GameHistoryScreen();
+          },
+        ),
+        GoRoute(
+          path: 'leaderboard',
+          builder: (BuildContext context, GoRouterState state) {
+            return const LeaderboardScreen();
           },
         ),
         GoRoute(

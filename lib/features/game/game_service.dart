@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'game_room.dart';
+import '../leaderboard/leaderboard_screen.dart';
 
 final gameServiceProvider = Provider<GameService>((ref) => GameService());
 
@@ -54,6 +55,72 @@ class GameService {
     });
   }
 
+  // Aggregates player stats across all finished games for leaderboard.
+  Future<List<LeaderboardEntry>> getLeaderboard() async {
+    try {
+      final snapshot = await _gamesRef
+          .where('isFinished', isEqualTo: true)
+          .get();
+
+      // Aggregate stats per player
+      final Map<String, _PlayerStats> playerStats = {};
+
+      for (final doc in snapshot.docs) {
+        final game = GameRoom.fromJson(doc.data() as Map<String, dynamic>)
+            .copyWith(id: doc.id);
+
+        // Find winner (highest score)
+        String? winnerId;
+        int highestScore = 0;
+        game.scores.forEach((playerId, score) {
+          if (score > highestScore) {
+            highestScore = score;
+            winnerId = playerId;
+          }
+        });
+
+        // Update stats for each player
+        for (final player in game.players) {
+          final score = game.scores[player.id] ?? 0;
+          final isWinner = player.id == winnerId && highestScore > 0;
+
+          if (!playerStats.containsKey(player.id)) {
+            playerStats[player.id] = _PlayerStats(
+              playerId: player.id,
+              playerName: player.profile?.displayName ?? player.name,
+              avatarUrl: player.profile?.avatarUrl,
+            );
+          }
+
+          playerStats[player.id]!.totalScore += score;
+          playerStats[player.id]!.gamesPlayed += 1;
+          if (isWinner) {
+            playerStats[player.id]!.gamesWon += 1;
+          }
+        }
+      }
+
+      // Convert to list and sort by total score
+      final entries = playerStats.values
+          .map((stats) => LeaderboardEntry(
+                odayerId: stats.playerId,
+                playerName: stats.playerName,
+                avatarUrl: stats.avatarUrl,
+                totalScore: stats.totalScore,
+                gamesPlayed: stats.gamesPlayed,
+                gamesWon: stats.gamesWon,
+              ))
+          .toList();
+
+      entries.sort((a, b) => b.totalScore.compareTo(a.totalScore));
+
+      return entries;
+    } catch (e) {
+      debugPrint('Error getting leaderboard: $e');
+      return [];
+    }
+  }
+
   // Updates the score of a player in a game.
   Future<void> updatePlayerScore(
       String gameId, String playerId, int increment) async {
@@ -96,4 +163,21 @@ class GameService {
     }
   }
 }
+
+// Helper class for aggregating player stats
+class _PlayerStats {
+  final String playerId;
+  final String playerName;
+  final String? avatarUrl;
+  int totalScore = 0;
+  int gamesPlayed = 0;
+  int gamesWon = 0;
+
+  _PlayerStats({
+    required this.playerId,
+    required this.playerName,
+    this.avatarUrl,
+  });
+}
+
 
