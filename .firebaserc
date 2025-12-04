@@ -1,5 +1,7 @@
 {
-  "projects": {},
+  "projects": {
+    "default": "taasclub-app"
+  },
   "targets": {},
   "etags": {}
 }
