@@ -1,5 +1,6 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/features/game/game_room.dart';
 import 'package:myapp/features/profile/profile_service.dart';
@@ -35,4 +36,39 @@ class LobbyService {
     final newGame = await _gamesRef.add(newRoom);
     return newGame.id;
   }
+
+  Future<void> joinGame(String gameId, Player player) async {
+    try {
+      final profileService = _ref.read(profileServiceProvider);
+      final profile = await profileService.getProfile(player.id);
+      final playerWithProfile = player.copyWith(profile: profile);
+
+      await _db.collection('games').doc(gameId).update({
+        'players': FieldValue.arrayUnion([playerWithProfile.toJson()]),
+        'scores.${player.id}': 0,
+      });
+    } catch (e) {
+      debugPrint('Error joining game: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> leaveGame(String gameId, String playerId) async {
+    try {
+      final doc = await _gamesRef.doc(gameId).get();
+      if (!doc.exists) return;
+
+      final game = doc.data()!;
+      final updatedPlayers = game.players.where((p) => p.id != playerId).toList();
+      final updatedScores = Map<String, int>.from(game.scores)..remove(playerId);
+
+      await _gamesRef.doc(gameId).update(
+        game.copyWith(players: updatedPlayers, scores: updatedScores).toJson(),
+      );
+    } catch (e) {
+      debugPrint('Error leaving game: $e');
+      rethrow;
+    }
+  }
 }
+
