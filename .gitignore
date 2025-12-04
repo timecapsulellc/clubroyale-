@@ -1,0 +1,69 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+gen/
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Android
+.gradle/
+**/build/
+**/app/build/
+**/app/generated/
+local.properties
+
+# iOS
+.ios/
+build/ios/
+DerivedData/
+Runner.xcworkspace/
+Runner.xcarchive/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+
+# Web
+build/web/
+
+# Windows
+build/windows/
+windows/flutter/ephemeral
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugins.cmake
+windows/runner/Debug/
+windows/runner/Profile/
+windows/runner/Release/
+windows/runner/flutter_window.pdb
+windows/runner/runner.exe.pdb
+
+# Linux
+build/linux/
+linux/flutter/ephemeral
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugins.cmake
+
+# macOS
+build/macos/
+macos/Flutter/ephemeral
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Flutter/generated_plugins.cmake

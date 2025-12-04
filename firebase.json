@@ -1,0 +1,28 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "taasclub-app",
+          "appId": "1:194696695724:android:af9dcabd3b1ea340c37409",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "taasclub-app",
+          "configurations": {
+            "android": "1:194696695724:android:af9dcabd3b1ea340c37409",
+            "web": "1:194696695724:web:edf1276970f02879c37409"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "database": "(default)",
+    "location": "nam5",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}
