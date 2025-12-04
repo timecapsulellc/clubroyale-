@@ -40,6 +40,20 @@ class GameService {
     });
   }
 
+  // Retrieves all finished games as a real-time stream.
+  Stream<List<GameRoom>> getFinishedGames() {
+    return _gamesRef
+        .where('isFinished', isEqualTo: true)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return GameRoom.fromJson(doc.data() as Map<String, dynamic>)
+            .copyWith(id: doc.id);
+      }).toList();
+    });
+  }
+
   // Updates the score of a player in a game.
   Future<void> updatePlayerScore(
       String gameId, String playerId, int increment) async {
@@ -65,10 +79,21 @@ class GameService {
   Future<void> finishGame(String gameId) async {
     try {
       await _gamesRef.doc(gameId).update({
+        'isFinished': true,
         'finishedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
       debugPrint('Error finishing game: $e');
     }
   }
+
+  // Deletes a game from Firestore.
+  Future<void> deleteGame(String gameId) async {
+    try {
+      await _gamesRef.doc(gameId).delete();
+    } catch (e) {
+      debugPrint('Error deleting game: $e');
+    }
+  }
 }
+

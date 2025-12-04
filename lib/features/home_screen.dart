@@ -152,12 +152,7 @@ class HomeScreen extends ConsumerWidget {
                           title: 'History',
                           subtitle: 'View past games',
                           color: colorScheme.secondary,
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Game history coming soon!'),
-                              ),
-                            );
+                          onTap: () => context.go('/history'),
                           },
                         ),
                       ),
