@@ -153,7 +153,6 @@ class HomeScreen extends ConsumerWidget {
                           subtitle: 'View past games',
                           color: colorScheme.secondary,
                           onTap: () => context.go('/history'),
-                          },
                         ),
                       ),
                     ],
