@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'auth_service.dart';
+import 'auth_gate.dart'; // For TestMode class
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -208,7 +209,26 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         ),
                       ),
 
-                      const SizedBox(height: 48),
+                      const SizedBox(height: 24),
+
+                      // Test Mode Button (for development)
+                      TextButton.icon(
+                        onPressed: () {
+                          TestMode.isEnabled.value = true;
+                        },
+                        icon: Icon(
+                          Icons.science,
+                          color: colorScheme.onPrimary.withOpacity(0.7),
+                        ),
+                        label: Text(
+                          '🧪 Enter Test Mode (Skip Sign-In)',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onPrimary.withOpacity(0.7),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
 
                       // Features list
                       _FeatureItem(
