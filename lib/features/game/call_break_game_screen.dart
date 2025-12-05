@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/features/auth/auth_service.dart';
 import 'package:myapp/features/game/call_break_service.dart';
 import 'package:myapp/features/game/game_room.dart';
-import 'package:myapp/features/game/models/card.dart';
+import 'package:myapp/features/game/engine/models/card.dart';
 import 'package:myapp/features/game/models/game_state.dart';
 import 'package:myapp/features/lobby/lobby_service.dart';
 import 'widgets/card_widgets.dart';

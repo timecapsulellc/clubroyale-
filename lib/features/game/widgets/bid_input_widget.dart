@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/features/game/models/game_state.dart';
 import 'package:myapp/features/game/services/card_validation_service.dart';
-import 'package:myapp/features/game/models/card.dart';
+import 'package:myapp/features/game/engine/models/card.dart';
 
 /// Widget for bidding phase
 class BidInputWidget extends StatefulWidget {

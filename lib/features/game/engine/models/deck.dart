@@ -1,4 +1,4 @@
-import 'package:myapp/features/game/models/card.dart';
+import 'package:myapp/features/game/engine/models/card.dart';
 
 /// Deck of 52 playing cards
 class Deck {

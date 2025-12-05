@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/features/game/models/card.dart';
+import 'package:myapp/features/game/engine/models/card.dart';
 
 /// Widget to display a single playing card
 class PlayingCardWidget extends StatelessWidget {

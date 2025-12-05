@@ -1,16 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:myapp/features/game/game_room.dart';
-import 'package:myapp/features/game/models/card.dart';
+import 'package:myapp/features/game/engine/models/card.dart';
 import 'package:myapp/features/game/models/deck.dart';
 import 'package:myapp/features/game/models/game_state.dart';
 import 'package:myapp/features/game/logic/call_break_logic.dart';
 
-final callBreakServiceProvider = Provider<CallBreakService>((ref) => CallBreakService());
+import 'package:myapp/features/game/services/sound_service.dart';
+
+final callBreakServiceProvider = Provider<CallBreakService>((ref) {
+  final soundService = ref.read(soundServiceProvider);
+  return CallBreakService(soundService);
+});
 
 /// Service for Call Break game logic
 class CallBreakService {
+  final SoundService _soundService;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  CallBreakService(this._soundService);
 
   /// Start a new round - deal cards and set bidding phase
   Future<void> startNewRound(String gameId, List<String> playerIds) async {
@@ -53,8 +61,69 @@ class CallBreakService {
     });
   }
 
+  /// Validate a move before playing
+  Future<void> validateMove(String gameId, String playerId, PlayingCard card) async {
+    final gameDoc = await _db.collection('games').doc(gameId).get();
+    final gameData = gameDoc.data()!;
+    
+    // 1. Check if it's player's turn
+    if (gameData['currentTurn'] != playerId) {
+      throw Exception('Not your turn');
+    }
+
+    // 2. Check if player has the card
+    final hands = _deserializeHands(gameData['playerHands'] as Map<String, dynamic>);
+    final playerHand = hands[playerId]!;
+    if (!playerHand.any((c) => c.suit == card.suit && c.rank == card.rank)) {
+      throw Exception('You do not have this card');
+    }
+
+    // 3. Check rules if trick is in progress
+    if (gameData['currentTrick'] != null) {
+      final currentTrick = Trick.fromJson(gameData['currentTrick'] as Map<String, dynamic>);
+      final ledSuit = currentTrick.ledSuit;
+      
+      // Rule: Must follow suit if possible
+      final hasLedSuit = playerHand.any((c) => c.suit == ledSuit);
+      if (hasLedSuit && card.suit != ledSuit) {
+        throw Exception('Must follow suit (${ledSuit.name})');
+      }
+
+      // Rule: If playing led suit, try to win
+      if (card.suit == ledSuit) {
+        final highestInSuit = currentTrick.cards
+            .where((c) => c.card.suit == ledSuit)
+            .map((c) => c.card.rank.value)
+            .fold(0, (max, val) => val > max ? val : max);
+            
+        final hasHigher = playerHand.any((c) => c.suit == ledSuit && c.rank.value > highestInSuit);
+        
+        if (hasHigher && card.rank.value <= highestInSuit) {
+          // Note: Some variations allow playing any card of suit. 
+          // Enforcing "must win if possible" is stricter.
+          // We'll leave this as a warning or strict rule depending on config.
+          // For now, let's be lenient on "must win" but strict on "must follow suit".
+        }
+      }
+
+      // Rule: If cannot follow suit, must play trump (Spade) if possible
+      if (!hasLedSuit) {
+        final hasSpade = playerHand.any((c) => c.suit == CardSuit.spades);
+        if (hasSpade && card.suit != CardSuit.spades) {
+           // Exception: If another player already played a Spade, 
+           // you only HAVE to play a Spade if you can beat it?
+           // Standard rule: Must play trump if you can't follow suit.
+           throw Exception('Must play Spade if you cannot follow suit');
+        }
+      }
+    }
+  }
+
   /// Play a card in the current trick
   Future<void> playCard(String gameId, String playerId, PlayingCard card) async {
+    // Validate move first
+    await validateMove(gameId, playerId, card);
+
     final gameDoc = await _db.collection('games').doc(gameId).get();
     final gameData = gameDoc.data()!;
     final playerIds = (gameData['players'] as List).map((p) => p['id'] as String).toList();
@@ -78,10 +147,16 @@ class CallBreakService {
     final hands = _deserializeHands(gameData['playerHands'] as Map<String, dynamic>);
     hands[playerId]!.removeWhere((c) => c.suit == card.suit && c.rank == card.rank);
 
+    // Play sound
+    _soundService.playCardSlide();
+
     // Check if trick is complete
     if (currentTrick.isComplete) {
       // Determine winner using Logic class
       final winnerId = CallBreakLogic.determineTrickWinner(currentTrick);
+      
+      // Play win sound
+      _soundService.playTrickWin();
       
       // Update tricks won
       final tricksWon = Map<String, int>.from(gameData['tricksWon'] ?? {});

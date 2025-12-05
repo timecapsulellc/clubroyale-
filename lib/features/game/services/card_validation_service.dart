@@ -1,4 +1,4 @@
-import 'package:myapp/features/game/models/card.dart';
+import 'package:myapp/features/game/engine/models/card.dart';
 import 'package:myapp/features/game/models/game_state.dart';
 
 /// Service for validating card plays according to Call Break rules

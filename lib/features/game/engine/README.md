@@ -1,169 +1,66 @@
 # Card Game Engine
 
-This directory contains the card game engine for TaasClub, built on top of the `playing_cards` package.
+This directory contains the core card game engine for TaasClub. It is a custom implementation designed specifically for Call Break mechanics.
 
 ## Overview
 
-Instead of cloning a repository and extracting card assets, we're using the [`playing_cards`](https://pub.dev/packages/playing_cards) package from pub.dev. This approach provides:
-
-- ✅ Production-ready card rendering
-- ✅ Automatic maintenance and updates
-- ✅ Clean, tested code
-- ✅ MIT licensed
-- ✅ No need to manage card image assets
+The engine provides a complete set of tools for managing card game logic and rendering. It is self-contained within `lib/features/game/engine` and does not rely on external card packages.
 
 ## Components
 
-### DeckService (`deck_service.dart`)
+### Models (`models/`)
 
-A utility service that wraps the `playing_cards` package with Call Break-specific functionality.
+- **`card.dart`**: Defines `PlayingCard`, `CardSuit`, and `CardRank`. Includes logic for card comparison and display strings.
+- **`deck.dart`**: Represents a standard 52-card deck with shuffling capabilities.
 
-**Key Methods:**
+### Widgets (`widgets/`)
+
+- **`playing_card_widget.dart`**: A highly customizable widget for rendering playing cards. Supports face-up/face-down states, selection highlighting, and animations.
+- **`card_hand_widget.dart`**: Displays a player's hand in a fanned layout, handling card selection and interaction.
+
+## Usage
+
+### Creating a Deck
 
 ```dart
-final deckService = DeckService();
+import 'package:myapp/features/game/engine/models/deck.dart';
 
-// Create and shuffle a deck
-final deck = deckService.createShuffledDeck();
-
-// Deal cards for Call Break (4 players, 13 cards each)
-final hands = deckService.dealCallBreakHands();
-// Returns: Map<int, List<PlayingCard>> where key is player index
-
-// Sort a hand by suit and rank
-final sortedHand = deckService.sortHand(myHand);
-
-// Count cards of a specific suit
-final spadeCount = deckService.countSuit(myHand, Suit.spades);
-
-// Get all cards of a suit
-final spades = deckService.getCardsOfSuit(myHand, Suit.spades);
-
-// Remove a card from hand
-deckService.removeCard(myHand, playedCard);
-
-// Get card description
-final desc = deckService.getCardDescription(card);
-// Returns: "Ace of Spades ♠"
+final deck = Deck();
+deck.shuffle();
+final hand = deck.deal(13);
 ```
 
-## Usage Example
-
-### Basic Card Rendering
+### Rendering a Card
 
 ```dart
-import 'package:playing_cards/playing_cards.dart';
+import 'package:myapp/features/game/engine/widgets/playing_card_widget.dart';
+import 'package:myapp/features/game/engine/models/card.dart';
 
-// Render a single card
-PlayingCardView(
-  card: PlayingCard(Suit.spades, CardValue.ace),
-)
-
-// With customization
-PlayingCardView(
-  card: PlayingCard(Suit.hearts, CardValue.king),
-  showBack: false,  // Show card face
-  elevation: 2.0,
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(8),
-  ),
+PlayingCardWidget(
+  card: PlayingCard(suit: CardSuit.spades, rank: CardRank.ace),
+  width: 60,
+  height: 90,
+  onTap: () => print('Card tapped!'),
 )
 ```
 
-### Dealing Cards for Call Break
+### Displaying a Hand
 
 ```dart
-import 'package:taas_club/features/game/engine/deck_service.dart';
+import 'package:myapp/features/game/engine/widgets/card_hand_widget.dart';
 
-final deckService = DeckService();
-
-// Deal hands for a Call Break game
-final hands = deckService.dealCallBreakHands();
-
-// hands[0] contains player 0's 13 cards
-// hands[1] contains player 1's 13 cards
-// hands[2] contains player 2's 13 cards
-// hands[3] contains player 3's 13 cards
-
-// Sort each hand
-final sortedHand = deckService.sortHand(hands[0]!);
+CardHandWidget(
+  cards: myHand,
+  onCardSelected: (card) => setState(() => selectedCard = card),
+)
 ```
 
-### Full Game Setup
+## Key Features
 
-```dart
-import 'package:playing_cards/playing_cards.dart';
-import 'package:taas_club/features/game/engine/deck_service.dart';
-
-class GameSetup {
-  final DeckService _deckService = DeckService();
-  
-  void startGame() {
-    // Deal cards to 4 players
-    final hands = _deckService.dealCallBreakHands();
-    
-    // Process each player's hand
-    for (int playerIndex = 0; playerIndex < 4; playerIndex++) {
-      final hand = hands[playerIndex]!;
-      final sortedHand = _deckService.sortHand(hand);
-      
-      // Show hand statistics
-      print('Player $playerIndex:');
-      print('  Total cards:${hand.length}');
-      print('  Spades: ${_deckService.countSuit(hand, Suit.spades)}');
-      print('  Hearts: ${_deckService.countSuit(hand, Suit.hearts)}');
-      print('  Diamonds: ${_deckService.countSuit(hand, Suit.diamonds)}');
-      print('  Clubs: ${_deckService.countSuit(hand, Suit.clubs)}');
-    }
-  }
-}
-```
+- **Custom Rendering**: Cards are drawn using Flutter widgets (Text, Icon, Container), ensuring crisp scaling on all devices without needing image assets.
+- **Call Break Logic**: The `PlayingCard` model includes specific comparison logic (`compareTo`) that handles trump suits and leading suits, essential for trick-taking games.
+- **Null Safety**: Fully compliant with modern Dart null safety standards.
 
 ## Testing
 
-A test screen is available at `/test-cards` route to verify the card engine integration.
-
-**To access:**
-1. Run the app
-2. Navigate to the test screen:
-   ```dart
-   context.go('/test-cards');
-   ```
-3. Verify:
-   - Cards render correctly
-   - All 4 suits display properly
-   - Shuffle/deal functionality works
-   - Card backs toggle correctly
-
-## Package Information
-
-**Package:** `playing_cards` v0.1.6  
-**License:** MIT  
-**Pub.dev:** https://pub.dev/packages/playing_cards  
-**GitHub:** https://github.com/bedardjo/playing_cards
-
-## Next Steps
-
-With the card engine in place, you can now:
-
-1. **Build the Lobby System** (Phase 4)
-   - Create/join game rooms
-   - Player ready-check
-   - Real-time synchronization
-
-2. **Implement Game Logic** (Phase 6)
-   - Bidding phase
-   - Card play validation
-   - Trick winner determination
-   - Scoring
-
-3. **Add Settlement Calculator** (Phase 5)
-   - Calculate who owes whom
-   - Process diamond transfers
-   - Record transaction history
-
-## Credits
-
-This engine uses the `playing_cards` package by Joseph Bedard.  
-Original package: https://pub.dev/packages/playing_cards  
-License: MIT
+To verify the engine integration, you can use the test screen at `/test-cards` (if implemented) or run the unit tests in `test/features/game/engine_test.dart`.

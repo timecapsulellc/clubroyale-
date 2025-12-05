@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/features/game/models/card.dart';
-import 'package:myapp/features/game/widgets/playing_card_widget.dart';
+import 'package:myapp/features/game/engine/models/card.dart';
+import 'package:myapp/features/game/engine/widgets/playing_card_widget.dart';
 
 /// Widget to display a player's hand of cards in a fanned layout
 class CardHandWidget extends StatelessWidget {

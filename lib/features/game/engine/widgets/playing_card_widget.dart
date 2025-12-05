@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/features/game/models/card.dart';
+import 'package:myapp/features/game/engine/models/card.dart';
 
 /// Widget to display a single playing card
 class PlayingCardWidget extends StatelessWidget {
@@ -26,34 +26,45 @@ class PlayingCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return GestureDetector(
-      onTap: isPlayable && !isFaceDown ? onTap : null,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: isFaceDown ? Colors.blue.shade800 : Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : Colors.grey.shade400,
-            width: isSelected ? 3 : 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.8, end: 1.0),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutBack,
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          child: child,
+        );
+      },
+      child: GestureDetector(
+        onTap: isPlayable && !isFaceDown ? onTap : null,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            color: isFaceDown ? Colors.blue.shade800 : Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : Colors.grey.shade400,
+              width: isSelected ? 3 : 1.5,
             ),
-          ],
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: isFaceDown
+              ? _buildCardBack(theme)
+              : card != null
+                  ? _buildCardFace(card!, theme)
+                  : _buildEmptyCard(theme),
         ),
-        child: isFaceDown
-            ? _buildCardBack(theme)
-            : card != null
-                ? _buildCardFace(card!, theme)
-                : _buildEmptyCard(theme),
       ),
     );
   }
