@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:myapp/features/game/models/card.dart';
-import 'package:myapp/features/game/models/deck.dart';
+import 'package:myapp/features/game/engine/models/card.dart';
+import 'package:myapp/features/game/engine/models/deck.dart';
 import 'package:myapp/features/game/models/game_state.dart';
 import 'package:myapp/features/game/logic/call_break_logic.dart';
 import 'package:myapp/features/game/services/card_validation_service.dart';

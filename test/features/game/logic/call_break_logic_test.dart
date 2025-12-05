@@ -96,10 +96,11 @@ void main() {
         final scores = CallBreakLogic.calculateRoundScores(
           bids: bids,
           tricksWon: tricksWon,
+          pointValue: 1.0,
         );
 
-        // Score = Bid + (Extra * 0.1)
-        // 3 + 0.1 = 3.1
+        // Score = (Bid + (Extra * 0.1)) * pointValue
+        // (3 + 0.1) * 1.0 = 3.1
         expect(scores['p1'], 3.1);
       });
 
@@ -110,9 +111,10 @@ void main() {
         final scores = CallBreakLogic.calculateRoundScores(
           bids: bids,
           tricksWon: tricksWon,
+          pointValue: 1.0,
         );
 
-        // Score = -Bid
+        // Score = -Bid * pointValue
         expect(scores['p1'], -4.0);
       });
 
@@ -123,6 +125,7 @@ void main() {
         final scores = CallBreakLogic.calculateRoundScores(
           bids: bids,
           tricksWon: tricksWon,
+          pointValue: 1.0,
         );
 
         expect(scores['p1'], 5.0);
