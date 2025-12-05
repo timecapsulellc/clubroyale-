@@ -24,9 +24,22 @@ class PlayingCardWidget extends StatelessWidget {
 
   /// Get the asset path for a playing card
   String _getCardAssetPath(PlayingCard card) {
-    final rank = card.rank.displayString.toLowerCase();
+    // Map rank to file naming convention
+    final String rankName;
+    switch (card.rank) {
+      case CardRank.ace:
+        rankName = 'ace';
+      case CardRank.king:
+        rankName = 'king';
+      case CardRank.queen:
+        rankName = 'queen';
+      case CardRank.jack:
+        rankName = 'jack';
+      default:
+        rankName = card.rank.value.toString(); // 2-10
+    }
     final suit = card.suit.name; // clubs, diamonds, hearts, spades
-    return 'assets/cards/png/${rank}_of_$suit.png';
+    return 'assets/cards/png/${rankName}_of_$suit.png';
   }
 
   @override

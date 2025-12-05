@@ -18,6 +18,7 @@ import 'features/ledger/ledger_screen.dart';
 import 'features/auth/auth_gate.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/profile/profile_screen.dart';
+import 'features/wallet/wallet_screen.dart';
 import 'config/revenuecat_config.dart';
 
 // 1. Define your routes
@@ -82,6 +83,12 @@ final GoRouter _router = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             final String gameId = state.pathParameters['gameId']!;
             return CallBreakGameScreen(gameId: gameId);
+          },
+        ),
+        GoRoute(
+          path: 'wallet',
+          builder: (BuildContext context, GoRouterState state) {
+            return const WalletScreen();
           },
         ),
       ],

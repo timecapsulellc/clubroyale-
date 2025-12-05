@@ -1,6 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/features/game/engine/models/card.dart';
 
+/// Helper to get asset path
+String _getCardAssetPath(PlayingCard card) {
+  String rankStr;
+  switch (card.rank) {
+    case CardRank.ace:
+      rankStr = 'ace';
+      break;
+    case CardRank.jack:
+      rankStr = 'jack';
+      break;
+    case CardRank.queen:
+      rankStr = 'queen';
+      break;
+    case CardRank.king:
+      rankStr = 'king';
+      break;
+    default:
+      rankStr = card.rank.value.toString();
+  }
+  return 'assets/cards/png/${rankStr}_of_${card.suit.name}.png';
+}
+
 /// Widget to display a single playing card
 class PlayingCardWidget extends StatelessWidget {
   final PlayingCard card;
@@ -22,9 +44,6 @@ class PlayingCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isRed = card.suit.isRed;
-
     return GestureDetector(
       onTap: isPlayable ? onTap : null,
       child: AnimatedContainer(
@@ -35,51 +54,84 @@ class PlayingCardWidget extends StatelessWidget {
             ? (Matrix4.identity()..translate(0.0, -12.0))
             : Matrix4.identity(),
         decoration: BoxDecoration(
-          color: Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected
-                ? colorScheme.primary
-                : isPlayable
-                    ? Colors.grey.shade300
-                    : Colors.grey.shade200,
-            width: isSelected ? 2 : 1,
-          ),
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? colorScheme.primary.withValues(alpha: 0.3)
-                  : Colors.black.withValues(alpha: 0.1),
-              blurRadius: isSelected ? 8 : 4,
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.4)
+                  : Colors.black.withValues(alpha: 0.2),
+              blurRadius: isSelected ? 12 : 4,
               offset: Offset(0, isSelected ? 4 : 2),
             ),
           ],
         ),
         child: Opacity(
-          opacity: isPlayable ? 1.0 : 0.5,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Rank
-              Text(
-                card.rank.displayString,
-                style: TextStyle(
-                  fontSize: width * 0.35,
-                  fontWeight: FontWeight.bold,
-                  color: isRed ? Colors.red : Colors.black,
-                ),
-              ),
-              // Suit
-              Text(
-                card.suit.symbol,
-                style: TextStyle(
-                  fontSize: width * 0.4,
-                  color: isRed ? Colors.red : Colors.black,
-                ),
-              ),
-            ],
+          opacity: isPlayable ? 1.0 : 0.6,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              _getCardAssetPath(card),
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                // Fallback to basic rendering
+                return _BasicCard(card: card, isSelected: isSelected, isPlayable: isPlayable);
+              },
+            ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _BasicCard extends StatelessWidget {
+  final PlayingCard card;
+  final bool isSelected;
+  final bool isPlayable;
+
+  const _BasicCard({
+    required this.card,
+    required this.isSelected,
+    required this.isPlayable,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isRed = card.suit.isRed;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isSelected
+              ? colorScheme.primary
+              : isPlayable
+                  ? Colors.grey.shade300
+                  : Colors.grey.shade200,
+          width: isSelected ? 2 : 1,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            card.rank.displayString,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: isRed ? Colors.red : Colors.black,
+            ),
+          ),
+          Text(
+            card.suit.symbol,
+            style: TextStyle(
+              fontSize: 20,
+              color: isRed ? Colors.red : Colors.black,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -102,36 +154,40 @@ class CardBackWidget extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.blue.shade700, Colors.blue.shade900],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Center(
-        child: Container(
-          width: width * 0.7,
-          height: height * 0.8,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Center(
-            child: Icon(
-              Icons.diamond,
-              color: Colors.white.withValues(alpha: 0.5),
-              size: width * 0.4,
-            ),
-          ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.asset(
+          'assets/cards/png/back.png',
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blue.shade700, Colors.blue.shade900],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.diamond,
+                  color: Colors.white.withOpacity(0.5),
+                  size: width * 0.4,
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -229,44 +285,34 @@ class MiniCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRed = card.suit.isRed;
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           width: 50,
-          height: 70,
+          height: 70, // Standardize height
           decoration: BoxDecoration(
-            color: Colors.white,
             borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: Colors.grey.shade300),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
+                color: Colors.black.withOpacity(0.1),
                 blurRadius: 2,
               ),
             ],
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                card.rank.displayString,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: isRed ? Colors.red : Colors.black,
-                ),
-              ),
-              Text(
-                card.suit.symbol,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: isRed ? Colors.red : Colors.black,
-                ),
-              ),
-            ],
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Image.asset(
+              _getCardAssetPath(card),
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return _BasicCard(
+                     card: card, 
+                     isSelected: false, 
+                     isPlayable: true
+                );
+              },
+            ),
           ),
         ),
         if (playerName != null)
