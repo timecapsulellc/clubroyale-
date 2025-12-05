@@ -1,137 +1,223 @@
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:myapp/features/game/game_room.dart';
+import 'package:myapp/features/game/game_config.dart';
+import 'package:myapp/features/profile/user_profile.dart';
 
 void main() {
   group('GameRoom Model Tests', () {
-    test('should create GameRoom from JSON', () {
+    test('should create GameRoom from JSON with player ready status', () {
       final json = {
-        'name': 'Test Game',
+        'id': 'room1',
+        'name': 'Test Room',
+        'hostId': 'user1',
+        'roomCode': '123456',
+        'status': 'waiting',
+        'config': {
+          'pointValue': 10.0,
+          'maxPlayers': 4,
+          'allowAds': true,
+          'totalRounds': 5,
+          'bootAmount': 0,
+        },
         'players': [
-          {'id': 'player1', 'name': 'Alice'},
-          {'id': 'player2', 'name': 'Bob'},
+          {
+            'id': 'user1',
+            'name': 'Player 1',
+            'profile': null,
+            'isReady': true,
+          },
+          {
+            'id': 'user2',
+            'name': 'Player 2',
+            'profile': null,
+            'isReady': false,
+          },
         ],
-        'scores': {'player1': 10, 'player2': 5},
+        'scores': {'user1': 0, 'user2': 0},
         'isFinished': false,
-        'createdAt': '2024-01-01T00:00:00.000Z',
+        'currentRound': 1,
       };
 
-      final gameRoom = GameRoom.fromJson(json);
+      final room = GameRoom.fromJson(json);
 
-      expect(gameRoom.name, 'Test Game');
-      expect(gameRoom.players.length, 2);
-      expect(gameRoom.players[0].name, 'Alice');
-      expect(gameRoom.players[1].name, 'Bob');
-      expect(gameRoom.scores['player1'], 10);
-      expect(gameRoom.scores['player2'], 5);
-      expect(gameRoom.isFinished, false);
+      expect(room.name, 'Test Room');
+      expect(room.players.length, 2);
+      expect(room.players[0].isReady, true);
+      expect(room.players[1].isReady, false);
     });
 
-    test('should convert GameRoom to JSON', () {
-      final gameRoom = GameRoom(
-        id: 'game1',
-        name: 'Test Game',
+    test('should convert GameRoom with ready status to JSON', () {
+      final room = GameRoom(
+        name: 'Test Room',
+        hostId: 'user1',
         players: [
-          const Player(id: 'player1', name: 'Alice'),
-          const Player(id: 'player2', name: 'Bob'),
+          const Player(id: 'user1', name: 'Player 1', isReady: true),
+          const Player(id: 'user2', name: 'Player 2', isReady: false),
         ],
-        scores: {'player1': 10, 'player2': 5},
-        isFinished: false,
-        createdAt: DateTime(2024, 1, 1),
+        scores: {'user1': 0, 'user2': 0},
       );
 
-      final json = gameRoom.toJson();
+      final json = room.toJson();
 
-      expect(json['name'], 'Test Game');
-      expect(json['players'].length, 2);
-      expect(json['scores']['player1'], 10);
-      expect(json['isFinished'], false);
+      expect(json['players'], isA<List>());
+      final playerList = json['players'] as List;
+      expect(playerList[0]['isReady'], true);
+      expect(playerList[1]['isReady'], false);
     });
 
-    test('should create copy with modified fields', () {
-      final original = GameRoom(
-        name: 'Original',
-        players: [const Player(id: 'p1', name: 'Player 1')],
-        scores: {'p1': 0},
-        createdAt: DateTime.now(),
+    test('allPlayersReady should return true when all players are ready', () {
+      final room = GameRoom(
+        name: 'Test Room',
+        hostId: 'user1',
+        players: [
+          const Player(id: 'user1', name: 'Player 1', isReady: true),
+          const Player(id: 'user2', name: 'Player 2', isReady: true),
+        ],
+        scores: {'user1': 0, 'user2': 0},
       );
 
-      final modified = original.copyWith(
-        id: 'new-id',
-        name: 'Modified',
-        scores: {'p1': 100},
-      );
-
-      expect(modified.id, 'new-id');
-      expect(modified.name, 'Modified');
-      expect(modified.scores['p1'], 100);
-      // Original should be unchanged
-      expect(original.name, 'Original');
-      expect(original.scores['p1'], 0);
+      expect(room.allPlayersReady, true);
     });
 
-    test('isFinished should default to false', () {
-      final gameRoom = GameRoom(
-        name: 'Test',
+    test('allPlayersReady should return false when some players not ready', () {
+      final room = GameRoom(
+        name: 'Test Room',
+        hostId: 'user1',
+        players: [
+          const Player(id: 'user1', name: 'Player 1', isReady: true),
+          const Player(id: 'user2', name: 'Player 2', isReady: false),
+        ],
+        scores: {'user1': 0, 'user2': 0},
+      );
+
+      expect(room.allPlayersReady, false);
+    });
+
+    test('allPlayersReady should return false when room is empty', () {
+      final room = GameRoom(
+        name: 'Test Room',
+        hostId: 'user1',
         players: [],
         scores: {},
-        createdAt: DateTime.now(),
       );
 
-      expect(gameRoom.isFinished, false);
+      expect(room.allPlayersReady, false);
+    });
+
+    test('canStart should return true when minimum players and all ready', () {
+      final room = GameRoom(
+        name: 'Test Room',
+        hostId: 'user1',
+        players: [
+          const Player(id: 'user1', name: 'Player 1', isReady: true),
+          const Player(id: 'user2', name: 'Player 2', isReady: true),
+        ],
+        scores: {'user1': 0, 'user2': 0},
+      );
+
+      expect(room.canStart, true);
+    });
+
+    test('canStart should return false when only one player', () {
+      final room = GameRoom(
+        name: 'Test Room',
+        hostId: 'user1',
+        players: [
+          const Player(id: 'user1', name: 'Player 1', isReady: true),
+        ],
+        scores: {'user1': 0},
+      );
+
+      expect(room.canStart, false);
+    });
+
+    test('canStart should return false when not all ready', () {
+      final room = GameRoom(
+        name: 'Test Room',
+        hostId: 'user1',
+        players: [
+          const Player(id: 'user1', name: 'Player 1', isReady: true),
+          const Player(id: 'user2', name: 'Player 2', isReady: false),
+        ],
+        scores: {'user1': 0, 'user2': 0},
+      );
+
+      expect(room.canStart, false);
     });
   });
 
   group('Player Model Tests', () {
-    test('should create Player from JSON', () {
+    test('should create Player with default isReady false', () {
+      const player = Player(id: 'user1', name: 'Player 1');
+
+      expect(player.isReady, false);
+    });
+
+    test('should create Player with explicit isReady true', () {
+      const player = Player(id: 'user1', name: 'Player 1', isReady: true);
+
+      expect(player.isReady, true);
+    });
+
+    test('should create Player from JSON with isReady', () {
       final json = {
-        'id': 'player1',
-        'name': 'Alice',
+        'id': 'user1',
+        'name': 'Player 1',
+        'profile': null,
+        'isReady': true,
       };
 
       final player = Player.fromJson(json);
 
-      expect(player.id, 'player1');
-      expect(player.name, 'Alice');
-      expect(player.profile, null);
+      expect(player.id, 'user1');
+      expect(player.name, 'Player 1');
+      expect(player.isReady, true);
     });
 
-    test('should create Player with profile', () {
+    test('should handle missing isReady in JSON (defaults to false)', () {
       final json = {
-        'id': 'player1',
-        'name': 'Alice',
-        'profile': {
-          'id': 'player1',
-          'displayName': 'Alice Smith',
-          'avatarUrl': 'https://example.com/avatar.jpg',
-        },
+        'id': 'user1',
+        'name': 'Player 1',
       };
 
       final player = Player.fromJson(json);
 
-      expect(player.id, 'player1');
-      expect(player.name, 'Alice');
-      expect(player.profile?.displayName, 'Alice Smith');
-      expect(player.profile?.avatarUrl, 'https://example.com/avatar.jpg');
+      expect(player.isReady, false);
     });
 
-    test('should convert Player to JSON', () {
-      const player = Player(id: 'player1', name: 'Alice');
+    test('should convert Player to JSON with isReady', () {
+      const player = Player(id: 'user1', name: 'Player 1', isReady: true);
+
       final json = player.toJson();
 
-      expect(json['id'], 'player1');
-      expect(json['name'], 'Alice');
+      expect(json['isReady'], true);
     });
 
-    test('should create copy with profile', () {
-      const original = Player(id: 'p1', name: 'Player');
+    test('should update isReady with copyWith', () {
+      const player = Player(id: 'user1', name: 'Player 1', isReady: false);
 
-      // Note: This test assumes copyWith exists on Player
-      // If using Freezed, this should work
-      final withId = original.copyWith(name: 'New Name');
+      final updatedPlayer = player.copyWith(isReady: true);
 
-      expect(withId.id, 'p1');
-      expect(withId.name, 'New Name');
+      expect(updatedPlayer.isReady, true);
+      expect(player.isReady, false); // Original unchanged
+    });
+
+    test('should create player with profile and ready status', () {
+      const profile = UserProfile(
+        id: 'user1',
+        displayName: 'John Doe',
+        avatarUrl: 'https://example.com/avatar.jpg',
+      );
+
+      const player = Player(
+        id: 'user1',
+        name: 'Player 1',
+        profile: profile,
+        isReady: true,
+      );
+
+      expect(player.profile, profile);
+      expect(player.isReady, true);
     });
   });
 }

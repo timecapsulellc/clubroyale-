@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'game_service.dart';
 import 'game_room.dart';
+import 'game_config.dart';
+import 'call_break_service.dart';
 import '../auth/auth_service.dart';
 import '../lobby/lobby_service.dart';
 
@@ -159,6 +162,48 @@ class _GameScreenState extends ConsumerState<GameScreen>
     }
   }
 
+  /// Share room code via WhatsApp or other apps
+  void _shareRoomCode(GameRoom game) {
+    if (game.roomCode == null) return;
+    
+    Share.share(
+      'Join my TaasClub game!\n\n'
+      '🎮 Room: ${game.name}\n'
+      '🔢 Code: ${game.roomCode}\n'
+      '💰 Point Value: ${game.config.pointValue.toInt()} units\n\n'
+      'Open the app and enter this code to join!',
+      subject: 'Join my game: ${game.name}',
+    );
+  }
+
+  /// Start the game (host only) - changes status from waiting to playing and deals cards
+  Future<void> _startGame(BuildContext context) async {
+    final lobbyService = ref.read(lobbyServiceProvider);
+    final callBreakService = ref.read(callBreakServiceProvider);
+    
+    // Start the game (change status)
+    await lobbyService.startGame(widget.gameId);
+    
+    // Get player IDs and deal first round
+    final gameAsyncValue = ref.read(gameProvider(widget.gameId));
+    gameAsyncValue.whenData((game) async {
+      if (game != null) {
+        final playerIds = game.players.map((p) => p.id).toList();
+        await callBreakService.startNewRound(widget.gameId, playerIds);
+      }
+    });
+    
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('🃏 Cards dealt! Tap "Play Cards" to start bidding.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final gameAsyncValue = ref.watch(gameProvider(widget.gameId));
@@ -213,6 +258,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
             );
           }
 
+          // Check if waiting for more players
+          final isWaiting = game.status == GameStatus.waiting;
+          final isHost = game.hostId == currentUserId;
+          final needsMorePlayers = game.players.length < 2;
+
           // Sort players by score
           final sortedPlayers = List<Player>.from(game.players)
             ..sort((a, b) =>
@@ -220,7 +270,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
           return Column(
             children: [
-              // Game Header
+              // Game Header with room code and config
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
@@ -233,27 +283,124 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 ),
                 child: Column(
                   children: [
-                    Text(
-                      game.name,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.people,
-                            size: 18, color: colorScheme.onSurfaceVariant),
+                        Text(
+                          game.name,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (isHost)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: Chip(
+                              avatar: const Icon(Icons.star, size: 14, color: Colors.amber),
+                              label: const Text('Host'),
+                              backgroundColor: Colors.amber.withOpacity(0.2),
+                              labelStyle: theme.textTheme.labelSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Room Code display
+                    if (game.roomCode != null)
+                      GestureDetector(
+                        onTap: () => _shareRoomCode(game),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: colorScheme.outline.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.pin, size: 16, color: colorScheme.primary),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Code: ${game.roomCode}',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontFamily: 'monospace',
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.primary,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(Icons.share, size: 16, color: colorScheme.primary),
+                            ],
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 8),
+                    // Game info row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.people, size: 18, color: colorScheme.onSurfaceVariant),
                         const SizedBox(width: 4),
                         Text(
-                          '${game.players.length} players',
+                          '${game.players.length}/${game.config.maxPlayers}',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Icon(Icons.monetization_on, size: 18, color: colorScheme.secondary),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${game.config.pointValue.toInt()} units/pt',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.secondary,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Icon(Icons.repeat, size: 18, color: colorScheme.onSurfaceVariant),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${game.config.totalRounds} rounds',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
                     ),
+                    // Status indicator
+                    if (isWaiting)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(
+                                width: 12,
+                                height: 12,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                needsMorePlayers 
+                                    ? 'Waiting for players to join...'
+                                    : 'Ready to start!',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: Colors.orange.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -335,17 +482,75 @@ class _GameScreenState extends ConsumerState<GameScreen>
           ),
         ),
       ),
-      floatingActionButton: ScaleTransition(
-        scale: CurvedAnimation(
-          parent: _fabController,
-          curve: Curves.elasticOut,
-        ),
-        child: FloatingActionButton.extended(
-          onPressed: () => _confirmFinishGame(context),
-          backgroundColor: colorScheme.primary,
-          icon: const Icon(Icons.flag),
-          label: const Text('Finish Game'),
-        ),
+      floatingActionButton: gameAsyncValue.maybeWhen(
+        data: (game) {
+          if (game == null) return null;
+          final isHost = game.hostId == currentUserId;
+          final isWaiting = game.status == GameStatus.waiting;
+          final isPlaying = game.status == GameStatus.playing;
+          
+          // Show Start Game button when waiting and enough players (need exactly 4 for Call Break)
+          if (isWaiting && isHost && game.players.length >= 4) {
+            return ScaleTransition(
+              scale: CurvedAnimation(
+                parent: _fabController,
+                curve: Curves.elasticOut,
+              ),
+              child: FloatingActionButton.extended(
+                onPressed: () => _startGame(context),
+                backgroundColor: Colors.green,
+                icon: const Icon(Icons.play_arrow),
+                label: const Text('Start Game'),
+              ),
+            );
+          }
+          
+          // Show "Play Cards" button for all players when game is playing
+          if (isPlaying) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Play Cards button - enter Call Break game
+                FloatingActionButton.extended(
+                  heroTag: 'play_cards',
+                  onPressed: () => context.go('/game/${widget.gameId}/play'),
+                  backgroundColor: Colors.deepPurple,
+                  icon: const Icon(Icons.casino),
+                  label: const Text('Play Cards'),
+                ),
+                const SizedBox(height: 12),
+                // Finish Game button (host only)
+                if (isHost)
+                  ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _fabController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: FloatingActionButton.extended(
+                      heroTag: 'finish_game',
+                      onPressed: () => _confirmFinishGame(context),
+                      backgroundColor: colorScheme.primary,
+                      icon: const Icon(Icons.flag),
+                      label: const Text('Finish Game'),
+                    ),
+                  ),
+              ],
+            );
+          }
+          
+          // Waiting state - show waiting message for non-hosts
+          if (isWaiting && !isHost) {
+            return FloatingActionButton.extended(
+              onPressed: null,
+              backgroundColor: Colors.grey,
+              icon: const Icon(Icons.hourglass_empty),
+              label: const Text('Waiting for host...'),
+            );
+          }
+          
+          return null;
+        },
+        orElse: () => null,
       ),
     );
   }

@@ -96,6 +96,25 @@ dart run build_runner build --delete-conflicting-outputs
 firebase deploy --only firestore:rules
 ```
 
+## Documentation
+
+### 🚀 New to the Project?
+- **[🎯 Getting Started Guide](docs/GETTING_STARTED.md)** - **START HERE** - Complete onboarding for new developers
+
+### 📋 Development Planning
+- **[📌 Implementation Tasks](docs/IMPLEMENTATION_TASKS.md)** - Complete actionable checklist for all phases
+- **[Development Roadmap](docs/DEVELOPMENT_ROADMAP.md)** - Complete 8-phase development plan
+- **[Clone Strategy Quick Start](docs/CLONE_STRATEGY_QUICK_START.md)** - TL;DR on what to clone vs. build
+- **[Card Engine Selection Guide](docs/CARD_ENGINE_SELECTION.md)** - How to find and integrate card game engines
+- **[Phase 3 Checklist](docs/PHASE_3_CHECKLIST.md)** - Step-by-step implementation guide for cloning card engine
+
+### 💎 Technical Guides
+- **[RevenueCat Setup](docs/REVENUECAT_SETUP.md)** - In-app purchase configuration
+- **[Blueprint](blueprint.md)** - Project architecture overview
+
+### 🎯 Current Focus
+**Phase 3:** Clone an open-source Call Break or card game engine to extract card assets and game logic. See [Clone Strategy](docs/CLONE_STRATEGY_QUICK_START.md) for details.
+
 ## Contributing
 
 1. Fork the repository

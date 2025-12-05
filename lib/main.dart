@@ -7,13 +7,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:myapp/firebase_options.dart';
 
 import 'features/lobby/lobby_screen.dart';
+import 'features/lobby/room_waiting_screen.dart';
 import 'features/game/game_screen.dart';
 import 'features/game/game_history_screen.dart';
+import 'features/game/call_break_game_screen.dart';
 import 'features/leaderboard/leaderboard_screen.dart';
 import 'features/ledger/ledger_screen.dart';
 import 'features/auth/auth_gate.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/profile/profile_screen.dart';
+import 'config/revenuecat_config.dart';
 
 // 1. Define your routes
 final GoRouter _router = GoRouter(
@@ -34,6 +37,13 @@ final GoRouter _router = GoRouter(
           path: 'lobby',
           builder: (BuildContext context, GoRouterState state) {
             return const LobbyScreen();
+          },
+        ),
+        GoRoute(
+          path: 'lobby/:roomId',
+          builder: (BuildContext context, GoRouterState state) {
+            final String roomId = state.pathParameters['roomId']!;
+            return RoomWaitingScreen(roomId: roomId);
           },
         ),
         GoRoute(
@@ -65,6 +75,13 @@ final GoRouter _router = GoRouter(
             return const ProfileScreen();
           },
         ),
+        GoRoute(
+          path: 'game/:gameId/play',
+          builder: (BuildContext context, GoRouterState state) {
+            final String gameId = state.pathParameters['gameId']!;
+            return CallBreakGameScreen(gameId: gameId);
+          },
+        ),
       ],
     ),
   ],
@@ -75,6 +92,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Initialize RevenueCat (will skip if not configured)
+  await RevenueCatConfig.initialize();
   runApp(
     const ProviderScope(
       child: MyApp(),

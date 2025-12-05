@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 
 import '../auth/auth_service.dart';
+import '../wallet/diamond_balance_widget.dart';
 import 'profile_service.dart';
 import 'user_profile.dart';
 
@@ -53,6 +54,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
+        actions: const [
+          DiamondBalanceBadge(),
+          SizedBox(width: 8),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
