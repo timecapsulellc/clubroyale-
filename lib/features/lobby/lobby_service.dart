@@ -150,7 +150,7 @@ class LobbyService {
       }
       
       // Use CallBreakService to initialize the game with dealt cards
-      final callBreakService = CallBreakService();
+      final callBreakService = _ref.read(callBreakServiceProvider);
       await callBreakService.startNewRound(gameId, playerIds);
       
       // Update status to playing

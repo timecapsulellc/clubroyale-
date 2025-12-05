@@ -1,9 +1,9 @@
-
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:myapp/features/profile/user_profile.dart';
+import 'package:myapp/features/game/engine/models/card.dart';
+import 'package:myapp/features/game/engine/models/deck.dart';
 import 'game_config.dart';
-import 'models/card.dart';
-import 'models/deck.dart';
 import 'models/game_state.dart';
 
 part 'game_room.freezed.dart';

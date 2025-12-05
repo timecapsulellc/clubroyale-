@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:myapp/features/game/game_room.dart';
+import 'package:myapp/features/game/game_service.dart';
 import 'package:myapp/features/game/call_break_service.dart';
 import 'package:myapp/features/game/models/game_state.dart';
-import 'package:myapp/features/game/providers/game_state_provider.dart';
 import 'package:myapp/features/game/services/card_validation_service.dart';
 
 final botServiceProvider = Provider((ref) => BotService(ref));
@@ -20,11 +21,10 @@ class BotService {
     stopMonitoring();
     debugPrint('BotService: Started monitoring game $gameId');
 
-    _subscription = _ref.read(currentGameProvider(gameId).stream).listen((gameAsync) {
-      gameAsync.whenData((game) {
-        if (game == null) return;
-        _checkForBotTurn(game);
-      });
+    final gameService = _ref.read(gameServiceProvider);
+    _subscription = gameService.getGameStream(gameId).listen((game) {
+      if (game == null) return;
+      _checkForBotTurn(game);
     });
   }
 
