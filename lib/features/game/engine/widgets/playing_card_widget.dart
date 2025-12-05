@@ -22,6 +22,13 @@ class PlayingCardWidget extends StatelessWidget {
     this.height = 90,
   });
 
+  /// Get the asset path for a playing card
+  String _getCardAssetPath(PlayingCard card) {
+    final rank = card.rank.displayString.toLowerCase();
+    final suit = card.suit.name; // clubs, diamonds, hearts, spades
+    return 'assets/cards/png/${rank}_of_$suit.png';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -43,13 +50,12 @@ class PlayingCardWidget extends StatelessWidget {
           width: width,
           height: height,
           decoration: BoxDecoration(
-            color: isFaceDown ? Colors.blue.shade800 : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isSelected
                   ? theme.colorScheme.primary
-                  : Colors.grey.shade400,
-              width: isSelected ? 3 : 1.5,
+                  : Colors.transparent,
+              width: isSelected ? 3 : 0,
             ),
             boxShadow: [
               BoxShadow(
@@ -59,76 +65,70 @@ class PlayingCardWidget extends StatelessWidget {
               ),
             ],
           ),
-          child: isFaceDown
-              ? _buildCardBack(theme)
-              : card != null
-                  ? _buildCardFace(card!, theme)
-                  : _buildEmptyCard(theme),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: isFaceDown
+                ? _buildCardBack(theme)
+                : card != null
+                    ? _buildCardFace(card!, theme)
+                    : _buildEmptyCard(theme),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildCardBack(ThemeData theme) {
-    return Center(
-      child: Icon(
-        Icons.casino,
-        color: Colors.white,
-        size: width * 0.4,
-      ),
+    return Image.asset(
+      'assets/cards/png/back.png',
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        // Fallback to custom rendering if asset not found
+        return Container(
+          color: Colors.blue.shade800,
+          child: Center(
+            child: Icon(
+              Icons.casino,
+              color: Colors.white,
+              size: width * 0.4,
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildCardFace(PlayingCard card, ThemeData theme) {
+    return Opacity(
+      opacity: isPlayable ? 1.0 : 0.5,
+      child: Image.asset(
+        _getCardAssetPath(card),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          // Fallback to custom rendering if asset not found
+          return _buildCustomCardFace(card, theme);
+        },
+      ),
+    );
+  }
+
+  /// Fallback custom rendering (original implementation)
+  Widget _buildCustomCardFace(PlayingCard card, ThemeData theme) {
     final color = card.suit.isRed ? Colors.red.shade700 : Colors.black87;
     final isDisabled = !isPlayable;
 
-    return Opacity(
-      opacity: isDisabled ? 0.5 : 1.0,
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Top rank and suit
-            Align(
-              alignment: Alignment.topLeft,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    card.rank.displayString,
-                    style: TextStyle(
-                      fontSize: width * 0.25,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                      height: 1.0,
-                    ),
-                  ),
-                  Text(
-                    card.suit.symbol,
-                    style: TextStyle(
-                      fontSize: width * 0.25,
-                      color: color,
-                      height: 1.0,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Center suit symbol
-            Text(
-              card.suit.symbol,
-              style: TextStyle(
-                fontSize: width * 0.5,
-                color: color.withOpacity(0.3),
-              ),
-            ),
-            // Bottom rank and suit (rotated)
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Transform.rotate(
-                angle: 3.14159, // 180 degrees
+    return Container(
+      color: Colors.white,
+      child: Opacity(
+        opacity: isDisabled ? 0.5 : 1.0,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Top rank and suit
+              Align(
+                alignment: Alignment.topLeft,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -152,19 +152,59 @@ class PlayingCardWidget extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-          ],
+              // Center suit symbol
+              Text(
+                card.suit.symbol,
+                style: TextStyle(
+                  fontSize: width * 0.5,
+                  color: color.withOpacity(0.3),
+                ),
+              ),
+              // Bottom rank and suit (rotated)
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Transform.rotate(
+                  angle: 3.14159, // 180 degrees
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        card.rank.displayString,
+                        style: TextStyle(
+                          fontSize: width * 0.25,
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                          height: 1.0,
+                        ),
+                      ),
+                      Text(
+                        card.suit.symbol,
+                        style: TextStyle(
+                          fontSize: width * 0.25,
+                          color: color,
+                          height: 1.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildEmptyCard(ThemeData theme) {
-    return Center(
-      child: Icon(
-        Icons.crop_portrait,
-        color: Colors.grey.shade300,
-        size: width * 0.4,
+    return Container(
+      color: Colors.grey.shade200,
+      child: Center(
+        child: Icon(
+          Icons.crop_portrait,
+          color: Colors.grey.shade300,
+          size: width * 0.4,
+        ),
       ),
     );
   }
