@@ -39,6 +39,8 @@ dependencies:
   # Phase 7: Polish
   audioplayers: ^5.2.1
   shared_preferences: ^2.2.2
+  firebase_analytics: ^12.0.4
+  firebase_crashlytics: ^5.0.5
 
 dev_dependencies:
   flutter_test:
