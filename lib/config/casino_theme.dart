@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 /// Casino-themed color palette for premium gaming experience
 class CasinoColors {
   // Primary Colors - Green Felt Theme
-  static const Color deepPurple = Color(0xFF0d2818); // Dark green (was purple)
-  static const Color darkPurple = Color(0xFF061a0f); // Very dark green
-  static const Color richPurple = Color(0xFF1a4f2e); // Rich green
+  static const Color deepPurple = Color(0xFF0a1f12); // Dark green (was purple)
+  static const Color darkPurple = Color(0xFF030d08); // Very dark green - DARKER
+  static const Color richPurple = Color(0xFF143823); // Rich green
   
   // Green Felt Table Colors
   static const Color feltGreenDark = Color(0xFF0d2818);
@@ -25,9 +25,9 @@ class CasinoColors {
   static const Color silverGray = Color(0xFF9e9e9e);
   
   // Surface Colors
-  static const Color cardBackground = Color(0xFF1a3d28);
-  static const Color cardBackgroundLight = Color(0xFF245038);
-  static const Color surfaceDark = Color(0xFF0a1f12);
+  static const Color cardBackground = Color(0xFF122b1c); // Slightly lighter for contrast
+  static const Color cardBackgroundLight = Color(0xFF1d4230); // More visible
+  static const Color surfaceDark = Color(0xFF061209);
   
   // Gradients - Green Felt
   static const LinearGradient primaryGradient = LinearGradient(
