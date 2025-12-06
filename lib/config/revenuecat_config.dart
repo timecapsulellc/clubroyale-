@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
@@ -26,9 +25,9 @@ class RevenueCatConfig {
       
       // Configure SDK based on platform
       PurchasesConfiguration configuration;
-      if (Platform.isIOS) {
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
         configuration = PurchasesConfiguration(_iosApiKey);
-      } else if (Platform.isAndroid) {
+      } else if (defaultTargetPlatform == TargetPlatform.android) {
         configuration = PurchasesConfiguration(_androidApiKey);
       } else {
         debugPrint('RevenueCat: Platform not supported');
@@ -48,6 +47,8 @@ class RevenueCatConfig {
   /// Set user identifier for RevenueCat
   /// Call this after user signs in
   static Future<void> setUserId(String userId) async {
+    if (kIsWeb) return; // Skip on web
+
     try {
       await Purchases.logIn(userId);
       debugPrint('RevenueCat: User logged in - $userId');
@@ -59,6 +60,8 @@ class RevenueCatConfig {
   /// Clear user identifier
   /// Call this when user signs out
   static Future<void> clearUserId() async {
+    if (kIsWeb) return; // Skip on web
+
     try {
       await Purchases.logOut();
       debugPrint('RevenueCat: User logged out');
@@ -69,6 +72,8 @@ class RevenueCatConfig {
   
   /// Get current customer info
   static Future<CustomerInfo?> getCustomerInfo() async {
+    if (kIsWeb) return null; // Skip on web
+
     try {
       return await Purchases.getCustomerInfo();
     } catch (e) {

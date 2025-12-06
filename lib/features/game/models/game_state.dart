@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:myapp/features/game/engine/models/card.dart';
+import 'package:taasclub/features/game/engine/models/card.dart';
 
 part 'game_state.freezed.dart';
 part 'game_state.g.dart';
@@ -14,7 +14,7 @@ enum GamePhase {
 
 /// Player's bid for a round
 @freezed
-class Bid with _$Bid {
+abstract class Bid with _$Bid {
   const factory Bid({
     required String playerId,
     required int amount, // 1-13
@@ -25,7 +25,7 @@ class Bid with _$Bid {
 
 /// A single played card in a trick
 @freezed
-class PlayedCard with _$PlayedCard {
+abstract class PlayedCard with _$PlayedCard {
   const factory PlayedCard({
     required String playerId,
     required PlayingCard card,
@@ -37,7 +37,7 @@ class PlayedCard with _$PlayedCard {
 
 /// A trick in progress or completed
 @freezed
-class Trick with _$Trick {
+abstract class Trick with _$Trick {
   const Trick._();
 
   const factory Trick({
@@ -71,7 +71,7 @@ class Trick with _$Trick {
 
 /// Player's tricks won in current round
 @freezed
-class PlayerTricks with _$PlayerTricks {
+abstract class PlayerTricks with _$PlayerTricks {
   const factory PlayerTricks({
     required String playerId,
     @Default(0) int tricksWon,

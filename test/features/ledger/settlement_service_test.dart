@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:myapp/features/ledger/services/settlement_service.dart';
+import 'package:taasclub/features/ledger/services/settlement_service.dart';
 
 void main() {
   late SettlementService settlementService;

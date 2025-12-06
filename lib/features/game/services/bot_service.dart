@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:myapp/features/game/game_room.dart';
-import 'package:myapp/features/game/game_service.dart';
-import 'package:myapp/features/game/call_break_service.dart';
-import 'package:myapp/features/game/models/game_state.dart';
-import 'package:myapp/features/game/services/card_validation_service.dart';
+import 'package:taasclub/features/game/game_room.dart';
+import 'package:taasclub/features/game/game_service.dart';
+import 'package:taasclub/features/game/call_break_service.dart';
+import 'package:taasclub/features/game/models/game_state.dart';
+import 'package:taasclub/features/game/services/card_validation_service.dart';
 
 final botServiceProvider = Provider((ref) => BotService(ref));
 

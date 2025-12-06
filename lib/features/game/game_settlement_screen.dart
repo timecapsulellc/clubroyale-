@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:myapp/features/game/game_room.dart';
-import 'package:myapp/features/game/providers/game_state_provider.dart';
-import 'package:myapp/features/ledger/services/settlement_service.dart';
-import 'package:myapp/features/game/services/sound_service.dart';
+import 'package:taasclub/features/game/game_room.dart';
+import 'package:taasclub/features/game/providers/game_state_provider.dart';
+import 'package:taasclub/features/ledger/services/settlement_service.dart';
+import 'package:taasclub/features/game/services/sound_service.dart';
 
 class GameSettlementScreen extends ConsumerStatefulWidget {
   final String gameId;

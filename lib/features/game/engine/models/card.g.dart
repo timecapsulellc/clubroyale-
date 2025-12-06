@@ -6,13 +6,12 @@ part of 'card.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PlayingCardImpl _$$PlayingCardImplFromJson(Map<String, dynamic> json) =>
-    _$PlayingCardImpl(
-      suit: $enumDecode(_$CardSuitEnumMap, json['suit']),
-      rank: $enumDecode(_$CardRankEnumMap, json['rank']),
-    );
+_PlayingCard _$PlayingCardFromJson(Map<String, dynamic> json) => _PlayingCard(
+  suit: $enumDecode(_$CardSuitEnumMap, json['suit']),
+  rank: $enumDecode(_$CardRankEnumMap, json['rank']),
+);
 
-Map<String, dynamic> _$$PlayingCardImplToJson(_$PlayingCardImpl instance) =>
+Map<String, dynamic> _$PlayingCardToJson(_PlayingCard instance) =>
     <String, dynamic>{
       'suit': _$CardSuitEnumMap[instance.suit]!,
       'rank': _$CardRankEnumMap[instance.rank]!,

@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:myapp/features/auth/auth_service.dart';
-import 'package:myapp/features/wallet/diamond_service.dart';
-import 'package:myapp/features/wallet/diamond_wallet.dart';
+import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:taasclub/features/wallet/diamond_service.dart';
+import 'package:taasclub/features/wallet/diamond_wallet.dart';
 
 class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});

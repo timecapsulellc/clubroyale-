@@ -68,7 +68,7 @@ enum CardRank {
 
 /// Represents a playing card in the deck
 @freezed
-class PlayingCard with _$PlayingCard {
+abstract class PlayingCard with _$PlayingCard {
   const PlayingCard._();
 
   const factory PlayingCard({

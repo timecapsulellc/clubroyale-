@@ -6,8 +6,8 @@ part of 'diamond_wallet.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$DiamondWalletImpl _$$DiamondWalletImplFromJson(Map<String, dynamic> json) =>
-    _$DiamondWalletImpl(
+_DiamondWallet _$DiamondWalletFromJson(Map<String, dynamic> json) =>
+    _DiamondWallet(
       userId: json['userId'] as String,
       balance: (json['balance'] as num?)?.toInt() ?? 0,
       totalPurchased: (json['totalPurchased'] as num?)?.toInt() ?? 0,
@@ -17,7 +17,7 @@ _$DiamondWalletImpl _$$DiamondWalletImplFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['lastUpdated'] as String),
     );
 
-Map<String, dynamic> _$$DiamondWalletImplToJson(_$DiamondWalletImpl instance) =>
+Map<String, dynamic> _$DiamondWalletToJson(_DiamondWallet instance) =>
     <String, dynamic>{
       'userId': instance.userId,
       'balance': instance.balance,
@@ -26,9 +26,8 @@ Map<String, dynamic> _$$DiamondWalletImplToJson(_$DiamondWalletImpl instance) =>
       'lastUpdated': instance.lastUpdated?.toIso8601String(),
     };
 
-_$DiamondTransactionImpl _$$DiamondTransactionImplFromJson(
-        Map<String, dynamic> json) =>
-    _$DiamondTransactionImpl(
+_DiamondTransaction _$DiamondTransactionFromJson(Map<String, dynamic> json) =>
+    _DiamondTransaction(
       id: json['id'] as String,
       userId: json['userId'] as String,
       amount: (json['amount'] as num).toInt(),
@@ -38,8 +37,7 @@ _$DiamondTransactionImpl _$$DiamondTransactionImplFromJson(
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
 
-Map<String, dynamic> _$$DiamondTransactionImplToJson(
-        _$DiamondTransactionImpl instance) =>
+Map<String, dynamic> _$DiamondTransactionToJson(_DiamondTransaction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,

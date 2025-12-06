@@ -5,7 +5,7 @@ part 'game_config.g.dart';
 
 /// Game configuration set by the host when creating a room
 @freezed
-class GameConfig with _$GameConfig {
+abstract class GameConfig with _$GameConfig {
   const factory GameConfig({
     /// Point value in units (user mentally maps to currency)
     /// e.g., 1 point = 10 units

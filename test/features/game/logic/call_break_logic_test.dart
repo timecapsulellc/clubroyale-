@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:myapp/features/game/engine/models/card.dart';
-import 'package:myapp/features/game/logic/call_break_logic.dart';
-import 'package:myapp/features/game/models/game_state.dart';
+import 'package:taasclub/features/game/engine/models/card.dart';
+import 'package:taasclub/features/game/logic/call_break_logic.dart';
+import 'package:taasclub/features/game/models/game_state.dart';
 
 void main() {
   group('CallBreakLogic', () {

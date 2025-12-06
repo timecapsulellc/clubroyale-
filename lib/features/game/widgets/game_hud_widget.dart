@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/features/game/engine/models/card.dart';
-import 'package:myapp/features/game/models/game_state.dart';
-import 'package:myapp/features/game/game_room.dart';
+import 'package:taasclub/features/game/engine/models/card.dart';
+import 'package:taasclub/features/game/models/game_state.dart';
+import 'package:taasclub/features/game/game_room.dart';
 
 /// Heads-up display showing game information
 class GameHUDWidget extends StatelessWidget {

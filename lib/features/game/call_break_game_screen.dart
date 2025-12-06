@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:myapp/features/auth/auth_service.dart';
-import 'package:myapp/features/game/call_break_service.dart';
-import 'package:myapp/features/game/game_room.dart';
-import 'package:myapp/features/game/engine/models/card.dart';
-import 'package:myapp/features/game/models/game_state.dart';
-import 'package:myapp/features/lobby/lobby_service.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
+import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:taasclub/features/game/call_break_service.dart';
+import 'package:taasclub/features/game/game_room.dart';
+import 'package:taasclub/features/game/engine/models/card.dart';
+import 'package:taasclub/features/game/models/game_state.dart';
+import 'package:taasclub/features/lobby/lobby_service.dart';
+import 'package:taasclub/config/casino_theme.dart';
+import 'package:taasclub/config/visual_effects.dart';
 import 'widgets/card_widgets.dart';
 import 'widgets/bidding_dialog.dart';
 import 'widgets/game_table_widgets.dart';
+import 'widgets/player_avatar.dart';
 
-import 'package:myapp/features/game/services/bot_service.dart';
+import 'package:taasclub/features/game/services/bot_service.dart';
+
+// RTC, Chat, and AI imports
+import 'package:taasclub/features/chat/widgets/chat_overlay.dart';
+import 'package:taasclub/features/chat/chat_service.dart';
+import 'package:taasclub/features/rtc/widgets/audio_controls.dart';
+import 'package:taasclub/features/rtc/signaling_service.dart';
+import 'package:taasclub/features/ai/ai_service.dart';
+import 'package:taasclub/features/ai/ai_tip_widget.dart';
 
 /// Main screen for Call Break gameplay
 class CallBreakGameScreen extends ConsumerStatefulWidget {
@@ -26,6 +39,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
   PlayingCard? _selectedCard;
   bool _isProcessing = false;
   bool _botServiceStarted = false;
+  bool _isChatExpanded = false;
 
   @override
   void dispose() {
@@ -71,25 +85,97 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
         }
 
         return Scaffold(
+          backgroundColor: CasinoColors.darkPurple,
           appBar: AppBar(
-            title: Text('Round ${game.currentRound}/${game.config.totalRounds}'),
+            backgroundColor: CasinoColors.deepPurple,
+            elevation: 0,
+            title: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [CasinoColors.gold.withOpacity(0.8), CasinoColors.bronzeGold],
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                'Round ${game.currentRound}/${game.config.totalRounds}',
+                style: const TextStyle(
+                  color: Color(0xFF1a0a2e),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
             centerTitle: true,
             actions: [
               // Show host indicator
               if (isHost)
-                const Padding(
-                  padding: EdgeInsets.only(right: 8),
-                  child: Icon(Icons.star, color: Colors.amber),
-                ),
+                Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: CasinoColors.gold.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.star, color: CasinoColors.gold, size: 20),
+                ).animate().shimmer(duration: 2.seconds, color: CasinoColors.gold.withOpacity(0.3)),
               // Show scores
               IconButton(
-                icon: const Icon(Icons.leaderboard),
+                icon: const Icon(Icons.leaderboard, color: Colors.white),
                 onPressed: () => _showScoreboard(context, game, playerNames),
                 tooltip: 'Scoreboard',
               ),
             ],
           ),
-          body: _buildGameBody(game, playerIds, playerNames, currentUserId!, myHand, isMyTurn),
+          body: Stack(
+            children: [
+              // Main game content
+              ParticleBackground(
+                primaryColor: CasinoColors.gold,
+                secondaryColor: CasinoColors.richPurple,
+                particleCount: 25,
+                child: _buildGameBody(game, playerIds, playerNames, currentUserId!, myHand, isMyTurn),
+              ),
+              
+              // Floating Audio Controls (top-left)
+              Positioned(
+                top: 8,
+                left: 8,
+                child: AudioFloatingButton(
+                  roomId: widget.gameId,
+                  userId: currentUserId!,
+                ),
+              ),
+              
+              // Floating Chat Overlay (bottom-right)
+              Positioned(
+                bottom: 80,
+                right: 8,
+                child: ChatOverlay(
+                  roomId: widget.gameId,
+                  userId: currentUserId!,
+                  userName: playerNames[currentUserId] ?? 'Player',
+                  isExpanded: _isChatExpanded,
+                  onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
+                ),
+              ),
+              
+              // AI Tip Widget (shown when it's user's turn during playing phase)
+              if (isMyTurn && game.gamePhase == GamePhase.playing && myHand.isNotEmpty)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: AiTipWidget(
+                    hand: myHand.map((c) => c.displayString).toList(),
+                    trickCards: game.currentTrick?.cards.map((c) => '${c.card.displayString}').toList() ?? [],
+                    tricksNeeded: (game.bids[currentUserId]?.amount ?? 0) - (game.tricksWon[currentUserId] ?? 0),
+                    tricksWon: game.tricksWon[currentUserId] ?? 0,
+                    bid: game.bids[currentUserId]?.amount ?? 0,
+                    ledSuit: game.currentTrick?.ledSuit?.name,
+                  ),
+                ),
+            ],
+          ),
           bottomNavigationBar: _buildBottomBar(game, currentUserId, isMyTurn, myHand),
         );
       },
@@ -105,99 +191,224 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
     bool isMyTurn,
   ) {
     final theme = Theme.of(context);
+    
+    // Get other players (exclude current user)
+    final otherPlayers = playerIds.where((id) => id != currentUserId).toList();
 
     return Column(
       children: [
-        // Other players' status (top row)
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: playerIds
-                .where((id) => id != currentUserId)
-                .map((playerId) => PlayerBidStatus(
-                      playerName: playerNames[playerId] ?? 'Player',
-                      bid: game.bids[playerId]?.amount,
-                      tricksWon: game.tricksWon[playerId] ?? 0,
-                      isCurrentTurn: game.currentTurn == playerId,
-                    ))
-                .toList(),
+        // Game table area with positioned players
+        Expanded(
+          child: Stack(
+            children: [
+              // Center content - phase indicator and trick area
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Phase indicator
+                    if (game.gamePhase != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: _getPhaseColor(game.gamePhase!),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _getPhaseColor(game.gamePhase!).withOpacity(0.5),
+                              blurRadius: 12,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          _getPhaseText(game.gamePhase!),
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ).animate().fadeIn().scale(),
+
+                    const SizedBox(height: 16),
+
+                    // Trick area
+                    TrickAreaWidget(
+                      currentTrick: game.currentTrick,
+                      playerNames: playerNames,
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Turn indicator
+                    if (game.gamePhase == GamePhase.playing)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isMyTurn ? CasinoColors.gold.withOpacity(0.2) : Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isMyTurn ? CasinoColors.gold : Colors.white.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Text(
+                          isMyTurn ? '🎯 Your turn!' : '${playerNames[game.currentTurn]}\'s turn',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: isMyTurn ? CasinoColors.gold : Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      
+                    if (game.currentTrick?.ledSuit != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'Must follow: ${game.currentTrick!.ledSuit.symbol}',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: game.currentTrick!.ledSuit.isRed ? Colors.red.shade300 : Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              
+              // Top player (opponent across table)
+              if (otherPlayers.isNotEmpty)
+                Positioned(
+                  top: 8,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: PlayerAvatar(
+                      name: playerNames[otherPlayers[0]] ?? 'Player',
+                      isCurrentTurn: game.currentTurn == otherPlayers[0],
+                      isHost: game.hostId == otherPlayers[0],
+                      bid: game.bids[otherPlayers[0]]?.amount,
+                      tricksWon: game.tricksWon[otherPlayers[0]] ?? 0,
+                    ).animate().fadeIn(delay: 100.ms).slideY(begin: -0.3),
+                  ),
+                ),
+              
+              // Left player (if 3+ players)
+              if (otherPlayers.length >= 2)
+                Positioned(
+                  left: 8,
+                  top: 0,
+                  bottom: 100,
+                  child: Center(
+                    child: PlayerAvatar(
+                      name: playerNames[otherPlayers[1]] ?? 'Player',
+                      isCurrentTurn: game.currentTurn == otherPlayers[1],
+                      isHost: game.hostId == otherPlayers[1],
+                      bid: game.bids[otherPlayers[1]]?.amount,
+                      tricksWon: game.tricksWon[otherPlayers[1]] ?? 0,
+                    ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.3),
+                  ),
+                ),
+              
+              // Right player (if 4 players)
+              if (otherPlayers.length >= 3)
+                Positioned(
+                  right: 8,
+                  top: 0,
+                  bottom: 100,
+                  child: Center(
+                    child: PlayerAvatar(
+                      name: playerNames[otherPlayers[2]] ?? 'Player',
+                      isCurrentTurn: game.currentTurn == otherPlayers[2],
+                      isHost: game.hostId == otherPlayers[2],
+                      bid: game.bids[otherPlayers[2]]?.amount,
+                      tricksWon: game.tricksWon[otherPlayers[2]] ?? 0,
+                    ).animate().fadeIn(delay: 300.ms).slideX(begin: 0.3),
+                  ),
+                ),
+            ],
           ),
         ),
 
-        // Game area
-        Expanded(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Phase indicator
-                if (game.gamePhase != null)
+        // Current player info bar
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.5),
+            border: Border(
+              top: BorderSide(color: CasinoColors.gold.withOpacity(0.3)),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: _getPhaseColor(game.gamePhase!),
-                      borderRadius: BorderRadius.circular(20),
+                      shape: BoxShape.circle,
+                      color: isMyTurn ? CasinoColors.gold : CasinoColors.feltGreenMid,
+                      border: Border.all(color: CasinoColors.gold, width: 2),
                     ),
                     child: Text(
-                      _getPhaseText(game.gamePhase!),
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: Colors.white,
+                      'You'[0],
+                      style: TextStyle(
+                        color: isMyTurn ? CasinoColors.feltGreenDark : Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-
-                const SizedBox(height: 24),
-
-                // Trick area
-                TrickAreaWidget(
-                  currentTrick: game.currentTrick,
-                  playerNames: playerNames,
-                ),
-
-                const SizedBox(height: 16),
-
-                // Turn indicator
-                if (game.gamePhase == GamePhase.playing) ...[
-                  Text(
-                    isMyTurn ? 'Your turn!' : '${playerNames[game.currentTurn]}\'s turn',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: isMyTurn ? Colors.green : Colors.grey,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (game.currentTrick?.ledSuit != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        'Must follow: ${game.currentTrick!.ledSuit.symbol}',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: game.currentTrick!.ledSuit.isRed
-                              ? Colors.red
-                              : Colors.black,
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'You',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
+                      Text(
+                        'Bid: ${game.bids[currentUserId]?.amount ?? "-"}  |  Tricks: ${game.tricksWon[currentUserId] ?? 0}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: Colors.white.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
-              ],
-            ),
-          ),
-        ),
-
-        // My status
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: PlayerBidStatus(
-            playerName: 'You',
-            bid: game.bids[currentUserId]?.amount,
-            tricksWon: game.tricksWon[currentUserId] ?? 0,
-            isCurrentTurn: isMyTurn,
+              ),
+              if (game.hostId == currentUserId)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: CasinoColors.gold.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: CasinoColors.gold),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.star, color: CasinoColors.gold, size: 14),
+                      SizedBox(width: 4),
+                      Text('Host', style: TextStyle(color: CasinoColors.gold, fontSize: 12)),
+                    ],
+                  ),
+                ),
+            ],
           ),
         ),
 
         // My hand
-        const SizedBox(height: 8),
         PlayerHandWidget(
           cards: myHand,
           selectedCard: _selectedCard,
@@ -208,7 +419,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
           },
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
       ],
     );
   }

@@ -6,7 +6,7 @@ part 'diamond_wallet.g.dart';
 /// Diamond wallet for virtual currency (monetization)
 /// Host buys diamonds via IAP to create rooms
 @freezed
-class DiamondWallet with _$DiamondWallet {
+abstract class DiamondWallet with _$DiamondWallet {
   const factory DiamondWallet({
     /// User ID who owns this wallet
     required String userId,
@@ -30,7 +30,7 @@ class DiamondWallet with _$DiamondWallet {
 
 /// Diamond transaction record
 @freezed
-class DiamondTransaction with _$DiamondTransaction {
+abstract class DiamondTransaction with _$DiamondTransaction {
   const factory DiamondTransaction({
     required String id,
     required String userId,

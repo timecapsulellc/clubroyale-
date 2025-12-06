@@ -1,8 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:myapp/features/profile/user_profile.dart';
-import 'package:myapp/features/game/engine/models/card.dart';
-import 'package:myapp/features/game/engine/models/deck.dart';
+import 'package:taasclub/features/profile/user_profile.dart';
+import 'package:taasclub/features/game/engine/models/card.dart';
+import 'package:taasclub/features/game/engine/models/deck.dart';
 import 'game_config.dart';
 import 'models/game_state.dart';
 
@@ -26,7 +26,7 @@ class GameStatusConverter implements JsonConverter<GameStatus, String> {
 }
 
 @freezed
-class GameRoom with _$GameRoom {
+abstract class GameRoom with _$GameRoom {
   const GameRoom._();
   
   const factory GameRoom({
@@ -44,6 +44,9 @@ class GameRoom with _$GameRoom {
     
     /// Current game status
     @GameStatusConverter() @Default(GameStatus.waiting) GameStatus status,
+    
+    /// Type of game (call_break, marriage, teen_patti, etc.)
+    @Default('call_break') String gameType,
     
     /// Game configuration (point value, rounds, etc.)
     @Default(GameConfig()) GameConfig config,
@@ -115,12 +118,13 @@ class GameRoom with _$GameRoom {
 }
 
 @freezed
-class Player with _$Player {
+abstract class Player with _$Player {
   const factory Player({
     required String id,
     required String name,
     UserProfile? profile,
     @Default(false) bool isReady,
+    @Default(false) bool isBot,
   }) = _Player;
 
   factory Player.fromJson(Map<String, dynamic> json) => _$PlayerFromJson(json);

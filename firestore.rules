@@ -48,6 +48,42 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow write: if false; // Server-side only
     }
+    
+    // ===== WALLET SYSTEM RULES =====
+    
+    // Wallets - users can read their own, only server can write
+    match /wallets/{userId} {
+      // Users can read their own wallet
+      allow read: if isOwner(userId);
+      
+      // Only the owner can create their wallet (initial setup)
+      allow create: if isOwner(userId);
+      
+      // Updates require validation - prevent negative balance
+      allow update: if isOwner(userId) && 
+        request.resource.data.balance >= 0;
+      
+      // Wallets cannot be deleted
+      allow delete: if false;
+    }
+    
+    // Transactions - read-only for participants, server writes
+    match /transactions/{transactionId} {
+      // Users can read transactions they're involved in
+      allow read: if isAuthenticated() && 
+        (request.auth.uid == resource.data.fromUserId ||
+         request.auth.uid == resource.data.toUserId);
+      
+      // Only server-side (Cloud Functions) can write transactions
+      allow write: if false;
+    }
+    
+    // Diamond purchase records - user can read their own
+    match /purchases/{purchaseId} {
+      allow read: if isAuthenticated() && 
+        request.auth.uid == resource.data.userId;
+      allow write: if false; // Server-side only via RevenueCat webhook
+    }
   }
 }
 

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:myapp/firebase_options.dart';
+import 'package:taasclub/firebase_options.dart';
 
 import 'features/lobby/lobby_screen.dart';
 import 'features/lobby/room_waiting_screen.dart';
@@ -19,6 +19,11 @@ import 'features/auth/auth_gate.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/wallet/wallet_screen.dart';
+import 'features/game/test_game_screen.dart';
+import 'games/marriage/marriage_game_screen.dart';
+import 'games/marriage/marriage_multiplayer_screen.dart';
+import 'games/teen_patti/teen_patti_screen.dart';
+import 'games/in_between/in_between_screen.dart';
 import 'config/revenuecat_config.dart';
 
 // 1. Define your routes
@@ -89,6 +94,39 @@ final GoRouter _router = GoRouter(
           path: 'wallet',
           builder: (BuildContext context, GoRouterState state) {
             return const WalletScreen();
+          },
+        ),
+        GoRoute(
+          path: 'test-game',
+          builder: (BuildContext context, GoRouterState state) {
+            return const TestGameScreen();
+          },
+        ),
+        GoRoute(
+          path: 'marriage',
+          builder: (BuildContext context, GoRouterState state) {
+            return const MarriageGameScreen();
+          },
+        ),
+        GoRoute(
+          path: 'marriage/:roomId',
+          builder: (BuildContext context, GoRouterState state) {
+            final String roomId = state.pathParameters['roomId']!;
+            return MarriageMultiplayerScreen(roomId: roomId);
+          },
+        ),
+        GoRoute(
+          path: 'teen_patti/:roomId',
+          builder: (BuildContext context, GoRouterState state) {
+            final String roomId = state.pathParameters['roomId']!;
+            return TeenPattiScreen(roomId: roomId);
+          },
+        ),
+        GoRoute(
+          path: 'in_between/:roomId',
+          builder: (BuildContext context, GoRouterState state) {
+            final String roomId = state.pathParameters['roomId']!;
+            return InBetweenScreen(roomId: roomId);
           },
         ),
       ],

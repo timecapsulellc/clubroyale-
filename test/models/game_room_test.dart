@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:myapp/features/game/game_room.dart';
-import 'package:myapp/features/game/game_config.dart';
-import 'package:myapp/features/profile/user_profile.dart';
+import 'package:taasclub/features/game/game_room.dart';
+import 'package:taasclub/features/game/game_config.dart';
+import 'package:taasclub/features/profile/user_profile.dart';
 
 void main() {
   group('GameRoom Model Tests', () {

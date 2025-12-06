@@ -7,24 +7,224 @@ final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService();
 });
 
+/// Mock user for test mode - stored globally
+class TestUser {
+  static String? uid;
+  static String? displayName;
+  static String? email;
+
+  static void generate({String? name}) {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    uid = 'test_user_$timestamp';
+    displayName = name ?? 'Test Player';
+    email = 'testplayer_$timestamp@taasclub.test';
+  }
+
+  static void clear() {
+    uid = null;
+    displayName = null;
+    email = null;
+  }
+}
+
+/// TestMode flag with reactive notifier
+class TestMode {
+  static final ValueNotifier<bool> _notifier = ValueNotifier(false);
+  
+  static ValueNotifier<bool> get notifier => _notifier;
+  
+  static bool get isEnabled => _notifier.value;
+  
+  static set isEnabled(bool value) {
+    _notifier.value = value;
+  }
+}
+
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  User? get currentUser => _auth.currentUser;
+  /// Returns the current user (Firebase or Mock)
+  User? get currentUser {
+    // If test mode is active and we have a test user
+    if (TestMode.isEnabled && TestUser.uid != null) {
+      return _TestModeUser();
+    }
+    return _auth.currentUser;
+  }
 
+  /// Check if currently in test mode
+  bool get isTestMode => TestMode.isEnabled;
+
+  /// Sign in anonymously - tries Firebase first, falls back to test mode
   Future<User?> signInAnonymously() async {
     try {
       final userCredential = await _auth.signInAnonymously();
       return userCredential.user;
     } catch (e) {
       debugPrint('Error signing in anonymously: $e');
-      return null;
+      
+      // Auto-enable test mode if Firebase auth fails
+      debugPrint('💡 Firebase Auth failed. Enabling Test Mode...');
+      return await enableTestMode();
     }
   }
 
+  /// Enable test mode and create a mock user
+  Future<User?> enableTestMode({String? playerName}) async {
+    debugPrint('🧪 Enabling Test Mode...');
+    
+    // Create mock user
+    TestUser.generate(name: playerName ?? 'Test Player');
+    TestMode.isEnabled = true;
+    
+    debugPrint('✅ Test Mode enabled! User: ${TestUser.displayName} (${TestUser.uid})');
+    
+    return _TestModeUser();
+  }
+
+  /// Sign out (handles both Firebase and test mode)
   Future<void> signOut() async {
-    await _auth.signOut();
+    if (TestMode.isEnabled) {
+      // Clear test mode
+      TestMode.isEnabled = false;
+      TestUser.clear();
+      debugPrint('🧪 Test Mode disabled');
+    }
+    
+    try {
+      await _auth.signOut();
+    } catch (e) {
+      debugPrint('Firebase signOut error (ignored in test mode): $e');
+    }
+  }
+}
+
+/// A mock User class for test mode
+class _TestModeUser implements User {
+  @override
+  String get uid => TestUser.uid ?? 'test_user';
+
+  @override
+  String? get displayName => TestUser.displayName;
+
+  @override
+  String? get email => TestUser.email;
+
+  @override
+  bool get emailVerified => true;
+
+  @override
+  bool get isAnonymous => true;
+
+  @override
+  UserMetadata get metadata => throw UnimplementedError();
+
+  @override
+  MultiFactor get multiFactor => throw UnimplementedError();
+
+  @override
+  String? get phoneNumber => null;
+
+  @override
+  String? get photoURL => null;
+
+  @override
+  List<UserInfo> get providerData => [];
+
+  @override
+  String? get refreshToken => null;
+
+  @override
+  String? get tenantId => null;
+
+  // Implement required methods with stubs
+  @override
+  Future<void> delete() async {}
+
+  @override
+  Future<String> getIdToken([bool forceRefresh = false]) async => 'mock_token';
+
+  @override
+  Future<IdTokenResult> getIdTokenResult([bool forceRefresh = false]) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserCredential> linkWithCredential(AuthCredential credential) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserCredential> linkWithProvider(AuthProvider provider) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserCredential> reauthenticateWithCredential(AuthCredential credential) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserCredential> reauthenticateWithProvider(AuthProvider provider) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> reload() async {}
+
+  @override
+  Future<void> sendEmailVerification([ActionCodeSettings? actionCodeSettings]) async {}
+
+  @override
+  Future<User> unlink(String providerId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updateDisplayName(String? displayName) async {}
+
+  @override
+  Future<void> updateEmail(String newEmail) async {}
+
+  @override
+  Future<void> updatePassword(String newPassword) async {}
+
+  @override
+  Future<void> updatePhoneNumber(PhoneAuthCredential phoneCredential) async {}
+
+  @override
+  Future<void> updatePhotoURL(String? photoURL) async {}
+
+  @override
+  Future<void> updateProfile({String? displayName, String? photoURL}) async {}
+
+  @override
+  Future<void> verifyBeforeUpdateEmail(String newEmail, [ActionCodeSettings? actionCodeSettings]) async {}
+
+  @override
+  Future<ConfirmationResult> linkWithPhoneNumber(String phoneNumber, [RecaptchaVerifier? verifier]) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserCredential> linkWithPopup(AuthProvider provider) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> linkWithRedirect(AuthProvider provider) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserCredential> reauthenticateWithPopup(AuthProvider provider) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> reauthenticateWithRedirect(AuthProvider provider) {
+    throw UnimplementedError();
   }
 }

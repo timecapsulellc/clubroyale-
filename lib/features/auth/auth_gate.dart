@@ -7,10 +7,7 @@ import 'auth_screen.dart';
 import '../home_screen.dart';
 import 'auth_service.dart';
 
-// Test mode flag - simple ValueNotifier for testing
-class TestMode {
-  static final ValueNotifier<bool> isEnabled = ValueNotifier(false);
-}
+// TestMode is imported from auth_service.dart
 
 class AuthGate extends ConsumerWidget {
   const AuthGate({super.key});
@@ -20,7 +17,7 @@ class AuthGate extends ConsumerWidget {
     final authService = ref.watch(authServiceProvider);
 
     return ValueListenableBuilder<bool>(
-      valueListenable: TestMode.isEnabled,
+      valueListenable: TestMode.notifier,
       builder: (context, isTestMode, child) {
         // If test mode is enabled, show HomeScreen directly
         if (isTestMode) {
@@ -45,5 +42,3 @@ class AuthGate extends ConsumerWidget {
     );
   }
 }
-
-

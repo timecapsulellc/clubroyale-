@@ -2,13 +2,61 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:myapp/features/game/game_room.dart';
-import 'package:myapp/features/game/game_config.dart';
-import 'package:myapp/features/game/call_break_service.dart';
-import 'package:myapp/features/profile/profile_service.dart';
-import 'package:myapp/features/lobby/room_code_service.dart';
+import 'package:taasclub/features/game/game_room.dart';
+import 'package:taasclub/features/game/game_config.dart';
+import 'package:taasclub/features/game/call_break_service.dart';
+import 'package:taasclub/features/game/models/game_state.dart';
+import 'package:taasclub/features/game/engine/models/deck.dart';
+import 'package:taasclub/features/profile/profile_service.dart';
+import 'package:taasclub/features/lobby/room_code_service.dart';
+import 'package:taasclub/features/auth/auth_service.dart';
+import 'dart:async';
+import 'dart:math';
 
 final lobbyServiceProvider = Provider<LobbyService>((ref) => LobbyService(ref));
+
+/// In-memory storage for Test Mode games (bypasses Firestore)
+class _TestModeStorage {
+  static final Map<String, GameRoom> _games = {};
+  static final StreamController<List<GameRoom>> _gamesController = 
+      StreamController<List<GameRoom>>.broadcast();
+  
+  static void addGame(String id, GameRoom game) {
+    _games[id] = game.copyWith(id: id);
+    _notifyListeners();
+  }
+  
+  static void updateGame(String id, GameRoom game) {
+    _games[id] = game.copyWith(id: id);
+    _notifyListeners();
+  }
+  
+  static GameRoom? getGame(String id) => _games[id];
+  
+  static List<GameRoom> getAllGames() => _games.values.toList();
+  
+  static Stream<List<GameRoom>> watchGames() {
+    // Emit current state immediately for new listeners
+    Future.microtask(() => _notifyListeners());
+    return _gamesController.stream;
+  }
+  
+  static Stream<GameRoom?> watchGame(String id) {
+    return watchGames().map((games) => games.firstWhere(
+      (g) => g.id == id,
+      orElse: () => _games[id]!,
+    ));
+  }
+  
+  static void _notifyListeners() {
+    _gamesController.add(_games.values.toList());
+  }
+  
+  static String generateRoomCode() {
+    final random = Random();
+    return (100000 + random.nextInt(899999)).toString();
+  }
+}
 
 class LobbyService {
   final Ref _ref;
@@ -23,6 +71,10 @@ class LobbyService {
   }
 
   Stream<List<GameRoom>> getGames() {
+    // Use in-memory storage for Test Mode
+    if (TestMode.isEnabled) {
+      return _TestModeStorage.watchGames();
+    }
     return _gamesRef.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) => doc.data().copyWith(id: doc.id)).toList();
     });
@@ -32,6 +84,22 @@ class LobbyService {
   /// [hostId] - The user ID of the host creating the room
   /// [config] - Optional game configuration (defaults will be used if not provided)
   Future<String> createGame(GameRoom room) async {
+    // Use in-memory storage for Test Mode
+    if (TestMode.isEnabled) {
+      final roomCode = _TestModeStorage.generateRoomCode();
+      final gameId = 'test_game_${DateTime.now().millisecondsSinceEpoch}';
+      
+      final newRoom = room.copyWith(
+        roomCode: roomCode,
+        status: GameStatus.waiting,
+        createdAt: DateTime.now(),
+      );
+      
+      _TestModeStorage.addGame(gameId, newRoom);
+      debugPrint('🧪 Test Mode: Created room $gameId with code $roomCode');
+      return gameId;
+    }
+    
     final roomCodeService = _ref.read(roomCodeServiceProvider);
     final profileService = _ref.read(profileServiceProvider);
     
@@ -76,6 +144,43 @@ class LobbyService {
   /// Joins a game using the 6-digit room code
   Future<String?> joinByCode(String roomCode, Player player) async {
     try {
+      // Test Mode: Search in-memory storage
+      if (TestMode.isEnabled) {
+        final games = _TestModeStorage.getAllGames();
+        final matchingGame = games.where((g) => g.roomCode == roomCode).firstOrNull;
+        
+        if (matchingGame == null) {
+          throw Exception('Room not found. Check the code and try again.');
+        }
+        
+        // Check if room is full
+        if (matchingGame.players.length >= matchingGame.config.maxPlayers) {
+          throw Exception('Room is full. Maximum ${matchingGame.config.maxPlayers} players allowed.');
+        }
+        
+        // Check if player is already in the room
+        if (matchingGame.players.any((p) => p.id == player.id)) {
+          return matchingGame.id;
+        }
+        
+        // Check if game is still accepting players
+        if (matchingGame.status != GameStatus.waiting) {
+          throw Exception('Game has already started. Cannot join now.');
+        }
+        
+        // Add player to the game
+        final updatedPlayers = [...matchingGame.players, player];
+        final updatedScores = Map<String, int>.from(matchingGame.scores)..[player.id] = 0;
+        
+        _TestModeStorage.updateGame(
+          matchingGame.id!,
+          matchingGame.copyWith(players: updatedPlayers, scores: updatedScores),
+        );
+        
+        debugPrint('🧪 Test Mode: Player ${player.name} joined room ${matchingGame.id}');
+        return matchingGame.id;
+      }
+      
       final roomCodeService = _ref.read(roomCodeServiceProvider);
       
       // Validate code format
@@ -135,6 +240,42 @@ class LobbyService {
   /// Start the game (host only - changes status from waiting to playing)
   /// Initializes Call Break game with card dealing and bidding phase
   Future<void> startGame(String gameId) async {
+    // Test Mode: Use in-memory storage
+    if (TestMode.isEnabled) {
+      final game = _TestModeStorage.getGame(gameId);
+      if (game == null) {
+        throw Exception('Game not found');
+      }
+      
+      final playerIds = game.players.map((p) => p.id).toList();
+      
+      // Require exactly 4 players for Call Break
+      if (playerIds.length != 4) {
+        throw Exception('Call Break requires exactly 4 players');
+      }
+      
+      // Deal cards locally
+      final hands = Deck.dealHands(playerIds);
+      
+      // Update game state
+      _TestModeStorage.updateGame(
+        gameId,
+        game.copyWith(
+          status: GameStatus.playing,
+          gamePhase: GamePhase.bidding,
+          playerHands: hands,
+          bids: <String, Bid>{},
+          tricksWon: {for (var id in playerIds) id: 0},
+          currentTrick: null,
+          trickHistory: [],
+          currentTurn: playerIds.first,
+        ),
+      );
+      
+      debugPrint('🧪 Test Mode: Game started with ${playerIds.length} players');
+      return;
+    }
+    
     try {
       final doc = await _gamesRef.doc(gameId).get();
       if (!doc.exists) {
@@ -183,6 +324,10 @@ class LobbyService {
 
   /// Watch a specific game room for real-time updates
   Stream<GameRoom?> watchRoom(String gameId) {
+    // Use in-memory storage for Test Mode
+    if (TestMode.isEnabled) {
+      return _TestModeStorage.watchGame(gameId);
+    }
     return _gamesRef.doc(gameId).snapshots().map((snapshot) {
       if (!snapshot.exists) return null;
       return snapshot.data()?.copyWith(id: snapshot.id);
@@ -191,6 +336,28 @@ class LobbyService {
 
   /// Set a player's ready status in a game room
   Future<void> setPlayerReady(String gameId, String playerId, bool isReady) async {
+    // Test Mode: Use in-memory storage
+    if (TestMode.isEnabled) {
+      final game = _TestModeStorage.getGame(gameId);
+      if (game == null) {
+        throw Exception('Game room not found');
+      }
+      
+      final updatedPlayers = game.players.map((player) {
+        if (player.id == playerId) {
+          return player.copyWith(isReady: isReady);
+        }
+        return player;
+      }).toList();
+      
+      _TestModeStorage.updateGame(
+        gameId,
+        game.copyWith(players: updatedPlayers),
+      );
+      debugPrint('🧪 Test Mode: Player $playerId ready=$isReady');
+      return;
+    }
+    
     try {
       final doc = await _gamesRef.doc(gameId).get();
       if (!doc.exists) {
@@ -223,6 +390,33 @@ class LobbyService {
 
   /// Add a bot player to the game (for testing)
   Future<void> addBot(String gameId) async {
+    // Use in-memory storage for Test Mode
+    if (TestMode.isEnabled) {
+      final game = _TestModeStorage.getGame(gameId);
+      if (game == null) return;
+      
+      if (game.players.length >= 4) {
+        throw Exception('Room is full');
+      }
+      
+      final botId = 'bot_${DateTime.now().millisecondsSinceEpoch}';
+      final botPlayer = Player(
+        id: botId,
+        name: 'Bot ${game.players.length + 1}',
+        isReady: true,
+      );
+      
+      final updatedPlayers = [...game.players, botPlayer];
+      final updatedScores = Map<String, int>.from(game.scores)..[botId] = 0;
+      
+      _TestModeStorage.updateGame(
+        gameId,
+        game.copyWith(players: updatedPlayers, scores: updatedScores),
+      );
+      debugPrint('🧪 Test Mode: Added bot $botId to game $gameId');
+      return;
+    }
+    
     try {
       final doc = await _gamesRef.doc(gameId).get();
       if (!doc.exists) return;

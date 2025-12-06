@@ -1,0 +1,703 @@
+/// Marriage Multiplayer Screen
+/// 
+/// Real-time multiplayer Marriage game connected to Firebase
+
+import 'package:flutter/material.dart' hide Card;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
+import 'package:taasclub/config/casino_theme.dart';
+import 'package:taasclub/config/visual_effects.dart';
+import 'package:taasclub/core/card_engine/pile.dart';
+import 'package:taasclub/core/card_engine/deck.dart';
+import 'package:taasclub/games/marriage/marriage_service.dart';
+import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:taasclub/core/card_engine/meld.dart';
+import 'package:taasclub/features/game/widgets/player_avatar.dart';
+
+/// Multiplayer Marriage game screen
+class MarriageMultiplayerScreen extends ConsumerStatefulWidget {
+  final String roomId;
+  
+  const MarriageMultiplayerScreen({
+    required this.roomId,
+    super.key,
+  });
+
+  @override
+  ConsumerState<MarriageMultiplayerScreen> createState() => _MarriageMultiplayerScreenState();
+}
+
+class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerScreen> {
+  String? _selectedCardId;
+  bool _isProcessing = false;
+  bool _hasDrawn = false;  // Can't discard until drawn
+  
+  // Card lookup cache
+  final Map<String, Card> _cardCache = {};
+  
+  @override
+  void initState() {
+    super.initState();
+    _buildCardCache();
+  }
+  
+  void _buildCardCache() {
+    // Build a cache of all possible cards for quick lookup
+    final deck = Deck.forMarriage();
+    for (final card in deck.cards) {
+      _cardCache[card.id] = card;
+    }
+  }
+  
+  Card? _getCard(String id) => _cardCache[id];
+  
+  @override
+  Widget build(BuildContext context) {
+    final marriageService = ref.watch(marriageServiceProvider);
+    final authService = ref.watch(authServiceProvider);
+    final currentUser = authService.currentUser;
+    
+    if (currentUser == null) {
+      return const Scaffold(
+        body: Center(child: Text('Please sign in')),
+      );
+    }
+    
+    return StreamBuilder<MarriageGameState?>(
+      stream: marriageService.watchGameState(widget.roomId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            backgroundColor: CasinoColors.feltGreenDark,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(color: CasinoColors.gold),
+                  const SizedBox(height: 16),
+                  const Text('Loading game...', style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            ),
+          );
+        }
+        
+        final state = snapshot.data;
+        if (state == null) {
+          return Scaffold(
+            backgroundColor: CasinoColors.feltGreenDark,
+            appBar: AppBar(
+              backgroundColor: Colors.black54,
+              title: const Text('Marriage'),
+            ),
+            body: const Center(
+              child: Text('Waiting for game to start...', 
+                style: TextStyle(color: Colors.white70)),
+            ),
+          );
+        }
+        
+        final myHand = state.playerHands[currentUser.uid] ?? [];
+        final isMyTurn = state.currentPlayerId == currentUser.uid;
+        final tiplu = state.tipluCardId.isNotEmpty ? _getCard(state.tipluCardId) : null;
+        final topDiscard = state.discardPile.isNotEmpty 
+            ? _getCard(state.discardPile.last) 
+            : null;
+        
+        return Scaffold(
+          backgroundColor: CasinoColors.feltGreenDark,
+          appBar: AppBar(
+            backgroundColor: Colors.black.withOpacity(0.5),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => context.go('/lobby'),
+            ),
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Marriage', style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(width: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: CasinoColors.gold.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: CasinoColors.gold),
+                  ),
+                  child: Text(
+                    'Round ${state.currentRound}',
+                    style: const TextStyle(color: CasinoColors.gold, fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              // Tiplu indicator
+              if (tiplu != null)
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('Tiplu: ', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      Text(
+                        tiplu.displayName,
+                        style: TextStyle(
+                          color: tiplu.suit.isRed ? Colors.red : Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          body: ParticleBackground(
+            primaryColor: CasinoColors.gold,
+            secondaryColor: CasinoColors.feltGreenMid,
+            particleCount: 15,
+            child: Column(
+              children: [
+                // Turn indicator
+                _buildTurnIndicator(state, currentUser.uid),
+                
+                // Other players
+                Expanded(
+                  flex: 2,
+                  child: _buildOpponentsArea(state, currentUser.uid),
+                ),
+                
+                // Center - deck and discard
+                Expanded(
+                  flex: 3,
+                  child: _buildCenterArea(state, topDiscard, isMyTurn),
+                ),
+                
+                // Meld suggestions
+                _buildMeldSuggestions(myHand, tiplu),
+                
+                // My hand
+                _buildMyHand(myHand, isMyTurn),
+                
+                // Action bar
+                _buildActionBar(isMyTurn, state, currentUser.uid),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  
+  Widget _buildMeldSuggestions(List<String> handIds, Card? tiplu) {
+    if (handIds.isEmpty) return const SizedBox.shrink();
+    
+    // Convert IDs to Cards
+    final cards = handIds.map((id) => _getCard(id)).whereType<Card>().toList();
+    final melds = MeldDetector.findAllMelds(cards, tiplu: tiplu);
+    
+    if (melds.isEmpty) return const SizedBox.shrink();
+    
+    return Container(
+      height: 40,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: melds.length,
+        itemBuilder: (context, index) {
+          final meld = melds[index];
+          return Container(
+            margin: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: _getMeldColor(meld.type).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: _getMeldColor(meld.type)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _getMeldTypeName(meld.type),
+                  style: TextStyle(color: _getMeldColor(meld.type), fontSize: 12),
+                ),
+                const SizedBox(width: 8),
+                ...meld.cards.take(3).map((c) => Padding(
+                  padding: const EdgeInsets.only(right: 2),
+                  child: Text(
+                    c.displayName,
+                    style: TextStyle(
+                      color: c.suit.isRed ? Colors.red : Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+  
+  Color _getMeldColor(MeldType type) {
+    switch (type) {
+      case MeldType.set: return Colors.blue;
+      case MeldType.run: return Colors.green;
+      case MeldType.tunnel: return Colors.orange;
+      case MeldType.marriage: return Colors.pink;
+    }
+  }
+  
+  String _getMeldTypeName(MeldType type) {
+    switch (type) {
+      case MeldType.set: return 'Trial';
+      case MeldType.run: return 'Sequence';
+      case MeldType.tunnel: return 'Tunnel';
+      case MeldType.marriage: return 'Marriage';
+    }
+  }
+  
+  Widget _buildTurnIndicator(MarriageGameState state, String myId) {
+    final isMyTurn = state.currentPlayerId == myId;
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      decoration: BoxDecoration(
+        color: isMyTurn ? Colors.green.withOpacity(0.3) : Colors.black.withOpacity(0.3),
+        border: Border(bottom: BorderSide(
+          color: isMyTurn ? Colors.green : Colors.white24,
+        )),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            isMyTurn ? Icons.play_arrow : Icons.hourglass_empty,
+            color: isMyTurn ? Colors.green : Colors.white54,
+            size: 20,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            isMyTurn ? 'Your Turn' : 'Waiting for opponent...',
+            style: TextStyle(
+              color: isMyTurn ? Colors.green : Colors.white54,
+              fontWeight: isMyTurn ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn();
+  }
+  
+  Widget _buildOpponentsArea(MarriageGameState state, String myId) {
+    final opponents = state.playerHands.keys.where((id) => id != myId).toList();
+    
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: opponents.take(3).map((playerId) {
+          final cardCount = state.playerHands[playerId]?.length ?? 0;
+          final isCurrentTurn = state.currentPlayerId == playerId;
+          
+          return PlayerAvatar(
+            name: 'Player ${opponents.indexOf(playerId) + 2}', // TODO: Get real name
+            isCurrentTurn: isCurrentTurn,
+            isHost: false, // TODO: Get host status
+            bid: null,
+            tricksWon: cardCount, // Showing card count as "score" for now
+          ).animate().fadeIn(delay: 200.ms);
+        }).toList(),
+      ),
+    );
+  }
+  
+  Widget _buildCenterArea(MarriageGameState state, Card? topDiscard, bool isMyTurn) {
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Deck
+          GestureDetector(
+            onTap: isMyTurn && !_hasDrawn ? _drawFromDeck : null,
+            child: _buildDeckPile(state.deckCards.length, isMyTurn && !_hasDrawn),
+          ),
+          
+          const SizedBox(width: 20),
+          
+          // Discard pile
+          GestureDetector(
+            onTap: isMyTurn && !_hasDrawn && topDiscard != null ? _drawFromDiscard : null,
+            child: _buildDiscardPile(topDiscard, isMyTurn && !_hasDrawn),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildDeckPile(int count, bool canDraw) {
+    return Container(
+      width: 80,
+      height: 110,
+      decoration: BoxDecoration(
+        color: CasinoColors.cardBackground,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: canDraw ? CasinoColors.gold : CasinoColors.gold.withOpacity(0.3),
+          width: canDraw ? 2 : 1,
+        ),
+        boxShadow: canDraw ? [
+          BoxShadow(
+            color: CasinoColors.gold.withOpacity(0.4),
+            blurRadius: 12,
+          ),
+        ] : null,
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            margin: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [CasinoColors.richPurple, CasinoColors.deepPurple],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Center(
+              child: Icon(Icons.style, 
+                color: CasinoColors.gold.withOpacity(0.5), 
+                size: 32,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 4,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                '$count',
+                style: const TextStyle(color: Colors.white, fontSize: 10),
+              ),
+            ),
+          ),
+          if (canDraw)
+            Positioned(
+              top: 4,
+              right: 4,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.add, size: 12, color: Colors.white),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildDiscardPile(Card? topCard, bool canDraw) {
+    return Container(
+      width: 80,
+      height: 110,
+      decoration: BoxDecoration(
+        color: topCard != null ? Colors.white : CasinoColors.cardBackground.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: canDraw && topCard != null ? CasinoColors.gold : CasinoColors.gold.withOpacity(0.3),
+          width: canDraw && topCard != null ? 2 : 1,
+        ),
+      ),
+      child: topCard != null
+          ? _buildCardWidget(topCard, false, isLarge: true)
+          : Center(
+              child: Text(
+                'Discard',
+                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
+              ),
+            ),
+    );
+  }
+  
+  Widget _buildMyHand(List<String> cardIds, bool isMyTurn) {
+    return Container(
+      height: 130,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: cardIds.asMap().entries.map((entry) {
+            final index = entry.key;
+            final cardId = entry.value;
+            final card = _getCard(cardId);
+            if (card == null) return const SizedBox();
+            
+            final isSelected = _selectedCardId == cardId;
+            
+            return GestureDetector(
+              onTap: isMyTurn ? () {
+                setState(() {
+                  _selectedCardId = isSelected ? null : cardId;
+                });
+              } : null,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                transform: Matrix4.translationValues(0, isSelected ? -15 : 0, 0),
+                margin: EdgeInsets.only(right: index < cardIds.length - 1 ? -25 : 0),
+                child: _buildCardWidget(card, isSelected),
+              ),
+            ).animate().fadeIn(delay: Duration(milliseconds: 30 * index));
+          }).toList(),
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildCardWidget(Card card, bool isSelected, {bool isLarge = false}) {
+    final size = isLarge ? const Size(70, 100) : const Size(60, 85);
+    
+    return Container(
+      width: size.width,
+      height: size.height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isSelected ? CasinoColors.gold : Colors.grey.shade300,
+          width: isSelected ? 2 : 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isSelected 
+                ? CasinoColors.gold.withOpacity(0.4) 
+                : Colors.black.withOpacity(0.2),
+            blurRadius: isSelected ? 8 : 4,
+            offset: const Offset(1, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            card.rank.symbol,
+            style: TextStyle(
+              color: card.suit.isRed ? Colors.red : Colors.black,
+              fontSize: isLarge ? 24 : 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            card.suit.symbol,
+            style: TextStyle(
+              color: card.suit.isRed ? Colors.red : Colors.black,
+              fontSize: isLarge ? 20 : 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildActionBar(bool isMyTurn, MarriageGameState state, String myId) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.5),
+        border: Border(top: BorderSide(color: CasinoColors.gold.withOpacity(0.3))),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // Discard button
+          ElevatedButton.icon(
+            onPressed: isMyTurn && _hasDrawn && _selectedCardId != null 
+                ? _discardCard 
+                : null,
+            icon: const Icon(Icons.arrow_upward),
+            label: const Text('Discard'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: CasinoColors.gold,
+              foregroundColor: Colors.black,
+              disabledBackgroundColor: Colors.grey.shade700,
+            ),
+          ),
+          
+          // Sort button
+          OutlinedButton.icon(
+            onPressed: () => setState(() {}),
+            icon: const Icon(Icons.sort),
+            label: const Text('Sort'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.white,
+              side: BorderSide(color: Colors.white.withOpacity(0.5)),
+            ),
+          ),
+          
+          // Declare button
+          ElevatedButton.icon(
+            onPressed: isMyTurn && _hasDrawn ? _declare : null,
+            icon: const Icon(Icons.check_circle),
+            label: const Text('Declare'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: Colors.grey.shade700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Future<void> _drawFromDeck() async {
+    if (_isProcessing || _hasDrawn) return;
+    
+    setState(() => _isProcessing = true);
+    
+    try {
+      final marriageService = ref.read(marriageServiceProvider);
+      final authService = ref.read(authServiceProvider);
+      final userId = authService.currentUser?.uid;
+      
+      if (userId != null) {
+        await marriageService.drawFromDeck(widget.roomId, userId);
+        setState(() => _hasDrawn = true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+  
+  Future<void> _drawFromDiscard() async {
+    if (_isProcessing || _hasDrawn) return;
+    
+    setState(() => _isProcessing = true);
+    
+    try {
+      final marriageService = ref.read(marriageServiceProvider);
+      final authService = ref.read(authServiceProvider);
+      final userId = authService.currentUser?.uid;
+      
+      if (userId != null) {
+        await marriageService.drawFromDiscard(widget.roomId, userId);
+        setState(() => _hasDrawn = true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+  
+  Future<void> _discardCard() async {
+    if (_selectedCardId == null || _isProcessing || !_hasDrawn) return;
+    
+    setState(() => _isProcessing = true);
+    
+    try {
+      final marriageService = ref.read(marriageServiceProvider);
+      final authService = ref.read(authServiceProvider);
+      final userId = authService.currentUser?.uid;
+      
+      if (userId != null) {
+        await marriageService.discardCard(widget.roomId, userId, _selectedCardId!);
+        setState(() {
+          _selectedCardId = null;
+          _hasDrawn = false; // Reset for next turn
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+  
+  Future<void> _declare() async {
+    if (_isProcessing) return;
+    
+    setState(() => _isProcessing = true);
+    
+    try {
+      final marriageService = ref.read(marriageServiceProvider);
+      final authService = ref.read(authServiceProvider);
+      final userId = authService.currentUser?.uid;
+      
+      if (userId != null) {
+        final success = await marriageService.declare(widget.roomId, userId);
+        if (success && mounted) {
+          _showWinDialog();
+        } else if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Cannot declare yet - complete all melds first!'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+  
+  void _showWinDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: CasinoColors.cardBackground,
+        title: const Text('🎉 You Win!', style: TextStyle(color: CasinoColors.gold)),
+        content: const Text('Congratulations!', style: TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.go('/lobby');
+            },
+            child: const Text('Back to Lobby'),
+          ),
+        ],
+      ),
+    );
+  }
+}

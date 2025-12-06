@@ -1,10 +1,11 @@
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:io';
+// import 'dart:io'; // Removed for web compatibility
 
 import '../auth/auth_service.dart';
 import '../wallet/diamond_balance_widget.dart';
@@ -21,7 +22,8 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _displayNameController = TextEditingController();
-  File? _image;
+  XFile? _image;
+  Uint8List? _imageBytes;
 
   @override
   void dispose() {
@@ -32,15 +34,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
       setState(() {
-        _image = File(pickedFile.path);
+        _image = pickedFile;
+        _imageBytes = bytes;
       });
     }
   }
 
   Future<String> _uploadAvatar(String userId) async {
+    if (_imageBytes == null) return '';
     final storageRef = FirebaseStorage.instance.ref().child('avatars/$userId');
-    final uploadTask = storageRef.putFile(_image!);
+    // Use putData instead of putFile for web compatibility
+    final uploadTask = storageRef.putData(_imageBytes!);
     final snapshot = await uploadTask.whenComplete(() {});
     return snapshot.ref.getDownloadURL();
   }
@@ -69,8 +75,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 onTap: _pickImage,
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage: _image != null ? FileImage(_image!) : null,
-                  child: _image == null ? const Icon(Icons.add_a_photo, size: 50) : null,
+                  // Use MemoryImage which works on usage both platforms without dart:io
+                  backgroundImage: _imageBytes != null ? MemoryImage(_imageBytes!) : null,
+                  child: _imageBytes == null ? const Icon(Icons.add_a_photo, size: 50) : null,
                 ),
               ),
               const SizedBox(height: 20),
@@ -92,7 +99,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   if (_formKey.currentState!.validate()) {
                     if (user != null) {
                       String? avatarUrl;
-                      if (_image != null) {
+                      if (_imageBytes != null) {
                         avatarUrl = await _uploadAvatar(user.uid);
                       }
                       final profile = UserProfile(

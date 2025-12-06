@@ -2,12 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:myapp/features/game/game_room.dart';
-import 'package:myapp/features/game/game_config.dart';
-import 'package:myapp/features/lobby/lobby_service.dart';
-import 'package:myapp/features/wallet/diamond_service.dart';
-import 'package:myapp/features/wallet/diamond_balance_widget.dart';
+import 'package:taasclub/features/game/game_room.dart';
+import 'package:taasclub/features/game/game_config.dart';
+import 'package:taasclub/features/lobby/lobby_service.dart';
+import 'package:taasclub/features/wallet/diamond_service.dart';
+import 'package:taasclub/features/wallet/diamond_balance_widget.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:math';
 
@@ -21,180 +22,235 @@ class LobbyScreen extends ConsumerWidget {
     final lobbyService = ref.watch(lobbyServiceProvider);
     final authService = ref.watch(authServiceProvider);
     final gamesStream = lobbyService.getGames();
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Game Lobby'),
-        centerTitle: true,
-        actions: [
-          // Diamond balance
-          DiamondBalanceBadge(),
-          // Join by Code button
-          IconButton(
-            icon: const Icon(Icons.pin_outlined),
-            onPressed: () => _showJoinByCodeDialog(context, ref),
-            tooltip: 'Join by Code',
-          ),
-          IconButton(
-            icon: const Icon(Icons.person_outline),
-            onPressed: () => context.go('/profile'),
-            tooltip: 'Profile',
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await authService.signOut();
-              if (context.mounted) {
-                context.go('/');
-              }
-            },
-            tooltip: 'Sign Out',
-          ),
-        ],
-      ),
-      body: StreamBuilder<List<GameRoom>>(
-        stream: gamesStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Loading games...'),
-                ],
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          // Premium Header
+          SliverAppBar(
+            expandedHeight: 180,
+            floating: false,
+            pinned: true,
+            stretch: true,
+            backgroundColor: Colors.deepPurple,
+            leading: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.arrow_back, color: Colors.white),
               ),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 64, color: colorScheme.error),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Something went wrong',
-                    style: theme.textTheme.titleLarge,
+              onPressed: () => context.go('/'),
+            ),
+            actions: [
+              DiamondBalanceBadge(),
+              IconButton(
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${snapshot.error}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                  child: const Icon(Icons.pin_outlined, color: Colors.white),
+                ),
+                onPressed: () => _showJoinByCodeDialog(context, ref),
+                tooltip: 'Join by Code',
               ),
-            );
-          }
-
-          final games = snapshot.data ?? [];
-
-          if (games.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer.withOpacity(0.3),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.sports_esports_outlined,
-                      size: 80,
-                      color: colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'No games yet!',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Create a new game or join with a code',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FilledButton.icon(
-                        onPressed: () => _showCreateGameDialog(context, ref),
-                        icon: const Icon(Icons.add),
-                        label: const Text('Create Game'),
-                      ),
-                      const SizedBox(width: 16),
-                      OutlinedButton.icon(
-                        onPressed: () => _showJoinByCodeDialog(context, ref),
-                        icon: const Icon(Icons.pin),
-                        label: const Text('Join by Code'),
-                      ),
+              const SizedBox(width: 8),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              title: const Text(
+                'Game Lobby',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              centerTitle: true,
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.deepPurple.shade400,
+                      Colors.deepPurple.shade700,
+                      Colors.purple.shade900,
                     ],
                   ),
+                ),
+                child: Stack(
+                  children: [
+                    // Pattern overlay
+                    Positioned.fill(
+                      child: Opacity(
+                        opacity: 0.1,
+                        child: GridView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 8,
+                          ),
+                          itemCount: 64,
+                          itemBuilder: (context, index) {
+                            return Icon(
+                              index % 3 == 0 ? Icons.sports_esports : Icons.videogame_asset,
+                              color: Colors.white,
+                              size: 20,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    // Center icon
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.sports_esports_rounded,
+                          size: 56,
+                          color: Colors.white,
+                        ),
+                      ).animate(onPlay: (c) => c.repeat(reverse: true))
+                       .scale(duration: 1500.ms, begin: const Offset(0.95, 0.95), end: const Offset(1.05, 1.05)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Quick Actions Bar
+          SliverToBoxAdapter(
+            child: Container(
+              margin: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _QuickActionButton(
+                      icon: Icons.add_rounded,
+                      label: 'Create Room',
+                      color: Colors.deepPurple,
+                      onTap: () => _showCreateGameDialog(context, ref),
+                    ).animate(delay: 100.ms).fadeIn().slideX(begin: -0.2),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _QuickActionButton(
+                      icon: Icons.pin_rounded,
+                      label: 'Join by Code',
+                      color: Colors.teal,
+                      onTap: () => _showJoinByCodeDialog(context, ref),
+                    ).animate(delay: 200.ms).fadeIn().slideX(begin: 0.2),
+                  ),
                 ],
               ),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              await Future.delayed(const Duration(milliseconds: 500));
-            },
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: games.length,
-              itemBuilder: (context, index) {
-                final game = games[index];
-                final isFinished = game.isFinished || game.status == GameStatus.settled;
-                final currentUser = authService.currentUser;
-                final isInGame = game.players.any((p) => p.id == currentUser?.uid);
-                final isHost = game.hostId == currentUser?.uid;
-
-                return _GameCard(
-                  game: game,
-                  isFinished: isFinished,
-                  isInGame: isInGame,
-                  isHost: isHost,
-                  onTap: () {
-                    if (isFinished) {
-                      context.go('/ledger/${game.id}');
-                    } else if (game.status == GameStatus.waiting) {
-                      context.go('/lobby/${game.id}');
-                    } else {
-                      context.go('/game/${game.id}/play');
-                    }
-                  },
-                  onJoin: isInGame
-                      ? null
-                      : () => _joinGame(context, ref, game),
-                  onShareCode: game.roomCode != null
-                      ? () => _shareRoomCode(context, game)
-                      : null,
-                );
-              },
             ),
-          );
-        },
+          ),
+
+          // Section Header
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: Text(
+                'Available Rooms',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+            ).animate(delay: 300.ms).fadeIn(),
+          ),
+
+          // Games List
+          StreamBuilder<List<GameRoom>>(
+            stream: gamesStream,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(color: Colors.deepPurple),
+                        SizedBox(height: 16),
+                        Text('Finding rooms...'),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              if (snapshot.hasError) {
+                return SliverFillRemaining(
+                  child: _ErrorState(error: snapshot.error.toString()),
+                );
+              }
+
+              final games = snapshot.data ?? [];
+
+              if (games.isEmpty) {
+                return SliverFillRemaining(
+                  child: _EmptyState(
+                    onCreateRoom: () => _showCreateGameDialog(context, ref),
+                    onJoinByCode: () => _showJoinByCodeDialog(context, ref),
+                  ),
+                );
+              }
+
+              return SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final game = games[index];
+                      final isFinished = game.isFinished || game.status == GameStatus.settled;
+                      final currentUser = authService.currentUser;
+                      final isInGame = game.players.any((p) => p.id == currentUser?.uid);
+                      final isHost = game.hostId == currentUser?.uid;
+
+                      return _EnhancedGameCard(
+                        game: game,
+                        isFinished: isFinished,
+                        isInGame: isInGame,
+                        isHost: isHost,
+                        onTap: () {
+                          if (isFinished) {
+                            context.go('/ledger/${game.id}');
+                          } else if (game.status == GameStatus.waiting) {
+                            context.go('/lobby/${game.id}');
+                          } else {
+                            context.go('/game/${game.id}/play');
+                          }
+                        },
+                        onJoin: isInGame ? null : () => _joinGame(context, ref, game),
+                        onShareCode: game.roomCode != null ? () => _shareRoomCode(context, game) : null,
+                      ).animate(delay: (100 * index).ms).fadeIn().slideX(begin: 0.1);
+                    },
+                    childCount: games.length,
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // Bottom padding
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCreateGameDialog(context, ref),
         icon: const Icon(Icons.add),
-        label: const Text('New Game'),
-        elevation: 4,
-      ),
+        label: const Text('New Room'),
+        backgroundColor: Colors.deepPurple,
+        elevation: 8,
+      ).animate().fadeIn(delay: 500.ms).scale(),
     );
   }
 
@@ -205,27 +261,49 @@ class LobbyScreen extends ConsumerWidget {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: const Icon(Icons.pin, size: 48),
+        icon: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.teal.shade50,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(Icons.pin_rounded, size: 48, color: Colors.teal.shade600),
+        ),
         title: const Text('Join by Room Code'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Enter the 6-digit code shared by the host'),
-            const SizedBox(height: 16),
+            Text(
+              'Enter the 6-digit code shared by the host',
+              style: TextStyle(color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 24),
             TextField(
               controller: codeController,
               keyboardType: TextInputType.number,
               maxLength: 6,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                letterSpacing: 8,
+                fontWeight: FontWeight.bold,
+              ),
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(6),
               ],
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: '000000',
                 counterText: '',
-                border: OutlineInputBorder(),
+                filled: true,
+                fillColor: Colors.grey.shade100,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.teal, width: 2),
+                ),
               ),
               autofocus: true,
             ),
@@ -242,7 +320,8 @@ class LobbyScreen extends ConsumerWidget {
                 Navigator.pop(context, codeController.text);
               }
             },
-            child: const Text('Join'),
+            style: FilledButton.styleFrom(backgroundColor: Colors.teal),
+            child: const Text('Join Room'),
           ),
         ],
       ),
@@ -257,68 +336,172 @@ class LobbyScreen extends ConsumerWidget {
   Future<void> _showCreateGameDialog(BuildContext context, WidgetRef ref) async {
     double pointValue = 10;
     int totalRounds = 5;
+    String gameType = 'call_break';
     
-    final result = await showDialog<GameConfig>(
+    final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          icon: const Icon(Icons.settings, size: 48),
-          title: const Text('Room Settings'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Point Value
-              Text('Point Value (Units per point)',
-                  style: Theme.of(context).textTheme.titleSmall),
-              const SizedBox(height: 8),
-              SegmentedButton<double>(
-                segments: const [
-                  ButtonSegment(value: 1, label: Text('1')),
-                  ButtonSegment(value: 5, label: Text('5')),
-                  ButtonSegment(value: 10, label: Text('10')),
-                  ButtonSegment(value: 20, label: Text('20')),
-                ],
-                selected: {pointValue},
-                onSelectionChanged: (values) {
-                  setState(() => pointValue = values.first);
-                },
+          icon: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.deepPurple.shade50,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.settings_rounded, size: 48, color: Colors.deepPurple.shade600),
+          ),
+          title: const Text('Create Room'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Game Type Selection
+                Text('Game Type',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    )),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _GameTypeOption(
+                        title: 'Call Break',
+                        subtitle: 'Trick-taking',
+                        icon: Icons.style_rounded,
+                        isSelected: gameType == 'call_break',
+                        onTap: () => setState(() => gameType = 'call_break'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _GameTypeOption(
+                        title: 'Marriage',
+                        subtitle: 'Rummy-style',
+                        icon: Icons.layers_rounded,
+                        isSelected: gameType == 'marriage',
+                        onTap: () => setState(() => gameType = 'marriage'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _GameTypeOption(
+                        title: 'Teen Patti',
+                        subtitle: 'Betting',
+                        icon: Icons.casino_rounded,
+                        isSelected: gameType == 'teen_patti',
+                        onTap: () => setState(() => gameType = 'teen_patti'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _GameTypeOption(
+                        title: 'In Between',
+                        subtitle: 'Quick bet',
+                        icon: Icons.unfold_more_rounded,
+                        isSelected: gameType == 'in_between',
+                        isNew: true,
+                        onTap: () => setState(() => gameType = 'in_between'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                
+                // Point Value
+                Text('Point Value (Units per point)',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    )),
+                const SizedBox(height: 12),
+                SegmentedButton<double>(
+                  segments: const [
+                    ButtonSegment(value: 1, label: Text('1')),
+                    ButtonSegment(value: 5, label: Text('5')),
+                    ButtonSegment(value: 10, label: Text('10')),
+                    ButtonSegment(value: 20, label: Text('20')),
+                  ],
+                  selected: {pointValue},
+                  onSelectionChanged: (values) {
+                    setState(() => pointValue = values.first);
+                  },
+                  style: SegmentedButton.styleFrom(
+                    selectedBackgroundColor: Colors.deepPurple.shade100,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                
+                // Rounds
+                Text('Number of Rounds',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    )),
+                const SizedBox(height: 12),
+                SegmentedButton<int>(
+                  segments: const [
+                    ButtonSegment(value: 3, label: Text('3')),
+                    ButtonSegment(value: 5, label: Text('5')),
+                    ButtonSegment(value: 10, label: Text('10')),
+                  ],
+                  selected: {totalRounds},
+                  onSelectionChanged: (values) {
+                    setState(() => totalRounds = values.first);
+                  },
+                  style: SegmentedButton.styleFrom(
+                    selectedBackgroundColor: Colors.deepPurple.shade100,
+                  ),
+                ),
+
+              const SizedBox(height: 16),
+              // Cost indicator
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.amber.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.amber.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.diamond, color: Colors.amber.shade700),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Creating a room costs ${DiamondService.roomCreationCost} diamonds',
+                        style: TextStyle(color: Colors.amber.shade800),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 20),
-              
-              // Rounds
-              Text('Number of Rounds',
-                  style: Theme.of(context).textTheme.titleSmall),
-              const SizedBox(height: 8),
-              SegmentedButton<int>(
-                segments: const [
-                  ButtonSegment(value: 3, label: Text('3')),
-                  ButtonSegment(value: 5, label: Text('5')),
-                  ButtonSegment(value: 10, label: Text('10')),
-                ],
-                selected: {totalRounds},
-                onSelectionChanged: (values) {
-                  setState(() => totalRounds = values.first);
-                },
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancel'),
             ),
-            FilledButton(
+            FilledButton.icon(
               onPressed: () {
                 Navigator.pop(
                   context,
-                  GameConfig(
-                    pointValue: pointValue,
-                    totalRounds: totalRounds,
-                  ),
+                  {
+                    'gameType': gameType,
+                    'config': GameConfig(
+                      pointValue: pointValue,
+                      totalRounds: totalRounds,
+                    ),
+                  },
                 );
               },
-              child: const Text('Create Room'),
+              icon: const Icon(Icons.add),
+              label: const Text('Create'),
+              style: FilledButton.styleFrom(backgroundColor: Colors.deepPurple),
             ),
           ],
         ),
@@ -326,11 +509,13 @@ class LobbyScreen extends ConsumerWidget {
     );
 
     if (result != null && context.mounted) {
-      await _createGame(context, ref, result);
+      final config = result['config'] as GameConfig;
+      final gameType = result['gameType'] as String;
+      await _createGame(context, ref, config, gameType);
     }
   }
 
-  Future<void> _createGame(BuildContext context, WidgetRef ref, GameConfig config) async {
+  Future<void> _createGame(BuildContext context, WidgetRef ref, GameConfig config, String gameType) async {
     final authService = ref.read(authServiceProvider);
     final lobbyService = ref.read(lobbyServiceProvider);
     final diamondService = ref.read(diamondServiceProvider);
@@ -338,52 +523,61 @@ class LobbyScreen extends ConsumerWidget {
 
     if (user == null) return;
 
-    // Check diamond balance
-    final hasEnough = await diamondService.hasEnoughDiamonds(
-      user.uid,
-      DiamondService.roomCreationCost,
-    );
-
-    if (!hasEnough && context.mounted) {
-      // Show insufficient balance dialog
-      final shouldBuy = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          icon: const Icon(Icons.diamond, size: 48, color: Colors.amber),
-          title: const Text('Insufficient Diamonds'),
-          content: Text(
-            'You need ${DiamondService.roomCreationCost} diamonds to create a room.\n\n'
-            'Would you like to get more diamonds?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Get Diamonds'),
-            ),
-          ],
-        ),
+    // Skip diamond check in Test Mode - allow free room creation
+    final isTestMode = TestMode.isEnabled;
+    
+    if (!isTestMode) {
+      // Check diamond balance (only for real users)
+      final hasEnough = await diamondService.hasEnoughDiamonds(
+        user.uid,
+        DiamondService.roomCreationCost,
       );
 
-      if (shouldBuy == true && context.mounted) {
-        // TODO: Navigate to diamond purchase screen
-        // context.push('/diamonds/purchase');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Diamond purchase screen coming soon!'),
+      if (!hasEnough && context.mounted) {
+        // Show insufficient balance dialog
+        final shouldBuy = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            icon: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.amber.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.diamond, size: 48, color: Colors.amber.shade600),
+            ),
+            title: const Text('Insufficient Diamonds'),
+            content: Text(
+              'You need ${DiamondService.roomCreationCost} diamonds to create a room.\n\n'
+              'Would you like to get more diamonds?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(backgroundColor: Colors.amber.shade700),
+                child: const Text('Get Diamonds'),
+              ),
+            ],
           ),
         );
+
+        if (shouldBuy == true && context.mounted) {
+          context.go('/wallet');
+        }
+        return;
       }
-      return;
     }
 
+    final gameTypeName = gameType == 'marriage' ? 'Marriage' : 'Call Break';
     final newGameRoom = GameRoom(
-      name: 'Game Room #${Random().nextInt(1000)}',
+      name: '$gameTypeName #${Random().nextInt(1000)}',
       hostId: user.uid,
       config: config,
+      gameType: gameType,
       players: [
         Player(id: user.uid, name: user.displayName ?? 'Player 1'),
       ],
@@ -393,14 +587,26 @@ class LobbyScreen extends ConsumerWidget {
 
     final newGameId = await lobbyService.createGame(newGameRoom);
 
-    // Deduct diamonds after successful room creation
-    await diamondService.processRoomCreation(user.uid, newGameId);
+    // Deduct diamonds after successful room creation (skip in Test Mode)
+    if (!isTestMode) {
+      await diamondService.processRoomCreation(user.uid, newGameId);
+    }
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Room created! ${DiamondService.roomCreationCost} diamonds deducted.'),
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 8),
+              Text(isTestMode 
+                ? 'Room created! (Test Mode - Free)' 
+                : 'Room created! ${DiamondService.roomCreationCost} diamonds used.'),
+            ],
+          ),
           backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
       context.go('/lobby/$newGameId');
@@ -427,8 +633,16 @@ class LobbyScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Theme.of(context).colorScheme.error,
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text(e.toString().replaceAll('Exception: ', ''))),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -455,15 +669,66 @@ class LobbyScreen extends ConsumerWidget {
   void _shareRoomCode(BuildContext context, GameRoom game) {
     if (game.roomCode == null) return;
     
+    // ignore: deprecated_member_use
     Share.share(
-      'Join my TaasClub game!\n\nRoom Code: ${game.roomCode}\n\nOpen the app and enter this code to join.',
-      subject: 'Join my game: ${game.name}',
+      'Join my TaasClub game! 🎮\n\nRoom Code: ${game.roomCode}\n\nOpen the app and enter this code to join.',
     );
   }
 }
 
+// Quick action button
+class _QuickActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
 
-class _GameCard extends StatelessWidget {
+  const _QuickActionButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shadowColor: color.withValues(alpha: 0.3),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [color, color.withValues(alpha: 0.8)],
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: Colors.white),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Enhanced game card
+class _EnhancedGameCard extends StatelessWidget {
   final GameRoom game;
   final bool isFinished;
   final bool isInGame;
@@ -472,7 +737,7 @@ class _GameCard extends StatelessWidget {
   final VoidCallback? onJoin;
   final VoidCallback? onShareCode;
 
-  const _GameCard({
+  const _EnhancedGameCard({
     required this.game,
     required this.isFinished,
     required this.isInGame,
@@ -485,206 +750,521 @@ class _GameCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+
+    final statusColor = isFinished 
+        ? Colors.grey 
+        : game.status == GameStatus.waiting 
+            ? Colors.green 
+            : Colors.orange;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      clipBehavior: Clip.antiAlias,
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 4,
+      shadowColor: Colors.deepPurple.withValues(alpha: 0.2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white,
+                Colors.deepPurple.shade50.withValues(alpha: 0.3),
+              ],
+            ),
+          ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: isFinished
-                          ? colorScheme.surfaceContainerHighest
-                          : colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      isFinished ? Icons.check_circle : Icons.sports_esports,
-                      color: isFinished
-                          ? colorScheme.onSurfaceVariant
-                          : colorScheme.primary,
-                    ),
+              // Header
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isFinished 
+                        ? [Colors.grey.shade400, Colors.grey.shade600]
+                        : [Colors.deepPurple.shade400, Colors.deepPurple.shade600],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                game.name,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            if (isHost)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.amber.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.star, size: 12, color: Colors.amber),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Host',
-                                      style: theme.textTheme.labelSmall?.copyWith(
-                                        color: Colors.amber.shade700,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.people,
-                              size: 16,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${game.players.length}/${game.config.maxPlayers}',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            if (game.roomCode != null) ...[
-                              const SizedBox(width: 12),
-                              Icon(
-                                Icons.pin,
-                                size: 14,
-                                color: colorScheme.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                game.roomCode!,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'monospace',
-                                ),
-                              ),
-                              if (onShareCode != null)
-                                IconButton(
-                                  icon: Icon(Icons.share, size: 16, color: colorScheme.primary),
-                                  onPressed: onShareCode,
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                  visualDensity: VisualDensity.compact,
-                                ),
-                            ],
-                            if (isInGame) ...[
-                              const SizedBox(width: 12),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: colorScheme.primaryContainer,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        isFinished ? Icons.check_circle : Icons.sports_esports,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
                                 child: Text(
-                                  'You\'re in',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: colorScheme.primary,
+                                  game.name,
+                                  style: theme.textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
+                              if (isHost)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.star, size: 12, color: Colors.white),
+                                      const SizedBox(width: 4),
+                                      const Text(
+                                        'Host',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                             ],
-                          ],
-                        ),
-                      ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(Icons.circle, size: 8, color: statusColor),
+                              const SizedBox(width: 6),
+                              Text(
+                                isFinished ? 'Finished' : (game.status == GameStatus.waiting ? 'Waiting' : 'In Progress'),
+                                style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  if (isFinished)
-                    Chip(
-                      label: const Text('Finished'),
-                      backgroundColor: colorScheme.surfaceContainerHighest,
-                      labelStyle: theme.textTheme.labelSmall,
-                    )
-                  else if (!isInGame && onJoin != null)
-                    FilledButton.tonal(
-                      onPressed: onJoin,
-                      child: const Text('Join'),
-                    )
-                  else
-                    const Icon(Icons.arrow_forward_ios, size: 16),
-                ],
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              // Point value info
-              if (!isFinished)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+
+              // Room code banner
+              if (game.roomCode != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurple.shade50,
+                  ),
                   child: Row(
                     children: [
-                      Icon(Icons.monetization_on, size: 14, color: colorScheme.secondary),
-                      const SizedBox(width: 4),
+                      Icon(Icons.pin, size: 18, color: Colors.deepPurple.shade700),
+                      const SizedBox(width: 8),
                       Text(
-                        '${game.config.pointValue.toInt()} units/point',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.secondary,
+                        'Room Code: ',
+                        style: TextStyle(color: Colors.deepPurple.shade600),
+                      ),
+                      Text(
+                        game.roomCode!,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'monospace',
+                          fontSize: 16,
+                          color: Colors.deepPurple.shade800,
+                          letterSpacing: 2,
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      Icon(Icons.repeat, size: 14, color: colorScheme.secondary),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${game.config.totalRounds} rounds',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.secondary,
+                      const Spacer(),
+                      if (onShareCode != null)
+                        IconButton(
+                          icon: Icon(Icons.share, size: 20, color: Colors.deepPurple.shade600),
+                          onPressed: onShareCode,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
-                      ),
                     ],
                   ),
                 ),
-              Wrap(
-                spacing: 8,
-                children: game.players
-                    .take(5)
-                    .map((p) => Chip(
-                          avatar: CircleAvatar(
-                            backgroundColor: colorScheme.primary,
-                            child: Text(
-                              p.name[0].toUpperCase(),
-                              style: TextStyle(
-                                color: colorScheme.onPrimary,
-                                fontSize: 12,
+
+              // Game info
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    // Stats row
+                    Row(
+                      children: [
+                        _GameStat(
+                          icon: Icons.people,
+                          value: '${game.players.length}/${game.config.maxPlayers}',
+                          label: 'Players',
+                        ),
+                        const SizedBox(width: 16),
+                        _GameStat(
+                          icon: Icons.monetization_on,
+                          value: '${game.config.pointValue.toInt()}',
+                          label: 'Units/pt',
+                        ),
+                        const SizedBox(width: 16),
+                        _GameStat(
+                          icon: Icons.repeat,
+                          value: '${game.config.totalRounds}',
+                          label: 'Rounds',
+                        ),
+                        const Spacer(),
+                        if (isInGame)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.green.shade100,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.check, size: 14, color: Colors.green.shade700),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Joined',
+                                  style: TextStyle(
+                                    color: Colors.green.shade700,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else if (!isFinished && onJoin != null)
+                          FilledButton(
+                            onPressed: onJoin,
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
                               ),
                             ),
+                            child: const Text('Join'),
                           ),
-                          label: Text(p.name),
-                          visualDensity: VisualDensity.compact,
-                        ))
-                    .toList(),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Players
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: game.players.take(5).map((p) {
+                        final isCurrentHost = p.id == game.hostId;
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isCurrentHost ? Colors.amber.shade50 : Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(20),
+                            border: isCurrentHost ? Border.all(color: Colors.amber) : null,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircleAvatar(
+                                radius: 12,
+                                backgroundColor: isCurrentHost ? Colors.amber : Colors.deepPurple.shade200,
+                                child: Text(
+                                  p.name[0].toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: isCurrentHost ? Colors.white : Colors.deepPurple.shade700,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                p.name,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  fontWeight: isCurrentHost ? FontWeight.bold : null,
+                                ),
+                              ),
+                              if (isCurrentHost) ...[
+                                const SizedBox(width: 4),
+                                Icon(Icons.star, size: 12, color: Colors.amber.shade700),
+                              ],
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GameStat extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+
+  const _GameStat({required this.icon, required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: Colors.grey.shade600),
+        const SizedBox(width: 4),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+            Text(
+              label,
+              style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// Empty state
+class _EmptyState extends StatelessWidget {
+  final VoidCallback onCreateRoom;
+  final VoidCallback onJoinByCode;
+
+  const _EmptyState({required this.onCreateRoom, required this.onJoinByCode});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.deepPurple.shade100, Colors.purple.shade50],
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.sports_esports_outlined,
+                size: 64,
+                color: Colors.deepPurple.shade400,
+              ),
+            ).animate().scale(duration: 500.ms, curve: Curves.elasticOut),
+            const SizedBox(height: 32),
+            Text(
+              'No Rooms Yet',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple.shade700,
+              ),
+            ).animate().fadeIn(delay: 200.ms),
+            const SizedBox(height: 12),
+            Text(
+              'Create a new room or join with a code\nto start playing!',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: Colors.grey.shade600,
+              ),
+              textAlign: TextAlign.center,
+            ).animate().fadeIn(delay: 300.ms),
+            const SizedBox(height: 32),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FilledButton.icon(
+                  onPressed: onCreateRoom,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Create Room'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                ).animate().fadeIn(delay: 400.ms).slideX(begin: -0.2),
+                const SizedBox(width: 16),
+                OutlinedButton.icon(
+                  onPressed: onJoinByCode,
+                  icon: const Icon(Icons.pin),
+                  label: const Text('Join by Code'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.deepPurple,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                ).animate().fadeIn(delay: 400.ms).slideX(begin: 0.2),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Error state
+class _ErrorState extends StatelessWidget {
+  final String error;
+
+  const _ErrorState({required this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.error_outline_rounded,
+                size: 64,
+                color: Colors.red.shade400,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Something went wrong',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: Colors.grey.shade600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Game type option widget for create dialog
+class _GameTypeOption extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final bool isSelected;
+  final bool isNew;
+  final VoidCallback onTap;
+
+  const _GameTypeOption({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.isSelected,
+    this.isNew = false,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.deepPurple.shade50 : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? Colors.deepPurple : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Stack(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  color: isSelected ? Colors.deepPurple : Colors.grey.shade600,
+                  size: 24,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isSelected ? Colors.deepPurple : Colors.black87,
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+            if (isNew)
+              Positioned(
+                top: -4,
+                right: -4,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    'NEW',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );

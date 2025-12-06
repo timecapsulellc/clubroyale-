@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:myapp/features/game/engine/models/card.dart';
-import 'package:myapp/features/game/engine/widgets/card_hand_widget.dart';
+import 'package:taasclub/features/game/engine/models/card.dart';
+import 'package:taasclub/features/game/engine/widgets/card_hand_widget.dart';
 
 void main() {
   group('CardHandWidget', () {

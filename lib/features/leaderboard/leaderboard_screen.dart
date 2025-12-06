@@ -1,9 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:myapp/features/game/game_room.dart';
-import 'package:myapp/features/game/game_service.dart';
+import 'package:taasclub/features/game/game_service.dart';
 
 /// Provider for leaderboard data - aggregates scores across all finished games
 final leaderboardProvider = FutureProvider<List<LeaderboardEntry>>((ref) async {
@@ -38,157 +38,215 @@ class LeaderboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final leaderboardAsync = ref.watch(leaderboardProvider);
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Leaderboard'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/'),
-        ),
-      ),
-      body: leaderboardAsync.when(
-        data: (entries) {
-          if (entries.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.amber.withOpacity(0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.emoji_events,
-                      size: 64,
-                      color: Colors.amber,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'No rankings yet',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Play some games to appear on the leaderboard!',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-                  FilledButton.icon(
-                    onPressed: () => context.go('/lobby'),
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('Start Playing'),
-                  ),
-                ],
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          // Premium Header
+          SliverAppBar(
+            expandedHeight: 200,
+            floating: false,
+            pinned: true,
+            stretch: true,
+            backgroundColor: Colors.amber.shade700,
+            leading: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.arrow_back, color: Colors.white),
               ),
-            );
-          }
-
-          return CustomScrollView(
-            slivers: [
-              // Top 3 Podium
-              SliverToBoxAdapter(
-                child: _TopThreePodium(entries: entries.take(3).toList()),
-              ),
-
-              // Rest of the leaderboard
-              SliverPadding(
-                padding: const EdgeInsets.all(16),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      // Skip first 3 since they're in podium
-                      final actualIndex = index + 3;
-                      if (actualIndex >= entries.length) return null;
-                      final entry = entries[actualIndex];
-                      return _LeaderboardTile(
-                        entry: entry,
-                        rank: actualIndex + 1,
-                      );
-                    },
-                    childCount: entries.length > 3 ? entries.length - 3 : 0,
+              onPressed: () => context.go('/'),
+            ),
+            actions: [
+              IconButton(
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
                   ),
+                  child: const Icon(Icons.refresh, color: Colors.white),
+                ),
+                onPressed: () => ref.invalidate(leaderboardProvider),
+              ),
+              const SizedBox(width: 8),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              title: const Text(
+                'Leaderboard',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
-          );
-        },
-        loading: () => const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Loading leaderboard...'),
-            ],
-          ),
-        ),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 64, color: colorScheme.error),
-              const SizedBox(height: 16),
-              Text('Error loading leaderboard',
-                  style: theme.textTheme.titleLarge),
-              const SizedBox(height: 8),
-              Text('$error', style: theme.textTheme.bodySmall),
-              const SizedBox(height: 24),
-              FilledButton.icon(
-                onPressed: () => ref.invalidate(leaderboardProvider),
-                icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+              centerTitle: true,
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.amber.shade500,
+                      Colors.orange.shade600,
+                      Colors.deepOrange.shade700,
+                    ],
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    // Pattern overlay
+                    Positioned.fill(
+                      child: Opacity(
+                        opacity: 0.1,
+                        child: GridView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 8,
+                          ),
+                          itemCount: 64,
+                          itemBuilder: (context, index) {
+                            return Icon(
+                              index % 3 == 0 ? Icons.emoji_events : Icons.star,
+                              color: Colors.white,
+                              size: 20,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    // Trophy icon
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.emoji_events_rounded,
+                          size: 56,
+                          color: Colors.white,
+                        ),
+                      ).animate(onPlay: (c) => c.repeat(reverse: true))
+                       .scale(duration: 1500.ms, begin: const Offset(0.95, 0.95), end: const Offset(1.05, 1.05)),
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
-        ),
+
+          // Content
+          leaderboardAsync.when(
+            data: (entries) {
+              if (entries.isEmpty) {
+                return SliverFillRemaining(
+                  child: _EmptyState(),
+                );
+              }
+
+              return SliverList(
+                delegate: SliverChildListDelegate([
+                  // Top 3 Podium
+                  _PremiumPodium(entries: entries.take(3).toList()),
+
+                  // Rest of the list
+                  if (entries.length > 3)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                      child: Text(
+                        'Other Rankings',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                    ),
+
+                  ...entries.skip(3).toList().asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final player = entry.value;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: _EnhancedLeaderboardTile(
+                        entry: player,
+                        rank: index + 4,
+                      ).animate(delay: (100 * index).ms).fadeIn().slideX(begin: 0.1),
+                    );
+                  }),
+
+                  const SizedBox(height: 32),
+                ]),
+              );
+            },
+            loading: () => const SliverFillRemaining(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: Colors.amber),
+                    SizedBox(height: 16),
+                    Text('Loading rankings...'),
+                  ],
+                ),
+              ),
+            ),
+            error: (error, stack) => SliverFillRemaining(
+              child: _ErrorState(
+                error: error.toString(),
+                onRetry: () => ref.invalidate(leaderboardProvider),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _TopThreePodium extends StatelessWidget {
+// Premium podium design
+class _PremiumPodium extends StatelessWidget {
   final List<LeaderboardEntry> entries;
 
-  const _TopThreePodium({required this.entries});
+  const _PremiumPodium({required this.entries});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Container(
+      margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            colorScheme.primaryContainer,
-            colorScheme.surface,
+            Colors.amber.shade50,
+            Colors.white,
           ],
         ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.amber.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Column(
         children: [
           Text(
-            '🏆 Top Players',
-            style: theme.textTheme.headlineSmall?.copyWith(
+            '🏆 Champions',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
+              color: Colors.amber.shade800,
             ),
-          ),
-          const SizedBox(height: 24),
+          ).animate().fadeIn(delay: 200.ms),
+          const SizedBox(height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -198,127 +256,123 @@ class _TopThreePodium extends StatelessWidget {
                 _PodiumPlayer(
                   entry: entries[1],
                   rank: 2,
-                  height: 100,
-                  color: Colors.grey.shade400,
-                )
+                  podiumHeight: 90,
+                  avatarSize: 50,
+                  colors: [Colors.grey.shade400, Colors.grey.shade600],
+                ).animate(delay: 400.ms).fadeIn().slideY(begin: 0.3)
               else
                 const SizedBox(width: 100),
 
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
 
               // 1st place (center)
               if (entries.isNotEmpty)
                 _PodiumPlayer(
                   entry: entries[0],
                   rank: 1,
-                  height: 130,
-                  color: Colors.amber,
-                )
+                  podiumHeight: 120,
+                  avatarSize: 64,
+                  colors: [Colors.amber.shade400, Colors.amber.shade700],
+                  showCrown: true,
+                ).animate(delay: 300.ms).fadeIn().slideY(begin: 0.3)
               else
                 const SizedBox(width: 110),
 
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
 
               // 3rd place (right)
               if (entries.length > 2)
                 _PodiumPlayer(
                   entry: entries[2],
                   rank: 3,
-                  height: 80,
-                  color: Colors.brown.shade300,
-                )
+                  podiumHeight: 70,
+                  avatarSize: 44,
+                  colors: [Colors.brown.shade300, Colors.brown.shade500],
+                ).animate(delay: 500.ms).fadeIn().slideY(begin: 0.3)
               else
                 const SizedBox(width: 100),
             ],
           ),
         ],
       ),
-    );
+    ).animate(delay: 100.ms).fadeIn().scale(begin: const Offset(0.95, 0.95));
   }
 }
 
 class _PodiumPlayer extends StatelessWidget {
   final LeaderboardEntry entry;
   final int rank;
-  final double height;
-  final Color color;
+  final double podiumHeight;
+  final double avatarSize;
+  final List<Color> colors;
+  final bool showCrown;
 
   const _PodiumPlayer({
     required this.entry,
     required this.rank,
-    required this.height,
-    required this.color,
+    required this.podiumHeight,
+    required this.avatarSize,
+    required this.colors,
+    this.showCrown = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Crown for 1st place
-        if (rank == 1)
-          const Text('👑', style: TextStyle(fontSize: 24))
+        if (showCrown)
+          const Text('👑', style: TextStyle(fontSize: 32))
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .scale(duration: 1000.ms, begin: const Offset(0.9, 0.9), end: const Offset(1.1, 1.1))
         else
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
 
         const SizedBox(height: 8),
 
-        // Avatar
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: color, width: 3),
+        // Avatar with gradient border
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(colors: colors),
+            boxShadow: [
+              BoxShadow(
+                color: colors[0].withValues(alpha: 0.4),
+                blurRadius: 12,
+                spreadRadius: 2,
               ),
-              child: CircleAvatar(
-                radius: rank == 1 ? 40 : 32,
-                backgroundImage: entry.avatarUrl != null
-                    ? NetworkImage(entry.avatarUrl!)
-                    : null,
-                backgroundColor: colorScheme.primaryContainer,
-                child: entry.avatarUrl == null
-                    ? Text(
-                        entry.playerName[0].toUpperCase(),
-                        style: TextStyle(
-                          fontSize: rank == 1 ? 28 : 22,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onPrimaryContainer,
-                        ),
-                      )
-                    : null,
-              ),
+            ],
+          ),
+          child: CircleAvatar(
+            radius: avatarSize / 2,
+            backgroundColor: Colors.white,
+            child: CircleAvatar(
+              radius: avatarSize / 2 - 3,
+              backgroundColor: colors[0].withValues(alpha: 0.2),
+              backgroundImage: entry.avatarUrl != null ? NetworkImage(entry.avatarUrl!) : null,
+              child: entry.avatarUrl == null
+                  ? Text(
+                      entry.playerName[0].toUpperCase(),
+                      style: TextStyle(
+                        fontSize: avatarSize * 0.4,
+                        fontWeight: FontWeight.bold,
+                        color: colors[1],
+                      ),
+                    )
+                  : null,
             ),
-            Positioned(
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '#$rank',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
 
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
 
         // Name
         SizedBox(
-          width: rank == 1 ? 110 : 100,
+          width: avatarSize * 2,
           child: Text(
             entry.playerName,
             style: theme.textTheme.titleSmall?.copyWith(
@@ -330,38 +384,71 @@ class _PodiumPlayer extends StatelessWidget {
           ),
         ),
 
-        // Score
-        Text(
-          '${entry.totalScore} pts',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: color,
-            fontWeight: FontWeight.bold,
+        // Score badge
+        Container(
+          margin: const EdgeInsets.only(top: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: colors),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            '${entry.totalScore} pts',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
           ),
         ),
 
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
 
         // Podium stand
         Container(
-          width: rank == 1 ? 110 : 100,
-          height: height,
+          width: avatarSize * 2,
+          height: podiumHeight,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.3),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-            border: Border.all(color: color, width: 2),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                colors[0].withValues(alpha: 0.3),
+                colors[1].withValues(alpha: 0.5),
+              ],
+            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            border: Border.all(color: colors[0], width: 2),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                '${entry.gamesWon}W',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    '$rank',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: colors[1],
+                    ),
+                  ),
                 ),
               ),
+              const SizedBox(height: 8),
               Text(
-                '${entry.gamesPlayed} games',
-                style: theme.textTheme.bodySmall,
+                '${entry.gamesWon}W / ${entry.gamesPlayed}G',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: colors[1],
+                ),
               ),
             ],
           ),
@@ -371,11 +458,12 @@ class _PodiumPlayer extends StatelessWidget {
   }
 }
 
-class _LeaderboardTile extends StatelessWidget {
+// Enhanced leaderboard tile for ranks 4+
+class _EnhancedLeaderboardTile extends StatelessWidget {
   final LeaderboardEntry entry;
   final int rank;
 
-  const _LeaderboardTile({
+  const _EnhancedLeaderboardTile({
     required this.entry,
     required this.rank,
   });
@@ -383,65 +471,248 @@ class _LeaderboardTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Row(
-          mainAxisSize: MainAxisSize.min,
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      shadowColor: Colors.amber.withValues(alpha: 0.1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.amber.shade50.withValues(alpha: 0.3)],
+          ),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Row(
           children: [
-            SizedBox(
-              width: 32,
-              child: Text(
-                '#$rank',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurfaceVariant,
+            // Rank badge
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: Text(
+                  '#$rank',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade600,
+                  ),
                 ),
               ),
             ),
+            const SizedBox(width: 16),
+
+            // Avatar
             CircleAvatar(
-              backgroundImage: entry.avatarUrl != null
-                  ? NetworkImage(entry.avatarUrl!)
-                  : null,
-              backgroundColor: colorScheme.primaryContainer,
+              radius: 24,
+              backgroundColor: Colors.amber.shade100,
+              backgroundImage: entry.avatarUrl != null ? NetworkImage(entry.avatarUrl!) : null,
               child: entry.avatarUrl == null
                   ? Text(
                       entry.playerName[0].toUpperCase(),
                       style: TextStyle(
-                        color: colorScheme.onPrimaryContainer,
                         fontWeight: FontWeight.bold,
+                        color: Colors.amber.shade700,
                       ),
                     )
                   : null,
             ),
-          ],
-        ),
-        title: Text(
-          entry.playerName,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Text(
-          '${entry.gamesPlayed} games • ${entry.gamesWon} wins',
-          style: theme.textTheme.bodySmall,
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              '${entry.totalScore}',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.primary,
+            const SizedBox(width: 16),
+
+            // Player info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    entry.playerName,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      _MiniStat(icon: Icons.games, value: '${entry.gamesPlayed}', color: Colors.blue),
+                      const SizedBox(width: 12),
+                      _MiniStat(icon: Icons.emoji_events, value: '${entry.gamesWon}', color: Colors.amber),
+                    ],
+                  ),
+                ],
               ),
             ),
+
+            // Score
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.amber.shade400, Colors.orange.shade500],
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '${entry.totalScore}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MiniStat extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final Color color;
+
+  const _MiniStat({required this.icon, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Empty state
+class _EmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.amber.shade100, Colors.orange.shade50],
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.emoji_events_outlined,
+                size: 64,
+                color: Colors.amber.shade600,
+              ),
+            ).animate().scale(duration: 500.ms, curve: Curves.elasticOut),
+            const SizedBox(height: 32),
             Text(
-              'points',
-              style: theme.textTheme.bodySmall,
+              'No Rankings Yet',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.amber.shade800,
+              ),
+            ).animate().fadeIn(delay: 200.ms),
+            const SizedBox(height: 12),
+            Text(
+              'Be the first to climb the leaderboard!\nPlay games to earn your spot.',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: Colors.grey.shade600,
+              ),
+              textAlign: TextAlign.center,
+            ).animate().fadeIn(delay: 300.ms),
+            const SizedBox(height: 32),
+            FilledButton.icon(
+              onPressed: () => context.go('/lobby'),
+              icon: const Icon(Icons.play_arrow_rounded),
+              label: const Text('Start Playing'),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.amber.shade700,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Error state
+class _ErrorState extends StatelessWidget {
+  final String error;
+  final VoidCallback onRetry;
+
+  const _ErrorState({required this.error, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.error_outline_rounded,
+                size: 64,
+                color: Colors.red.shade400,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Failed to load rankings',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: Colors.grey.shade600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.amber.shade700,
+              ),
             ),
           ],
         ),
