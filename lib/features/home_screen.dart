@@ -559,52 +559,38 @@ class _EnhancedActivityCard extends StatelessWidget {
 class _HistoryPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Mock data for visual design
     final recentMatches = [
-      {'result': 'Won', 'score': '+120', 'date': '2m ago', 'color': Colors.green},
-      {'result': '2nd', 'score': '+45', 'date': '1h ago', 'color': Colors.blue},
-      {'result': 'Lost', 'score': '-50', 'date': 'yesterday', 'color': Colors.red},
+      {'result': 'Won', 'score': '+120', 'color': Colors.green},
+      {'result': '2nd', 'score': '+45', 'color': Colors.blue},
+      {'result': 'Lost', 'score': '-50', 'color': Colors.red},
     ];
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Mini Stats Row
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
              _MiniDashboardStat(label: 'Win Rate', value: '45%', icon: Icons.trending_up, color: Colors.green),
-             Container(width: 1, height: 24, color: Colors.grey.withValues(alpha: 0.3)),
+             Container(width: 1, height: 20, color: Colors.grey.withValues(alpha: 0.3)),
              _MiniDashboardStat(label: 'Total', value: '12', icon: Icons.games, color: Colors.indigo),
           ],
         ),
-        const SizedBox(height: 12),
-        // Recent Match List
-        Expanded(
-          child: Column(
-            children: recentMatches.map((match) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                children: [
-                  Container(
-                    width: 6, 
-                    height: 6, 
-                    decoration: BoxDecoration(color: match['color'] as Color, shape: BoxShape.circle),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    match['result'] as String,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey.shade800),
-                  ),
-                  const Spacer(),
-                  Text(
-                    match['score'] as String,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: match['color'] as Color),
-                  ),
-                ],
-              ),
-            )).toList(),
+        const SizedBox(height: 8),
+        // Recent Match List - compact
+        ...recentMatches.map((match) => Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Row(
+            children: [
+              Container(width: 6, height: 6, decoration: BoxDecoration(color: match['color'] as Color, shape: BoxShape.circle)),
+              const SizedBox(width: 6),
+              Text(match['result'] as String, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.grey.shade800)),
+              const Spacer(),
+              Text(match['score'] as String, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: match['color'] as Color)),
+            ],
           ),
-        ),
+        )),
       ],
     );
   }
@@ -634,102 +620,39 @@ class _LeaderboardPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final topPlayers = [
-      {'name': 'KingDavid', 'score': '2450', 'rank': 1, 'medal': '🥇', 'color': Colors.amber},
-      {'name': 'Sarah_W', 'score': '2180', 'rank': 2, 'medal': '🥈', 'color': Colors.grey.shade400},
-      {'name': 'ProGamer', 'score': '1950', 'rank': 3, 'medal': '🥉', 'color': Colors.brown.shade400},
+      {'name': 'KingDavid', 'score': '2450', 'medal': '🥇', 'color': Colors.amber},
+      {'name': 'Sarah_W', 'score': '2180', 'medal': '🥈', 'color': Colors.grey.shade400},
+      {'name': 'ProGamer', 'score': '1950', 'medal': '🥉', 'color': Colors.brown.shade400},
     ];
 
     return Column(
-      children: [
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: topPlayers.map((player) => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: (player['color'] as Color).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: (player['color'] as Color).withOpacity(0.2)),
-              ),
-              child: Row(
-                children: [
-                  // Medal emoji
-                  Text(
-                    player['medal'] as String,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(width: 6),
-                  // Avatar with rank-based border
-                  Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: player['color'] as Color, width: 2),
-                    ),
-                    child: CircleAvatar(
-                      radius: 10,
-                      backgroundImage: const AssetImage('assets/images/avatar_placeholder.png'),
-                      backgroundColor: Colors.grey.shade200,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Name
-                  Expanded(
-                    child: Text(
-                      player['name'] as String, 
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600, 
-                        fontSize: 12,
-                        color: Colors.grey.shade800,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  // Score with trophy icon
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.star, size: 10, color: Colors.orange.shade700),
-                        const SizedBox(width: 2),
-                        Text(
-                          player['score'] as String,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.orange.shade800),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            )).toList(),
-          ),
-        ),
-        const SizedBox(height: 6),
-        // Your rank badge
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      mainAxisSize: MainAxisSize.min,
+      children: topPlayers.map((player) => Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.orange.withOpacity(0.15), Colors.amber.withOpacity(0.1)],
-            ),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.orange.withOpacity(0.3)),
+            color: (player['color'] as Color).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(6),
           ),
           child: Row(
-            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.emoji_events, size: 14, color: Colors.orange.shade700),
+              Text(player['medal'] as String, style: const TextStyle(fontSize: 14)),
               const SizedBox(width: 4),
-              Text('Your Rank: #12', style: TextStyle(fontSize: 11, color: Colors.orange.shade900, fontWeight: FontWeight.bold)),
+              CircleAvatar(radius: 8, backgroundColor: (player['color'] as Color)),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  player['name'] as String,
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 11, color: Colors.grey.shade800),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text('★${player['score']}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.orange.shade700)),
             ],
           ),
         ),
-      ],
+      )).toList(),
     );
   }
 }
