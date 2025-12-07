@@ -12,7 +12,7 @@ import 'features/lobby/lobby_screen.dart';
 import 'features/lobby/room_waiting_screen.dart';
 import 'features/game/game_screen.dart';
 import 'features/game/game_history_screen.dart';
-import 'features/game/call_break_game_screen.dart';
+import 'games/call_break/call_break_screen.dart';
 import 'features/leaderboard/leaderboard_screen.dart';
 import 'features/ledger/ledger_screen.dart';
 import 'features/auth/auth_gate.dart';
@@ -24,6 +24,7 @@ import 'games/marriage/marriage_game_screen.dart';
 import 'games/marriage/marriage_multiplayer_screen.dart';
 import 'games/teen_patti/teen_patti_screen.dart';
 import 'games/in_between/in_between_screen.dart';
+import 'features/game/settlement/settlement_preview_screen.dart';
 import 'config/revenuecat_config.dart';
 
 // 1. Define your routes
@@ -103,6 +104,12 @@ final GoRouter _router = GoRouter(
           },
         ),
         GoRoute(
+          path: 'call-break',
+          builder: (BuildContext context, GoRouterState state) {
+            return const CallBreakGameScreen();
+          },
+        ),
+        GoRoute(
           path: 'marriage',
           builder: (BuildContext context, GoRouterState state) {
             return const MarriageGameScreen();
@@ -127,6 +134,13 @@ final GoRouter _router = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             final String roomId = state.pathParameters['roomId']!;
             return InBetweenScreen(roomId: roomId);
+          },
+        ),
+        GoRoute(
+          path: 'settlement/:gameId',
+          builder: (BuildContext context, GoRouterState state) {
+            final String gameId = state.pathParameters['gameId']!;
+            return SettlementPreviewScreen(gameId: gameId);
           },
         ),
       ],

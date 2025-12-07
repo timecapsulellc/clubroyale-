@@ -248,4 +248,144 @@ class MeldDetector {
     
     return melds;
   }
+  /// Validates if a hand can be completely partitioned into valid melds
+  static bool validateHand(List<Card> hand, {Card? tiplu}) {
+    if (hand.isEmpty) return true;
+    
+    // Sort hand to ensure consistent processing
+    final sortedHand = List<Card>.from(hand)
+      ..sort((a, b) => a.id.compareTo(b.id)); 
+      
+    return _canPartition(sortedHand, tiplu);
+  }
+  
+  static bool _canPartition(List<Card> remaining, Card? tiplu) {
+    if (remaining.isEmpty) return true;
+    
+    // Optimization: Always try to fuse the first card
+    final pivot = remaining.first;
+    
+    // Find all valid melds containing the pivot
+    // 1. Sets containing pivot
+    final sets = _findSetsWithCard(pivot, remaining);
+    for (final meld in sets) {
+      if (_tryMeld(meld, remaining, tiplu)) return true;
+    }
+    
+    // 2. Runs containing pivot
+    final runs = _findRunsWithCard(pivot, remaining);
+    for (final meld in runs) {
+      if (_tryMeld(meld, remaining, tiplu)) return true;
+    }
+    
+    // 3. Tunnels containing pivot
+    final tunnels = _findTunnelsWithCard(pivot, remaining);
+    for (final meld in tunnels) {
+      if (_tryMeld(meld, remaining, tiplu)) return true;
+    }
+    
+    // 4. Marriage containing pivot
+    if (tiplu != null) {
+      final marriages = _findMarriagesWithCard(pivot, remaining, tiplu);
+      for (final meld in marriages) {
+        if (_tryMeld(meld, remaining, tiplu)) return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  static bool _tryMeld(Meld meld, List<Card> remaining, Card? tiplu) {
+    final meldIds = meld.cards.map((c) => c.id).toSet();
+    if (!meld.cards.every((c) => remaining.any((r) => r.id == c.id))) return false;
+    
+    final newRemaining = remaining.where((c) => !meldIds.contains(c.id)).toList();
+    return _canPartition(newRemaining, tiplu);
+  }
+  
+  static List<SetMeld> _findSetsWithCard(Card target, List<Card> pool) {
+    final matches = pool.where((c) => c.rank == target.rank).toList();
+    if (matches.length < 3) return [];
+    
+    final sets = <SetMeld>[];
+    if (matches.length >= 3) {
+      final others = matches.where((c) => c.id != target.id).toList();
+      for (int i = 0; i < others.length; i++) {
+        for (int j = i + 1; j < others.length; j++) {
+           sets.add(SetMeld([target, others[i], others[j]]));
+        }
+      }
+    }
+    return sets;
+  }
+  
+  static List<RunMeld> _findRunsWithCard(Card target, List<Card> pool) {
+    final sameSuit = pool.where((c) => c.suit == target.suit).toList()
+      ..sort((a, b) => a.rank.value.compareTo(b.rank.value));
+      
+    final runs = <RunMeld>[];
+    final targetIdx = sameSuit.indexWhere((c) => c.id == target.id);
+    if (targetIdx == -1) return [];
+    
+    // Check all valid sub-windows of length 3+ containing target
+    for (int start = 0; start < sameSuit.length; start++) {
+      for (int end = start + 3; end <= sameSuit.length; end++) {
+        final window = sameSuit.sublist(start, end);
+        if (!window.any((c) => c.id == target.id)) continue;
+        
+        bool consecutive = true;
+        for (int k = 1; k < window.length; k++) {
+           if (window[k].rank.value != window[k-1].rank.value + 1) {
+             consecutive = false;
+             break;
+           }
+        }
+        if (consecutive) runs.add(RunMeld(window));
+      }
+    }
+    return runs;
+  }
+  
+  static List<TunnelMeld> _findTunnelsWithCard(Card target, List<Card> pool) {
+     final matches = pool.where((c) => c.rank == target.rank && c.suit == target.suit).toList();
+     if (matches.length < 3) return [];
+     
+     final tunnels = <TunnelMeld>[];
+     final deckMap = <int, Card>{};
+     for (var c in matches) deckMap[c.deckIndex] = c;
+     
+     if (deckMap.keys.toSet().length >= 3) {
+       final distinct = deckMap.values.take(3).toList();
+       if (distinct.any((c) => c.id == target.id)) {
+          tunnels.add(TunnelMeld(distinct));
+       }
+     }
+     return tunnels;
+  }
+  
+  static List<MarriageMeld> _findMarriagesWithCard(Card target, List<Card> pool, Card tiplu) {
+     final marriages = <MarriageMeld>[];
+     if (target.suit != tiplu.suit) return [];
+     
+     final val = target.rank.value;
+     final tVal = tiplu.rank.value;
+     if ((val - tVal).abs() > 1 && val != tVal) return [];
+     
+     final jhipluRank = tVal - 1;
+     final popluRank = tVal + 1;
+     
+     try {
+       final hasJhiplu = pool.firstWhere((c) => c.suit == tiplu.suit && c.rank.value == jhipluRank);
+       final hasTiplu = pool.firstWhere((c) => c.suit == tiplu.suit && c.rank.value == tVal);
+       final hasPoplu = pool.firstWhere((c) => c.suit == tiplu.suit && c.rank.value == popluRank);
+       
+        if (hasJhiplu.id != hasTiplu.id && hasTiplu.id != hasPoplu.id) {
+           final m = MarriageMeld([hasJhiplu, hasTiplu, hasPoplu], tiplu: tiplu);
+           if (m.contains(target)) marriages.add(m);
+        }
+     } catch (e) {
+       // missing card
+     }
+     return marriages;
+  }
 }

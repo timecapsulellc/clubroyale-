@@ -70,6 +70,22 @@ class HomeScreen extends ConsumerWidget {
                     Image.asset(
                       'assets/images/casino_bg_dark.png',
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Fallback gradient when image fails to load
+                        return Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                CasinoColors.deepPurple,
+                                CasinoColors.richPurple,
+                                CasinoColors.darkPurple,
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     // Gradient Overlay for text contrast
                     Container(
@@ -876,7 +892,14 @@ class _WalletCard extends ConsumerWidget {
                                   crossAxisAlignment: CrossAxisAlignment.baseline,
                                   textBaseline: TextBaseline.alphabetic,
                                   children: [
-                                    Image.asset('assets/images/diamond_3d.png', width: 28, height: 28),
+                                    Image.asset(
+                                      'assets/images/diamond_3d.png', 
+                                      width: 28, 
+                                      height: 28,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return const Text('💎', style: TextStyle(fontSize: 24));
+                                      },
+                                    ),
                                     const SizedBox(width: 8),
                                     Text(
                                       '$balance',
@@ -1052,11 +1075,11 @@ class _CardDemoCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     // Use actual card PNG assets
     final cards = [
-      'ace_of_spades.png',
-      'king_of_hearts.png',
-      'queen_of_diamonds.png',
-      'jack_of_clubs.png',
-      '10_of_spades.png',
+      {'file': 'ace_of_spades.png', 'rank': 'A', 'suit': '♠', 'color': Colors.black},
+      {'file': 'king_of_hearts.png', 'rank': 'K', 'suit': '♥', 'color': Colors.red},
+      {'file': 'queen_of_diamonds.png', 'rank': 'Q', 'suit': '♦', 'color': Colors.red},
+      {'file': 'jack_of_clubs.png', 'rank': 'J', 'suit': '♣', 'color': Colors.black},
+      {'file': '10_of_spades.png', 'rank': '10', 'suit': '♠', 'color': Colors.black},
     ];
 
     return SizedBox(
@@ -1066,6 +1089,7 @@ class _CardDemoCarousel extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         itemCount: cards.length,
         itemBuilder: (context, index) {
+          final card = cards[index];
           return Padding(
             padding: EdgeInsets.only(
               left: index == 0 ? 0 : 8,
@@ -1075,6 +1099,7 @@ class _CardDemoCarousel extends StatelessWidget {
               width: 90,
               height: 130,
               decoration: BoxDecoration(
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
@@ -1087,8 +1112,16 @@ class _CardDemoCarousel extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.asset(
-                  'assets/cards/png/${cards[index]}',
+                  'assets/cards/png/${card['file']}',
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    // Fallback to styled card widget
+                    return _FallbackCard(
+                      rank: card['rank'] as String,
+                      suit: card['suit'] as String,
+                      color: card['color'] as Color,
+                    );
+                  },
                 ),
               ),
             ).animate(delay: (100 * index).ms)
@@ -1100,6 +1133,34 @@ class _CardDemoCarousel extends StatelessWidget {
     );
   }
 }
+
+// Fallback card widget when image fails to load
+class _FallbackCard extends StatelessWidget {
+  final String rank;
+  final String suit;
+  final Color color;
+
+  const _FallbackCard({required this.rank, required this.suit, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(rank, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color)),
+          Text(suit, style: TextStyle(fontSize: 32, color: color)),
+        ],
+      ),
+    );
+  }
+}
+
 
 class _DemoPlayingCard extends StatelessWidget {
   final String rank;

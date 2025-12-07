@@ -1,30 +1,51 @@
 # TaasClub 🎮
 
-A Flutter game room application that allows users to create and join game rooms, track scores in real-time, and share results with friends.
+A Flutter multiplayer card game platform featuring popular South Asian card games with real-time gameplay, in-app purchases, and social features.
 
-## Features
+## 🎴 Games Available
+
+| Game | Players | Status |
+|------|---------|--------|
+| **Marriage** | 2-8 | ✅ Full Multiplayer |
+| **Call Break** | 4 | ✅ With AI Opponents |
+| **Teen Patti** | 2-8 | ✅ With AI Bots |
+| **In-Between** | 2-8 | ✅ With AI Bots |
+
+## ✨ Features
 
 - 🔐 **Firebase Authentication** - Anonymous sign-in for quick start
-- 🎲 **Game Rooms** - Create and join multiplayer game rooms
-- ⚡ **Real-time Scores** - Live score updates using Firestore
+- 🎲 **Game Rooms** - Create and join multiplayer rooms with room codes
+- ⚡ **Real-time Gameplay** - Live game state sync using Firestore
+- 💎 **Diamond Wallet** - In-app currency with RevenueCat integration
 - 📊 **Game History** - View past games and results
 - 🏆 **Leaderboard** - See top players ranked by score
 - 👤 **User Profiles** - Customize display name and avatar
 - 📤 **Share Results** - Share game results with friends
 
-## Tech Stack
+## 🃏 Card Engine
 
-- **Flutter** - Cross-platform UI framework
+The app includes a complete card engine (`lib/core/card_engine/`) with:
+- 56 card assets (52 cards + jokers + card backs)
+- Deck management (1-4 decks with shuffling/dealing)
+- Meld detection (Sets, Runs, Tunnels, Marriage)
+- Hand validation with backtracking algorithm
+
+## 🛠 Tech Stack
+
+- **Flutter** 3.9+ - Cross-platform UI framework
 - **Firebase** - Backend services
-  - Firestore (database)
+  - Firestore (real-time database)
   - Authentication
   - Storage (avatars)
+  - Cloud Functions (GenKit AI)
+  - Crashlytics
 - **Riverpod** - State management
 - **go_router** - Navigation
 - **Freezed** - Immutable data classes
-- **Google Fonts** - Material 3 typography
+- **RevenueCat** - In-app purchases
+- **LiveKit** - Real-time video/audio
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -52,76 +73,101 @@ A Flutter game room application that allows users to create and join game rooms,
 
 4. Run the app:
    ```bash
-   flutter run
+   flutter run -d chrome  # Web
+   flutter run -d android # Android
+   flutter run -d ios     # iOS
    ```
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 lib/
+├── core/
+│   └── card_engine/      # Card, Deck, Meld logic
 ├── features/
-│   ├── auth/           # Authentication screens and services
-│   ├── game/           # Game room, scores, and history
-│   ├── ledger/         # Completed game results
-│   ├── lobby/          # Game room listing and creation
-│   └── profile/        # User profile management
-├── firebase_options.dart
+│   ├── auth/             # Authentication
+│   ├── lobby/            # Room creation/joining
+│   ├── wallet/           # Diamond purchases
+│   ├── ledger/           # Game history
+│   ├── profile/          # User profiles
+│   └── game/             # General game screens
+├── games/
+│   ├── call_break/       # Call Break game
+│   ├── marriage/         # Marriage game
+│   ├── teen_patti/       # Teen Patti game
+│   └── in_between/       # In-Between game
 └── main.dart
 ```
 
-## Firebase Setup
+## 🧪 Testing
 
-The app uses the following Firebase services:
-
-- **Firestore Collections:**
-  - `games` - Active and completed game rooms
-  - `users` - User profiles
-
-- **Security Rules:** Configured for authenticated access only
-
-## Development
-
-### Run with hot reload:
 ```bash
-flutter run
+# Run all tests
+flutter test
+
+# Run game tests only (89 tests)
+flutter test test/games/
+
+# Run specific game tests
+flutter test test/games/marriage/
+flutter test test/games/call_break/
 ```
 
-### Generate Freezed files:
+**Test Coverage:**
+- Marriage: 52 tests (integration + unit)
+- Call Break: 20 tests
+- General: 17 tests
+
+## 🎯 Game Routes
+
+| Route | Game |
+|-------|------|
+| `/call-break` | Call Break (solo with AI) |
+| `/marriage` | Marriage (solo practice) |
+| `/marriage/:roomId` | Marriage (multiplayer) |
+| `/teen_patti/:roomId` | Teen Patti |
+| `/in_between/:roomId` | In-Between |
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [PROJECT_AUDIT_DEC7.md](docs/PROJECT_AUDIT_DEC7.md) | Latest project status |
+| [REMAINING_TASKS.md](docs/REMAINING_TASKS.md) | Task list and progress |
+| [GETTING_STARTED.md](docs/GETTING_STARTED.md) | Developer onboarding |
+| [REVENUECAT_SETUP.md](docs/REVENUECAT_SETUP.md) | IAP configuration |
+| [LIVEKIT_SETUP.md](docs/LIVEKIT_SETUP.md) | Video/audio setup |
+
+## 🔧 Development Commands
+
 ```bash
+# Generate Freezed files
 dart run build_runner build --delete-conflicting-outputs
-```
 
-### Deploy Firestore rules:
-```bash
+# Analyze code
+flutter analyze
+
+# Deploy Firestore rules
 firebase deploy --only firestore:rules
+
+# Deploy Cloud Functions
+cd functions && npm run build && firebase deploy --only functions
 ```
 
-## Documentation
+## 📊 Current Status
 
-### 🚀 New to the Project?
-- **[🎯 Getting Started Guide](docs/GETTING_STARTED.md)** - **START HERE** - Complete onboarding for new developers
+- **Project Completion:** 94%
+- **Tests Passing:** 156
+- **Games:** 4 fully implemented
+- **Last Updated:** December 7, 2025
 
-### 📋 Development Planning
-- **[📌 Implementation Tasks](docs/IMPLEMENTATION_TASKS.md)** - Complete actionable checklist for all phases
-- **[Development Roadmap](docs/DEVELOPMENT_ROADMAP.md)** - Complete 8-phase development plan
-- **[Clone Strategy Quick Start](docs/CLONE_STRATEGY_QUICK_START.md)** - TL;DR on what to clone vs. build
-- **[Card Engine Selection Guide](docs/CARD_ENGINE_SELECTION.md)** - How to find and integrate card game engines
-- **[Phase 3 Checklist](docs/PHASE_3_CHECKLIST.md)** - Step-by-step implementation guide for cloning card engine
+## 🚧 Remaining Work
 
-### 💎 Technical Guides
-- **[RevenueCat Setup](docs/REVENUECAT_SETUP.md)** - In-app purchase configuration
-- **[Blueprint](blueprint.md)** - Project architecture overview
+1. Settlement preview screen
+2. Matchmaking queue
+3. Move validation Cloud Functions
 
-### 🎯 Current Focus
-**Phase 3:** Clone an open-source Call Break or card game engine to extract card assets and game logic. See [Clone Strategy](docs/CLONE_STRATEGY_QUICK_START.md) for details.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+See [REMAINING_TASKS.md](docs/REMAINING_TASKS.md) for details.
 
 ## License
 
@@ -130,4 +176,3 @@ This project is private and proprietary.
 ## Contact
 
 For questions or support, please contact the development team.
-

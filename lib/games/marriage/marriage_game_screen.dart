@@ -314,14 +314,8 @@ class _MarriageGameScreenState extends State<MarriageGameScreen> {
                   _selectedCardId = isSelected ? null : card.id;
                 });
               },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                transform: Matrix4.translationValues(
-                  0, 
-                  isSelected ? -15 : 0, 
-                  0,
-                ),
-                margin: EdgeInsets.only(right: index < cards.length - 1 ? -25 : 0),
+              child: Transform.translate(
+                offset: Offset(index > 0 ? -25.0 * index : 0, isSelected ? -15 : 0),
                 child: _buildCard(card, isSelected),
               ),
             ).animate().fadeIn(delay: Duration(milliseconds: 50 * index));

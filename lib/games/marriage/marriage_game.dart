@@ -205,11 +205,8 @@ class MarriageGame implements BaseGame {
     final hand = _hands[playerId]!;
     
     // Check if hand can be declared (all cards in valid melds)
-    final melds = MeldDetector.findAllMelds(hand.cards, tiplu: _tiplu);
-    
-    // For a valid declaration, all 21 cards must be in melds
-    // Simplified check: at least 7 melds (each with 3 cards)
-    if (melds.length >= 7) {
+    // For a valid declaration, all 21 cards must be in non-overlapping melds
+    if (MeldDetector.validateHand(hand.cards, tiplu: _tiplu)) {
       _roundWinner = playerId;
       endRound();
       return true;

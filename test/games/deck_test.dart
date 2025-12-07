@@ -51,8 +51,10 @@ void main() {
       final deck = Deck.forMarriage(deckCount: 3);
       
       // Assert - each rank should appear 12 times (3 decks * 4 suits)
+      // Exclude jokers from this count
+      final nonJokerCards = deck.cards.where((c) => !c.isJoker).toList();
       for (final rank in Rank.values) {
-        final cardsOfRank = deck.cards.where((c) => c.rank == rank).toList();
+        final cardsOfRank = nonJokerCards.where((c) => c.rank == rank).toList();
         expect(cardsOfRank.length, 12, reason: 'Rank ${rank.symbol} should appear 12 times');
       }
     });
@@ -62,8 +64,10 @@ void main() {
       final deck = Deck.forMarriage(deckCount: 4);
       
       // Assert - each suit should appear 52 times (13 ranks * 4 decks)
+      // Exclude jokers from this count
+      final nonJokerCards = deck.cards.where((c) => !c.isJoker).toList();
       for (final suit in Suit.values) {
-        final cardsOfSuit = deck.cards.where((c) => c.suit == suit).toList();
+        final cardsOfSuit = nonJokerCards.where((c) => c.suit == suit).toList();
         expect(cardsOfSuit.length, 52, reason: 'Suit ${suit.symbol} should appear 52 times');
       }
     });
