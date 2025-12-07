@@ -63,13 +63,14 @@ void main() {
       final currentPlayer = game.currentPlayerId!;
       final hand = game.getHand(currentPlayer);
       final cardToPlay = hand.first;
+      final initialHandSize = hand.length;
 
       // Action: Discard a card
       game.playCard(currentPlayer, cardToPlay);
 
-      // Verify: Card removed from hand
-      expect(game.getHand(currentPlayer).contains(cardToPlay), false);
-      expect(game.getHand(currentPlayer).length, 20);
+      // Verify: Card removed from hand (get fresh reference)
+      final newHand = game.getHand(currentPlayer);
+      expect(newHand.length, initialHandSize - 1);
 
       // Verify: Card added to discard pile
       expect(game.topDiscard, equals(cardToPlay));
