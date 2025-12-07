@@ -9,7 +9,8 @@ import 'pile.dart';
 enum DeckConfig {
   single(1, false),    // 52 cards, no jokers
   double(2, false),    // 104 cards, no jokers
-  triple(3, true);     // 156 cards + 6 jokers (for Marriage)
+  triple(3, true),     // 156 cards + 6 jokers (for Marriage 2-5 players)
+  quadruple(4, true);  // 208 cards + 8 jokers (for Marriage 6-8 players)
   
   final int deckCount;
   final bool includeJokers;
@@ -32,7 +33,13 @@ class Deck extends Pile {
   factory Deck.double() => Deck(config: DeckConfig.double);
   
   /// Create a triple deck for Marriage (156 cards + jokers)
-  factory Deck.forMarriage() => Deck(config: DeckConfig.triple);
+  /// Use [deckCount] parameter for 6-8 players (4 decks needed)
+  factory Deck.forMarriage({int deckCount = 3}) {
+    if (deckCount >= 4) {
+      return Deck(config: DeckConfig.quadruple);
+    }
+    return Deck(config: DeckConfig.triple);
+  }
   
   void _initialize() {
     clear();

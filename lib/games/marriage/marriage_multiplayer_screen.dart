@@ -44,7 +44,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   
   void _buildCardCache() {
     // Build a cache of all possible cards for quick lookup
-    final deck = Deck.forMarriage();
+    // Use 4 decks to include all possible cards for 6-8 player games
+    final deck = Deck.forMarriage(deckCount: 4);
     for (final card in deck.cards) {
       _cardCache[card.id] = card;
     }

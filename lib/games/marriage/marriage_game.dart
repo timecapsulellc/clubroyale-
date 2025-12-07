@@ -21,10 +21,10 @@ class MarriageGame implements BaseGame {
   int get minPlayers => 2;
   
   @override
-  int get maxPlayers => 5;
+  int get maxPlayers => 8;
   
   @override
-  int get deckCount => 3;
+  int get deckCount => _playerIds.length > 5 ? 4 : 3;
   
   @override
   int get cardsPerPlayer => 21;
@@ -73,7 +73,9 @@ class MarriageGame implements BaseGame {
     }
     
     _playerIds = List.from(playerIds);
-    _deck = Deck.forMarriage();
+    // Use 4 decks for 6-8 players, 3 decks for 2-5 players
+    final requiredDecks = playerIds.length > 5 ? 4 : 3;
+    _deck = Deck.forMarriage(deckCount: requiredDecks);
     _discardPile = Pile();
     _hands.clear();
     _scores.clear();

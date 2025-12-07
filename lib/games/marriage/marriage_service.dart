@@ -65,8 +65,9 @@ class MarriageService {
   
   /// Start a new Marriage game
   Future<void> startGame(String roomId, List<String> playerIds) async {
-    // Create a triple deck (156 cards + 6 jokers)
-    final deck = Deck.forMarriage();
+    // Use 4 decks for 6-8 players, 3 decks for 2-5 players
+    final requiredDecks = playerIds.length > 5 ? 4 : 3;
+    final deck = Deck.forMarriage(deckCount: requiredDecks);
     deck.shuffle();
     
     // Deal cards to each player

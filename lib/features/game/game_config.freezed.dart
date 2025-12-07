@@ -219,7 +219,7 @@ return $default(_that.pointValue,_that.maxPlayers,_that.allowAds,_that.totalRoun
 @JsonSerializable()
 
 class _GameConfig implements GameConfig {
-  const _GameConfig({this.pointValue = 10, this.maxPlayers = 4, this.allowAds = true, this.totalRounds = 5, this.bootAmount = 0});
+  const _GameConfig({this.pointValue = 10, this.maxPlayers = 8, this.allowAds = true, this.totalRounds = 5, this.bootAmount = 0});
   factory _GameConfig.fromJson(Map<String, dynamic> json) => _$GameConfigFromJson(json);
 
 /// Point value in units (user mentally maps to currency)

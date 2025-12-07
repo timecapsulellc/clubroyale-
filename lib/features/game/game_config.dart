@@ -12,7 +12,7 @@ abstract class GameConfig with _$GameConfig {
     @Default(10) double pointValue,
     
     /// Maximum players allowed in the room
-    @Default(4) int maxPlayers,
+    @Default(8) int maxPlayers,
     
     /// Whether guests see ads (host can pay to disable)
     @Default(true) bool allowAds,
