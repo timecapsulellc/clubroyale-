@@ -1,281 +1,284 @@
-/// Invite Service
-/// 
-/// Manages game invitations between users.
+// Deep Link Invite Service
+//
+// Shareable invite links with signed tokens for security.
+// Supports WhatsApp, SMS, and other sharing methods.
 
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:share_plus/share_plus.dart';
 
-/// Provider for InviteService
-final inviteServiceProvider = Provider<InviteService>((ref) {
-  final authService = ref.watch(authServiceProvider);
-  return InviteService(authService);
-});
-
-/// Provider for watching incoming invites
-final myInvitesProvider = StreamProvider<List<GameInvite>>((ref) {
-  final inviteService = ref.watch(inviteServiceProvider);
-  final userId = ref.watch(authServiceProvider).currentUser?.uid;
-  if (userId == null) return Stream.value([]);
-  return inviteService.watchMyInvites(userId);
-});
-
-/// Invite status
-enum InviteStatus {
-  pending,
-  accepted,
-  declined,
-  expired,
-}
-
-/// Game invitation data
-class GameInvite {
-  final String id;
-  final String fromUserId;
-  final String fromDisplayName;
-  final String? fromAvatarUrl;
-  final String toUserId;
-  final String roomId;
-  final String? roomCode;
+/// Invite link data
+class InviteLink {
+  final String deepLink;
+  final String roomCode;
+  final String hostName;
   final String gameType;
-  final InviteStatus status;
-  final DateTime createdAt;
   final DateTime expiresAt;
-
-  GameInvite({
-    required this.id,
-    required this.fromUserId,
-    required this.fromDisplayName,
-    this.fromAvatarUrl,
-    required this.toUserId,
-    required this.roomId,
-    this.roomCode,
+  final String token;
+  
+  InviteLink({
+    required this.deepLink,
+    required this.roomCode,
+    required this.hostName,
     required this.gameType,
-    required this.status,
-    required this.createdAt,
     required this.expiresAt,
+    required this.token,
   });
 
-  factory GameInvite.fromJson(Map<String, dynamic> json, String id) {
-    return GameInvite(
-      id: id,
-      fromUserId: json['fromUserId'] ?? '',
-      fromDisplayName: json['fromDisplayName'] ?? 'Player',
-      fromAvatarUrl: json['fromAvatarUrl'],
-      toUserId: json['toUserId'] ?? '',
-      roomId: json['roomId'] ?? '',
-      roomCode: json['roomCode'],
-      gameType: json['gameType'] ?? 'unknown',
-      status: InviteStatus.values.firstWhere(
-        (e) => e.name == json['status'],
-        orElse: () => InviteStatus.pending,
-      ),
-      createdAt: (json['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      expiresAt: (json['expiresAt'] as Timestamp?)?.toDate() ?? 
-                 DateTime.now().add(const Duration(minutes: 5)),
-    );
-  }
-
   bool get isExpired => DateTime.now().isAfter(expiresAt);
+
+  String get formattedExpiry {
+    final hours = expiresAt.difference(DateTime.now()).inHours;
+    if (hours < 1) return 'Less than 1 hour';
+    if (hours < 24) return '$hours hours';
+    return '${(hours / 24).floor()} days';
+  }
 }
 
-/// Service for managing game invitations
+/// Invite validation status
+enum InviteStatus {
+  valid,
+  invalid,
+  expired,
+  roomNotFound,
+  roomFull,
+  gameStarted,
+}
+
+/// Invite validation result
+class InviteValidation {
+  final InviteStatus status;
+  final String? roomId;
+  final String? roomCode;
+  final String? error;
+  
+  InviteValidation._({
+    required this.status, 
+    this.roomId, 
+    this.roomCode, 
+    this.error,
+  });
+  
+  factory InviteValidation.valid({required String roomId, required String roomCode}) =>
+      InviteValidation._(status: InviteStatus.valid, roomId: roomId, roomCode: roomCode);
+  
+  factory InviteValidation.invalid(String error) =>
+      InviteValidation._(status: InviteStatus.invalid, error: error);
+  
+  factory InviteValidation.expired() =>
+      InviteValidation._(status: InviteStatus.expired, error: 'Invite has expired');
+  
+  factory InviteValidation.roomNotFound() =>
+      InviteValidation._(status: InviteStatus.roomNotFound, error: 'Room no longer exists');
+  
+  factory InviteValidation.roomFull() =>
+      InviteValidation._(status: InviteStatus.roomFull, error: 'Room is full');
+  
+  factory InviteValidation.gameStarted() =>
+      InviteValidation._(status: InviteStatus.gameStarted, error: 'Game has already started');
+  
+  bool get isValid => status == InviteStatus.valid;
+}
+
+/// Deep Link Invite Service
 class InviteService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final AuthService _authService;
-
-  /// Invite expiration time in minutes
-  static const int inviteExpirationMinutes = 5;
-
-  InviteService(this._authService);
-
-  /// Send a game invite
-  Future<bool> sendInvite({
-    required String toUserId,
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  
+  // Base URL for deep links
+  static const String _baseUrl = 'https://taasclub.app/join';
+  
+  // Signing secret (in production, use environment variable or secure storage)
+  static const String _signingSecret = 'TAASCLUB_INVITE_SECRET_2024';
+  
+  /// Generate a signed invite link
+  Future<InviteLink> generateInviteLink({
     required String roomId,
-    String? roomCode,
+    required String roomCode,
+    required String hostId,
+    required String hostName,
     required String gameType,
+    Duration expiry = const Duration(hours: 24),
   }) async {
-    final currentUser = _authService.currentUser;
-    if (currentUser == null) return false;
-
-    try {
-      // Check for existing pending invite
-      final existing = await _db
-          .collection('invites')
-          .where('fromUserId', isEqualTo: currentUser.uid)
-          .where('toUserId', isEqualTo: toUserId)
-          .where('roomId', isEqualTo: roomId)
-          .where('status', isEqualTo: 'pending')
-          .get();
-
-      if (existing.docs.isNotEmpty) {
-        debugPrint('Invite already sent');
-        return false;
-      }
-
-      final expiresAt = DateTime.now().add(
-        Duration(minutes: inviteExpirationMinutes),
-      );
-
-      await _db.collection('invites').add({
-        'fromUserId': currentUser.uid,
-        'fromDisplayName': currentUser.displayName ?? 'Player',
-        'fromAvatarUrl': currentUser.photoURL,
-        'toUserId': toUserId,
-        'roomId': roomId,
-        'roomCode': roomCode,
-        'gameType': gameType,
-        'status': 'pending',
-        'createdAt': FieldValue.serverTimestamp(),
-        'expiresAt': Timestamp.fromDate(expiresAt),
-      });
-
-      debugPrint('Invite sent to $toUserId for room $roomId');
-      return true;
-    } catch (e) {
-      debugPrint('Error sending invite: $e');
-      return false;
-    }
-  }
-
-  /// Accept an invite
-  Future<String?> acceptInvite(String inviteId) async {
-    final currentUser = _authService.currentUser;
-    if (currentUser == null) return null;
-
-    try {
-      final inviteDoc = await _db.collection('invites').doc(inviteId).get();
-      if (!inviteDoc.exists) return null;
-
-      final invite = GameInvite.fromJson(inviteDoc.data()!, inviteId);
-
-      // Verify invite is for current user
-      if (invite.toUserId != currentUser.uid) return null;
-
-      // Check if expired
-      if (invite.isExpired) {
-        await _db.collection('invites').doc(inviteId).update({
-          'status': 'expired',
-        });
-        return null;
-      }
-
-      // Update status
-      await _db.collection('invites').doc(inviteId).update({
-        'status': 'accepted',
-      });
-
-      return invite.roomId;
-    } catch (e) {
-      debugPrint('Error accepting invite: $e');
-      return null;
-    }
-  }
-
-  /// Decline an invite
-  Future<bool> declineInvite(String inviteId) async {
-    try {
-      await _db.collection('invites').doc(inviteId).update({
-        'status': 'declined',
-      });
-      return true;
-    } catch (e) {
-      debugPrint('Error declining invite: $e');
-      return false;
-    }
-  }
-
-  /// Watch incoming invites for a user
-  Stream<List<GameInvite>> watchMyInvites(String userId) {
-    return _db
-        .collection('invites')
-        .where('toUserId', isEqualTo: userId)
-        .where('status', isEqualTo: 'pending')
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snapshot) {
-          final now = DateTime.now();
-          return snapshot.docs
-              .map((doc) => GameInvite.fromJson(doc.data(), doc.id))
-              .where((invite) => !invite.isExpired) // Filter expired
-              .toList();
-        });
-  }
-
-  /// Get invite by ID
-  Future<GameInvite?> getInvite(String inviteId) async {
-    try {
-      final doc = await _db.collection('invites').doc(inviteId).get();
-      if (!doc.exists) return null;
-      return GameInvite.fromJson(doc.data()!, doc.id);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  /// Invite multiple friends at once
-  Future<int> inviteFriends({
-    required List<String> friendIds,
-    required String roomId,
-    String? roomCode,
-    required String gameType,
-  }) async {
-    int successCount = 0;
+    final expiresAt = DateTime.now().add(expiry);
     
-    for (final friendId in friendIds) {
-      final success = await sendInvite(
-        toUserId: friendId,
+    final payload = {
+      'roomId': roomId,
+      'roomCode': roomCode,
+      'hostId': hostId,
+      'gameType': gameType,
+      'exp': expiresAt.millisecondsSinceEpoch,
+    };
+    
+    final payloadJson = jsonEncode(payload);
+    final payloadBase64 = base64Url.encode(utf8.encode(payloadJson));
+    
+    // Sign the payload
+    final signature = _sign(payloadBase64);
+    final token = '$payloadBase64.$signature';
+    
+    final deepLink = '$_baseUrl?token=$token';
+    
+    // Store invite for tracking
+    await _firestore.collection('invites').add({
+      'roomId': roomId,
+      'roomCode': roomCode,
+      'hostId': hostId,
+      'hostName': hostName,
+      'gameType': gameType,
+      'token': token,
+      'expiresAt': Timestamp.fromDate(expiresAt),
+      'createdAt': FieldValue.serverTimestamp(),
+      'usedBy': <String>[],
+    });
+    
+    return InviteLink(
+      deepLink: deepLink,
+      roomCode: roomCode,
+      hostName: hostName,
+      gameType: gameType,
+      expiresAt: expiresAt,
+      token: token,
+    );
+  }
+  
+  /// Validate and parse an invite token
+  Future<InviteValidation> validateInviteToken(String token) async {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 2) {
+        return InviteValidation.invalid('Malformed token');
+      }
+      
+      final payloadBase64 = parts[0];
+      final signature = parts[1];
+      
+      // Verify signature
+      if (_sign(payloadBase64) != signature) {
+        return InviteValidation.invalid('Invalid signature');
+      }
+      
+      // Decode payload
+      final payloadJson = utf8.decode(base64Url.decode(payloadBase64));
+      final payload = jsonDecode(payloadJson) as Map<String, dynamic>;
+      
+      // Check expiry
+      final exp = payload['exp'] as int;
+      if (DateTime.now().millisecondsSinceEpoch > exp) {
+        return InviteValidation.expired();
+      }
+      
+      // Check room still exists and has space
+      final roomId = payload['roomId'] as String;
+      final roomDoc = await _firestore.collection('matches').doc(roomId).get();
+      
+      if (!roomDoc.exists) {
+        return InviteValidation.roomNotFound();
+      }
+      
+      final roomData = roomDoc.data()!;
+      final players = Map.from(roomData['players'] ?? {});
+      final maxPlayers = roomData['maxPlayers'] ?? 4;
+      final status = roomData['status'] as String?;
+      
+      if (players.length >= maxPlayers) {
+        return InviteValidation.roomFull();
+      }
+      
+      if (status != null && status != 'waiting') {
+        return InviteValidation.gameStarted();
+      }
+      
+      return InviteValidation.valid(
         roomId: roomId,
-        roomCode: roomCode,
-        gameType: gameType,
+        roomCode: payload['roomCode'] as String,
       );
-      if (success) successCount++;
+    } catch (e) {
+      return InviteValidation.invalid('Error parsing token: $e');
+    }
+  }
+  
+  /// Share invite link via system share sheet
+  Future<void> shareInviteLink(InviteLink invite) async {
+    final gameDisplayName = _getGameDisplayName(invite.gameType);
+    
+    final message = '''
+🎴 Join my $gameDisplayName game on TaasClub!
+
+📍 Room Code: ${invite.roomCode}
+👤 Host: ${invite.hostName}
+⏰ Expires: ${invite.formattedExpiry}
+
+👉 Tap to join: ${invite.deepLink}
+
+Or open TaasClub and enter the room code!
+''';
+    
+    await Share.share(message, subject: 'Join my TaasClub game!');
+  }
+  
+  /// Share via WhatsApp specifically
+  Future<void> shareToWhatsApp(InviteLink invite) async {
+    // Uses share_plus which will show WhatsApp in the share sheet
+    await shareInviteLink(invite);
+  }
+  
+  /// Mark invite as used
+  Future<void> markInviteUsed(String token, String usedByUserId) async {
+    final query = await _firestore
+        .collection('invites')
+        .where('token', isEqualTo: token)
+        .limit(1)
+        .get();
+    
+    if (query.docs.isNotEmpty) {
+      await query.docs.first.reference.update({
+        'usedBy': FieldValue.arrayUnion([usedByUserId]),
+        'lastUsedAt': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+  
+  /// Get invite stats for analytics
+  Future<Map<String, dynamic>> getInviteStats(String roomId) async {
+    final query = await _firestore
+        .collection('invites')
+        .where('roomId', isEqualTo: roomId)
+        .get();
+    
+    int totalInvites = query.docs.length;
+    int totalUses = 0;
+    
+    for (final doc in query.docs) {
+      final usedBy = doc.data()['usedBy'] as List?;
+      totalUses += usedBy?.length ?? 0;
     }
     
-    return successCount;
+    return {
+      'totalInvites': totalInvites,
+      'totalUses': totalUses,
+      'conversionRate': totalInvites > 0 ? totalUses / totalInvites : 0,
+    };
   }
-
-  /// Cancel a sent invite
-  Future<bool> cancelInvite(String inviteId) async {
-    final currentUser = _authService.currentUser;
-    if (currentUser == null) return false;
-
-    try {
-      final inviteDoc = await _db.collection('invites').doc(inviteId).get();
-      if (!inviteDoc.exists) return false;
-
-      final data = inviteDoc.data()!;
-      if (data['fromUserId'] != currentUser.uid) return false;
-
-      await _db.collection('invites').doc(inviteId).delete();
-      return true;
-    } catch (e) {
-      debugPrint('Error canceling invite: $e');
-      return false;
-    }
+  
+  String _sign(String data) {
+    final hmac = Hmac(sha256, utf8.encode(_signingSecret));
+    final digest = hmac.convert(utf8.encode(data));
+    return base64Url.encode(digest.bytes);
   }
-
-  /// Cleanup expired invites (can be run periodically)
-  Future<void> cleanupExpiredInvites() async {
-    try {
-      final now = DateTime.now();
-      final expiredInvites = await _db
-          .collection('invites')
-          .where('status', isEqualTo: 'pending')
-          .where('expiresAt', isLessThan: Timestamp.fromDate(now))
-          .get();
-
-      final batch = _db.batch();
-      for (final doc in expiredInvites.docs) {
-        batch.update(doc.reference, {'status': 'expired'});
-      }
-      await batch.commit();
-
-      debugPrint('Cleaned up ${expiredInvites.docs.length} expired invites');
-    } catch (e) {
-      debugPrint('Error cleaning up expired invites: $e');
+  
+  String _getGameDisplayName(String gameType) {
+    switch (gameType) {
+      case 'marriage':
+        return 'Marriage';
+      case 'call_break':
+        return 'Call Break';
+      case 'teen_patti':
+        return 'Teen Patti';
+      case 'rummy':
+        return 'Rummy';
+      default:
+        return gameType;
     }
   }
 }
