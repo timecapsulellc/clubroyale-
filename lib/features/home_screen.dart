@@ -9,6 +9,7 @@ import 'package:taasclub/config/casino_theme.dart';
 import 'package:taasclub/config/visual_effects.dart';
 import 'package:taasclub/features/game/services/test_game_service.dart';
 import 'package:taasclub/features/game/widgets/player_avatar.dart';
+import 'package:taasclub/core/responsive/responsive_utils.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -326,10 +327,10 @@ class HomeScreen extends ConsumerWidget {
                   GridView.count(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 0.72,
+                    crossAxisCount: context.responsive(mobile: 2, tablet: 3, desktop: 4),
+                    mainAxisSpacing: context.scaledSpacing(12),
+                    crossAxisSpacing: context.scaledSpacing(12),
+                    childAspectRatio: context.isMobile ? 0.72 : 0.85,
                     children: [
                       _EnhancedActivityCard(
                         icon: Icons.history_rounded,
