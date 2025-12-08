@@ -1,340 +1,234 @@
-# RevenueCat IAP Setup Guide
+# RevenueCat Setup Guide
 
-This guide walks through setting up RevenueCat for in-app purchases (diamonds) in the TaasClub Flutter app.
-
----
-
-## 📋 Prerequisites
-
-- [ ] Apple Developer Account ($99/year)
-- [ ] Google Play Developer Account ($25 one-time)
-- [ ] RevenueCat account (free tier available)
-- [ ] App Store Connect access
-- [ ] Google Play Console access
+Complete setup guide for integrating RevenueCat with TaasClub.
 
 ---
 
-## 🔧 Step 1: RevenueCat Dashboard Setup
+## Step 1: Create RevenueCat Account
 
-### 1.1 Create RevenueCat Project
-1. Go to [https://app.revenuecat.com/signup](https://app.revenuecat.com/signup)
-2. Create a new project: **TaasClub**
-3. Note your **Public API Key** (found in Project Settings)
-
-### 1.2 Configure iOS App
-1. In RevenueCat dashboard → Apps → Add iOS App
-2. Enter:
-   - Bundle ID: `com.taasclub.app` (or your bundle ID)
-   - App Store Shared Secret (from App Store Connect)
-
-### 1.3 Configure Android App
-1. In RevenueCat dashboard → Apps → Add Android App
-2. Enter:
-   - Package Name: `com.taasclub.app`
-   - Upload Google Service Account JSON
+1. Go to [https://app.revenuecat.com](https://app.revenuecat.com)
+2. Sign up with Google or email
+3. Create a new Project: "TaasClub"
 
 ---
 
-## 🍎 Step 2: App Store Connect Setup (iOS)
+## Step 2: Add Android App
 
-### 2.1 Create In-App Purchase Products
-1. Go to App Store Connect → My Apps → TaasClub
-2. Navigate to **Features** → **In-App Purchases**
-3. Create **4 Consumable** products:
+1. In RevenueCat dashboard → **Apps** → **+ New**
+2. Select **Google Play Store**
+3. App name: `TaasClub`
+4. Package name: `app.taasclub`
+5. Click **Create**
 
-| Product ID | Price | Diamonds |
-|------------|-------|----------|
-| `diamonds_50` | $0.99 | 50 |
-| `diamonds_120` | $1.99 | 120 (100 + 20 bonus) |
-| `diamonds_300` | $4.99 | 300 (250 + 50 bonus) |
-| `diamonds_650` | $9.99 | 650 (500 + 150 bonus) |
+### Google Play Service Credentials
 
-4. For each product:
-   - **Type**: Consumable
-   - **Reference Name**: e.g., "50 Diamonds Pack"
-   - **Product ID**: Match the table above
-   - **Price**: Set tier
-   - **Description**: "Purchase [X] diamonds to create rooms"
-
-### 2.2 Get Shared Secret
-1. App Store Connect → Users and Access → Keys → In-App Purchase
-2. Copy the **Shared Secret**
-3. Paste it in RevenueCat → iOS App Settings
+1. In Google Play Console → **Setup** → **API access**
+2. Create or link a Google Cloud project
+3. Create a **Service Account** with:
+   - Role: **Financial Data → View financial data**
+   - Role: **Financial Data → Manage orders and subscriptions**
+4. Generate JSON key file
+5. Upload JSON key to RevenueCat → **App Settings** → **Service Credentials**
 
 ---
 
-## 🤖 Step 3: Google Play Console Setup (Android)
+## Step 3: Add iOS App (Optional)
 
-### 3.1 Create In-App Products
-1. Go to Google Play Console → TaasClub → Monetize → In-app products
-2. Create **4 Managed products** (same IDs as iOS):
-
-| Product ID | Price | Title |
-|------------|-------|-------|
-| `diamonds_50` | ₹100 | 50 Diamonds |
-| `diamonds_120` | ₹200 | 120 Diamonds |
-| `diamonds_300` | ₹500 | 300 Diamonds |
-| `diamonds_650` | ₹1000 | 650 Diamonds |
-
-3. For each:
-   - **Product ID**: Match iOS
-   - **Description**: "Get [X] diamonds for room creation"
-   - **Price**: Set per country
-
-### 3.2 Configure Service Account
-1. Google Cloud Console → Enable Google Play Developer API
-2. Create Service Account
-3. Download JSON key
-4. Upload to RevenueCat → Android App Settings
+1. In RevenueCat dashboard → **Apps** → **+ New**
+2. Select **Apple App Store**
+3. App name: `TaasClub`
+4. Bundle ID: `app.taasclub`
+5. Upload App Store Connect API key
 
 ---
 
-## 💎 Step 4: RevenueCat Entitlements & Offerings
+## Step 4: Create Products
 
-### 4.1 Create Entitlements
-1. RevenueCat → Entitlements → Create Entitlement
-2. Name: **diamonds** (for checking premium access if needed)
+### In Google Play Console
 
-### 4.2 Create Offerings
-1. RevenueCat → Offerings → Create Offering
-2. Offering ID: `default`
-3. Add all 4 packages:
-   - Package 1: `diamonds_50` → `$rc_monthly` identifier
-   - Package 2: `diamonds_120` → `$rc_six_month` identifier
-   - Package 3: `diamonds_300` → `$rc_annual` identifier
-   - Package 4: `diamonds_650` → `$rc_lifetime` identifier
+Go to **Monetization** → **Products** → **In-app products**
 
-> **Note**: RevenueCat maps custom product IDs to standard identifiers for cross-platform consistency.
+Create these products:
+
+| Product ID | Name | Price |
+|------------|------|-------|
+| `diamonds_50` | 50 Diamonds | $0.99 |
+| `diamonds_110` | 110 Diamonds | $1.99 |
+| `diamonds_575` | 575 Diamonds | $7.99 |
+| `diamonds_1200` | 1200 Diamonds | $14.99 |
+
+### In RevenueCat
+
+1. Go to **Products** → **+ New**
+2. Add each Google Play product ID
+3. Set **Identifier** matching the product ID
 
 ---
 
-## 📱 Step 5: Flutter App Integration
+## Step 5: Create Offerings
 
-### 5.1 Add Environment Variables
-Create `.env` files in project root:
+1. Go to **Offerings** → **+ New**
+2. Create offering: `default`
+3. Add all 4 diamond products to this offering
+4. Set as **Current Offering**
 
-**.env.development**
-```bash
-REVENUECAT_API_KEY_IOS=your_ios_public_api_key_here
-REVENUECAT_API_KEY_ANDROID=your_android_public_api_key_here
+---
+
+## Step 6: Get API Keys
+
+1. Go to **Project Settings** → **API Keys**
+2. Copy the **Public SDK key** for Android/iOS
+3. Keep the **Secret API key** for webhooks (server-side)
+
+---
+
+## Step 7: Update Flutter Code
+
+Edit `lib/features/store/diamond_store.dart`:
+
+```dart
+// Replace this line:
+// static const String _apiKey = 'YOUR_REVENUECAT_API_KEY';
+
+// With your actual key:
+static const String _apiKey = 'appl_XXXXXXXXXXXXXXXXXX';
 ```
 
-**.env.production**
-```bash
-REVENUECAT_API_KEY_IOS=your_production_ios_key
-REVENUECAT_API_KEY_ANDROID=your_production_android_key
-```
-
-### 5.2 Update main.dart
-Replace the placeholder initialization in `main.dart`:
+### Full Integration Code
 
 ```dart
 import 'package:purchases_flutter/purchases_flutter.dart';
 
-Future<void> main() async {
+class DiamondStoreService {
+  static const String _apiKey = 'YOUR_API_KEY_HERE';
+  
+  static Future<void> initialize() async {
+    await Purchases.setLogLevel(LogLevel.debug);
+    
+    final configuration = PurchasesConfiguration(_apiKey)
+      ..appUserID = null; // Let RevenueCat generate ID
+    
+    await Purchases.configure(configuration);
+  }
+  
+  Future<void> purchaseDiamonds(String productId) async {
+    try {
+      final offerings = await Purchases.getOfferings();
+      final product = offerings.current?.availablePackages
+          .firstWhere((p) => p.storeProduct.identifier == productId);
+      
+      if (product != null) {
+        final result = await Purchases.purchasePackage(product);
+        // Grant diamonds based on result
+        _grantDiamonds(result);
+      }
+    } on PurchasesErrorCode catch (e) {
+      // Handle error
+      print('Purchase error: $e');
+    }
+  }
+  
+  void _grantDiamonds(CustomerInfo customerInfo) {
+    // Check entitlements and grant diamonds
+    // Called automatically after successful purchase
+  }
+}
+```
+
+---
+
+## Step 8: Initialize in main.dart
+
+```dart
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   
   // Initialize RevenueCat
-  await _configureRevenueCat();
+  await DiamondStoreService.initialize();
   
-  runApp(const ProviderScope(child: MyApp()));
-}
-
-Future<void> _configureRevenueCat() async {
-  await Purchases.setLogLevel(LogLevel.debug);
-  
-  PurchasesConfiguration configuration;
-  if (Platform.isIOS) {
-    configuration = PurchasesConfiguration('your_ios_api_key');
-  } else if (Platform.isAndroid) {
-    configuration = PurchasesConfiguration('your_android_api_key');
-  } else {
-    return;
-  }
-  
-  await Purchases.configure(configuration);
-}
-```
-
-### 5.3 Update DiamondPurchaseScreen
-Replace the placeholder code in `lib/features/wallet/diamond_purchase_screen.dart`:
-
-```dart
-Future<void> _purchasePackage(DiamondPackage package) async {
-  setState(() => _isPurchasing = true);
-
-  try {
-    // Get offerings from RevenueCat
-    final offerings = await Purchases.getOfferings();
-    final currentOffering = offerings.current;
-    
-    if (currentOffering == null) {
-      throw Exception('No offerings available');
-    }
-    
-    // Find the package
-    final rcPackage = currentOffering.availablePackages.firstWhere(
-      (p) => p.storeProduct.identifier == package.productId,
-      orElse: () => throw Exception('Package not found'),
-    );
-    
-    // Make purchase
-    final purchaserInfo = await Purchases.purchasePackage(rcPackage);
-    
-    // Verify purchase
-    if (purchaserInfo.entitlements.active.isNotEmpty) {
-      // Add diamonds to user's wallet
-      final authService = ref.read(authServiceProvider);
-      final userId = authService.currentUser?.uid;
-      
-      if (userId != null) {
-        final diamondService = ref.read(diamondServiceProvider);
-        await diamondService.addDiamonds(
-          userId,
-          package.diamonds,
-          DiamondTransactionType.purchase,
-          description: 'Purchased ${package.diamonds} diamonds via ${Platform.isIOS ? 'App Store' : 'Google Play'}',
-        );
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('✨ Successfully purchased ${package.diamonds} diamonds!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          Navigator.pop(context);
-        }
-      }
-    }
-  } on PlatformException catch (e) {
-    final errorCode = PurchasesErrorHelper.getErrorCode(e);
-    if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Purchase failed: ${e.message}'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-    }
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Purchase failed: $e'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-    }
-  } finally {
-    if (mounted) {
-      setState(() => _isPurchasing = false);
-    }
-  }
+  runApp(const MyApp());
 }
 ```
 
 ---
 
-## 🧪 Step 6: Testing
+## Step 9: Set Up Webhooks (Server-side)
 
-### 6.1 iOS Sandbox Testing
-1. Settings → App Store → Sandbox Account
-2. Create test user in App Store Connect
-3. Sign in with test account on device
-4. Test purchases (they're free in sandbox)
+For server-side verification, set up RevenueCat webhooks:
 
-### 6.2 Android Testing
-1. Google Play Console → Setup → License Testing
-2. Add test Gmail accounts
-3. Upload APK to Internal Testing track
-4. Install from Play Store on test device
-5. Test purchases
+1. Go to **Project Settings** → **Webhooks**
+2. Add webhook URL: `https://us-central1-taasclub-app.cloudfunctions.net/revenuecatWebhook`
+3. Select events: `INITIAL_PURCHASE`, `RENEWAL`, `CANCELLATION`
 
-### 6.3 RevenueCat Testing
-1. Go to RevenueCat → Customers
-2. Verify transactions appear
-3. Check that entitlements are granted
+### Cloud Function for Webhook
 
----
+```typescript
+// functions/src/revenueCat/webhook.ts
+import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
 
-## ✅ Production Checklist
-
-Before going live:
-
-- [ ] All IAP products approved in App Store Connect
-- [ ] All IAP products active in Google Play Console
-- [ ] RevenueCat production API keys configured
-- [ ] Tested purchases on physical devices (iOS & Android)
-- [ ] Verified webhook integration (if using backend)
-- [ ] Added privacy policy link (required by Apple/Google)
-- [ ] Configured tax & banking info in store consoles
-- [ ] Enabled production mode in RevenueCat
-- [ ] Updated `.env.production` with real keys
-- [ ] Tested restore purchases functionality
-
----
-
-## 🔐 Security Notes
-
-1. **Never commit API keys** to version control
-2. Use environment variables via `flutter_dotenv` or similar
-3. Enable App Store Server Notifications (iOS)
-4. Enable Google Play Real-time Developer Notifications (Android)
-5. Implement receipt validation via RevenueCat webhooks
+export const revenuecatWebhook = functions.https.onRequest(async (req, res) => {
+  const event = req.body;
+  
+  if (event.type === 'INITIAL_PURCHASE') {
+    const userId = event.app_user_id;
+    const productId = event.product_id;
+    
+    // Map product to diamonds
+    const diamondAmounts: Record<string, number> = {
+      'diamonds_50': 50,
+      'diamonds_110': 110,
+      'diamonds_575': 575,
+      'diamonds_1200': 1200,
+    };
+    
+    const diamonds = diamondAmounts[productId] || 0;
+    
+    // Grant diamonds
+    await admin.firestore()
+      .collection('users')
+      .doc(userId)
+      .update({
+        diamonds: admin.firestore.FieldValue.increment(diamonds),
+      });
+  }
+  
+  res.status(200).send('OK');
+});
+```
 
 ---
 
-## 📚 References
+## Step 10: Test Purchases
 
-- [RevenueCat Flutter SDK](https://docs.revenuecat.com/docs/flutter)
-- [App Store Connect Guide](https://developer.apple.com/app-store-connect/)
-- [Google Play Console Guide](https://play.google.com/console/about/)
-- [RevenueCat Dashboard](https://app.revenuecat.com)
+### Test on Android
 
----
+1. Add test accounts in Google Play Console
+2. Use license testing mode
+3. Purchases will complete without charge
 
-## 🆘 Troubleshooting
+### Test on iOS
 
-### "No products found"
-- Verify product IDs match exactly in code, App Store Connect, and Google Play Console
-- Check that products are approved/active
-- Ensure RevenueCat is configured with correct credentials
-
-### "Purchase failed"
-- Check device has valid payment method
-- Verify app is signed with correct provisioning profile (iOS)
-- Ensure Google Play billing is enabled in app (Android)
-
-### "Entitlements not granted"
-- Check RevenueCat dashboard for transaction
-- Verify webhook integration if using backend
-- Review RevenueCat logs for errors
+1. Create Sandbox testers in App Store Connect
+2. Sign into sandbox account on device
+3. Purchases use sandbox environment
 
 ---
 
-## 💰 Pricing Strategy (India)
+## Troubleshooting
 
-Suggested pricing for Indian market:
-
-| Package | Diamonds | Price (₹) | Price (USD) | Bonus | Value |
-|---------|----------|-----------|-------------|-------|-------|
-| Starter | 50 | 100 | $1.19 | - | 5 rooms |
-| Popular | 120 | 200 | $2.39 | +20 | 12 rooms |
-| Premium | 300 | 500 | $5.99 | +50 | 30 rooms |
-| Ultimate | 650 | 1000 | $11.99 | +150 | 65 rooms |
-
-**Conversion**: 1 room = 10 diamonds
+| Issue | Solution |
+|-------|----------|
+| "Product not found" | Wait 24h for Play Console to sync |
+| "Purchase cancelled" | Check Google Play account status |
+| "Invalid credentials" | Verify service account JSON in RevenueCat |
+| Diamonds not granted | Check webhook logs in Firebase |
 
 ---
 
-## 🎁 Promotional Strategy
+## Security Reminders
 
-1. **First-time bonus**: Give 50 starter diamonds on signup
-2. **Daily rewards**: 5 diamonds per day for login streak
-3. **Referral bonus**: 20 diamonds for each friend who joins
-4. **Limited offers**: 2x diamonds during festivals
-5. **Loyalty tiers**: Bonus diamonds for repeat purchasers
+- ⚠️ Never expose secret API key in client code
+- ⚠️ Always verify purchases server-side via webhooks
+- ⚠️ Log all transactions for audit
