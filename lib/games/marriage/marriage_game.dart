@@ -24,7 +24,15 @@ class MarriageGame implements BaseGame {
   int get maxPlayers => 8;
   
   @override
-  int get deckCount => _playerIds.length > 5 ? 4 : 3;
+  int get deckCount {
+    // Chief Architect Audit: Proper stockpile buffer calculation
+    // 2-4 players: 3 decks (156 cards) - 84 dealt, 72 buffer (46%)
+    // 5-6 players: 4 decks (208 cards) - 126 dealt, 82 buffer (39%)
+    // 7-8 players: 5 decks (260 cards) - 168 dealt, 92 buffer (35%)
+    if (_playerIds.length >= 7) return 5;
+    if (_playerIds.length >= 5) return 4;
+    return 3;
+  }
   
   @override
   int get cardsPerPlayer => 21;
