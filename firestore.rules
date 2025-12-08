@@ -17,99 +17,143 @@ service cloud.firestore {
       return request.auth.token.admin == true;
     }
     
-    // Check if user is a player in a match
-    function isPlayerInMatch(matchData) {
-      return request.auth.uid in matchData.players.keys();
-    }
-    
-    // Check if user is host of a match
-    function isMatchHost(matchData) {
-      return request.auth.uid == matchData.hostId;
-    }
-    
-    // Validate diamond balance is non-negative
-    function hasValidBalance(data) {
-      return data.diamonds >= 0;
-    }
-    
     // ============ USER PROFILES ============
     
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId) && hasValidBalance(request.resource.data);
-      allow delete: if false; // Soft delete only
+      allow create: if isAuthenticated();
+      allow update: if isOwner(userId);
+      allow delete: if false;
     }
     
-    // ============ MATCHES (GAME ROOMS) ============
+    // ============ GAMES (ROOMS) ============
+    // Main collection for game rooms - used by lobby_service
+    
+    match /games/{gameId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    
+    // ============ MATCHES ============
+    // Alternative collection name used by some services
     
     match /matches/{matchId} {
-      // Anyone authenticated can read active matches
       allow read: if isAuthenticated();
-      
-      // Anyone authenticated can create a match (they become host)
-      allow create: if isAuthenticated() && 
-        request.resource.data.hostId == request.auth.uid;
-      
-      // Only players can update match state
-      allow update: if isAuthenticated() && 
-        (isPlayerInMatch(resource.data) || isMatchHost(resource.data));
-      
-      // Only host can delete (close room)
-      allow delete: if isAuthenticated() && isMatchHost(resource.data);
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
     }
     
     // ============ INVITES ============
     
     match /invites/{inviteId} {
-      // Anyone can read invites (needed for validation)
       allow read: if isAuthenticated();
-      
-      // Only host can create invites for their room
-      allow create: if isAuthenticated() && 
-        request.resource.data.hostId == request.auth.uid;
-      
-      // Track invite usage
+      allow create: if isAuthenticated();
       allow update: if isAuthenticated();
-      
-      allow delete: if false; // Keep for audit
-    }
-    
-    // ============ WALLETS & DIAMONDS ============
-    
-    match /wallets/{userId} {
-      allow read: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId) && 
-        request.resource.data.balance >= 0;
       allow delete: if false;
     }
     
-    // ============ PURCHASES (Server-side only) ============
+    // ============ DIAMONDS ============
     
-    match /purchases/{purchaseId} {
-      allow read: if isAuthenticated() && 
-        request.auth.uid == resource.data.userId;
-      allow write: if false; // RevenueCat webhook only
-    }
-    
-    match /purchase_logs/{logId} {
-      allow read: if isAuthenticated() && 
-        request.auth.uid == resource.data.userId;
-      allow write: if false; // Server-side only
+    match /diamond_rewards/{rewardId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if false;
+      allow delete: if false;
     }
     
     match /diamond_spending/{spendId} {
-      allow read: if isAuthenticated() && 
-        request.auth.uid == resource.data.userId;
-      allow write: if false; // Server-side only
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if false;
+      allow delete: if false;
     }
     
-    // ============ AUDIT LOGS (Read-only) ============
+    // ============ REFERRALS ============
+    
+    match /referrals/{referralId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if false;
+      allow delete: if false;
+    }
+    
+    // ============ CHAT ============
+    
+    match /chat/{roomId}/messages/{messageId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+    }
+    
+    // ============ CONVERSATIONS (DMs) ============
+    
+    match /conversations/{conversationId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+      
+      match /messages/{messageId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated();
+        allow update: if false;
+        allow delete: if false;
+      }
+    }
+    
+    // ============ MATCHMAKING QUEUE ============
+    
+    match /matchmaking_queue/{queueId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    
+    // ============ SIGNALING (WebRTC) ============
+    
+    match /signaling/{roomId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+      
+      match /{document=**} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated();
+      }
+    }
+    
+    // ============ WALLETS ============
+    
+    match /wallets/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+    
+    // ============ PROFILES ============
+    
+    match /profiles/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId);
+    }
+    
+    // ============ LEDGER ============
+    
+    match /ledger/{gameId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    // ============ AUDIT LOGS (Server-side only) ============
     
     match /audit_logs/{logId} {
       allow read: if isAdmin();
-      allow write: if false; // Server-side only
+      allow write: if false;
     }
     
     match /audit_game_events/{eventId} {
@@ -117,54 +161,29 @@ service cloud.firestore {
       allow write: if false;
     }
     
-    match /audit_deals/{dealId} {
-      allow read: if isAdmin();
-      allow write: if false;
-    }
-    
-    match /audit_moves/{moveId} {
-      allow read: if isAdmin();
-      allow write: if false;
-    }
-    
-    match /audit_suspicious/{suspiciousId} {
-      allow read: if isAdmin();
-      allow write: if false;
-    }
-    
-    match /audit_player_stats/{userId} {
-      // Players can see their own stats
-      allow read: if isOwner(userId) || isAdmin();
-      allow write: if false;
-    }
-    
-    // ============ FLAGGED USERS (Admin only) ============
+    // ============ FLAGGED USERS ============
     
     match /flaggedUsers/{userId} {
       allow read: if isAdmin();
       allow write: if false;
     }
     
-    // ============ LEGACY COLLECTIONS ============
+    // ============ PURCHASES ============
     
-    match /games/{gameId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated() && 
-        request.auth.uid in resource.data.scores.keys();
-      allow delete: if isAuthenticated() && 
-        request.auth.uid in resource.data.scores.keys();
-    }
-    
-    match /ledger/{gameId} {
+    match /purchases/{purchaseId} {
       allow read: if isAuthenticated();
       allow write: if false;
     }
     
+    match /purchase_logs/{logId} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+    
+    // ============ TRANSACTIONS ============
+    
     match /transactions/{transactionId} {
-      allow read: if isAuthenticated() && 
-        (request.auth.uid == resource.data.fromUserId ||
-         request.auth.uid == resource.data.toUserId);
+      allow read: if isAuthenticated();
       allow write: if false;
     }
   }
