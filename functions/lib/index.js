@@ -5,24 +5,29 @@
  * Main entry point for all Cloud Functions including:
  * - Anti-cheat validation (existing)
  * - AI-powered game features (Genkit)
+ * - Push notifications (FCM)
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processSettlement = exports.validateMove = exports.validateBid = exports.getBidSuggestion = exports.moderateChat = exports.getBotPlay = exports.getGameTip = exports.validateSpectatorAccess = exports.generateLiveKitToken = void 0;
+exports.processSettlement = exports.validateMove = exports.validateBid = exports.onFriendRequestCreated = exports.onInviteCreated = exports.getMatchSuggestions = exports.getBidSuggestion = exports.moderateChat = exports.getBotPlay = exports.getGameTip = exports.validateSpectatorAccess = exports.generateLiveKitToken = void 0;
 const https_1 = require("firebase-functions/v2/https");
+const firestore_1 = require("firebase-functions/v2/firestore");
 const app_1 = require("firebase-admin/app");
-const firestore_1 = require("firebase-admin/firestore");
+const firestore_2 = require("firebase-admin/firestore");
+const messaging_1 = require("firebase-admin/messaging");
 // Import Genkit flows
 const gameTipFlow_1 = require("./genkit/flows/gameTipFlow");
 const botPlayFlow_1 = require("./genkit/flows/botPlayFlow");
 const moderationFlow_1 = require("./genkit/flows/moderationFlow");
 const bidSuggestionFlow_1 = require("./genkit/flows/bidSuggestionFlow");
+const matchmakingFlow_1 = require("./genkit/flows/matchmakingFlow");
 // Export LiveKit token functions
 var tokenService_1 = require("./livekit/tokenService");
 Object.defineProperty(exports, "generateLiveKitToken", { enumerable: true, get: function () { return tokenService_1.generateLiveKitToken; } });
 Object.defineProperty(exports, "validateSpectatorAccess", { enumerable: true, get: function () { return tokenService_1.validateSpectatorAccess; } });
 // Initialize Firebase Admin
 (0, app_1.initializeApp)();
-const db = (0, firestore_1.getFirestore)();
+const db = (0, firestore_2.getFirestore)();
+const messaging = (0, messaging_1.getMessaging)();
 // =====================================================
 // GENKIT AI FUNCTIONS
 // =====================================================
@@ -86,7 +91,7 @@ exports.moderateChat = (0, https_1.onCall)(async (request) => {
                 message: input.message,
                 roomId: input.roomId,
                 result,
-                timestamp: firestore_1.FieldValue.serverTimestamp(),
+                timestamp: firestore_2.FieldValue.serverTimestamp(),
             });
         }
         return { success: true, ...result };
@@ -116,6 +121,120 @@ exports.getBidSuggestion = (0, https_1.onCall)(async (request) => {
     catch (error) {
         console.error('Bid suggestion error:', error);
         throw new https_1.HttpsError('internal', 'Failed to generate bid suggestion');
+    }
+});
+/**
+ * Get AI-powered matchmaking suggestions
+ */
+exports.getMatchSuggestions = (0, https_1.onCall)(async (request) => {
+    const userId = request.auth?.uid;
+    if (!userId) {
+        throw new https_1.HttpsError('unauthenticated', 'User must be logged in');
+    }
+    const input = request.data;
+    if (!input.gameType) {
+        throw new https_1.HttpsError('invalid-argument', 'Game type is required');
+    }
+    try {
+        const result = await (0, matchmakingFlow_1.matchmakingFlow)({
+            ...input,
+            userId: userId,
+        });
+        return { success: true, ...result };
+    }
+    catch (error) {
+        console.error('Matchmaking error:', error);
+        return {
+            success: true,
+            suggestions: [],
+            reasoning: 'Matchmaking temporarily unavailable',
+            waitTimeEstimate: 30,
+        };
+    }
+});
+// =====================================================
+// FCM PUSH NOTIFICATIONS
+// =====================================================
+/**
+ * Send push notification when a game invite is created
+ */
+exports.onInviteCreated = (0, firestore_1.onDocumentCreated)('invites/{inviteId}', async (event) => {
+    const invite = event.data?.data();
+    if (!invite)
+        return;
+    const toUserId = invite.toUserId;
+    const fromName = invite.fromDisplayName || 'Someone';
+    const gameType = invite.gameType || 'a game';
+    // Get the recipient's FCM token
+    const userDoc = await db.collection('users').doc(toUserId).get();
+    const fcmToken = userDoc.data()?.fcmToken;
+    if (!fcmToken) {
+        console.log(`No FCM token for user ${toUserId}`);
+        return;
+    }
+    // Send the notification
+    try {
+        await messaging.send({
+            token: fcmToken,
+            notification: {
+                title: 'Game Invitation! 🎮',
+                body: `${fromName} invited you to play ${gameType}`,
+            },
+            data: {
+                type: 'game_invite',
+                inviteId: event.params.inviteId,
+                roomId: invite.roomId || '',
+                gameType: gameType,
+            },
+            android: {
+                priority: 'high',
+                notification: {
+                    channelId: 'game_invites',
+                    icon: 'ic_notification',
+                },
+            },
+            webpush: {
+                notification: {
+                    icon: '/icons/icon-192.png',
+                    badge: '/icons/icon-72.png',
+                },
+            },
+        });
+        console.log(`Notification sent to ${toUserId}`);
+    }
+    catch (error) {
+        console.error('FCM send error:', error);
+    }
+});
+/**
+ * Send push notification for friend request
+ */
+exports.onFriendRequestCreated = (0, firestore_1.onDocumentCreated)('friendRequests/{requestId}', async (event) => {
+    const request = event.data?.data();
+    if (!request)
+        return;
+    const toUserId = request.toUserId;
+    const fromName = request.fromDisplayName || 'Someone';
+    // Get the recipient's FCM token
+    const userDoc = await db.collection('users').doc(toUserId).get();
+    const fcmToken = userDoc.data()?.fcmToken;
+    if (!fcmToken)
+        return;
+    try {
+        await messaging.send({
+            token: fcmToken,
+            notification: {
+                title: 'Friend Request! 👋',
+                body: `${fromName} wants to be your friend`,
+            },
+            data: {
+                type: 'friend_request',
+                requestId: event.params.requestId,
+            },
+        });
+    }
+    catch (error) {
+        console.error('FCM send error:', error);
     }
 });
 // =====================================================
@@ -288,11 +407,11 @@ exports.processSettlement = (0, https_1.onCall)(async (request) => {
     for (const settlement of settlements) {
         const debtorWalletRef = db.collection('wallets').doc(settlement.from);
         batch.update(debtorWalletRef, {
-            balance: firestore_1.FieldValue.increment(-settlement.amount),
+            balance: firestore_2.FieldValue.increment(-settlement.amount),
         });
         const creditorWalletRef = db.collection('wallets').doc(settlement.to);
         batch.update(creditorWalletRef, {
-            balance: firestore_1.FieldValue.increment(settlement.amount),
+            balance: firestore_2.FieldValue.increment(settlement.amount),
         });
         const txRef = db.collection('transactions').doc();
         batch.set(txRef, {
@@ -301,7 +420,7 @@ exports.processSettlement = (0, https_1.onCall)(async (request) => {
             toUserId: settlement.to,
             amount: settlement.amount,
             type: 'settlement',
-            timestamp: firestore_1.FieldValue.serverTimestamp(),
+            timestamp: firestore_2.FieldValue.serverTimestamp(),
             status: 'completed',
         });
     }

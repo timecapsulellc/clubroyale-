@@ -4,17 +4,21 @@
  * Main entry point for all Cloud Functions including:
  * - Anti-cheat validation (existing)
  * - AI-powered game features (Genkit)
+ * - Push notifications (FCM)
  */
 
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { getMessaging } from 'firebase-admin/messaging';
 
 // Import Genkit flows
 import { gameTipFlow, GameTipInput } from './genkit/flows/gameTipFlow';
 import { botPlayFlow, BotPlayInput } from './genkit/flows/botPlayFlow';
 import { moderationFlow, ModerationInput } from './genkit/flows/moderationFlow';
 import { bidSuggestionFlow, BidSuggestionInput } from './genkit/flows/bidSuggestionFlow';
+import { matchmakingFlow, MatchmakingInput } from './genkit/flows/matchmakingFlow';
 
 // Export LiveKit token functions
 export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenService';
@@ -22,6 +26,7 @@ export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenSe
 // Initialize Firebase Admin
 initializeApp();
 const db = getFirestore();
+const messaging = getMessaging();
 
 // =====================================================
 // GENKIT AI FUNCTIONS
@@ -129,6 +134,129 @@ export const getBidSuggestion = onCall(async (request) => {
     } catch (error) {
         console.error('Bid suggestion error:', error);
         throw new HttpsError('internal', 'Failed to generate bid suggestion');
+    }
+});
+
+/**
+ * Get AI-powered matchmaking suggestions
+ */
+export const getMatchSuggestions = onCall(async (request) => {
+    const userId = request.auth?.uid;
+    if (!userId) {
+        throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    const input: MatchmakingInput = request.data;
+
+    if (!input.gameType) {
+        throw new HttpsError('invalid-argument', 'Game type is required');
+    }
+
+    try {
+        const result = await matchmakingFlow({
+            ...input,
+            userId: userId,
+        });
+        return { success: true, ...result };
+    } catch (error) {
+        console.error('Matchmaking error:', error);
+        return {
+            success: true,
+            suggestions: [],
+            reasoning: 'Matchmaking temporarily unavailable',
+            waitTimeEstimate: 30,
+        };
+    }
+});
+
+// =====================================================
+// FCM PUSH NOTIFICATIONS
+// =====================================================
+
+/**
+ * Send push notification when a game invite is created
+ */
+export const onInviteCreated = onDocumentCreated('invites/{inviteId}', async (event) => {
+    const invite = event.data?.data();
+    if (!invite) return;
+
+    const toUserId = invite.toUserId;
+    const fromName = invite.fromDisplayName || 'Someone';
+    const gameType = invite.gameType || 'a game';
+
+    // Get the recipient's FCM token
+    const userDoc = await db.collection('users').doc(toUserId).get();
+    const fcmToken = userDoc.data()?.fcmToken;
+
+    if (!fcmToken) {
+        console.log(`No FCM token for user ${toUserId}`);
+        return;
+    }
+
+    // Send the notification
+    try {
+        await messaging.send({
+            token: fcmToken,
+            notification: {
+                title: 'Game Invitation! 🎮',
+                body: `${fromName} invited you to play ${gameType}`,
+            },
+            data: {
+                type: 'game_invite',
+                inviteId: event.params.inviteId,
+                roomId: invite.roomId || '',
+                gameType: gameType,
+            },
+            android: {
+                priority: 'high',
+                notification: {
+                    channelId: 'game_invites',
+                    icon: 'ic_notification',
+                },
+            },
+            webpush: {
+                notification: {
+                    icon: '/icons/icon-192.png',
+                    badge: '/icons/icon-72.png',
+                },
+            },
+        });
+        console.log(`Notification sent to ${toUserId}`);
+    } catch (error) {
+        console.error('FCM send error:', error);
+    }
+});
+
+/**
+ * Send push notification for friend request
+ */
+export const onFriendRequestCreated = onDocumentCreated('friendRequests/{requestId}', async (event) => {
+    const request = event.data?.data();
+    if (!request) return;
+
+    const toUserId = request.toUserId;
+    const fromName = request.fromDisplayName || 'Someone';
+
+    // Get the recipient's FCM token
+    const userDoc = await db.collection('users').doc(toUserId).get();
+    const fcmToken = userDoc.data()?.fcmToken;
+
+    if (!fcmToken) return;
+
+    try {
+        await messaging.send({
+            token: fcmToken,
+            notification: {
+                title: 'Friend Request! 👋',
+                body: `${fromName} wants to be your friend`,
+            },
+            data: {
+                type: 'friend_request',
+                requestId: event.params.requestId,
+            },
+        });
+    } catch (error) {
+        console.error('FCM send error:', error);
     }
 });
 

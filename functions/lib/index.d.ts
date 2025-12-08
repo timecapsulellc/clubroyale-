@@ -4,6 +4,7 @@
  * Main entry point for all Cloud Functions including:
  * - Anti-cheat validation (existing)
  * - AI-powered game features (Genkit)
+ * - Push notifications (FCM)
  */
 export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenService';
 /**
@@ -51,6 +52,28 @@ export declare const getBidSuggestion: import("firebase-functions/v2/https").Cal
     riskLevel: "safe" | "moderate" | "aggressive";
     success: boolean;
 }>, unknown>;
+/**
+ * Get AI-powered matchmaking suggestions
+ */
+export declare const getMatchSuggestions: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
+    reasoning: string;
+    suggestions: string[];
+    waitTimeEstimate: number;
+    alternativeGameType?: string | undefined;
+    success: boolean;
+}>, unknown>;
+/**
+ * Send push notification when a game invite is created
+ */
+export declare const onInviteCreated: import("firebase-functions/core").CloudFunction<import("firebase-functions/v2/firestore").FirestoreEvent<import("firebase-functions/v2/firestore").QueryDocumentSnapshot | undefined, {
+    inviteId: string;
+}>>;
+/**
+ * Send push notification for friend request
+ */
+export declare const onFriendRequestCreated: import("firebase-functions/core").CloudFunction<import("firebase-functions/v2/firestore").FirestoreEvent<import("firebase-functions/v2/firestore").QueryDocumentSnapshot | undefined, {
+    requestId: string;
+}>>;
 /**
  * Validate a bid in Call Break
  */
