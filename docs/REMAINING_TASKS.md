@@ -1,103 +1,83 @@
-# TaasClub - Project Status & Roadmap
+# TaasClub - Project Status
 
-> **Last Updated:** December 8, 2025 20:00 IST  
-> **Status:** 98% Complete → World-Class Platform  
+> **Last Updated:** December 8, 2025 20:30 IST  
+> **Strategy:** Private Club Ledger (Strategy A)  
+> **Status:** 98% Complete  
 > **Live URL:** https://taasclub-app.web.app
 
 ---
 
-## 🎯 Current Status
+## 🎯 Core Philosophy
 
-| Metric | Value |
-|--------|-------|
-| **Cloud Functions** | 12 Deployed |
-| **Games** | 4 Complete |
-| **GenKit AI Flows** | 5 Active |
-| **Tests** | 169 Passing |
-| **Live URL** | https://taasclub-app.web.app |
+> **The app is a CALCULATOR, not a BANK.**
 
----
-
-## ✅ Completed Features
-
-| Feature | Status |
-|---------|--------|
-| Marriage Game | ✅ Complete |
-| Call Break | ✅ Complete |
-| Teen Patti | ✅ Complete |
-| Rummy | ✅ Complete |
-| GenKit AI (5 flows) | ✅ Complete |
-| Social Features | ✅ Complete |
-| Diamond Wallet | ✅ Complete |
-| Firebase Hosting | ✅ Deployed |
-| Responsive Design | ✅ Complete |
-| Sound Service | ✅ Complete |
-| AI Difficulty (4 levels) | ✅ Complete |
+- Uses "Units" terminology (never Rupees/Dollars)
+- Settlement is text/image only
+- Users settle offline via UPI/Cash
+- Host pays Diamonds, Guests play free
 
 ---
 
-## 📋 Strategic Documentation
+## 📋 Strategy A Foundation Docs
+
+| Document | Purpose |
+|----------|---------|
+| [DOC1_SAFE_HARBOR_LOGIC.md](./DOC1_SAFE_HARBOR_LOGIC.md) | Legal framework, firewall rules |
+| [DOC2_SETTLEMENT_ALGORITHM.md](./DOC2_SETTLEMENT_ALGORITHM.md) | Settlement math & code |
+| [DOC3_MONETIZATION_FLOW.md](./DOC3_MONETIZATION_FLOW.md) | Diamond economy, revenue |
+| [PRD_TAASCLUB.md](./PRD_TAASCLUB.md) | Product Requirements |
+| [MASTER_ARCHITECT_PROMPT.md](./MASTER_ARCHITECT_PROMPT.md) | AI agent instructions |
+
+---
+
+## 📈 Strategic Planning Docs
 
 | Document | Purpose |
 |----------|---------|
 | [ULTIMATE_ROADMAP.md](./ULTIMATE_ROADMAP.md) | 12-month strategic plan |
-| [MARRIAGE_GAME_SPEC.md](./MARRIAGE_GAME_SPEC.md) | P2P, AI, anti-cheat specs |
+| [MARRIAGE_GAME_SPEC.md](./MARRIAGE_GAME_SPEC.md) | P2P, GenKit AI specs |
 | [GAME_ENGINE_SDK.md](./GAME_ENGINE_SDK.md) | Pluggable game framework |
 | [CLUB_COUNCIL_GOVERNANCE.md](./CLUB_COUNCIL_GOVERNANCE.md) | Technical governance |
 | [SUCCESS_METRICS.md](./SUCCESS_METRICS.md) | KPIs and targets |
 
 ---
 
-## 🚀 Roadmap Summary
+## ✅ Current Implementation Status
 
-### Q1 2026: Foundation
-- [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Sentry monitoring
-- [ ] GameEngine abstraction
-- [ ] 4 AI difficulty levels
-
-### Q2 2026: Expansion
-- [ ] Clubs/Guilds system
-- [ ] Tournaments & seasons
-- [ ] Season Pass
-
-### Q3 2026: Monetization
-- [ ] VIP subscription
-- [ ] Creator marketplace
-- [ ] Video feeds
-
-### Q4 2026: Scale
-- [ ] Multi-region deployment
-- [ ] Esports infrastructure
-- [ ] 1M MAU target
+| Feature | Status |
+|---------|--------|
+| Marriage Game | ✅ Complete |
+| Call Break | ✅ Complete |
+| Teen Patti | ✅ Complete |
+| Settlement Service | ✅ Complete |
+| Diamond Wallet | ✅ Complete |
+| GenKit AI (5 flows) | ✅ Complete |
+| Firebase Hosting | ✅ Deployed |
+| Tests | ✅ 169 Passing |
 
 ---
 
-## 💰 Investment Summary
+## 💎 Monetization Model
 
-| Category | Monthly Cost |
-|----------|--------------|
-| Team (5.5 FTE) | $31,000 |
-| Infrastructure | $3,800 |
-| **Total** | **$34,800** |
-
-**Break-even:** 140K MAU @ 5% VIP conversion
+| Item | Cost | Who |
+|------|------|-----|
+| Create Room | 10 💎 | Host |
+| Ad-Free Game | 5 💎 | Host |
+| Join Game | FREE | Guest |
 
 ---
 
 ## 🔗 Links
 
-- **Live App:** https://taasclub-app.web.app
-- **Firebase Console:** https://console.firebase.google.com/project/taasclub-app
+- **Live:** https://taasclub-app.web.app
+- **Console:** https://console.firebase.google.com/project/taasclub-app
 - **GitHub:** https://github.com/timecapsulellc/TaasClub
 
 ---
 
-## 📞 Next Actions
+## 📞 Next Steps
 
-1. Set up GitHub Projects board
-2. Schedule Club Council kickoff
-3. Implement CI/CD pipeline
-4. Begin GameEngine abstraction
-
-**Vision:** The "Discord of Card Games" - 1M MAU by 2026
+1. Set up CI/CD pipeline
+2. GameEngine abstraction
+3. Clubs/Guilds feature
+4. Tournament system
