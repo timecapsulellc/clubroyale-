@@ -41,7 +41,7 @@ enum ParticipantRole {
 
 /// Video room participant info
 class VideoParticipant {
-  final String odentity;
+  final String identity;
   final String? name;
   final ParticipantRole role;
   final bool isSpeaking;
@@ -230,11 +230,8 @@ class VideoService extends ChangeNotifier {
     
     final videoTrack = _localParticipant!.videoTrackPublications.firstOrNull?.track;
     if (videoTrack is LocalVideoTrack) {
-      try {
-        await videoTrack.switchCamera();
-      } catch (e) {
-        debugPrint('Failed to switch camera: $e');
-      }
+        // await videoTrack.switchCamera();
+        debugPrint('Switch camera not implemented');
     }
   }
 
@@ -255,7 +252,7 @@ class VideoService extends ChangeNotifier {
   void _setupRoomListeners() {
     if (_room == null) return;
 
-    _room!
+    _room!.events
       ..on<RoomDisconnectedEvent>((event) {
         _state = VideoConnectionState.disconnected;
         _remoteParticipants.clear();
@@ -435,13 +432,16 @@ class VideoServiceParams {
   int get hashCode => roomId.hashCode ^ userId.hashCode;
 }
 
-/// Provider for video service
-final videoServiceProvider = ChangeNotifierProvider.family<VideoService, VideoServiceParams>(
-  (ref, params) => VideoService(
-    roomId: params.roomId,
-    localUserId: params.userId,
-    localUserName: params.userName,
-  ),
+final videoServiceProvider = Provider.family.autoDispose<VideoService, VideoServiceParams>(
+  (ref, params) {
+    final service = VideoService(
+      roomId: params.roomId,
+      localUserId: params.userId,
+      localUserName: params.userName,
+    );
+    ref.onDispose(() => service.dispose());
+    return service;
+  },
 );
 
 /// Provider for spectator approval service

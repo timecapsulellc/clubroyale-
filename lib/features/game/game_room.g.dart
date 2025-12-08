@@ -23,6 +23,7 @@ _GameRoom _$GameRoomFromJson(Map<String, dynamic> json) => _GameRoom(
       .toList(),
   scores: Map<String, int>.from(json['scores'] as Map),
   isFinished: json['isFinished'] as bool? ?? false,
+  isPublic: json['isPublic'] as bool? ?? false,
   createdAt: json['createdAt'] == null
       ? null
       : DateTime.parse(json['createdAt'] as String),
@@ -69,6 +70,7 @@ Map<String, dynamic> _$GameRoomToJson(_GameRoom instance) => <String, dynamic>{
   'players': instance.players,
   'scores': instance.scores,
   'isFinished': instance.isFinished,
+  'isPublic': instance.isPublic,
   'createdAt': instance.createdAt?.toIso8601String(),
   'finishedAt': instance.finishedAt?.toIso8601String(),
   'currentRound': instance.currentRound,

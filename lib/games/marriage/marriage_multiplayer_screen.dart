@@ -14,6 +14,9 @@ import 'package:taasclub/games/marriage/marriage_service.dart';
 import 'package:taasclub/features/auth/auth_service.dart';
 import 'package:taasclub/core/card_engine/meld.dart';
 import 'package:taasclub/features/game/widgets/player_avatar.dart';
+import 'package:taasclub/features/chat/widgets/chat_overlay.dart';
+import 'package:taasclub/features/rtc/widgets/audio_controls.dart';
+import 'package:taasclub/features/video/widgets/video_grid.dart';
 
 /// Multiplayer Marriage game screen
 class MarriageMultiplayerScreen extends ConsumerStatefulWidget {
@@ -32,6 +35,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   String? _selectedCardId;
   bool _isProcessing = false;
   bool _hasDrawn = false;  // Can't discard until drawn
+  bool _isChatExpanded = false;
+  bool _showVideoGrid = false;
   
   // Card lookup cache
   final Map<String, Card> _cardCache = {};
@@ -107,6 +112,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             : null;
         
         return Scaffold(
+
           backgroundColor: CasinoColors.feltGreenDark,
           appBar: AppBar(
             backgroundColor: Colors.black.withOpacity(0.5),
@@ -159,37 +165,85 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                     ],
                   ),
                 ),
+                
+              // Video Toggle
+              IconButton(
+                icon: Icon(_showVideoGrid ? Icons.videocam_off : Icons.videocam),
+                onPressed: () => setState(() => _showVideoGrid = !_showVideoGrid),
+                tooltip: _showVideoGrid ? 'Hide Video' : 'Show Video',
+              ),
+              
+              // Audio Mute/Unmute (Mini implementation)
+              AudioFloatingButton(roomId: widget.roomId, userId: currentUser.uid),
             ],
           ),
           body: ParticleBackground(
             primaryColor: CasinoColors.gold,
             secondaryColor: CasinoColors.feltGreenMid,
             particleCount: 15,
-            child: Column(
+            child: Stack(
               children: [
-                // Turn indicator
-                _buildTurnIndicator(state, currentUser.uid),
-                
-                // Other players
-                Expanded(
-                  flex: 2,
-                  child: _buildOpponentsArea(state, currentUser.uid),
+                // Main Game Layer
+                Column(
+                  children: [
+                    // Turn indicator
+                    _buildTurnIndicator(state, currentUser.uid),
+                    
+                    // Other players (Scrollable for 8 players)
+                    Expanded(
+                      flex: 2,
+                      child: _buildOpponentsArea(state, currentUser.uid),
+                    ),
+                    
+                    // Center - deck and discard
+                    Expanded(
+                      flex: 3,
+                      child: _buildCenterArea(state, topDiscard, isMyTurn),
+                    ),
+                    
+                    // Meld suggestions
+                    _buildMeldSuggestions(myHand, tiplu),
+                    
+                    // My hand
+                    _buildMyHand(myHand, isMyTurn),
+                    
+                    // Action bar
+                    _buildActionBar(isMyTurn, state, currentUser.uid),
+                  ],
                 ),
                 
-                // Center - deck and discard
-                Expanded(
-                  flex: 3,
-                  child: _buildCenterArea(state, topDiscard, isMyTurn),
+                // Video Grid Overlay
+                if (_showVideoGrid)
+                  Positioned(
+                    top: 60,
+                    right: 16,
+                    width: 200,
+                    height: 300,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: VideoGridWidget(
+                        roomId: widget.roomId,
+                        userId: currentUser.uid,
+                        userName: currentUser.displayName ?? 'Player',
+                      ),
+                    ),
+                  ),
+                  
+                // Chat Overlay
+                Positioned(
+                  bottom: 140, // Above hand
+                  left: 16,
+                  child: ChatOverlay(
+                    roomId: widget.roomId,
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName ?? 'Player',
+                    isExpanded: _isChatExpanded,
+                    onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
+                  ),
                 ),
-                
-                // Meld suggestions
-                _buildMeldSuggestions(myHand, tiplu),
-                
-                // My hand
-                _buildMyHand(myHand, isMyTurn),
-                
-                // Action bar
-                _buildActionBar(isMyTurn, state, currentUser.uid),
               ],
             ),
           ),
@@ -303,21 +357,27 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     final opponents = state.playerHands.keys.where((id) => id != myId).toList();
     
     return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: opponents.take(3).map((playerId) {
-          final cardCount = state.playerHands[playerId]?.length ?? 0;
-          final isCurrentTurn = state.currentPlayerId == playerId;
-          
-          return PlayerAvatar(
-            name: 'Player ${opponents.indexOf(playerId) + 2}', // TODO: Get real name
-            isCurrentTurn: isCurrentTurn,
-            isHost: false, // TODO: Get host status
-            bid: null,
-            tricksWon: cardCount, // Showing card count as "score" for now
-          ).animate().fadeIn(delay: 200.ms);
-        }).toList(),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: opponents.map((playerId) {
+            final cardCount = state.playerHands[playerId]?.length ?? 0;
+            final isCurrentTurn = state.currentPlayerId == playerId;
+            
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: PlayerAvatar(
+                name: 'Player ${opponents.indexOf(playerId) + 2}', // TODO: Get real name
+                isCurrentTurn: isCurrentTurn,
+                isHost: false, // TODO: Get host status
+                bid: null,
+                tricksWon: cardCount, // Showing card count as "score" for now
+              ).animate().fadeIn(delay: 200.ms),
+            );
+          }).toList(),
+        ),
       ),
     );
   }

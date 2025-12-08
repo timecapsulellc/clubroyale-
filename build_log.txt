@@ -1,0 +1,123 @@
+Compiling lib/main.dart for the Web...                          
+Wasm dry run findings:
+Found incompatibilities with WebAssembly.
+
+file:///Users/dadou/.pub-cache/hosted/pub.dev/dart_webrtc-1.6.0/lib/src/frame_cryptor_impl.dart 509:11 - invalid_runtime_check_with_js_interop_types lint violation: Cast from 'List<InvalidType>' to 'JSObject' casts a Dart value to a JS interop type, which might not be platform-consistent. (6)
+file:///Users/dadou/.pub-cache/hosted/pub.dev/dart_webrtc-1.6.0/lib/src/frame_cryptor_impl.dart 584:11 - invalid_runtime_check_with_js_interop_types lint violation: Cast from 'List<InvalidType>' to 'JSObject' casts a Dart value to a JS interop type, which might not be platform-consistent. (6)
+file:///Users/dadou/.pub-cache/hosted/pub.dev/purchases_flutter-9.9.10/lib/web/purchases_flutter_web.dart 456:9 - invalid_runtime_check_with_js_interop_types lint violation: Runtime check between 'dynamic' and 'JSObject' checks whether a Dart value is a JS interop type, which might not be platform-consistent. (7)
+
+Consider addressing these issues to enable wasm builds. See docs for more info: https://docs.flutter.dev/platform-integration/web/wasm
+
+Use --no-wasm-dry-run to disable these warnings.
+Target dart2js failed: ProcessException: Process exited abnormally with exit code 1:
+lib/features/video/video_service.dart:439:30:
+Error: Undefined name 'ChangeNotifierProvider'.
+final videoServiceProvider = ChangeNotifierProvider.family<VideoService, VideoServiceParams>(
+                             ^^^^^^^^^^^^^^^^^^^^^^
+lib/features/video/widgets/video_grid.dart:47:43:
+Error: The argument type 'List<dynamic>' can't be assigned to the parameter type 'List<_ParticipantInfo>'.
+ - 'List' is from 'dart:core'.
+ - '_ParticipantInfo' is from 'package:taasclub/features/video/widgets/video_grid.dart' ('lib/features/video/widgets/video_grid.dart').
+          child: _buildVideoGrid(context, allParticipants),
+                                          ^
+lib/features/video/widgets/video_grid.dart:157:22:
+Error: The getter 'RTCVideoViewObjectFit' isn't defined for the type 'VideoGridWidget'.
+ - 'VideoGridWidget' is from 'package:taasclub/features/video/widgets/video_grid.dart' ('lib/features/video/widgets/video_grid.dart').
+                fit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                     ^^^^^^^^^^^^^^^^^^^^^
+lib/features/video/video_service.dart:54:19:
+Error: 'identity' isn't an instance field of this class.
+    required this.identity,
+                  ^^^^^^^^
+lib/features/video/video_service.dart:234:38:
+Error: Too few positional arguments: 1 required, 0 given.
+        await videoTrack.switchCamera();
+                                     ^
+lib/features/video/video_service.dart:259:9:
+Error: The method 'on' isn't defined for the type 'Room'.
+ - 'Room' is from 'package:livekit_client/src/core/room.dart' ('../.pub-cache/hosted/pub.dev/livekit_client-2.3.1+hotfix.1/lib/src/core/room.dart').
+      ..on<RoomDisconnectedEvent>((event) {
+        ^^
+lib/features/video/video_service.dart:264:9:
+Error: The method 'on' isn't defined for the type 'Room'.
+ - 'Room' is from 'package:livekit_client/src/core/room.dart' ('../.pub-cache/hosted/pub.dev/livekit_client-2.3.1+hotfix.1/lib/src/core/room.dart').
+      ..on<RoomReconnectingEvent>((event) {
+        ^^
+lib/features/video/video_service.dart:268:9:
+Error: The method 'on' isn't defined for the type 'Room'.
+ - 'Room' is from 'package:livekit_client/src/core/room.dart' ('../.pub-cache/hosted/pub.dev/livekit_client-2.3.1+hotfix.1/lib/src/core/room.dart').
+      ..on<RoomReconnectedEvent>((event) {
+        ^^
+lib/features/video/video_service.dart:272:9:
+Error: The method 'on' isn't defined for the type 'Room'.
+ - 'Room' is from 'package:livekit_client/src/core/room.dart' ('../.pub-cache/hosted/pub.dev/livekit_client-2.3.1+hotfix.1/lib/src/core/room.dart').
+      ..on<ParticipantConnectedEvent>((event) {
+        ^^
+lib/features/video/video_service.dart:276:9:
+Error: The method 'on' isn't defined for the type 'Room'.
+ - 'Room' is from 'package:livekit_client/src/core/room.dart' ('../.pub-cache/hosted/pub.dev/livekit_client-2.3.1+hotfix.1/lib/src/core/room.dart').
+      ..on<ParticipantDisconnectedEvent>((event) {
+        ^^
+lib/features/video/video_service.dart:280:9:
+Error: The method 'on' isn't defined for the type 'Room'.
+ - 'Room' is from 'package:livekit_client/src/core/room.dart' ('../.pub-cache/hosted/pub.dev/livekit_client-2.3.1+hotfix.1/lib/src/core/room.dart').
+      ..on<TrackSubscribedEvent>((event) {
+        ^^
+lib/features/video/video_service.dart:283:9:
+Error: The method 'on' isn't defined for the type 'Room'.
+ - 'Room' is from 'package:livekit_client/src/core/room.dart' ('../.pub-cache/hosted/pub.dev/livekit_client-2.3.1+hotfix.1/lib/src/core/room.dart').
+      ..on<TrackUnsubscribedEvent>((event) {
+        ^^
+lib/features/video/video_service.dart:286:9:
+Error: The method 'on' isn't defined for the type 'Room'.
+ - 'Room' is from 'package:livekit_client/src/core/room.dart' ('../.pub-cache/hosted/pub.dev/livekit_client-2.3.1+hotfix.1/lib/src/core/room.dart').
+      ..on<ActiveSpeakersChangedEvent>((event) {
+        ^^
+lib/features/video/video_service.dart:44:16:
+Error: Final field 'odentity' is not initialized.
+  final String odentity;
+               ^^^^^^^^
+Error: Compilation failed.
+  Command: /opt/homebrew/Caskroom/flutter/3.29.3/flutter/bin/cache/dart-sdk/bin/dart compile js --platform-binaries=/opt/homebrew/Caskroom/flutter/3.29.3/flutter/bin/cache/flutter_web_sdk/kernel --invoker=flutter_tool -Ddart.vm.product=true -DFLUTTER_VERSION=3.38.4 -DFLUTTER_CHANNEL=stable -DFLUTTER_GIT_URL=https://github.com/flutter/flutter.git -DFLUTTER_FRAMEWORK_REVISION=66dd93f9a2 -DFLUTTER_ENGINE_REVISION=a5cb96369e -DFLUTTER_DART_VERSION=3.10.3 -DFLUTTER_WEB_USE_SKIA=true -DFLUTTER_WEB_USE_SKWASM=false -DFLUTTER_WEB_CANVASKIT_URL=https://www.gstatic.com/flutter-canvaskit/a5cb96369ef86c7e85abf5d662a1ca5d89775053/ --native-null-assertions --no-source-maps -O4 --minify -o /Users/dadou/TaasClub/.dart_tool/flutter_build/31bb5a9f7ba70fa89caa44c945cbdc81/app.dill --packages=/Users/dadou/TaasClub/.dart_tool/package_config.json --cfe-only /Users/dadou/TaasClub/.dart_tool/flutter_build/31bb5a9f7ba70fa89caa44c945cbdc81/main.dart
+#0      RunResult.throwException (package:flutter_tools/src/base/process.dart:153:5)
+#1      _DefaultProcessUtils.run (package:flutter_tools/src/base/process.dart:379:19)
+<asynchronous suspension>
+#2      Dart2JSTarget.build (package:flutter_tools/src/build_system/targets/web.dart:207:5)
+<asynchronous suspension>
+#3      _BuildInstance._invokeInternal (package:flutter_tools/src/build_system/build_system.dart:895:9)
+<asynchronous suspension>
+#4      Future.wait.<anonymous closure> (dart:async/future.dart:546:21)
+<asynchronous suspension>
+#5      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:833:32)
+<asynchronous suspension>
+#6      Future.wait.<anonymous closure> (dart:async/future.dart:546:21)
+<asynchronous suspension>
+#7      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:833:32)
+<asynchronous suspension>
+#8      FlutterBuildSystem.build (package:flutter_tools/src/build_system/build_system.dart:653:16)
+<asynchronous suspension>
+#9      WebBuilder.buildWeb (package:flutter_tools/src/web/compile.dart:94:34)
+<asynchronous suspension>
+#10     BuildWebCommand.runCommand (package:flutter_tools/src/commands/build_web.dart:296:5)
+<asynchronous suspension>
+#11     FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1559:27)
+<asynchronous suspension>
+#12     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+<asynchronous suspension>
+#13     CommandRunner.runCommand (package:args/command_runner.dart:212:13)
+<asynchronous suspension>
+#14     FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:487:9)
+<asynchronous suspension>
+#15     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+<asynchronous suspension>
+#16     FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:422:5)
+<asynchronous suspension>
+#17     run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:104:11)
+<asynchronous suspension>
+#18     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+<asynchronous suspension>
+#19     main (package:flutter_tools/executable.dart:103:3)
+<asynchronous suspension>
+
+Compiling lib/main.dart for the Web...                             48.7s
+Error: Failed to compile application for the Web.

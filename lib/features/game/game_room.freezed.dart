@@ -25,7 +25,8 @@ mixin _$GameRoom {
  GameConfig get config;/// List of players in the room
  List<Player> get players;/// Player scores map (playerId -> score)
  Map<String, int> get scores;/// Whether game is finished (legacy, use status instead)
- bool get isFinished;/// When the room was created
+ bool get isFinished;/// Whether room is public (visible in lobby) or private (code-only)
+ bool get isPublic;/// When the room was created
  DateTime? get createdAt;/// When the game finished
  DateTime? get finishedAt;// ===== Call Break Game Fields =====
 /// Current round number (1-indexed)
@@ -50,16 +51,16 @@ $GameRoomCopyWith<GameRoom> get copyWith => _$GameRoomCopyWithImpl<GameRoom>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GameRoom&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.hostId, hostId) || other.hostId == hostId)&&(identical(other.roomCode, roomCode) || other.roomCode == roomCode)&&(identical(other.status, status) || other.status == status)&&(identical(other.gameType, gameType) || other.gameType == gameType)&&(identical(other.config, config) || other.config == config)&&const DeepCollectionEquality().equals(other.players, players)&&const DeepCollectionEquality().equals(other.scores, scores)&&(identical(other.isFinished, isFinished) || other.isFinished == isFinished)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.finishedAt, finishedAt) || other.finishedAt == finishedAt)&&(identical(other.currentRound, currentRound) || other.currentRound == currentRound)&&(identical(other.gamePhase, gamePhase) || other.gamePhase == gamePhase)&&const DeepCollectionEquality().equals(other.playerHands, playerHands)&&const DeepCollectionEquality().equals(other.bids, bids)&&(identical(other.currentTrick, currentTrick) || other.currentTrick == currentTrick)&&const DeepCollectionEquality().equals(other.trickHistory, trickHistory)&&const DeepCollectionEquality().equals(other.tricksWon, tricksWon)&&const DeepCollectionEquality().equals(other.roundScores, roundScores)&&(identical(other.currentTurn, currentTurn) || other.currentTurn == currentTurn));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GameRoom&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.hostId, hostId) || other.hostId == hostId)&&(identical(other.roomCode, roomCode) || other.roomCode == roomCode)&&(identical(other.status, status) || other.status == status)&&(identical(other.gameType, gameType) || other.gameType == gameType)&&(identical(other.config, config) || other.config == config)&&const DeepCollectionEquality().equals(other.players, players)&&const DeepCollectionEquality().equals(other.scores, scores)&&(identical(other.isFinished, isFinished) || other.isFinished == isFinished)&&(identical(other.isPublic, isPublic) || other.isPublic == isPublic)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.finishedAt, finishedAt) || other.finishedAt == finishedAt)&&(identical(other.currentRound, currentRound) || other.currentRound == currentRound)&&(identical(other.gamePhase, gamePhase) || other.gamePhase == gamePhase)&&const DeepCollectionEquality().equals(other.playerHands, playerHands)&&const DeepCollectionEquality().equals(other.bids, bids)&&(identical(other.currentTrick, currentTrick) || other.currentTrick == currentTrick)&&const DeepCollectionEquality().equals(other.trickHistory, trickHistory)&&const DeepCollectionEquality().equals(other.tricksWon, tricksWon)&&const DeepCollectionEquality().equals(other.roundScores, roundScores)&&(identical(other.currentTurn, currentTurn) || other.currentTurn == currentTurn));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,name,hostId,roomCode,status,gameType,config,const DeepCollectionEquality().hash(players),const DeepCollectionEquality().hash(scores),isFinished,createdAt,finishedAt,currentRound,gamePhase,const DeepCollectionEquality().hash(playerHands),const DeepCollectionEquality().hash(bids),currentTrick,const DeepCollectionEquality().hash(trickHistory),const DeepCollectionEquality().hash(tricksWon),const DeepCollectionEquality().hash(roundScores),currentTurn]);
+int get hashCode => Object.hashAll([runtimeType,id,name,hostId,roomCode,status,gameType,config,const DeepCollectionEquality().hash(players),const DeepCollectionEquality().hash(scores),isFinished,isPublic,createdAt,finishedAt,currentRound,gamePhase,const DeepCollectionEquality().hash(playerHands),const DeepCollectionEquality().hash(bids),currentTrick,const DeepCollectionEquality().hash(trickHistory),const DeepCollectionEquality().hash(tricksWon),const DeepCollectionEquality().hash(roundScores),currentTurn]);
 
 @override
 String toString() {
-  return 'GameRoom(id: $id, name: $name, hostId: $hostId, roomCode: $roomCode, status: $status, gameType: $gameType, config: $config, players: $players, scores: $scores, isFinished: $isFinished, createdAt: $createdAt, finishedAt: $finishedAt, currentRound: $currentRound, gamePhase: $gamePhase, playerHands: $playerHands, bids: $bids, currentTrick: $currentTrick, trickHistory: $trickHistory, tricksWon: $tricksWon, roundScores: $roundScores, currentTurn: $currentTurn)';
+  return 'GameRoom(id: $id, name: $name, hostId: $hostId, roomCode: $roomCode, status: $status, gameType: $gameType, config: $config, players: $players, scores: $scores, isFinished: $isFinished, isPublic: $isPublic, createdAt: $createdAt, finishedAt: $finishedAt, currentRound: $currentRound, gamePhase: $gamePhase, playerHands: $playerHands, bids: $bids, currentTrick: $currentTrick, trickHistory: $trickHistory, tricksWon: $tricksWon, roundScores: $roundScores, currentTurn: $currentTurn)';
 }
 
 
@@ -70,7 +71,7 @@ abstract mixin class $GameRoomCopyWith<$Res>  {
   factory $GameRoomCopyWith(GameRoom value, $Res Function(GameRoom) _then) = _$GameRoomCopyWithImpl;
 @useResult
 $Res call({
- String? id, String name, String hostId, String? roomCode,@GameStatusConverter() GameStatus status, String gameType, GameConfig config, List<Player> players, Map<String, int> scores, bool isFinished, DateTime? createdAt, DateTime? finishedAt, int currentRound,@JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) GamePhase? gamePhase,@JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) Map<String, List<PlayingCard>> playerHands, Map<String, Bid> bids, Trick? currentTrick, List<Trick> trickHistory, Map<String, int> tricksWon,@JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) Map<String, List<double>> roundScores, String? currentTurn
+ String? id, String name, String hostId, String? roomCode,@GameStatusConverter() GameStatus status, String gameType, GameConfig config, List<Player> players, Map<String, int> scores, bool isFinished, bool isPublic, DateTime? createdAt, DateTime? finishedAt, int currentRound,@JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) GamePhase? gamePhase,@JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) Map<String, List<PlayingCard>> playerHands, Map<String, Bid> bids, Trick? currentTrick, List<Trick> trickHistory, Map<String, int> tricksWon,@JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) Map<String, List<double>> roundScores, String? currentTurn
 });
 
 
@@ -87,7 +88,7 @@ class _$GameRoomCopyWithImpl<$Res>
 
 /// Create a copy of GameRoom
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? hostId = null,Object? roomCode = freezed,Object? status = null,Object? gameType = null,Object? config = null,Object? players = null,Object? scores = null,Object? isFinished = null,Object? createdAt = freezed,Object? finishedAt = freezed,Object? currentRound = null,Object? gamePhase = freezed,Object? playerHands = null,Object? bids = null,Object? currentTrick = freezed,Object? trickHistory = null,Object? tricksWon = null,Object? roundScores = null,Object? currentTurn = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = null,Object? hostId = null,Object? roomCode = freezed,Object? status = null,Object? gameType = null,Object? config = null,Object? players = null,Object? scores = null,Object? isFinished = null,Object? isPublic = null,Object? createdAt = freezed,Object? finishedAt = freezed,Object? currentRound = null,Object? gamePhase = freezed,Object? playerHands = null,Object? bids = null,Object? currentTrick = freezed,Object? trickHistory = null,Object? tricksWon = null,Object? roundScores = null,Object? currentTurn = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -99,6 +100,7 @@ as String,config: null == config ? _self.config : config // ignore: cast_nullabl
 as GameConfig,players: null == players ? _self.players : players // ignore: cast_nullable_to_non_nullable
 as List<Player>,scores: null == scores ? _self.scores : scores // ignore: cast_nullable_to_non_nullable
 as Map<String, int>,isFinished: null == isFinished ? _self.isFinished : isFinished // ignore: cast_nullable_to_non_nullable
+as bool,isPublic: null == isPublic ? _self.isPublic : isPublic // ignore: cast_nullable_to_non_nullable
 as bool,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,finishedAt: freezed == finishedAt ? _self.finishedAt : finishedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,currentRound: null == currentRound ? _self.currentRound : currentRound // ignore: cast_nullable_to_non_nullable
@@ -216,10 +218,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String name,  String hostId,  String? roomCode, @GameStatusConverter()  GameStatus status,  String gameType,  GameConfig config,  List<Player> players,  Map<String, int> scores,  bool isFinished,  DateTime? createdAt,  DateTime? finishedAt,  int currentRound, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)  GamePhase? gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)  Map<String, List<PlayingCard>> playerHands,  Map<String, Bid> bids,  Trick? currentTrick,  List<Trick> trickHistory,  Map<String, int> tricksWon, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)  Map<String, List<double>> roundScores,  String? currentTurn)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String name,  String hostId,  String? roomCode, @GameStatusConverter()  GameStatus status,  String gameType,  GameConfig config,  List<Player> players,  Map<String, int> scores,  bool isFinished,  bool isPublic,  DateTime? createdAt,  DateTime? finishedAt,  int currentRound, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)  GamePhase? gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)  Map<String, List<PlayingCard>> playerHands,  Map<String, Bid> bids,  Trick? currentTrick,  List<Trick> trickHistory,  Map<String, int> tricksWon, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)  Map<String, List<double>> roundScores,  String? currentTurn)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GameRoom() when $default != null:
-return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_that.gameType,_that.config,_that.players,_that.scores,_that.isFinished,_that.createdAt,_that.finishedAt,_that.currentRound,_that.gamePhase,_that.playerHands,_that.bids,_that.currentTrick,_that.trickHistory,_that.tricksWon,_that.roundScores,_that.currentTurn);case _:
+return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_that.gameType,_that.config,_that.players,_that.scores,_that.isFinished,_that.isPublic,_that.createdAt,_that.finishedAt,_that.currentRound,_that.gamePhase,_that.playerHands,_that.bids,_that.currentTrick,_that.trickHistory,_that.tricksWon,_that.roundScores,_that.currentTurn);case _:
   return orElse();
 
 }
@@ -237,10 +239,10 @@ return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String name,  String hostId,  String? roomCode, @GameStatusConverter()  GameStatus status,  String gameType,  GameConfig config,  List<Player> players,  Map<String, int> scores,  bool isFinished,  DateTime? createdAt,  DateTime? finishedAt,  int currentRound, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)  GamePhase? gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)  Map<String, List<PlayingCard>> playerHands,  Map<String, Bid> bids,  Trick? currentTrick,  List<Trick> trickHistory,  Map<String, int> tricksWon, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)  Map<String, List<double>> roundScores,  String? currentTurn)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String name,  String hostId,  String? roomCode, @GameStatusConverter()  GameStatus status,  String gameType,  GameConfig config,  List<Player> players,  Map<String, int> scores,  bool isFinished,  bool isPublic,  DateTime? createdAt,  DateTime? finishedAt,  int currentRound, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)  GamePhase? gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)  Map<String, List<PlayingCard>> playerHands,  Map<String, Bid> bids,  Trick? currentTrick,  List<Trick> trickHistory,  Map<String, int> tricksWon, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)  Map<String, List<double>> roundScores,  String? currentTurn)  $default,) {final _that = this;
 switch (_that) {
 case _GameRoom():
-return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_that.gameType,_that.config,_that.players,_that.scores,_that.isFinished,_that.createdAt,_that.finishedAt,_that.currentRound,_that.gamePhase,_that.playerHands,_that.bids,_that.currentTrick,_that.trickHistory,_that.tricksWon,_that.roundScores,_that.currentTurn);case _:
+return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_that.gameType,_that.config,_that.players,_that.scores,_that.isFinished,_that.isPublic,_that.createdAt,_that.finishedAt,_that.currentRound,_that.gamePhase,_that.playerHands,_that.bids,_that.currentTrick,_that.trickHistory,_that.tricksWon,_that.roundScores,_that.currentTurn);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -257,10 +259,10 @@ return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String name,  String hostId,  String? roomCode, @GameStatusConverter()  GameStatus status,  String gameType,  GameConfig config,  List<Player> players,  Map<String, int> scores,  bool isFinished,  DateTime? createdAt,  DateTime? finishedAt,  int currentRound, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)  GamePhase? gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)  Map<String, List<PlayingCard>> playerHands,  Map<String, Bid> bids,  Trick? currentTrick,  List<Trick> trickHistory,  Map<String, int> tricksWon, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)  Map<String, List<double>> roundScores,  String? currentTurn)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String name,  String hostId,  String? roomCode, @GameStatusConverter()  GameStatus status,  String gameType,  GameConfig config,  List<Player> players,  Map<String, int> scores,  bool isFinished,  bool isPublic,  DateTime? createdAt,  DateTime? finishedAt,  int currentRound, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)  GamePhase? gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)  Map<String, List<PlayingCard>> playerHands,  Map<String, Bid> bids,  Trick? currentTrick,  List<Trick> trickHistory,  Map<String, int> tricksWon, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)  Map<String, List<double>> roundScores,  String? currentTurn)?  $default,) {final _that = this;
 switch (_that) {
 case _GameRoom() when $default != null:
-return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_that.gameType,_that.config,_that.players,_that.scores,_that.isFinished,_that.createdAt,_that.finishedAt,_that.currentRound,_that.gamePhase,_that.playerHands,_that.bids,_that.currentTrick,_that.trickHistory,_that.tricksWon,_that.roundScores,_that.currentTurn);case _:
+return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_that.gameType,_that.config,_that.players,_that.scores,_that.isFinished,_that.isPublic,_that.createdAt,_that.finishedAt,_that.currentRound,_that.gamePhase,_that.playerHands,_that.bids,_that.currentTrick,_that.trickHistory,_that.tricksWon,_that.roundScores,_that.currentTurn);case _:
   return null;
 
 }
@@ -272,7 +274,7 @@ return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_th
 @JsonSerializable()
 
 class _GameRoom extends GameRoom {
-  const _GameRoom({this.id, required this.name, required this.hostId, this.roomCode, @GameStatusConverter() this.status = GameStatus.waiting, this.gameType = 'call_break', this.config = const GameConfig(), required final  List<Player> players, required final  Map<String, int> scores, this.isFinished = false, this.createdAt, this.finishedAt, this.currentRound = 1, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) this.gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) final  Map<String, List<PlayingCard>> playerHands = const {}, final  Map<String, Bid> bids = const {}, this.currentTrick, final  List<Trick> trickHistory = const [], final  Map<String, int> tricksWon = const {}, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) final  Map<String, List<double>> roundScores = const {}, this.currentTurn}): _players = players,_scores = scores,_playerHands = playerHands,_bids = bids,_trickHistory = trickHistory,_tricksWon = tricksWon,_roundScores = roundScores,super._();
+  const _GameRoom({this.id, required this.name, required this.hostId, this.roomCode, @GameStatusConverter() this.status = GameStatus.waiting, this.gameType = 'call_break', this.config = const GameConfig(), required final  List<Player> players, required final  Map<String, int> scores, this.isFinished = false, this.isPublic = false, this.createdAt, this.finishedAt, this.currentRound = 1, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) this.gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) final  Map<String, List<PlayingCard>> playerHands = const {}, final  Map<String, Bid> bids = const {}, this.currentTrick, final  List<Trick> trickHistory = const [], final  Map<String, int> tricksWon = const {}, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) final  Map<String, List<double>> roundScores = const {}, this.currentTurn}): _players = players,_scores = scores,_playerHands = playerHands,_bids = bids,_trickHistory = trickHistory,_tricksWon = tricksWon,_roundScores = roundScores,super._();
   factory _GameRoom.fromJson(Map<String, dynamic> json) => _$GameRoomFromJson(json);
 
 /// Firestore document ID
@@ -309,6 +311,8 @@ class _GameRoom extends GameRoom {
 
 /// Whether game is finished (legacy, use status instead)
 @override@JsonKey() final  bool isFinished;
+/// Whether room is public (visible in lobby) or private (code-only)
+@override@JsonKey() final  bool isPublic;
 /// When the room was created
 @override final  DateTime? createdAt;
 /// When the game finished
@@ -381,16 +385,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GameRoom&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.hostId, hostId) || other.hostId == hostId)&&(identical(other.roomCode, roomCode) || other.roomCode == roomCode)&&(identical(other.status, status) || other.status == status)&&(identical(other.gameType, gameType) || other.gameType == gameType)&&(identical(other.config, config) || other.config == config)&&const DeepCollectionEquality().equals(other._players, _players)&&const DeepCollectionEquality().equals(other._scores, _scores)&&(identical(other.isFinished, isFinished) || other.isFinished == isFinished)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.finishedAt, finishedAt) || other.finishedAt == finishedAt)&&(identical(other.currentRound, currentRound) || other.currentRound == currentRound)&&(identical(other.gamePhase, gamePhase) || other.gamePhase == gamePhase)&&const DeepCollectionEquality().equals(other._playerHands, _playerHands)&&const DeepCollectionEquality().equals(other._bids, _bids)&&(identical(other.currentTrick, currentTrick) || other.currentTrick == currentTrick)&&const DeepCollectionEquality().equals(other._trickHistory, _trickHistory)&&const DeepCollectionEquality().equals(other._tricksWon, _tricksWon)&&const DeepCollectionEquality().equals(other._roundScores, _roundScores)&&(identical(other.currentTurn, currentTurn) || other.currentTurn == currentTurn));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GameRoom&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.hostId, hostId) || other.hostId == hostId)&&(identical(other.roomCode, roomCode) || other.roomCode == roomCode)&&(identical(other.status, status) || other.status == status)&&(identical(other.gameType, gameType) || other.gameType == gameType)&&(identical(other.config, config) || other.config == config)&&const DeepCollectionEquality().equals(other._players, _players)&&const DeepCollectionEquality().equals(other._scores, _scores)&&(identical(other.isFinished, isFinished) || other.isFinished == isFinished)&&(identical(other.isPublic, isPublic) || other.isPublic == isPublic)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.finishedAt, finishedAt) || other.finishedAt == finishedAt)&&(identical(other.currentRound, currentRound) || other.currentRound == currentRound)&&(identical(other.gamePhase, gamePhase) || other.gamePhase == gamePhase)&&const DeepCollectionEquality().equals(other._playerHands, _playerHands)&&const DeepCollectionEquality().equals(other._bids, _bids)&&(identical(other.currentTrick, currentTrick) || other.currentTrick == currentTrick)&&const DeepCollectionEquality().equals(other._trickHistory, _trickHistory)&&const DeepCollectionEquality().equals(other._tricksWon, _tricksWon)&&const DeepCollectionEquality().equals(other._roundScores, _roundScores)&&(identical(other.currentTurn, currentTurn) || other.currentTurn == currentTurn));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,name,hostId,roomCode,status,gameType,config,const DeepCollectionEquality().hash(_players),const DeepCollectionEquality().hash(_scores),isFinished,createdAt,finishedAt,currentRound,gamePhase,const DeepCollectionEquality().hash(_playerHands),const DeepCollectionEquality().hash(_bids),currentTrick,const DeepCollectionEquality().hash(_trickHistory),const DeepCollectionEquality().hash(_tricksWon),const DeepCollectionEquality().hash(_roundScores),currentTurn]);
+int get hashCode => Object.hashAll([runtimeType,id,name,hostId,roomCode,status,gameType,config,const DeepCollectionEquality().hash(_players),const DeepCollectionEquality().hash(_scores),isFinished,isPublic,createdAt,finishedAt,currentRound,gamePhase,const DeepCollectionEquality().hash(_playerHands),const DeepCollectionEquality().hash(_bids),currentTrick,const DeepCollectionEquality().hash(_trickHistory),const DeepCollectionEquality().hash(_tricksWon),const DeepCollectionEquality().hash(_roundScores),currentTurn]);
 
 @override
 String toString() {
-  return 'GameRoom(id: $id, name: $name, hostId: $hostId, roomCode: $roomCode, status: $status, gameType: $gameType, config: $config, players: $players, scores: $scores, isFinished: $isFinished, createdAt: $createdAt, finishedAt: $finishedAt, currentRound: $currentRound, gamePhase: $gamePhase, playerHands: $playerHands, bids: $bids, currentTrick: $currentTrick, trickHistory: $trickHistory, tricksWon: $tricksWon, roundScores: $roundScores, currentTurn: $currentTurn)';
+  return 'GameRoom(id: $id, name: $name, hostId: $hostId, roomCode: $roomCode, status: $status, gameType: $gameType, config: $config, players: $players, scores: $scores, isFinished: $isFinished, isPublic: $isPublic, createdAt: $createdAt, finishedAt: $finishedAt, currentRound: $currentRound, gamePhase: $gamePhase, playerHands: $playerHands, bids: $bids, currentTrick: $currentTrick, trickHistory: $trickHistory, tricksWon: $tricksWon, roundScores: $roundScores, currentTurn: $currentTurn)';
 }
 
 
@@ -401,7 +405,7 @@ abstract mixin class _$GameRoomCopyWith<$Res> implements $GameRoomCopyWith<$Res>
   factory _$GameRoomCopyWith(_GameRoom value, $Res Function(_GameRoom) _then) = __$GameRoomCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String name, String hostId, String? roomCode,@GameStatusConverter() GameStatus status, String gameType, GameConfig config, List<Player> players, Map<String, int> scores, bool isFinished, DateTime? createdAt, DateTime? finishedAt, int currentRound,@JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) GamePhase? gamePhase,@JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) Map<String, List<PlayingCard>> playerHands, Map<String, Bid> bids, Trick? currentTrick, List<Trick> trickHistory, Map<String, int> tricksWon,@JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) Map<String, List<double>> roundScores, String? currentTurn
+ String? id, String name, String hostId, String? roomCode,@GameStatusConverter() GameStatus status, String gameType, GameConfig config, List<Player> players, Map<String, int> scores, bool isFinished, bool isPublic, DateTime? createdAt, DateTime? finishedAt, int currentRound,@JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) GamePhase? gamePhase,@JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) Map<String, List<PlayingCard>> playerHands, Map<String, Bid> bids, Trick? currentTrick, List<Trick> trickHistory, Map<String, int> tricksWon,@JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) Map<String, List<double>> roundScores, String? currentTurn
 });
 
 
@@ -418,7 +422,7 @@ class __$GameRoomCopyWithImpl<$Res>
 
 /// Create a copy of GameRoom
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? hostId = null,Object? roomCode = freezed,Object? status = null,Object? gameType = null,Object? config = null,Object? players = null,Object? scores = null,Object? isFinished = null,Object? createdAt = freezed,Object? finishedAt = freezed,Object? currentRound = null,Object? gamePhase = freezed,Object? playerHands = null,Object? bids = null,Object? currentTrick = freezed,Object? trickHistory = null,Object? tricksWon = null,Object? roundScores = null,Object? currentTurn = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = null,Object? hostId = null,Object? roomCode = freezed,Object? status = null,Object? gameType = null,Object? config = null,Object? players = null,Object? scores = null,Object? isFinished = null,Object? isPublic = null,Object? createdAt = freezed,Object? finishedAt = freezed,Object? currentRound = null,Object? gamePhase = freezed,Object? playerHands = null,Object? bids = null,Object? currentTrick = freezed,Object? trickHistory = null,Object? tricksWon = null,Object? roundScores = null,Object? currentTurn = freezed,}) {
   return _then(_GameRoom(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -430,6 +434,7 @@ as String,config: null == config ? _self.config : config // ignore: cast_nullabl
 as GameConfig,players: null == players ? _self._players : players // ignore: cast_nullable_to_non_nullable
 as List<Player>,scores: null == scores ? _self._scores : scores // ignore: cast_nullable_to_non_nullable
 as Map<String, int>,isFinished: null == isFinished ? _self.isFinished : isFinished // ignore: cast_nullable_to_non_nullable
+as bool,isPublic: null == isPublic ? _self.isPublic : isPublic // ignore: cast_nullable_to_non_nullable
 as bool,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,finishedAt: freezed == finishedAt ? _self.finishedAt : finishedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,currentRound: null == currentRound ? _self.currentRound : currentRound // ignore: cast_nullable_to_non_nullable

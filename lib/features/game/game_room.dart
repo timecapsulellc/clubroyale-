@@ -60,6 +60,9 @@ abstract class GameRoom with _$GameRoom {
     /// Whether game is finished (legacy, use status instead)
     @Default(false) bool isFinished,
     
+    /// Whether room is public (visible in lobby) or private (code-only)
+    @Default(false) bool isPublic,
+    
     /// When the room was created
     DateTime? createdAt,
     

@@ -12,8 +12,11 @@ class DiamondService {
   /// Cost in diamonds to create a room
   static const int roomCreationCost = 10;
   
-  /// Default starting diamonds for new users
-  static const int starterDiamonds = 50;
+  /// Default starting diamonds for new users (Welcome Bonus!)
+  static const int starterDiamonds = 1000;
+  
+  /// Daily bonus diamonds
+  static const int dailyBonus = 100;
 
   /// Get user's diamond wallet
   Future<DiamondWallet> getWallet(String userId) async {
@@ -172,5 +175,58 @@ class DiamondService {
       DiamondTransactionType.refund,
       description: reason,
     );
+  }
+
+  /// Check if user can claim daily bonus (once per day)
+  Future<bool> canClaimDailyBonus(String userId) async {
+    try {
+      final doc = await _db.collection('wallets').doc(userId).get();
+      if (!doc.exists) return true;
+      
+      final data = doc.data()!;
+      final lastClaimTimestamp = data['lastDailyClaimDate'];
+      if (lastClaimTimestamp == null) return true;
+      
+      final lastClaim = (lastClaimTimestamp as Timestamp).toDate();
+      final now = DateTime.now();
+      
+      // Check if last claim was on a different day
+      return lastClaim.year != now.year || 
+             lastClaim.month != now.month || 
+             lastClaim.day != now.day;
+    } catch (e) {
+      debugPrint('Error checking daily bonus: $e');
+      return false;
+    }
+  }
+
+  /// Claim daily bonus (100 diamonds per day)
+  Future<bool> claimDailyBonus(String userId) async {
+    try {
+      final canClaim = await canClaimDailyBonus(userId);
+      if (!canClaim) {
+        return false; // Already claimed today
+      }
+      
+      // Update wallet with bonus and claim date
+      await _db.collection('wallets').doc(userId).update({
+        'balance': FieldValue.increment(dailyBonus),
+        'lastDailyClaimDate': FieldValue.serverTimestamp(),
+        'lastUpdated': FieldValue.serverTimestamp(),
+      });
+      
+      // Record transaction
+      await _recordTransaction(
+        userId: userId,
+        amount: dailyBonus,
+        type: DiamondTransactionType.bonus,
+        description: 'Daily bonus claimed! 🎁',
+      );
+      
+      return true;
+    } catch (e) {
+      debugPrint('Error claiming daily bonus: $e');
+      return false;
+    }
   }
 }

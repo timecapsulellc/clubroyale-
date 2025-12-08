@@ -598,31 +598,52 @@ class LobbyScreen extends ConsumerWidget {
       createdAt: DateTime.now(),
     );
 
-    final newGameId = await lobbyService.createGame(newGameRoom);
+    try {
+      final newGameId = await lobbyService.createGame(newGameRoom);
 
-    // Deduct diamonds after successful room creation (skip in Test Mode)
-    if (!isTestMode) {
-      await diamondService.processRoomCreation(user.uid, newGameId);
-    }
+      // Deduct diamonds after successful room creation (skip in Test Mode)
+      if (!isTestMode) {
+        await diamondService.processRoomCreation(user.uid, newGameId);
+      }
 
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white),
-              const SizedBox(width: 8),
-              Text(isTestMode 
-                ? 'Room created! (Test Mode - Free)' 
-                : 'Room created! ${DiamondService.roomCreationCost} diamonds used.'),
-            ],
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 8),
+                Text(isTestMode 
+                  ? 'Room created! (Test Mode - Free)' 
+                  : 'Room created! ${DiamondService.roomCreationCost} diamonds used.'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      );
-      context.go('/lobby/$newGameId');
+        );
+        context.go('/lobby/$newGameId');
+      }
+    } catch (e) {
+      debugPrint('Error creating room: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Failed to create room: $e')),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
     }
   }
 

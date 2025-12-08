@@ -9,6 +9,8 @@ import 'package:taasclub/features/lobby/lobby_service.dart';
 import 'package:taasclub/games/marriage/marriage_service.dart';
 import 'package:taasclub/games/teen_patti/teen_patti_service.dart';
 import 'package:taasclub/games/in_between/in_between_service.dart';
+import 'package:taasclub/features/chat/widgets/chat_overlay.dart';
+import 'package:taasclub/features/rtc/widgets/audio_controls.dart';
 import 'package:share_plus/share_plus.dart';
 
 class RoomWaitingScreen extends ConsumerStatefulWidget {
@@ -26,6 +28,7 @@ class RoomWaitingScreen extends ConsumerStatefulWidget {
 class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
   bool _isTogglingReady = false;
   bool _isStarting = false;
+  bool _isChatExpanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -150,12 +153,39 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                 ),
             ],
           ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Room Code Card - Premium Design
+          body: Stack(
+            children: [
+              // Main Content
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Audio Controls Card at top
+                    Card(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.headset_mic, color: Colors.deepPurple),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Text(
+                                'Voice Chat',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            AudioFloatingButton(
+                              roomId: widget.roomId,
+                              userId: currentUser.uid,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    
+                    // Room Code Card - Premium Design
                 if (room.roomCode != null)
                   Container(
                     decoration: BoxDecoration(
@@ -700,7 +730,22 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
               ],
             ),
           ),
-        );
+          
+          // Chat Overlay (floating)
+          Positioned(
+            bottom: 24,
+            left: 24,
+            child: ChatOverlay(
+              roomId: widget.roomId,
+              userId: currentUser.uid,
+              userName: currentUser.displayName ?? 'Player',
+              isExpanded: _isChatExpanded,
+              onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
+            ),
+          ),
+        ],
+      ),
+    );
       },
     );
   }

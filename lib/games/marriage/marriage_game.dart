@@ -61,7 +61,7 @@ class MarriageGame implements BaseGame {
   Card? get tiplu => _tiplu;
   
   /// Get current round number (1-indexed)
-  int get currentRound => _currentRound + 1;
+  int get currentRound => _currentRound;
   
   /// Get top card of discard pile
   Card? get topDiscard => _discardPile.topCard;

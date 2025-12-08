@@ -1,6 +1,6 @@
 # TaasClub 🎮
 
-A Flutter multiplayer card game platform featuring popular South Asian card games with real-time gameplay, in-app purchases, and social features.
+A Flutter multiplayer card game platform featuring popular South Asian card games with real-time gameplay, social features, AI-powered matchmaking, and in-app purchases.
 
 ## 🎴 Games Available
 
@@ -13,90 +13,105 @@ A Flutter multiplayer card game platform featuring popular South Asian card game
 
 ## ✨ Features
 
+### Core Gameplay
 - 🔐 **Firebase Authentication** - Anonymous sign-in for quick start
 - 🎲 **Game Rooms** - Create and join multiplayer rooms with room codes
 - ⚡ **Real-time Gameplay** - Live game state sync using Firestore
 - 💎 **Diamond Wallet** - In-app currency with RevenueCat integration
-- 📊 **Game History** - View past games and results
-- 🏆 **Leaderboard** - See top players ranked by score
-- 👤 **User Profiles** - Customize display name and avatar
-- 📤 **Share Results** - Share game results with friends
+- 🎁 **Daily Bonus** - 100 diamonds per day + 1000 welcome diamonds
 
-## 🃏 Card Engine
+### Social Features (NEW)
+- 👥 **Online Players** - See who's online in the lobby
+- 🤝 **Friends System** - Send/accept friend requests
+- 📨 **Game Invites** - Invite friends to your game room
+- 💬 **Global Chat** - Chat in lobby with GenKit AI moderation
+- 📩 **Direct Messages** - 1:1 private messaging
 
-The app includes a complete card engine (`lib/core/card_engine/`) with:
-- 56 card assets (52 cards + jokers + card backs)
-- Deck management (1-4 decks with shuffling/dealing)
-- Meld detection (Sets, Runs, Tunnels, Marriage)
-- Hand validation with backtracking algorithm
+### AI & Matchmaking (NEW)
+- 🏆 **ELO Rating System** - Skill-based ranking (Bronze → Diamond)
+- ⚡ **Quick Match** - Instant matchmaking with similar-skill players
+- 🤖 **GenKit AI Flows** - Bot play, bid suggestions, game tips, moderation
+
+### Communication
+- 🎤 **Voice Chat** - WebRTC-based audio during games
+- 📹 **Video Chat** - LiveKit video grid in game rooms
+- 💬 **In-Game Chat** - Text messaging with AI moderation
 
 ## 🛠 Tech Stack
 
-- **Flutter** 3.9+ - Cross-platform UI framework
-- **Firebase** - Backend services
-  - Firestore (real-time database)
-  - Authentication
-  - Storage (avatars)
-  - Cloud Functions (GenKit AI)
-  - Crashlytics
-- **Riverpod** - State management
-- **go_router** - Navigation
-- **Freezed** - Immutable data classes
-- **RevenueCat** - In-app purchases
-- **LiveKit** - Real-time video/audio
+| Category | Technologies |
+|----------|--------------|
+| **Frontend** | Flutter 3.9+, Riverpod, go_router, Freezed |
+| **Backend** | Firebase (Firestore, Auth, Functions, Storage) |
+| **AI** | GenKit + Gemini Flash for game AI & moderation |
+| **Real-time** | WebRTC (audio), LiveKit (video), Firestore (chat) |
+| **Monetization** | RevenueCat (IAP), Diamond wallet system |
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-
 - Flutter SDK ^3.9.0
 - Firebase CLI
-- A Firebase project
+- Node.js 18+ (for Cloud Functions)
 
 ### Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/timecapsulellc/TaasClub.git
-   cd TaasClub
-   ```
+```bash
+# Clone repository
+git clone https://github.com/timecapsulellc/TaasClub.git
+cd TaasClub
 
-2. Install dependencies:
-   ```bash
-   flutter pub get
-   ```
+# Install Flutter dependencies
+flutter pub get
 
-3. Configure Firebase:
-   ```bash
-   flutterfire configure
-   ```
+# Generate Freezed files
+dart run build_runner build --delete-conflicting-outputs
 
-4. Run the app:
-   ```bash
-   flutter run -d chrome  # Web
-   flutter run -d android # Android
-   flutter run -d ios     # iOS
-   ```
+# Configure Firebase
+flutterfire configure
+
+# Run the app
+flutter run -d chrome  # Web
+flutter run -d android # Android
+```
 
 ## 📁 Project Structure
 
 ```
 lib/
 ├── core/
-│   └── card_engine/      # Card, Deck, Meld logic
+│   └── card_engine/          # Card, Deck, Meld logic
 ├── features/
-│   ├── auth/             # Authentication
-│   ├── lobby/            # Room creation/joining
-│   ├── wallet/           # Diamond purchases
-│   ├── ledger/           # Game history
-│   ├── profile/          # User profiles
-│   └── game/             # General game screens
+│   ├── auth/                 # Authentication
+│   ├── lobby/                # Room creation/joining
+│   ├── wallet/               # Diamond purchases & bonuses
+│   ├── chat/                 # In-game chat with moderation
+│   ├── profile/              # User profiles
+│   ├── social/               # NEW: Friends, Presence, Invites
+│   │   ├── presence_service.dart
+│   │   ├── friends_service.dart
+│   │   ├── invite_service.dart
+│   │   ├── dm_service.dart
+│   │   ├── matchmaking_service.dart
+│   │   └── widgets/
+│   ├── ai/                   # GenKit AI integration
+│   └── game/                 # Game engine & screens
 ├── games/
-│   ├── call_break/       # Call Break game
-│   ├── marriage/         # Marriage game
-│   ├── teen_patti/       # Teen Patti game
-│   └── in_between/       # In-Between game
+│   ├── call_break/
+│   ├── marriage/
+│   ├── teen_patti/
+│   └── in_between/
 └── main.dart
+
+functions/
+└── src/
+    └── genkit/
+        └── flows/
+            ├── gameTipFlow.ts
+            ├── botPlayFlow.ts
+            ├── moderationFlow.ts
+            ├── bidSuggestionFlow.ts
+            └── matchmakingFlow.ts   # NEW
 ```
 
 ## 🧪 Testing
@@ -105,38 +120,19 @@ lib/
 # Run all tests
 flutter test
 
-# Run game tests only (89 tests)
-flutter test test/games/
-
-# Run specific game tests
-flutter test test/games/marriage/
-flutter test test/games/call_break/
+# Current test count: 169 passing
 ```
 
-**Test Coverage:**
-- Marriage: 52 tests (integration + unit)
-- Call Break: 20 tests
-- General: 17 tests
+## 📊 Current Status
 
-## 🎯 Game Routes
-
-| Route | Game |
-|-------|------|
-| `/call-break` | Call Break (solo with AI) |
-| `/marriage` | Marriage (solo practice) |
-| `/marriage/:roomId` | Marriage (multiplayer) |
-| `/teen_patti/:roomId` | Teen Patti |
-| `/in_between/:roomId` | In-Between |
-
-## 📚 Documentation
-
-| Document | Description |
-|----------|-------------|
-| [PROJECT_AUDIT_DEC7.md](docs/PROJECT_AUDIT_DEC7.md) | Latest project status |
-| [REMAINING_TASKS.md](docs/REMAINING_TASKS.md) | Task list and progress |
-| [GETTING_STARTED.md](docs/GETTING_STARTED.md) | Developer onboarding |
-| [REVENUECAT_SETUP.md](docs/REVENUECAT_SETUP.md) | IAP configuration |
-| [LIVEKIT_SETUP.md](docs/LIVEKIT_SETUP.md) | Video/audio setup |
+| Metric | Value |
+|--------|-------|
+| **Project Completion** | 98% |
+| **Tests Passing** | 169 |
+| **Games** | 4 fully implemented |
+| **Social Features** | Fully implemented |
+| **AI Flows** | 5 GenKit flows |
+| **Last Updated** | December 8, 2025 |
 
 ## 🔧 Development Commands
 
@@ -147,27 +143,26 @@ dart run build_runner build --delete-conflicting-outputs
 # Analyze code
 flutter analyze
 
-# Deploy Firestore rules
-firebase deploy --only firestore:rules
+# Deploy web app
+flutter build web --release
+firebase deploy --only hosting
 
 # Deploy Cloud Functions
 cd functions && npm run build && firebase deploy --only functions
 ```
 
-## 📊 Current Status
+## 📚 Documentation
 
-- **Project Completion:** 94%
-- **Tests Passing:** 156
-- **Games:** 4 fully implemented
-- **Last Updated:** December 7, 2025
+| Document | Description |
+|----------|-------------|
+| [ARCHITECTURE_AUDIT.md](docs/ARCHITECTURE_AUDIT.md) | Latest architecture & audit |
+| [REMAINING_TASKS.md](docs/REMAINING_TASKS.md) | Outstanding work |
+| [GETTING_STARTED.md](docs/GETTING_STARTED.md) | Developer onboarding |
+| [LIVEKIT_SETUP.md](docs/LIVEKIT_SETUP.md) | Video/audio setup |
 
-## 🚧 Remaining Work
+## 🌐 Deployment
 
-1. Settlement preview screen
-2. Matchmaking queue
-3. Move validation Cloud Functions
-
-See [REMAINING_TASKS.md](docs/REMAINING_TASKS.md) for details.
+**Live URL:** https://taasclub-app.web.app
 
 ## License
 

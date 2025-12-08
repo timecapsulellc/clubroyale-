@@ -36,6 +36,11 @@ class _MarriageGameScreenState extends State<MarriageGameScreen> {
     _game = MarriageGame();
     _game.initialize([_playerId, ..._botIds]);
     _game.startRound();
+    
+    // Check if bots need to play (if user doesn't start)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _playBotTurns();
+    });
   }
   
   @override

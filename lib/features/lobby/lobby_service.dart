@@ -334,6 +334,34 @@ class LobbyService {
     });
   }
 
+  /// Watch public rooms (isPublic = true, status = waiting)
+  Stream<List<GameRoom>> watchPublicRooms() {
+    // Test Mode: Return empty for now
+    if (TestMode.isEnabled) {
+      return _TestModeStorage.watchGames().map(
+        (games) => games.where((g) => g.isPublic && g.status == GameStatus.waiting).toList(),
+      );
+    }
+    
+    return _db
+        .collection('games')
+        .where('isPublic', isEqualTo: true)
+        .where('status', isEqualTo: GameStatus.waiting.name)
+        .orderBy('createdAt', descending: true)
+        .limit(20)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs
+              .map((doc) => GameRoom.fromJson(doc.data()).copyWith(id: doc.id))
+              .toList();
+        });
+  }
+
+  /// Join a room by ID (used by public rooms list)
+  Future<void> joinRoom(String gameId, Player player) async {
+    await joinGame(gameId, player);
+  }
+
   /// Set a player's ready status in a game room
   Future<void> setPlayerReady(String gameId, String playerId, bool isReady) async {
     // Test Mode: Use in-memory storage

@@ -22,6 +22,7 @@ import 'features/profile/profile_screen.dart';
 import 'features/wallet/wallet_screen.dart';
 import 'features/game/test_game_screen.dart';
 import 'games/marriage/marriage_game_screen.dart';
+import 'games/marriage/marriage_entry_screen.dart';
 import 'games/marriage/marriage_multiplayer_screen.dart';
 import 'games/teen_patti/teen_patti_screen.dart';
 import 'games/in_between/in_between_screen.dart';
@@ -116,6 +117,12 @@ final GoRouter _router = GoRouter(
         ),
         GoRoute(
           path: 'marriage',
+          builder: (BuildContext context, GoRouterState state) {
+            return const MarriageEntryScreen();
+          },
+        ),
+        GoRoute(
+          path: 'marriage/practice',
           builder: (BuildContext context, GoRouterState state) {
             return const MarriageGameScreen();
           },

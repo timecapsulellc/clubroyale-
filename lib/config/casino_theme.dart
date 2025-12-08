@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 
 /// Casino-themed color palette for premium gaming experience
 class CasinoColors {
-  // Primary Colors - Green Felt Theme
-  static const Color deepPurple = Color(0xFF0a1f12); // Dark green (was purple)
-  static const Color darkPurple = Color(0xFF030d08); // Very dark green - DARKER
-  static const Color richPurple = Color(0xFF143823); // Rich green
+  // Primary Colors - Purple Theme (matching branding mockup)
+  static const Color deepPurple = Color(0xFF1a0a2e); // Dark purple
+  static const Color darkPurple = Color(0xFF0d051a); // Very dark purple
+  static const Color richPurple = Color(0xFF2d1b4e); // Rich purple
   
-  // Green Felt Table Colors
-  static const Color feltGreenDark = Color(0xFF0d2818);
-  static const Color feltGreenMid = Color(0xFF1a4f2e);
-  static const Color feltGreenLight = Color(0xFF2d6b45);
-  static const Color tableEdge = Color(0xFF3d2814); // Wood brown
+  // Purple Table Colors
+  static const Color feltGreenDark = Color(0xFF1f1035);   // Purple dark (was green)
+  static const Color feltGreenMid = Color(0xFF3b2066);    // Purple mid
+  static const Color feltGreenLight = Color(0xFF5a3a87);  // Purple light
+  static const Color tableEdge = Color(0xFF3d2814);       // Wood brown (keep)
   
   // Accent Colors
   static const Color gold = Color(0xFFffd700);
@@ -20,16 +20,16 @@ class CasinoColors {
   
   // Supporting Colors
   static const Color velvetRed = Color(0xFF8b0000);
-  static const Color feltGreen = Color(0xFF0d5c2e);
+  static const Color feltGreen = Color(0xFF4a2875); // Purple accent
   static const Color neonPink = Color(0xFFff1493);
   static const Color silverGray = Color(0xFF9e9e9e);
   
   // Surface Colors
-  static const Color cardBackground = Color(0xFF122b1c); // Slightly lighter for contrast
-  static const Color cardBackgroundLight = Color(0xFF1d4230); // More visible
-  static const Color surfaceDark = Color(0xFF061209);
+  static const Color cardBackground = Color(0xFF251540); // Purple card bg
+  static const Color cardBackgroundLight = Color(0xFF3a2560); // Lighter purple
+  static const Color surfaceDark = Color(0xFF0a0514);
   
-  // Gradients - Green Felt
+  // Gradients - Purple Theme
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
