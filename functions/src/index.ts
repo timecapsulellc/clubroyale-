@@ -20,6 +20,13 @@ import { moderationFlow, ModerationInput } from './genkit/flows/moderationFlow';
 import { bidSuggestionFlow, BidSuggestionInput } from './genkit/flows/bidSuggestionFlow';
 import { matchmakingFlow, MatchmakingInput } from './genkit/flows/matchmakingFlow';
 
+// Import game-specific AI flows
+import { marriageBotPlayFlow, MarriageBotInput } from './genkit/marriageBotPlayFlow';
+import { callBreakBotPlayFlow, CallBreakBotInput } from './genkit/callBreakBotPlayFlow';
+
+// Import audit service
+import { AuditService, logMove, logSuspiciousActivity } from './services/auditService';
+
 // Export LiveKit token functions
 export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenService';
 
