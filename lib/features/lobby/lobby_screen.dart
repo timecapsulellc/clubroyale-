@@ -9,6 +9,7 @@ import 'package:taasclub/features/game/game_config.dart';
 import 'package:taasclub/features/lobby/lobby_service.dart';
 import 'package:taasclub/features/wallet/diamond_service.dart';
 import 'package:taasclub/features/wallet/diamond_balance_widget.dart';
+import 'package:taasclub/features/feedback/feedback_dialog.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:math';
 
@@ -47,6 +48,18 @@ class LobbyScreen extends ConsumerWidget {
             ),
             actions: [
               DiamondBalanceBadge(),
+              IconButton(
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.feedback_outlined, color: Colors.white),
+                ),
+                onPressed: () => FeedbackDialog.show(context),
+                tooltip: 'Send Feedback',
+              ),
               IconButton(
                 icon: Container(
                   padding: const EdgeInsets.all(8),

@@ -60,6 +60,7 @@ dev_dependencies:
   freezed: ^3.2.3
   json_serializable: ^6.8.0
   firebase_auth_mocks: ^0.15.1
+  flutter_launcher_icons: ^0.14.3
   integration_test:
     sdk: flutter
 
@@ -70,3 +71,4 @@ flutter:
     - assets/cards/png/
     - assets/images/
     - assets/images/chips/
+    - assets/store/

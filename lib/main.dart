@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:taasclub/firebase_options.dart';
+import 'core/services/analytics_service.dart';
 
 import 'features/lobby/lobby_screen.dart';
 import 'features/lobby/room_waiting_screen.dart';
@@ -27,8 +28,12 @@ import 'games/in_between/in_between_screen.dart';
 import 'features/game/settlement/settlement_preview_screen.dart';
 import 'config/revenuecat_config.dart';
 
+// Analytics service singleton for screen tracking
+final _analyticsService = AnalyticsService();
+
 // 1. Define your routes
 final GoRouter _router = GoRouter(
+  observers: [_analyticsService.observer],
   routes: <RouteBase>[
     GoRoute(
       path: '/',

@@ -1,0 +1,21 @@
+# Flutter Launcher Icons Configuration
+# Run: dart run flutter_launcher_icons
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/store/app_icon_round.png"
+  
+  # Android specific
+  adaptive_icon_background: "#1a0a2e"
+  adaptive_icon_foreground: "assets/store/app_icon_round.png"
+  
+  # iOS specific
+  remove_alpha_ios: true
+  
+  # Web favicon
+  web:
+    generate: true
+    image_path: "assets/store/app_icon_round.png"
+    background_color: "#1a0a2e"
+    theme_color: "#6b21a8"

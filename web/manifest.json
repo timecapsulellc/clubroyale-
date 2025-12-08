@@ -1,13 +1,60 @@
 {
     "name": "TaasClub",
     "short_name": "TaasClub",
+    "id": "/taasclub-app",
     "start_url": ".",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#1a0a2e",
     "theme_color": "#6b21a8",
-    "description": "TaasClub - A multiplayer Call Break card game",
+    "description": "TaasClub - Play Call Break, Marriage, Teen Patti & more card games with friends online",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
+    "categories": [
+        "games",
+        "entertainment",
+        "social"
+    ],
+    "lang": "en",
+    "dir": "ltr",
+    "shortcuts": [
+        {
+            "name": "Play Call Break",
+            "short_name": "Call Break",
+            "description": "Start a Call Break game",
+            "url": "/#/call-break",
+            "icons": [
+                {
+                    "src": "icons/Icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Play Marriage",
+            "short_name": "Marriage",
+            "description": "Start a Marriage game",
+            "url": "/#/marriage",
+            "icons": [
+                {
+                    "src": "icons/Icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Game Lobby",
+            "short_name": "Lobby",
+            "description": "Join or create game rooms",
+            "url": "/#/lobby",
+            "icons": [
+                {
+                    "src": "icons/Icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ],
     "icons": [
         {
             "src": "icons/Icon-192.png",
