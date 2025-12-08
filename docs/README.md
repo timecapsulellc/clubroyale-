@@ -1,9 +1,7 @@
-# TaasClub - Project Status
+# TaasClub - Documentation Hub
 
-> **Last Updated:** December 8, 2025 20:30 IST  
-> **Strategy:** Private Club Ledger (Strategy A)  
-> **Status:** 98% Complete  
-> **Live URL:** https://taasclub-app.web.app
+> **Version:** 1.0 | **Date:** December 8, 2025  
+> **Status:** 98% Complete | **Live:** https://taasclub-app.web.app
 
 ---
 
@@ -137,3 +135,21 @@ docs/
 | **Live App** | https://taasclub-app.web.app |
 | **Firebase Console** | https://console.firebase.google.com/project/taasclub-app |
 | **GitHub** | https://github.com/timecapsulellc/TaasClub |
+
+---
+
+## 📖 Document Quick Reference
+
+### For Legal/Compliance Team
+→ [DOC1_SAFE_HARBOR_LOGIC.md](./DOC1_SAFE_HARBOR_LOGIC.md)
+
+### For Developers
+→ [MASTER_ARCHITECT_PROMPT.md](./MASTER_ARCHITECT_PROMPT.md)  
+→ [GAME_ENGINE_SDK.md](./GAME_ENGINE_SDK.md)
+
+### For Product Managers
+→ [PRD_TAASCLUB.md](./PRD_TAASCLUB.md)  
+→ [SUCCESS_METRICS.md](./SUCCESS_METRICS.md)
+
+### For Executive/Strategy
+→ [ULTIMATE_ROADMAP.md](./ULTIMATE_ROADMAP.md)

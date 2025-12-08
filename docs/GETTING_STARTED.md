@@ -1,172 +1,148 @@
-# 🚀 TaasClub - Getting Started Guide
+# Getting Started with TaasClub
 
-**Welcome to TaasClub!** This guide will help you get started with development.
-
-> **Project Status:** 98% Production Ready ✅  
-> **Live URL:** https://taasclub-app.web.app  
-> **Last Updated:** December 8, 2025
+> **Quick Start Guide for Developers**
 
 ---
 
-## 🎯 Quick Start (5 minutes)
+## 📊 Project Status
 
-### 1. Clone & Run
+| Component | Status |
+|-----------|--------|
+| 4 Games | ✅ Complete |
+| Settlement Service | ✅ Complete |
+| GenKit AI (5 flows) | ✅ Complete |
+| 12 Cloud Functions | ✅ Deployed |
+| 169 Tests | ✅ Passing |
+
+**Live URL:** https://taasclub-app.web.app
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Flutter 3.x
+- Node.js 18+ (for functions)
+- Firebase CLI
+
+### Installation
 
 ```bash
 # Clone repository
 git clone https://github.com/timecapsulellc/TaasClub.git
 cd TaasClub
 
-# Install dependencies
+# Install Flutter dependencies
 flutter pub get
 
-# Generate Freezed files
-dart run build_runner build --delete-conflicting-outputs
-
-# Run the app
+# Run web version
 flutter run -d chrome
-```
-
-### 2. Key Documentation
-
-| Document | Description |
-|----------|-------------|
-| [README.md](../README.md) | Project overview |
-| [ARCHITECTURE_AUDIT.md](ARCHITECTURE_AUDIT.md) | Technical audit & features |
-| [REMAINING_TASKS.md](REMAINING_TASKS.md) | Outstanding work |
-
----
-
-## 🎮 What is TaasClub?
-
-A multiplayer card game platform with **4 games**, **social features**, **AI matchmaking**, and **real-time communication**.
-
-### Games
-- 🎴 **Marriage** (2-8 players)
-- ♠️ **Call Break** (4 players)
-- 🃏 **Teen Patti** (2-8 players)
-- 🎰 **In-Between** (2-8 players)
-
-### Key Features
-- 💎 Diamond wallet with daily bonuses
-- 👥 Friends, presence, game invites
-- 🤖 GenKit AI (bot play, moderation, matchmaking)
-- 🎤 Voice & video chat (WebRTC/LiveKit)
-- 🏆 ELO ranking system
-
----
-
-## 🏗️ Project Architecture
-
-```
-lib/
-├── core/card_engine/     # Card assets & logic
-├── features/
-│   ├── auth/             # Firebase Auth
-│   ├── chat/             # In-game chat
-│   ├── lobby/            # Room management
-│   ├── wallet/           # Diamond economy
-│   ├── social/           # Friends, invites, matchmaking
-│   ├── ai/               # GenKit integration
-│   └── game/             # Game engine
-└── games/
-    ├── marriage/
-    ├── call_break/
-    ├── teen_patti/
-    └── in_between/
-
-functions/src/genkit/flows/
-    ├── gameTipFlow.ts
-    ├── botPlayFlow.ts
-    ├── moderationFlow.ts
-    ├── bidSuggestionFlow.ts
-    └── matchmakingFlow.ts
-```
-
----
-
-## 🛠️ Development Commands
-
-```bash
-# Install dependencies
-flutter pub get
-
-# Generate Freezed models
-dart run build_runner build --delete-conflicting-outputs
 
 # Run tests
 flutter test
+```
+
+### Firebase Setup
+
+```bash
+# Install Firebase CLI
+npm install -g firebase-tools
+
+# Login
+firebase login
+
+# Deploy functions
+cd functions && npm install && npm run build
+firebase deploy --only functions
+
+# Deploy hosting
+flutter build web --release
+firebase deploy --only hosting
+```
+
+---
+
+## 🎯 Core Principle
+
+> **The app is a CALCULATOR, not a BANK.**
+
+```
+INSIDE APP          │   OUTSIDE APP
+─────────           │   ───────────
+Points/Units        │   Cash/UPI
+Diamonds (virtual)  │   Real Money
+Bill Image          │   Actual Payments
+```
+
+---
+
+## 📁 Project Structure
+
+```
+lib/
+├── core/
+│   ├── responsive/        # Screen breakpoints
+│   ├── audio/             # Sound effects
+│   └── ai/                # AI difficulty
+├── features/
+│   ├── auth/              # Phone login
+│   ├── lobby/             # Room create/join
+│   ├── wallet/            # Diamond balance
+│   ├── game/              # Game screens
+│   ├── social/            # Friends, chat
+│   └── settlement/        # Bill generation
+└── games/
+    ├── core/              # GameEngine abstract
+    ├── marriage/          # Marriage logic
+    └── call_break/        # Call Break logic
+```
+
+---
+
+## 📖 Key Documentation
+
+| Doc | Purpose |
+|-----|---------|
+| [docs/README.md](./README.md) | Documentation Hub |
+| [docs/PRD_TAASCLUB.md](./PRD_TAASCLUB.md) | Product Requirements |
+| [docs/MASTER_ARCHITECT_PROMPT.md](./MASTER_ARCHITECT_PROMPT.md) | AI Dev Guide |
+| [docs/DOC2_SETTLEMENT_ALGORITHM.md](./DOC2_SETTLEMENT_ALGORITHM.md) | Settlement Math |
+
+---
+
+## 🔧 Development Commands
+
+```bash
+# Run specific test file
+flutter test test/games/marriage/marriage_game_test.dart
+
+# Build web release
+flutter build web --release
 
 # Analyze code
 flutter analyze
 
-# Build web
-flutter build web --release
-
-# Deploy web
-npx firebase deploy --only hosting
-
-# Deploy functions
-cd functions && npm run build && firebase deploy --only functions
+# Format code
+dart format lib/
 ```
 
 ---
 
-## 🧪 Testing
+## 🚀 Roadmap
 
-```bash
-# Run all 169 tests
-flutter test
+### Phase 1: Foundation (Current)
+- [x] 4 Games complete
+- [x] Settlement service
+- [x] Cloud Functions deployed
+- [ ] CI/CD Pipeline
+- [ ] Sentry integration
 
-# Run specific game tests
-flutter test test/games/marriage/
-flutter test test/games/call_break/
-```
+### Phase 2: Platform
+- [ ] Clubs/Guilds
+- [ ] Tournaments
+- [ ] Season Pass
 
----
-
-## 📊 Current Status
-
-| Category | Status |
-|----------|--------|
-| Games | ✅ 4 Complete |
-| Social | ✅ Complete |
-| AI/GenKit | ✅ 5 Flows |
-| Communication | ✅ Chat/Audio/Video |
-| Economy | ✅ Diamonds + Bonuses |
-| Tests | ✅ 169 Passing |
-
----
-
-## 🚀 Deployment
-
-### Web (Already Deployed)
-```bash
-flutter build web --release
-npx firebase deploy --only hosting
-```
-
-### Android
-```bash
-flutter build appbundle --release
-# Upload to Play Console
-```
-
-### Cloud Functions
-```bash
-cd functions
-npm run build
-firebase deploy --only functions
-```
-
----
-
-## 📚 Further Reading
-
-- [Architecture Audit](ARCHITECTURE_AUDIT.md) - Full technical details
-- [LiveKit Setup](LIVEKIT_SETUP.md) - Video/audio configuration
-- [RevenueCat Setup](REVENUECAT_SETUP.md) - IAP configuration
-
----
-
-**Live App:** https://taasclub-app.web.app 🎮
+### Phase 3: Scale
+- [ ] Multi-region
+- [ ] Esports
+- [ ] 1M MAU
