@@ -4,13 +4,13 @@
 TaasClub - Marriage & Call Break
 
 ## Short Description (80 chars max)
-Play classic South Asian card games online with friends! 🎴
+Play classic South Asian card games FREE with friends! 🎴
 
 ## Full Description
 
 🎴 **TaasClub - Play Marriage & Call Break with Friends!**
 
-Play classic South Asian card games online with friends or practice against AI opponents.
+100% FREE card games with friends - no payments, no gambling, just fun!
 
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -24,51 +24,68 @@ Play classic South Asian card games online with friends or practice against AI o
 • **Call Break** - The popular trick-taking game for 4 players
   - Bid wisely, win tricks
   - Spades are always trump
-  - Compete to highest score over 5 rounds
+  - Compete for highest score over 5 rounds
 
 ━━━━━━━━━━━━━━━━━━━━
 
 **✨ FEATURES**
 
 ✓ Create private rooms with 6-digit codes
-✓ Invite friends via shareable links
+✓ Invite friends via WhatsApp
 ✓ Play against smart AI bots
 ✓ Track scores and settlements
-✓ Voice chat during games
-✓ Works offline (vs bots)
+✓ Share results to WhatsApp
+✓ Works on web AND mobile - no install needed!
 
 ━━━━━━━━━━━━━━━━━━━━
 
-**🎯 WHY TAASCLUB?**
+**💎 FREE DIAMONDS**
 
-• **Social Gaming** - Play with friends anywhere in the world
-• **Fair Play** - Transparent scoring and anti-cheat systems
-• **No Ads** - Distraction-free gaming experience
-• **Reconnection** - Resume games if you disconnect
+Earn diamonds through:
+• Daily login bonus
+• Completing games
+• Inviting friends
+• Weekly rewards
+
+Use diamonds to create rooms and more!
+
+*Diamonds are FREE and cannot be purchased. Diamonds have no real-world value.*
+
+━━━━━━━━━━━━━━━━━━━━
+
+**🎯 WHAT TAASCLUB IS**
+
+✅ A FREE social card game app
+✅ A score tracking utility
+✅ A way to play with friends anywhere
+
+**❌ WHAT TAASCLUB IS NOT**
+
+❌ NOT a gambling app
+❌ NO real money involved
+❌ NO payments processed
+❌ NO in-app purchases
 
 ━━━━━━━━━━━━━━━━━━━━
 
 **⚠️ IMPORTANT NOTICES**
 
-This app is a **social scorekeeping utility** for entertainment purposes only.
+This app is a **social scorekeeper** for entertainment purposes only.
 
-• Virtual currency (Diamonds) is used for platform features only
-• Diamonds cannot be exchanged for real money
-• No real-money wagering or cash prizes
+• No real-money wagering or prizes
+• Settlement summaries are informational only
+• Players settle privately outside the app
 • Players must be 18+ to use this app
-
-**Not a gambling app.**
 
 ━━━━━━━━━━━━━━━━━━━━
 
 **📧 SUPPORT**
 
-Questions or feedback? Contact us at:
-support@taasclub.app
+Questions? Contact us at: support@taasclub.app
 
 ━━━━━━━━━━━━━━━━━━━━
 
-Download TaasClub and start playing with friends today! 🎴
+Download TaasClub FREE and play with friends! 🎴
 
 ---
 
@@ -76,7 +93,7 @@ Download TaasClub and start playing with friends today! 🎴
 Card Games
 
 ## Tags
-card games, marriage, call break, multiplayer, social games, rummy, trick taking, nepali games, indian card games, friends
+card games, marriage, call break, free multiplayer, social games, rummy, nepali games, indian card games, friends, free games
 
 ## Content Rating
 Teen (simulated gambling themes)
@@ -87,13 +104,13 @@ Teen (simulated gambling themes)
 ---
 
 ## Promotional Text (170 chars)
-Play Marriage & Call Break with friends online! Create rooms, invite friends, track scores. The ultimate South Asian card game experience. Free to play!
+Play Marriage & Call Break FREE with friends! Create rooms, share to WhatsApp, track scores. 100% free - no payments, no gambling. Just fun!
 
 ---
 
-## What's New (Latest Update)
-• New: 8-player support for Marriage
-• New: Smart AI opponents
-• New: Shareable invite links
-• Improved: Game reconnection
-• Improved: Settlement sharing
+## What's New
+• 100% FREE - no in-app purchases!
+• Earn diamonds through daily login
+• Share settlements to WhatsApp
+• New: 8-player Marriage support
+• Smart AI opponents

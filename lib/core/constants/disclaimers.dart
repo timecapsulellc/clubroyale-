@@ -1,84 +1,119 @@
-// Compliance Constants & Banned Terms Sanitizer
+// Legal Disclaimers & Compliance Constants
 //
-// Centralized disclaimers and term sanitization for Google Play compliance.
+// Safe Harbor disclaimers and banned terms for Google Play compliance.
+// TaasClub is a FREE scorekeeper - NO in-app purchases!
 
-/// Legal disclaimers for Safe Harbor compliance
+/// Central disclaimers for legal compliance
 class Disclaimers {
-  /// Main Safe Harbor disclaimer - REQUIRED on first launch
+  /// Safe Harbor disclaimer for game start
   static const String safeHarbor = '''
-TaasClub is a social scorekeeping utility for card games.
+TaasClub is a FREE social entertainment app for tracking card game scores.
 
-• All point settlements are private and offline
-• We do not process, facilitate, or track real-money transactions
-• Virtual currency (Diamonds) cannot be exchanged for cash or prizes
-• This is a skill-based game, not gambling
-• Players must be 18+ to use this app
+• This app does NOT process payments
+• This app does NOT facilitate gambling
+• This app does NOT allow real-money wagering
+• Virtual diamonds are FREE and have NO cash value
 
-By continuing, you agree to these terms.
+All settlements shown are informational only. Users settle privately outside the app.
 ''';
 
-  /// Short version for in-app display
+  /// Short disclaimer for UI elements
   static const String shortDisclaimer = 
-    'TaasClub is for entertainment only. Diamonds have no cash value.';
+      'TaasClub is a free scorekeeper. Diamonds are free and have no cash value.';
 
-  /// Age verification prompt
+  /// Age verification disclaimer
   static const String ageVerification = 
-    'You must be 18 or older to use TaasClub. Please confirm your age.';
+      'You must be 18 years or older to use this app. Card games are skill-based entertainment only.';
 
-  /// Terms for settlement screen
+  /// Settlement disclaimer
   static const String settlementDisclaimer = '''
-This is a scorecard only. TaasClub does not process payments.
-Any settlements between players are private and offline.
+This settlement summary is for informational purposes only. 
+TaasClub does not process payments or facilitate money transfers.
+Any settlements between players occur privately outside this app.
 ''';
 
-  /// Store disclaimer
-  static const String storeDisclaimer =
-    'Diamonds are virtual currency for platform fees only. No cash value.';
+  /// Diamond disclaimer - CRITICAL: Diamonds are FREE
+  static const String diamondsDisclaimer = 
+      'Diamonds are FREE platform credits earned through daily login, referrals, and gameplay. '
+      'Diamonds have NO real-world value and CANNOT be purchased or cashed out.';
+
+  /// Terms acceptance text
+  static const String termsAcceptance = 
+      'By using TaasClub, you agree that this is a skill-based entertainment app '
+      'and not a gambling platform. You confirm you are 18+ years old.';
+
+  /// WhatsApp share footer
+  static const String shareFooter = 
+      '🎴 Play free at taasclub.app';
 }
 
-/// Banned terms that should NEVER appear in UI
+/// Banned terms that should be sanitized for Google Play compliance
 class BannedTerms {
-  static const List<String> banned = [
-    'bet', 'wager', 'gamble', 'gambling', 'casino',
-    'payout', 'winnings', 'jackpot', 'cash out', 'cashout',
-    'rupee', 'dollar', 'real money', 'withdraw', 'withdrawal',
-    'stake', 'odds', 'betting', 'prize money',
-  ];
-  
+  /// Terms to replace for compliance
   static const Map<String, String> replacements = {
-    'bet': 'entry fee',
-    'wager': 'stake points',
-    'payout': 'settlement',
-    'winnings': 'balance',
-    'cash': 'credits',
-    'gambling': 'skill game',
-    'casino': 'club',
-    'prize': 'reward',
-    'stake': 'entry',
-    'jackpot': 'bonus pool',
+    'bet': 'entry',
+    'betting': 'playing',
+    'wager': 'stake',
+    'wagering': 'playing',
+    'gamble': 'play',
+    'gambling': 'gaming',
+    'casino': 'game room',
+    'cash out': 'settle',
+    'cashout': 'settle',
+    'real money': 'points',
+    'win money': 'win points',
+    'buy': 'earn',
+    'purchase': 'claim',
+    'pay': 'use',
+    'payment': 'reward',
   };
-  
-  /// Validate text doesn't contain banned terms
-  static bool containsBannedTerms(String text) {
-    final lowerText = text.toLowerCase();
-    return banned.any((term) => lowerText.contains(term));
-  }
-  
-  /// Replace banned terms with safe alternatives
-  static String sanitize(String text) {
-    var result = text;
+
+  /// Sanitize text by replacing banned terms
+  static String sanitize(String input) {
+    String result = input.toLowerCase();
     for (final entry in replacements.entries) {
       result = result.replaceAll(
-        RegExp(entry.key, caseSensitive: false), 
+        RegExp(entry.key, caseSensitive: false),
         entry.value,
       );
     }
     return result;
   }
 
-  /// Get list of violations in text
-  static List<String> getViolations(String text) {
-    final lowerText = text.toLowerCase();
-    return banned.where((term) => lowerText.contains(term)).toList();
+  /// Check if text contains banned terms
+  static bool containsBannedTerms(String input) {
+    final lower = input.toLowerCase();
+    return replacements.keys.any((term) => lower.contains(term));
   }
+
+  /// Get list of banned terms found
+  static List<String> findBannedTerms(String input) {
+    final lower = input.toLowerCase();
+    return replacements.keys.where((term) => lower.contains(term)).toList();
+  }
+}
+
+/// Legal-safe terminology
+class SafeTerms {
+  // Money/currency terms → Points
+  static const String points = 'points';
+  static const String score = 'score';
+  static const String diamonds = 'diamonds';
+  
+  // Gambling terms → Gaming
+  static const String play = 'play';
+  static const String game = 'game';
+  static const String match = 'match';
+  static const String room = 'room';
+  
+  // Payment terms → Earn/Claim
+  static const String earn = 'earn';
+  static const String claim = 'claim';
+  static const String reward = 'reward';
+  static const String bonus = 'bonus';
+  
+  // Settlement terms
+  static const String settlement = 'score summary';
+  static const String owes = 'owes points to';
+  static const String settleUp = 'settle scores';
 }
