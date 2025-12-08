@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAM_ID.app.taasclub",
+        "paths": ["/join/*", "/invite/*", "/room/*"]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["TEAM_ID.app.taasclub"]
+  }
+}
