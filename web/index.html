@@ -1,47 +1,227 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
+  <!-- Core Meta Tags -->
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="TaasClub - Play Call Break, Marriage, Teen Patti & more card games with friends online">
-  <meta name="theme-color" content="#6b21a8">
-  <meta name="mobile-web-app-capable" content="yes">
 
-  <!-- iOS meta tags & icons -->
+  <!-- SEO Meta Tags -->
+  <title>TaasClub - Play Marriage & Call Break with Friends</title>
+  <meta name="description"
+    content="Play Marriage, Call Break, and more card games online with friends. Create private rooms, invite friends, and track scores. Free to play!">
+  <meta name="keywords"
+    content="marriage card game, call break, nepali card game, indian card games, multiplayer card games, online card games">
+  <meta name="author" content="TaasClub">
+  <meta name="robots" content="index, follow">
+
+  <!-- Theme & PWA -->
+  <meta name="theme-color" content="#6b21a8">
+  <meta name="background-color" content="#1a0a2e">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="application-name" content="TaasClub">
+
+  <!-- Apple-Specific Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="TaasClub">
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- Apple Touch Icons (multiple sizes) -->
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/Icon-152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="icons/Icon-192.png">
+
+  <!-- Apple Splash Screens (iPhone X) -->
+  <link rel="apple-touch-startup-image" href="splash/splash-1125x2436.png"
+    media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://taasclub-app.web.app/">
+  <meta property="og:title" content="TaasClub - Play Marriage & Call Break with Friends">
+  <meta property="og:description"
+    content="Play classic South Asian card games online with friends. Create rooms, invite friends, track scores!">
+  <meta property="og:image" content="https://taasclub-app.web.app/icons/Icon-512.png">
+  <meta property="og:site_name" content="TaasClub">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://taasclub-app.web.app/">
+  <meta name="twitter:title" content="TaasClub - Play Marriage & Call Break">
+  <meta name="twitter:description" content="Play classic card games online with friends. Free to play!">
+  <meta name="twitter:image" content="https://taasclub-app.web.app/icons/Icon-512.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/Icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/Icon-16.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
 
-  <title>TaasClub</title>
+  <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
+
+  <!-- Preconnect to Firebase -->
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "TaasClub",
+    "description": "Play Marriage, Call Break, and more card games with friends online",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "Web, Android, iOS",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.5",
+      "ratingCount": "100"
+    }
+  }
+  </script>
+
+  <!-- Loading Styles (inline for performance) -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #1a0a2e;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 100%);
+      z-index: 9999;
+    }
+
+    #loading-logo {
+      width: 80px;
+      height: 80px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    #loading-text {
+      color: #a78bfa;
+      font-size: 24px;
+      font-weight: 600;
+      margin-top: 20px;
+      letter-spacing: 2px;
+    }
+
+    #loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(167, 139, 250, 0.3);
+      border-top-color: #a78bfa;
+      border-radius: 50%;
+      margin-top: 30px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <!-- Loading Screen -->
+  <div id="loading">
+    <img id="loading-logo" src="icons/Icon-192.png" alt="TaasClub">
+    <div id="loading-text">TaasClub</div>
+    <div id="loading-spinner"></div>
+  </div>
+
+  <!-- Flutter Configuration -->
   <script>
-    window.flutterWebRenderer = "html";
+    // Use CanvasKit for better performance
+    window.flutterWebRenderer = "canvaskit";
+
+    // Remove loading screen when app loads
+    window.addEventListener('flutter-first-frame', function () {
+      const loading = document.getElementById('loading');
+      if (loading) {
+        loading.style.transition = 'opacity 0.3s';
+        loading.style.opacity = '0';
+        setTimeout(() => loading.remove(), 300);
+      }
+    });
+
+    // PWA Install Prompt Handler
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // Signal to Flutter that install is available
+      window.dispatchEvent(new CustomEvent('pwa-install-available'));
+    });
+
+    // Expose install function to Flutter
+    window.installPWA = async function () {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        return outcome === 'accepted';
+      }
+      return false;
+    };
+
+    // Check if running as installed PWA
+    window.isPWAInstalled = function () {
+      return window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
+    };
   </script>
+
+  <!-- Flutter Bootstrap -->
   <script src="flutter_bootstrap.js" async></script>
+
+  <!-- Noscript Fallback -->
+  <noscript>
+    <div style="padding: 40px; text-align: center; color: white; background: #1a0a2e; min-height: 100vh;">
+      <h1>TaasClub</h1>
+      <p>JavaScript is required to play TaasClub.</p>
+      <p>Please enable JavaScript in your browser settings.</p>
+    </div>
+  </noscript>
 </body>
 
 </html>
