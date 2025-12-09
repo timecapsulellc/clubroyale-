@@ -112,15 +112,29 @@ class LobbyService {
       return player.copyWith(profile: profile);
     }));
 
-    // Create room with host info, code, and config
-    final newRoom = room.copyWith(
-      players: playersWithProfiles,
-      roomCode: roomCode,
-      status: GameStatus.waiting,
-      createdAt: DateTime.now(),
-    );
+    // Create Firestore-safe map with explicit toJson calls on nested objects
+    final firestoreData = <String, dynamic>{
+      'name': room.name,
+      'hostId': room.hostId,
+      'roomCode': roomCode,
+      'status': GameStatus.waiting.name,
+      'gameType': room.gameType,
+      'config': room.config.toJson(), // CRITICAL: Explicit toJson()
+      'players': playersWithProfiles.map((p) => {
+        'id': p.id,
+        'name': p.name,
+        'isReady': p.isReady,
+        'isBot': p.isBot,
+        'profile': p.profile?.toJson(),
+      }).toList(),
+      'scores': room.scores,
+      'isFinished': false,
+      'isPublic': room.isPublic,
+      'createdAt': FieldValue.serverTimestamp(),
+      'currentRound': 1,
+    };
     
-    final newGame = await _gamesRef.add(newRoom);
+    final newGame = await _db.collection('games').add(firestoreData);
     return newGame.id;
   }
 

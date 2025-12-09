@@ -229,6 +229,6 @@ class AnalyticsService {
   // ============ SCREEN TRACKING ============
 
   Future<void> setCurrentScreen(String screenName) async {
-    await _analytics.setCurrentScreen(screenName: screenName);
+    await _analytics.logScreenView(screenName: screenName);
   }
 }

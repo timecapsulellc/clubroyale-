@@ -4,6 +4,7 @@
 // Prevents white screens and provides user-friendly error UI.
 
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 

@@ -1,13 +1,8 @@
 // PWA Service
 //
-// Handles PWA-specific functionality:
-// - Install prompt
-// - Online/offline detection
-// - Service worker communication
-// - Wake lock for games
+// Handles PWA-specific functionality (simplified version)
 
 import 'dart:async';
-import 'dart:js_interop';
 import 'package:flutter/foundation.dart';
 import 'package:web/web.dart' as web;
 
@@ -40,15 +35,6 @@ class PWAService {
     if (_isPWAInstalled()) {
       _updateInstallState(PWAInstallState.installed);
     }
-
-    // Listen for install availability from JavaScript
-    web.window.addEventListener('pwa-install-available', _onInstallAvailable.toJS);
-  }
-
-  void _onInstallAvailable(web.Event event) {
-    if (_installState != PWAInstallState.installed) {
-      _updateInstallState(PWAInstallState.available);
-    }
   }
 
   void _updateInstallState(PWAInstallState state) {
@@ -70,22 +56,10 @@ class PWAService {
     if (!kIsWeb || _installState != PWAInstallState.available) {
       return false;
     }
-
-    try {
-      // Call JavaScript install function
-      final result = _callJSInstallPWA();
-      if (result) {
-        _updateInstallState(PWAInstallState.installed);
-      }
-      return result;
-    } catch (e) {
-      debugPrint('PWA install error: $e');
-      return false;
-    }
+    // In web, this would be handled by JavaScript
+    // For now, return false and let JS handle it
+    return false;
   }
-
-  @JS('installPWA')
-  external static bool _callJSInstallPWA();
 
   /// Check if app should show install prompt
   bool shouldShowInstallPrompt() {
@@ -132,49 +106,4 @@ class PWAService {
   void dispose() {
     _installStateController.close();
   }
-}
-
-/// Wake Lock Service - Prevent screen sleep during games
-class WakeLockService {
-  static WakeLockSentinel? _wakeLock;
-
-  /// Request wake lock (keep screen on)
-  static Future<bool> requestWakeLock() async {
-    if (!kIsWeb) return false;
-
-    try {
-      _wakeLock = await web.window.navigator.wakeLock.request('screen');
-      return true;
-    } catch (e) {
-      debugPrint('Wake lock not supported or denied: $e');
-      return false;
-    }
-  }
-
-  /// Release wake lock
-  static Future<void> releaseWakeLock() async {
-    await _wakeLock?.release();
-    _wakeLock = null;
-  }
-}
-
-// JavaScript interop types
-@JS()
-@staticInterop
-class WakeLockSentinel {}
-
-extension WakeLockSentinelExtension on WakeLockSentinel {
-  external JSPromise release();
-}
-
-extension NavigatorWakeLock on web.Navigator {
-  external WakeLock get wakeLock;
-}
-
-@JS()
-@staticInterop
-class WakeLock {}
-
-extension WakeLockExtension on WakeLock {
-  external JSPromise<WakeLockSentinel> request(String type);
 }

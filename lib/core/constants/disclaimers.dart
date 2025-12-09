@@ -21,6 +21,11 @@ All settlements shown are informational only. Users settle privately outside the
   static const String shortDisclaimer = 
       'TaasClub is a free scorekeeper. Diamonds are free and have no cash value.';
 
+  /// Store disclaimer (DEPRECATED - no store, diamonds are FREE)
+  static const String storeDisclaimer = 
+      'Diamonds are FREE platform credits for creating rooms. They have no cash value.';
+
+
   /// Age verification disclaimer
   static const String ageVerification = 
       'You must be 18 years or older to use this app. Card games are skill-based entertainment only.';
