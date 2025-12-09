@@ -20,7 +20,7 @@ mixin _$DiamondWallet {
  int get balance;/// Total diamonds purchased (lifetime)
  int get totalPurchased;/// Total diamonds spent (lifetime)
  int get totalSpent;/// Last transaction timestamp
- DateTime? get lastUpdated;
+@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? get lastUpdated;
 /// Create a copy of DiamondWallet
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -53,7 +53,7 @@ abstract mixin class $DiamondWalletCopyWith<$Res>  {
   factory $DiamondWalletCopyWith(DiamondWallet value, $Res Function(DiamondWallet) _then) = _$DiamondWalletCopyWithImpl;
 @useResult
 $Res call({
- String userId, int balance, int totalPurchased, int totalSpent, DateTime? lastUpdated
+ String userId, int balance, int totalPurchased, int totalSpent,@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? lastUpdated
 });
 
 
@@ -162,7 +162,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  int balance,  int totalPurchased,  int totalSpent,  DateTime? lastUpdated)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  int balance,  int totalPurchased,  int totalSpent, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? lastUpdated)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DiamondWallet() when $default != null:
 return $default(_that.userId,_that.balance,_that.totalPurchased,_that.totalSpent,_that.lastUpdated);case _:
@@ -183,7 +183,7 @@ return $default(_that.userId,_that.balance,_that.totalPurchased,_that.totalSpent
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  int balance,  int totalPurchased,  int totalSpent,  DateTime? lastUpdated)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  int balance,  int totalPurchased,  int totalSpent, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? lastUpdated)  $default,) {final _that = this;
 switch (_that) {
 case _DiamondWallet():
 return $default(_that.userId,_that.balance,_that.totalPurchased,_that.totalSpent,_that.lastUpdated);case _:
@@ -203,7 +203,7 @@ return $default(_that.userId,_that.balance,_that.totalPurchased,_that.totalSpent
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  int balance,  int totalPurchased,  int totalSpent,  DateTime? lastUpdated)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  int balance,  int totalPurchased,  int totalSpent, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? lastUpdated)?  $default,) {final _that = this;
 switch (_that) {
 case _DiamondWallet() when $default != null:
 return $default(_that.userId,_that.balance,_that.totalPurchased,_that.totalSpent,_that.lastUpdated);case _:
@@ -218,7 +218,7 @@ return $default(_that.userId,_that.balance,_that.totalPurchased,_that.totalSpent
 @JsonSerializable()
 
 class _DiamondWallet implements DiamondWallet {
-  const _DiamondWallet({required this.userId, this.balance = 0, this.totalPurchased = 0, this.totalSpent = 0, this.lastUpdated});
+  const _DiamondWallet({required this.userId, this.balance = 0, this.totalPurchased = 0, this.totalSpent = 0, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) this.lastUpdated});
   factory _DiamondWallet.fromJson(Map<String, dynamic> json) => _$DiamondWalletFromJson(json);
 
 /// User ID who owns this wallet
@@ -230,7 +230,7 @@ class _DiamondWallet implements DiamondWallet {
 /// Total diamonds spent (lifetime)
 @override@JsonKey() final  int totalSpent;
 /// Last transaction timestamp
-@override final  DateTime? lastUpdated;
+@override@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) final  DateTime? lastUpdated;
 
 /// Create a copy of DiamondWallet
 /// with the given fields replaced by the non-null parameter values.
@@ -265,7 +265,7 @@ abstract mixin class _$DiamondWalletCopyWith<$Res> implements $DiamondWalletCopy
   factory _$DiamondWalletCopyWith(_DiamondWallet value, $Res Function(_DiamondWallet) _then) = __$DiamondWalletCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, int balance, int totalPurchased, int totalSpent, DateTime? lastUpdated
+ String userId, int balance, int totalPurchased, int totalSpent,@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? lastUpdated
 });
 
 
@@ -300,7 +300,7 @@ as DateTime?,
 /// @nodoc
 mixin _$DiamondTransaction {
 
- String get id; String get userId; int get amount; DiamondTransactionType get type; String? get description; String? get gameId; DateTime get createdAt;
+ String get id; String get userId; int get amount; DiamondTransactionType get type; String? get description; String? get gameId;@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime get createdAt;
 /// Create a copy of DiamondTransaction
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -333,7 +333,7 @@ abstract mixin class $DiamondTransactionCopyWith<$Res>  {
   factory $DiamondTransactionCopyWith(DiamondTransaction value, $Res Function(DiamondTransaction) _then) = _$DiamondTransactionCopyWithImpl;
 @useResult
 $Res call({
- String id, String userId, int amount, DiamondTransactionType type, String? description, String? gameId, DateTime createdAt
+ String id, String userId, int amount, DiamondTransactionType type, String? description, String? gameId,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime createdAt
 });
 
 
@@ -444,7 +444,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  int amount,  DiamondTransactionType type,  String? description,  String? gameId,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  int amount,  DiamondTransactionType type,  String? description,  String? gameId, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DiamondTransaction() when $default != null:
 return $default(_that.id,_that.userId,_that.amount,_that.type,_that.description,_that.gameId,_that.createdAt);case _:
@@ -465,7 +465,7 @@ return $default(_that.id,_that.userId,_that.amount,_that.type,_that.description,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  int amount,  DiamondTransactionType type,  String? description,  String? gameId,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  int amount,  DiamondTransactionType type,  String? description,  String? gameId, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _DiamondTransaction():
 return $default(_that.id,_that.userId,_that.amount,_that.type,_that.description,_that.gameId,_that.createdAt);case _:
@@ -485,7 +485,7 @@ return $default(_that.id,_that.userId,_that.amount,_that.type,_that.description,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  int amount,  DiamondTransactionType type,  String? description,  String? gameId,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  int amount,  DiamondTransactionType type,  String? description,  String? gameId, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _DiamondTransaction() when $default != null:
 return $default(_that.id,_that.userId,_that.amount,_that.type,_that.description,_that.gameId,_that.createdAt);case _:
@@ -500,7 +500,7 @@ return $default(_that.id,_that.userId,_that.amount,_that.type,_that.description,
 @JsonSerializable()
 
 class _DiamondTransaction implements DiamondTransaction {
-  const _DiamondTransaction({required this.id, required this.userId, required this.amount, required this.type, this.description, this.gameId, required this.createdAt});
+  const _DiamondTransaction({required this.id, required this.userId, required this.amount, required this.type, this.description, this.gameId, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) required this.createdAt});
   factory _DiamondTransaction.fromJson(Map<String, dynamic> json) => _$DiamondTransactionFromJson(json);
 
 @override final  String id;
@@ -509,7 +509,7 @@ class _DiamondTransaction implements DiamondTransaction {
 @override final  DiamondTransactionType type;
 @override final  String? description;
 @override final  String? gameId;
-@override final  DateTime createdAt;
+@override@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) final  DateTime createdAt;
 
 /// Create a copy of DiamondTransaction
 /// with the given fields replaced by the non-null parameter values.
@@ -544,7 +544,7 @@ abstract mixin class _$DiamondTransactionCopyWith<$Res> implements $DiamondTrans
   factory _$DiamondTransactionCopyWith(_DiamondTransaction value, $Res Function(_DiamondTransaction) _then) = __$DiamondTransactionCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String userId, int amount, DiamondTransactionType type, String? description, String? gameId, DateTime createdAt
+ String id, String userId, int amount, DiamondTransactionType type, String? description, String? gameId,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime createdAt
 });
 
 

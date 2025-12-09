@@ -27,8 +27,8 @@ mixin _$GameRoom {
  Map<String, int> get scores;/// Whether game is finished (legacy, use status instead)
  bool get isFinished;/// Whether room is public (visible in lobby) or private (code-only)
  bool get isPublic;/// When the room was created
- DateTime? get createdAt;/// When the game finished
- DateTime? get finishedAt;// ===== Call Break Game Fields =====
+@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime? get createdAt;/// When the game finished
+@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime? get finishedAt;// ===== Call Break Game Fields =====
 /// Current round number (1-indexed)
  int get currentRound;/// Current phase of the game
 @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) GamePhase? get gamePhase;/// Player hands (playerId -> cards)
@@ -71,7 +71,7 @@ abstract mixin class $GameRoomCopyWith<$Res>  {
   factory $GameRoomCopyWith(GameRoom value, $Res Function(GameRoom) _then) = _$GameRoomCopyWithImpl;
 @useResult
 $Res call({
- String? id, String name, String hostId, String? roomCode,@GameStatusConverter() GameStatus status, String gameType, GameConfig config, List<Player> players, Map<String, int> scores, bool isFinished, bool isPublic, DateTime? createdAt, DateTime? finishedAt, int currentRound,@JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) GamePhase? gamePhase,@JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) Map<String, List<PlayingCard>> playerHands, Map<String, Bid> bids, Trick? currentTrick, List<Trick> trickHistory, Map<String, int> tricksWon,@JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) Map<String, List<double>> roundScores, String? currentTurn
+ String? id, String name, String hostId, String? roomCode,@GameStatusConverter() GameStatus status, String gameType, GameConfig config, List<Player> players, Map<String, int> scores, bool isFinished, bool isPublic,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime? createdAt,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime? finishedAt, int currentRound,@JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) GamePhase? gamePhase,@JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) Map<String, List<PlayingCard>> playerHands, Map<String, Bid> bids, Trick? currentTrick, List<Trick> trickHistory, Map<String, int> tricksWon,@JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) Map<String, List<double>> roundScores, String? currentTurn
 });
 
 
@@ -218,7 +218,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String name,  String hostId,  String? roomCode, @GameStatusConverter()  GameStatus status,  String gameType,  GameConfig config,  List<Player> players,  Map<String, int> scores,  bool isFinished,  bool isPublic,  DateTime? createdAt,  DateTime? finishedAt,  int currentRound, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)  GamePhase? gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)  Map<String, List<PlayingCard>> playerHands,  Map<String, Bid> bids,  Trick? currentTrick,  List<Trick> trickHistory,  Map<String, int> tricksWon, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)  Map<String, List<double>> roundScores,  String? currentTurn)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String name,  String hostId,  String? roomCode, @GameStatusConverter()  GameStatus status,  String gameType,  GameConfig config,  List<Player> players,  Map<String, int> scores,  bool isFinished,  bool isPublic, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime? createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime? finishedAt,  int currentRound, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)  GamePhase? gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)  Map<String, List<PlayingCard>> playerHands,  Map<String, Bid> bids,  Trick? currentTrick,  List<Trick> trickHistory,  Map<String, int> tricksWon, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)  Map<String, List<double>> roundScores,  String? currentTurn)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GameRoom() when $default != null:
 return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_that.gameType,_that.config,_that.players,_that.scores,_that.isFinished,_that.isPublic,_that.createdAt,_that.finishedAt,_that.currentRound,_that.gamePhase,_that.playerHands,_that.bids,_that.currentTrick,_that.trickHistory,_that.tricksWon,_that.roundScores,_that.currentTurn);case _:
@@ -239,7 +239,7 @@ return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String name,  String hostId,  String? roomCode, @GameStatusConverter()  GameStatus status,  String gameType,  GameConfig config,  List<Player> players,  Map<String, int> scores,  bool isFinished,  bool isPublic,  DateTime? createdAt,  DateTime? finishedAt,  int currentRound, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)  GamePhase? gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)  Map<String, List<PlayingCard>> playerHands,  Map<String, Bid> bids,  Trick? currentTrick,  List<Trick> trickHistory,  Map<String, int> tricksWon, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)  Map<String, List<double>> roundScores,  String? currentTurn)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String name,  String hostId,  String? roomCode, @GameStatusConverter()  GameStatus status,  String gameType,  GameConfig config,  List<Player> players,  Map<String, int> scores,  bool isFinished,  bool isPublic, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime? createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime? finishedAt,  int currentRound, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)  GamePhase? gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)  Map<String, List<PlayingCard>> playerHands,  Map<String, Bid> bids,  Trick? currentTrick,  List<Trick> trickHistory,  Map<String, int> tricksWon, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)  Map<String, List<double>> roundScores,  String? currentTurn)  $default,) {final _that = this;
 switch (_that) {
 case _GameRoom():
 return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_that.gameType,_that.config,_that.players,_that.scores,_that.isFinished,_that.isPublic,_that.createdAt,_that.finishedAt,_that.currentRound,_that.gamePhase,_that.playerHands,_that.bids,_that.currentTrick,_that.trickHistory,_that.tricksWon,_that.roundScores,_that.currentTurn);case _:
@@ -259,7 +259,7 @@ return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String name,  String hostId,  String? roomCode, @GameStatusConverter()  GameStatus status,  String gameType,  GameConfig config,  List<Player> players,  Map<String, int> scores,  bool isFinished,  bool isPublic,  DateTime? createdAt,  DateTime? finishedAt,  int currentRound, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)  GamePhase? gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)  Map<String, List<PlayingCard>> playerHands,  Map<String, Bid> bids,  Trick? currentTrick,  List<Trick> trickHistory,  Map<String, int> tricksWon, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)  Map<String, List<double>> roundScores,  String? currentTurn)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String name,  String hostId,  String? roomCode, @GameStatusConverter()  GameStatus status,  String gameType,  GameConfig config,  List<Player> players,  Map<String, int> scores,  bool isFinished,  bool isPublic, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime? createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)  DateTime? finishedAt,  int currentRound, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)  GamePhase? gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)  Map<String, List<PlayingCard>> playerHands,  Map<String, Bid> bids,  Trick? currentTrick,  List<Trick> trickHistory,  Map<String, int> tricksWon, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)  Map<String, List<double>> roundScores,  String? currentTurn)?  $default,) {final _that = this;
 switch (_that) {
 case _GameRoom() when $default != null:
 return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_that.gameType,_that.config,_that.players,_that.scores,_that.isFinished,_that.isPublic,_that.createdAt,_that.finishedAt,_that.currentRound,_that.gamePhase,_that.playerHands,_that.bids,_that.currentTrick,_that.trickHistory,_that.tricksWon,_that.roundScores,_that.currentTurn);case _:
@@ -274,7 +274,7 @@ return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_th
 @JsonSerializable()
 
 class _GameRoom extends GameRoom {
-  const _GameRoom({this.id, required this.name, required this.hostId, this.roomCode, @GameStatusConverter() this.status = GameStatus.waiting, this.gameType = 'call_break', this.config = const GameConfig(), required final  List<Player> players, required final  Map<String, int> scores, this.isFinished = false, this.isPublic = false, this.createdAt, this.finishedAt, this.currentRound = 1, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) this.gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) final  Map<String, List<PlayingCard>> playerHands = const {}, final  Map<String, Bid> bids = const {}, this.currentTrick, final  List<Trick> trickHistory = const [], final  Map<String, int> tricksWon = const {}, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) final  Map<String, List<double>> roundScores = const {}, this.currentTurn}): _players = players,_scores = scores,_playerHands = playerHands,_bids = bids,_trickHistory = trickHistory,_tricksWon = tricksWon,_roundScores = roundScores,super._();
+  const _GameRoom({this.id, required this.name, required this.hostId, this.roomCode, @GameStatusConverter() this.status = GameStatus.waiting, this.gameType = 'call_break', this.config = const GameConfig(), required final  List<Player> players, required final  Map<String, int> scores, this.isFinished = false, this.isPublic = false, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) this.createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) this.finishedAt, this.currentRound = 1, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) this.gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) final  Map<String, List<PlayingCard>> playerHands = const {}, final  Map<String, Bid> bids = const {}, this.currentTrick, final  List<Trick> trickHistory = const [], final  Map<String, int> tricksWon = const {}, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) final  Map<String, List<double>> roundScores = const {}, this.currentTurn}): _players = players,_scores = scores,_playerHands = playerHands,_bids = bids,_trickHistory = trickHistory,_tricksWon = tricksWon,_roundScores = roundScores,super._();
   factory _GameRoom.fromJson(Map<String, dynamic> json) => _$GameRoomFromJson(json);
 
 /// Firestore document ID
@@ -314,9 +314,9 @@ class _GameRoom extends GameRoom {
 /// Whether room is public (visible in lobby) or private (code-only)
 @override@JsonKey() final  bool isPublic;
 /// When the room was created
-@override final  DateTime? createdAt;
+@override@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) final  DateTime? createdAt;
 /// When the game finished
-@override final  DateTime? finishedAt;
+@override@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) final  DateTime? finishedAt;
 // ===== Call Break Game Fields =====
 /// Current round number (1-indexed)
 @override@JsonKey() final  int currentRound;
@@ -405,7 +405,7 @@ abstract mixin class _$GameRoomCopyWith<$Res> implements $GameRoomCopyWith<$Res>
   factory _$GameRoomCopyWith(_GameRoom value, $Res Function(_GameRoom) _then) = __$GameRoomCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String name, String hostId, String? roomCode,@GameStatusConverter() GameStatus status, String gameType, GameConfig config, List<Player> players, Map<String, int> scores, bool isFinished, bool isPublic, DateTime? createdAt, DateTime? finishedAt, int currentRound,@JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) GamePhase? gamePhase,@JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) Map<String, List<PlayingCard>> playerHands, Map<String, Bid> bids, Trick? currentTrick, List<Trick> trickHistory, Map<String, int> tricksWon,@JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) Map<String, List<double>> roundScores, String? currentTurn
+ String? id, String name, String hostId, String? roomCode,@GameStatusConverter() GameStatus status, String gameType, GameConfig config, List<Player> players, Map<String, int> scores, bool isFinished, bool isPublic,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime? createdAt,@JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) DateTime? finishedAt, int currentRound,@JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) GamePhase? gamePhase,@JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) Map<String, List<PlayingCard>> playerHands, Map<String, Bid> bids, Trick? currentTrick, List<Trick> trickHistory, Map<String, int> tricksWon,@JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) Map<String, List<double>> roundScores, String? currentTurn
 });
 
 
