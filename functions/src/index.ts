@@ -223,19 +223,20 @@ export const onInviteCreated = onDocumentCreated('invites/{inviteId}', async (ev
     const fromName = invite.fromDisplayName || 'Someone';
     const gameType = invite.gameType || 'a game';
 
-    // Get the recipient's FCM token
-    const userDoc = await db.collection('users').doc(toUserId).get();
-    const fcmToken = userDoc.data()?.fcmToken;
+    // Get the recipient's FCM tokens from subcollection
+    const tokensSnapshot = await db.collection('users').doc(toUserId).collection('fcmTokens').get();
 
-    if (!fcmToken) {
-        console.log(`No FCM token for user ${toUserId}`);
+    if (tokensSnapshot.empty) {
+        console.log(`No FCM tokens for user ${toUserId}`);
         return;
     }
 
-    // Send the notification
+    // Get all active tokens
+    const tokens = tokensSnapshot.docs.map(doc => doc.id);
+
+    // Send the notification to all tokens
     try {
-        await messaging.send({
-            token: fcmToken,
+        const message = {
             notification: {
                 title: 'Game Invitation! 🎮',
                 body: `${fromName} invited you to play ${gameType}`,
@@ -247,7 +248,7 @@ export const onInviteCreated = onDocumentCreated('invites/{inviteId}', async (ev
                 gameType: gameType,
             },
             android: {
-                priority: 'high',
+                priority: 'high' as const,
                 notification: {
                     channelId: 'game_invites',
                     icon: 'ic_notification',
@@ -259,8 +260,18 @@ export const onInviteCreated = onDocumentCreated('invites/{inviteId}', async (ev
                     badge: '/icons/icon-72.png',
                 },
             },
-        });
-        console.log(`Notification sent to ${toUserId}`);
+        };
+
+        // Send to each token
+        for (const token of tokens) {
+            try {
+                await messaging.send({ ...message, token });
+                console.log(`Notification sent to ${toUserId} via token`);
+            } catch (tokenError) {
+                console.error(`Failed to send to token: ${token}`, tokenError);
+                // Optionally delete invalid tokens
+            }
+        }
     } catch (error) {
         console.error('FCM send error:', error);
     }
@@ -276,24 +287,31 @@ export const onFriendRequestCreated = onDocumentCreated('friendRequests/{request
     const toUserId = request.toUserId;
     const fromName = request.fromDisplayName || 'Someone';
 
-    // Get the recipient's FCM token
-    const userDoc = await db.collection('users').doc(toUserId).get();
-    const fcmToken = userDoc.data()?.fcmToken;
+    // Get the recipient's FCM tokens from subcollection
+    const tokensSnapshot = await db.collection('users').doc(toUserId).collection('fcmTokens').get();
 
-    if (!fcmToken) return;
+    if (tokensSnapshot.empty) return;
+
+    const tokens = tokensSnapshot.docs.map(doc => doc.id);
 
     try {
-        await messaging.send({
-            token: fcmToken,
-            notification: {
-                title: 'Friend Request! 👋',
-                body: `${fromName} wants to be your friend`,
-            },
-            data: {
-                type: 'friend_request',
-                requestId: event.params.requestId,
-            },
-        });
+        for (const token of tokens) {
+            try {
+                await messaging.send({
+                    token,
+                    notification: {
+                        title: 'Friend Request! 👋',
+                        body: `${fromName} wants to be your friend`,
+                    },
+                    data: {
+                        type: 'friend_request',
+                        requestId: event.params.requestId,
+                    },
+                });
+            } catch (tokenError) {
+                console.error(`Failed to send to token: ${token}`, tokenError);
+            }
+        }
     } catch (error) {
         console.error('FCM send error:', error);
     }

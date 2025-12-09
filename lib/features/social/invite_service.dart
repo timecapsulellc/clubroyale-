@@ -223,7 +223,7 @@ class InviteService {
       
       // Check room still exists and has space
       final roomId = payload['roomId'] as String;
-      final roomDoc = await _firestore.collection('matches').doc(roomId).get();
+      final roomDoc = await _firestore.collection('games').doc(roomId).get();
       
       if (!roomDoc.exists) {
         return InviteValidation.roomNotFound();
