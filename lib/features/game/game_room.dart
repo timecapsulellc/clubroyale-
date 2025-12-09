@@ -64,9 +64,17 @@ abstract class GameRoom with _$GameRoom {
     @Default(false) bool isPublic,
     
     /// When the room was created
+    @JsonKey(
+      fromJson: _dateTimeFromJson,
+      toJson: _dateTimeToJson,
+    )
     DateTime? createdAt,
     
     /// When the game finished
+    @JsonKey(
+      fromJson: _dateTimeFromJson,
+      toJson: _dateTimeToJson,
+    )
     DateTime? finishedAt,
     
     // ===== Call Break Game Fields =====
@@ -190,3 +198,14 @@ Map<String, dynamic> _roundScoresToJson(Map<String, List<double>> scores) {
   });
   return json;
 }
+
+/// Convert DateTime from JSON (handles Firestore Timestamp and String)
+DateTime? _dateTimeFromJson(dynamic json) {
+  if (json == null) return null;
+  if (json is Timestamp) return json.toDate();
+  if (json is String) return DateTime.tryParse(json);
+  return null;
+}
+
+/// Convert DateTime to JSON
+String? _dateTimeToJson(DateTime? dateTime) => dateTime?.toIso8601String();

@@ -192,7 +192,9 @@ service cloud.firestore {
     
     match /transactions/{transactionId} {
       allow read: if isAuthenticated();
-      allow write: if false;
+      allow create: if isAuthenticated();
+      allow update: if false;
+      allow delete: if false;
     }
   }
 }
