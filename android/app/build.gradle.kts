@@ -33,7 +33,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.taasclub.app"
+        // TODO: Change back to com.taasclub.app after updating Firebase
+        applicationId = "com.example.myapp"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -58,8 +59,8 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false  // Disabled to avoid Play Core errors
+            isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -67,4 +68,10 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Add split compatibility for deferred components
+    implementation("com.google.android.play:app-update:2.1.0")
+    implementation("com.google.android.play:asset-delivery:2.2.2")
 }
