@@ -29,6 +29,12 @@ import 'games/teen_patti/teen_patti_screen.dart';
 import 'games/in_between/in_between_screen.dart';
 import 'features/game/settlement/settlement_preview_screen.dart';
 import 'config/revenuecat_config.dart';
+// Diamond Economy imports
+import 'features/wallet/screens/earn_diamonds_screen.dart';
+import 'features/wallet/screens/transfer_screen.dart';
+import 'features/admin/screens/admin_panel_screen.dart';
+import 'features/admin/screens/grant_request_screen.dart';
+import 'features/admin/screens/pending_approvals_screen.dart';
 
 // Analytics service singleton for screen tracking
 final _analyticsService = AnalyticsService();
@@ -154,6 +160,37 @@ final GoRouter _router = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             final String gameId = state.pathParameters['gameId']!;
             return SettlementPreviewScreen(gameId: gameId);
+          },
+        ),
+        // Diamond Economy Routes
+        GoRoute(
+          path: 'earn-diamonds',
+          builder: (BuildContext context, GoRouterState state) {
+            return const EarnDiamondsScreen();
+          },
+        ),
+        GoRoute(
+          path: 'transfer',
+          builder: (BuildContext context, GoRouterState state) {
+            return const TransferScreen();
+          },
+        ),
+        GoRoute(
+          path: 'admin',
+          builder: (BuildContext context, GoRouterState state) {
+            return const AdminPanelScreen();
+          },
+        ),
+        GoRoute(
+          path: 'admin/grant',
+          builder: (BuildContext context, GoRouterState state) {
+            return const GrantRequestScreen();
+          },
+        ),
+        GoRoute(
+          path: 'admin/approvals',
+          builder: (BuildContext context, GoRouterState state) {
+            return const PendingApprovalsScreen();
           },
         ),
       ],

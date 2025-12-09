@@ -33,6 +33,11 @@ export { auditGameUpdate } from './triggers/auditTriggers';
 // Export LiveKit token functions
 export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenService';
 
+// Export Diamond Economy functions
+export { grantSignupBonus, claimDailyLogin, claimAdReward, grantGameReward, processReferral } from './rewards/diamondRewards';
+export { onTransferConfirmed, expireStaleTransfers } from './transfers/diamondTransfers';
+export { onGrantApproved, executeCooledGrants, notifyAdminNewChat } from './admin/diamondAdmin';
+
 // Initialize Firebase Admin
 initializeApp();
 const db = getFirestore();

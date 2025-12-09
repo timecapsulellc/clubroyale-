@@ -196,5 +196,64 @@ service cloud.firestore {
       allow update: if false;
       allow delete: if false;
     }
+    
+    // ============ DIAMOND ECONOMY ============
+    
+    // Diamond rewards - track claimed rewards
+    match /diamond_rewards/{rewardId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if false; // Only Cloud Functions can create
+      allow update: if false;
+      allow delete: if false;
+    }
+    
+    // Diamond grant requests - admin only
+    match /diamond_requests/{requestId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated(); // Admins only (checked in code)
+      allow update: if isAuthenticated(); // Admins only (checked in code)
+      allow delete: if false;
+    }
+    
+    // Diamond P2P transfers
+    match /diamond_transfers/{transferId} {
+      allow read: if isAuthenticated() && 
+        (resource.data.fromUserId == request.auth.uid || 
+         resource.data.toUserId == request.auth.uid);
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && 
+        (resource.data.fromUserId == request.auth.uid || 
+         resource.data.toUserId == request.auth.uid);
+      allow delete: if false;
+    }
+    
+    // Admin support chats
+    match /admin_chats/{chatId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+      
+      match /messages/{messageId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated();
+        allow update: if false;
+        allow delete: if false;
+      }
+    }
+    
+    // Admins collection
+    match /admins/{adminEmail} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only Cloud Functions or manual setup
+    }
+    
+    // Referrals
+    match /referrals/{referralId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if false;
+      allow delete: if false;
+    }
   }
 }
