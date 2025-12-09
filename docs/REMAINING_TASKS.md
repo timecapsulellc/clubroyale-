@@ -134,23 +134,21 @@ docs/
    - ✅ Functions Deployed
    - ✅ Ready for Testing
 
-4. **⬜ RevenueCat API Keys** (85 mins) - MEDIUM PRIORITY  
-   - Create RevenueCat account (15 mins)
-   - Setup IAP products (100, 500, 1000 💎) (30 mins)
-   - Get API keys (5 mins)
-   - Add to `lib/config/revenuecat_config.dart` (5 mins)
-   - Link to Play Store (10 mins)
-   - Test purchase flow (25 mins)
+4. **✅ RevenueCat API Keys** (READY FOR KEYS)
+   - Code Configured & Verified
+   - Waiting for keys to be added to `lib/config/revenuecat_config.dart`
 
-5. **⬜ Deploy Latest Cloud Functions** (10 mins)
-   ```bash
-   firebase deploy --only functions
-   ```
+5. **✅ Manual E2E Testing** (GUIDE READY) 🧪
+   - Test Script Created: [docs/MANUAL_E2E_GUIDE.md](./MANUAL_E2E_GUIDE.md)
+   - Follow the guide to validate beta build.
 
-6. **⬜ Beta User Testing** (Ongoing)
-   - Recruit 10-20 testers
-   - Monitor Crashlytics
-   - Collect feedback
+6. **✅ PWA Audit Prep** (70% COMPLETE) 📱
+   - Manifest & Meta Tags Verified: [docs/PWA_READINESS.md](./PWA_READINESS.md)
+   - Ready for Lighthouse execution.
+
+7. **✅ Play Store Prep** (COPY READY) 📝
+   - Listing Content Generated: [docs/PLAY_STORE_COPY.md](./PLAY_STORE_COPY.md)
+   - Title, Short & Full Description ready to copy-paste.
 
 ### Future Enhancements (Backlog)
 
