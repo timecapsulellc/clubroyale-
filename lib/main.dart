@@ -193,6 +193,18 @@ final GoRouter _router = GoRouter(
             return const PendingApprovalsScreen();
           },
         ),
+        GoRoute(
+          path: 'admin/chats',
+          builder: (BuildContext context, GoRouterState state) {
+            return const AdminChatScreen();
+          },
+        ),
+        GoRoute(
+          path: 'support',
+          builder: (BuildContext context, GoRouterState state) {
+            return const UserSupportChatScreen();
+          },
+        ),
       ],
     ),
   ],

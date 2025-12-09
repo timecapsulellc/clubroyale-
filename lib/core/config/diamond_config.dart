@@ -99,4 +99,13 @@ class DiamondConfig {
     }
     return null;
   }
+  // ============ AD CONFIGURATION ============
+
+  /// Android Ad Unit ID (Rewarded Video - Test ID)
+  /// REPLACE with real ID on release: ca-app-pub-xxxxxxxx/yyyyyyyy
+  static const String androidAdUnitId = 'ca-app-pub-3940256099942544/5224354917';
+
+  /// iOS Ad Unit ID (Rewarded Video - Test ID)
+  /// REPLACE with real ID on release: ca-app-pub-xxxxxxxx/yyyyyyyy
+  static const String iosAdUnitId = 'ca-app-pub-3940256099942544/1712485313';
 }

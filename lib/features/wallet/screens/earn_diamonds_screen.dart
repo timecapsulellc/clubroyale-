@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taasclub/core/config/diamond_config.dart';
 import 'package:taasclub/features/auth/auth_service.dart';
 import 'package:taasclub/features/wallet/diamond_rewards_service.dart';
+import 'package:taasclub/core/services/ad_service.dart';
 
 /// Screen for earning free diamonds
 class EarnDiamondsScreen extends ConsumerStatefulWidget {
@@ -72,30 +73,41 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
     final user = ref.read(authServiceProvider).currentUser;
     if (user == null) return;
 
-    // TODO: Integrate with AdMob rewarded video
-    // For now, simulate ad completion
+    final adService = ref.read(adServiceProvider);
+    
+    // Show loading indicator or toast if needed
     setState(() => _isLoading = true);
+    
     try {
-      await Future.delayed(const Duration(seconds: 2)); // Simulate ad
+      final rewardEarned = await adService.showRewardedAd();
       
-      final rewardsService = ref.read(diamondRewardsServiceProvider);
-      final result = await rewardsService.claimAdReward(user.uid, 'test_ad_${DateTime.now().millisecondsSinceEpoch}');
-      
-      if (mounted) {
-        if (result.success) {
+      if (rewardEarned) {
+        // Grant reward via backend
+        final rewardsService = ref.read(diamondRewardsServiceProvider);
+        final result = await rewardsService.claimAdReward(user.uid);
+        
+        if (mounted) {
+          if (result.success) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('🎬 Earned ${result.amount} diamonds! (${result.remaining} ads left today)'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            _loadStatus();
+          } else {
+             ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(result.reason ?? 'Failed to claim reward'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+        }
+      } else {
+         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('🎬 Earned ${result.amount} diamonds! (${result.remaining} ads left today)'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          _loadStatus();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result.reason ?? 'Cannot watch more ads'),
-              backgroundColor: Colors.orange,
-            ),
+            const SnackBar(content: Text('Ad failed to load or was cancelled')),
           );
         }
       }
@@ -134,6 +146,13 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize ads when screen loads (if not already done)
+    ref.read(adServiceProvider).initialize();
   }
 
   @override

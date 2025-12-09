@@ -1,5 +1,6 @@
 
-import 'package:flutter/material.dart';
+import 'package:taasclub/core/config/diamond_config.dart';
+import 'package:taasclub/features/wallet/diamond_rewards_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -105,9 +106,36 @@ class WalletScreen extends ConsumerWidget {
                   ),
                 ),
 
-                const SizedBox(height: 32),
-                
-                // Transaction History Header
+                const SizedBox(height: 24),
+            
+            // Actions Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _ActionButton(
+                  icon: Icons.diamond_outlined,
+                  label: 'Earn',
+                  color: Colors.amber,
+                  onTap: () => context.push('/earn-diamonds'),
+                ),
+                _ActionButton(
+                  icon: Icons.swap_horiz,
+                  label: 'Transfer',
+                  color: Colors.blue,
+                  onTap: () => context.push('/transfer'),
+                ),
+                _ActionButton(
+                  icon: Icons.support_agent,
+                  label: 'Support',
+                  color: Colors.purple,
+                  onTap: () => context.push('/support'),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 32),
+            
+            // Transaction History Header
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(

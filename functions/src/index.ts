@@ -37,6 +37,7 @@ export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenSe
 export { grantSignupBonus, claimDailyLogin, claimAdReward, grantGameReward, processReferral } from './rewards/diamondRewards';
 export { onTransferConfirmed, expireStaleTransfers } from './transfers/diamondTransfers';
 export { onGrantApproved, executeCooledGrants, notifyAdminNewChat } from './admin/diamondAdmin';
+export { weeklyTasks, dailyCleanup } from './scheduled/dailyTasks';
 
 // Initialize Firebase Admin
 initializeApp();
