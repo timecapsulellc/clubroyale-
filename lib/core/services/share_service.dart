@@ -24,12 +24,12 @@ See you at the tables! 🃏
 ''';
 
     try {
-      final result = await Share.shareWithResult(
+      await Share.share(
         shareText,
         subject: 'Join me on TaasClub!',
       );
 
-      if (result.status == ShareResultStatus.success && context.mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Invite shared successfully! 🎉'),
@@ -71,12 +71,12 @@ Let's play! 🃏
 ''';
 
     try {
-      final result = await Share.shareWithResult(
+      await Share.share(
         shareText,
         subject: 'Join my $gameName game!',
       );
 
-      if (result.status == ShareResultStatus.success && context.mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Invite sent! 🚀'),

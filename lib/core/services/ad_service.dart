@@ -6,14 +6,8 @@ import 'ad_service_stub.dart'
 
 /// Main AdService that delegates to platform-specific implementations
 class AdService {
-  final _AdServiceInterface _impl = getAdService();
+  final _impl = getAdService();
 
   Future<void> initialize() => _impl.initialize();
   Future<bool> showRewardedAd() => _impl.showRewardedAd();
-}
-
-/// Platform interface
-abstract class _AdServiceInterface {
-  Future<void> initialize();
-  Future<bool> showRewardedAd();
 }

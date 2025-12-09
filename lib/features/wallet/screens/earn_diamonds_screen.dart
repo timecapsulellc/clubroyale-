@@ -22,6 +22,8 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
   void initState() {
     super.initState();
     _loadStatus();
+    // Initialize ads when screen loads
+    AdService().initialize();
   }
 
   Future<void> _loadStatus() async {
@@ -85,7 +87,10 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
       if (rewardEarned) {
         // Grant reward via backend
         final rewardsService = ref.read(diamondRewardsServiceProvider);
-        final result = await rewardsService.claimAdReward(user.uid);
+        final result = await rewardsService.claimAdReward(
+          user.uid,
+          'ad_${DateTime.now().millisecondsSinceEpoch}',
+        );
         
         if (mounted) {
           if (result.success) {
@@ -147,14 +152,6 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadStatus();
-    // Initialize ads when screen loads
-    AdService().initialize();
   }
 
   @override

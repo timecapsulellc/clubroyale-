@@ -31,10 +31,13 @@ import 'features/game/settlement/settlement_preview_screen.dart';
 import 'config/revenuecat_config.dart';
 // Diamond Economy imports
 import 'features/wallet/screens/earn_diamonds_screen.dart';
-import 'features/wallet/screens/transfer_screen.dart';
-import 'features/admin/screens/admin_panel_screen.dart';
-import 'features/admin/screens/grant_request_screen.dart';
-import 'features/admin/screens/pending_approvals_screen.dart';
+import 'package:taasclub/features/wallet/screens/transfer_screen.dart';
+import 'package:taasclub/features/admin/screens/admin_panel_screen.dart';
+import 'package:taasclub/features/admin/screens/grant_request_screen.dart';
+import 'package:taasclub/features/admin/screens/pending_approvals_screen.dart';
+// TODO: Fix chat screen API mismatches before enabling
+// import 'package:taasclub/features/admin/screens/admin_chat_screen.dart';
+// import 'package:taasclub/features/wallet/screens/user_support_chat_screen.dart';
 
 // Analytics service singleton for screen tracking
 final _analyticsService = AnalyticsService();
@@ -193,18 +196,19 @@ final GoRouter _router = GoRouter(
             return const PendingApprovalsScreen();
           },
         ),
-        GoRoute(
-          path: 'admin/chats',
-          builder: (BuildContext context, GoRouterState state) {
-            return const AdminChatScreen();
-          },
-        ),
-        GoRoute(
-          path: 'support',
-          builder: (BuildContext context, GoRouterState state) {
-            return const UserSupportChatScreen();
-          },
-        ),
+        // TODO: Fix chat screen API mismatches before enabling
+        // GoRoute(
+        //   path: 'admin/chats',
+        //   builder: (BuildContext context, GoRouterState state) {
+        //     return const AdminChatScreen();
+        //   },
+        // ),
+        // GoRoute(
+        //   path: 'support',
+        //   builder: (BuildContext context, GoRouterState state) {
+        //     return const UserSupportChatScreen();
+        //   },
+        // ),
       ],
     ),
   ],
