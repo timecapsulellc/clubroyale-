@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../core/constants/firebase_config.dart';
 
 final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService();
@@ -60,6 +63,44 @@ class AuthService {
 
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
+  /// Setup FCM for push notifications
+  Future<void> _setupFCM(String uid) async {
+    try {
+      if (kIsWeb) {
+        // Request permission
+        final settings = await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+
+        if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+           // Get token
+           final token = await FirebaseMessaging.instance.getToken(
+             vapidKey: FirebaseConfig.vapidKey,
+           );
+           
+           if (token != null) {
+             debugPrint('🔥 FCM Token: $token');
+             // Save to Firestore
+             await FirebaseFirestore.instance
+                 .collection('users')
+                 .doc(uid)
+                 .collection('fcmTokens')
+                 .doc(token)
+                 .set({
+               'token': token,
+               'createdAt': FieldValue.serverTimestamp(),
+               'platform': kIsWeb ? 'web' : 'mobile',
+             });
+           }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error setting up FCM: $e');
+    }
+  }
+
   /// Sign in with Google
   Future<User?> signInWithGoogle() async {
     try {
@@ -85,6 +126,11 @@ class AuthService {
         TestUser.clear();
       }
       
+      // Setup FCM after successful login
+      if (userCredential.user != null) {
+        await _setupFCM(userCredential.user!.uid);
+      }
+      
       return userCredential.user;
     } catch (e) {
       debugPrint('Error signing in with Google: $e');
@@ -96,6 +142,12 @@ class AuthService {
   Future<User?> signInAnonymously() async {
     try {
       final userCredential = await _auth.signInAnonymously();
+      
+      // Setup FCM after successful login
+      if (userCredential.user != null) {
+        await _setupFCM(userCredential.user!.uid);
+      }
+      
       return userCredential.user;
     } catch (e) {
       debugPrint('Error signing in anonymously: $e');

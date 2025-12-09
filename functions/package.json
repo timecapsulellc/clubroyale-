@@ -12,7 +12,7 @@
     "genkit:start": "genkit start -- npx tsx --watch src/index.ts"
   },
   "engines": {
-    "node": "20"
+    "node": "16"
   },
   "dependencies": {
     "@genkit-ai/core": "^0.9.0",
