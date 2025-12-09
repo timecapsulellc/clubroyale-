@@ -12,6 +12,7 @@ import 'package:taasclub/games/in_between/in_between_service.dart';
 import 'package:taasclub/features/chat/widgets/chat_overlay.dart';
 import 'package:taasclub/features/rtc/widgets/audio_controls.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:taasclub/core/services/share_service.dart';
 
 class RoomWaitingScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -148,8 +149,14 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
               if (room.roomCode != null)
                 IconButton(
                   icon: const Icon(Icons.share),
-                  onPressed: () => _shareRoomCode(room),
                   tooltip: 'Share Room Code',
+                  onPressed: () async {
+                    await ShareService.shareGameRoomCode(
+                      room.roomCode!,
+                      room.gameType.toUpperCase(),
+                      context: context,
+                    );
+                  },
                 ),
             ],
           ),

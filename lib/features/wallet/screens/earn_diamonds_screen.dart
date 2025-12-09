@@ -4,6 +4,7 @@ import 'package:taasclub/core/config/diamond_config.dart';
 import 'package:taasclub/features/auth/auth_service.dart';
 import 'package:taasclub/features/wallet/diamond_rewards_service.dart';
 import 'package:taasclub/core/services/ad_service.dart';
+import 'package:taasclub/core/services/share_service.dart';
 
 /// Screen for earning free diamonds
 class EarnDiamondsScreen extends ConsumerStatefulWidget {
@@ -73,7 +74,7 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
     final user = ref.read(authServiceProvider).currentUser;
     if (user == null) return;
 
-    final adService = ref.read(adServiceProvider);
+    final adService = AdService();
     
     // Show loading indicator or toast if needed
     setState(() => _isLoading = true);
@@ -151,8 +152,9 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize ads when screen loads (if not already done)
-    ref.read(adServiceProvider).initialize();
+    _loadStatus();
+    // Initialize ads when screen loads
+    AdService().initialize();
   }
 
   @override
@@ -352,11 +354,20 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
                 if (isPlayGames)
                   const Text('Auto', style: TextStyle(color: Colors.grey))
                 else if (isReferral)
-                  TextButton(
-                    onPressed: () {
-                      // TODO: Share invite link
+                  TextButton.icon(
+                    onPressed: () async {
+                      final user = ref.read(authServiceProvider).currentUser;
+                      if (user != null) {
+                        // Using user UID as referral code for now
+                        // You can customize this to use a shorter code
+                        await ShareService.shareReferralCode(
+                          user.uid.substring(0, 8).toUpperCase(),
+                          context: context,
+                        );
+                      }
                     },
-                    child: const Text('Share'),
+                    icon: const Icon(Icons.share),
+                    label: const Text('Share'),
                   )
                 else if (isClaimed)
                   Container(
