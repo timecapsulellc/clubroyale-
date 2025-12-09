@@ -19,7 +19,8 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.taasclub.app"
+    // IMPORTANT: namespace must match applicationId for launcher to find MainActivity
+    namespace = "com.example.myapp"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

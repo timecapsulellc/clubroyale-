@@ -27,6 +27,14 @@ service cloud.firestore {
       allow delete: if false;
     }
     
+    // Profiles collection (used by profile_service.dart)
+    match /profiles/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow update: if isAuthenticated() && isOwner(userId);
+      allow delete: if false;
+    }
+    
     // Wallets collection for diamond balances
     match /wallets/{userId} {
       allow read: if isAuthenticated();
