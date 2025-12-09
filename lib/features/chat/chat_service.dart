@@ -27,7 +27,7 @@ class ChatService {
 
   /// Get reference to chat collection
   CollectionReference<Map<String, dynamic>> get _chatRef =>
-      _firestore.collection('game_rooms').doc(roomId).collection('chat');
+      _firestore.collection('games').doc(roomId).collection('chat');
 
   /// Stream of chat messages (real-time)
   Stream<List<ChatMessage>> get messagesStream {
