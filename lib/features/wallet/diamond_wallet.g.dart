@@ -12,9 +12,7 @@ _DiamondWallet _$DiamondWalletFromJson(Map<String, dynamic> json) =>
       balance: (json['balance'] as num?)?.toInt() ?? 0,
       totalPurchased: (json['totalPurchased'] as num?)?.toInt() ?? 0,
       totalSpent: (json['totalSpent'] as num?)?.toInt() ?? 0,
-      lastUpdated: json['lastUpdated'] == null
-          ? null
-          : DateTime.parse(json['lastUpdated'] as String),
+      lastUpdated: _nullableDateTimeFromJson(json['lastUpdated']),
     );
 
 Map<String, dynamic> _$DiamondWalletToJson(_DiamondWallet instance) =>
@@ -23,7 +21,7 @@ Map<String, dynamic> _$DiamondWalletToJson(_DiamondWallet instance) =>
       'balance': instance.balance,
       'totalPurchased': instance.totalPurchased,
       'totalSpent': instance.totalSpent,
-      'lastUpdated': instance.lastUpdated?.toIso8601String(),
+      'lastUpdated': _nullableDateTimeToJson(instance.lastUpdated),
     };
 
 _DiamondTransaction _$DiamondTransactionFromJson(Map<String, dynamic> json) =>
@@ -34,7 +32,7 @@ _DiamondTransaction _$DiamondTransactionFromJson(Map<String, dynamic> json) =>
       type: $enumDecode(_$DiamondTransactionTypeEnumMap, json['type']),
       description: json['description'] as String?,
       gameId: json['gameId'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: _dateTimeFromJson(json['createdAt']),
     );
 
 Map<String, dynamic> _$DiamondTransactionToJson(_DiamondTransaction instance) =>
@@ -45,7 +43,7 @@ Map<String, dynamic> _$DiamondTransactionToJson(_DiamondTransaction instance) =>
       'type': _$DiamondTransactionTypeEnumMap[instance.type]!,
       'description': instance.description,
       'gameId': instance.gameId,
-      'createdAt': instance.createdAt.toIso8601String(),
+      'createdAt': _dateTimeToJson(instance.createdAt),
     };
 
 const _$DiamondTransactionTypeEnumMap = {
