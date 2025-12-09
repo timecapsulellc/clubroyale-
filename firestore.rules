@@ -22,8 +22,16 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
-      allow update: if isOwner(userId);
+      // Allow users to update their own profile AND diamond balance
+      allow update: if isAuthenticated() && isOwner(userId);
       allow delete: if false;
+    }
+    
+    // Wallets collection for diamond balances
+    match /wallets/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && isOwner(userId);
     }
     
     // ============ GAMES (ROOMS) ============

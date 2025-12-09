@@ -114,6 +114,27 @@ class AiService {
       riskLevel: data['riskLevel'] as String,
     );
   }
+
+  /// Get Marriage AI bot's play
+  Future<MarriageBotPlayResult> getMarriageBotPlay({
+    required String difficulty,
+    required List<String> hand,
+    required Map<String, dynamic> gameState,
+  }) async {
+    final callable = _functions.httpsCallable('marriageBotPlay');
+    final result = await callable.call<Map<String, dynamic>>({
+      'difficulty': difficulty,
+      'hand': hand,
+      'gameState': gameState,
+    });
+
+    final data = result.data;
+    return MarriageBotPlayResult(
+      action: data['action'] as String,
+      card: data['card'] as String?,
+      reasoning: data['reasoning'] as String?,
+    );
+  }
 }
 
 // =====================================================
@@ -173,6 +194,18 @@ class BidSuggestionResult {
     required this.reasoning,
     required this.handStrength,
     required this.riskLevel,
+  });
+}
+
+class MarriageBotPlayResult {
+  final String action;
+  final String? card;
+  final String? reasoning;
+
+  MarriageBotPlayResult({
+    required this.action,
+    this.card,
+    this.reasoning,
   });
 }
 

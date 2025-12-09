@@ -7,6 +7,14 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:taasclub/features/auth/auth_service.dart';
+
+/// Provider for InviteService
+final inviteServiceProvider = Provider<InviteService>((ref) {
+  final authService = ref.watch(authServiceProvider);
+  return InviteService(authService: authService);
+});
 
 /// Invite link data
 class InviteLink {
@@ -84,12 +92,57 @@ class InviteValidation {
 /// Deep Link Invite Service
 class InviteService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final AuthService authService;
+  
+  InviteService({required this.authService});
   
   // Base URL for deep links
   static const String _baseUrl = 'https://taasclub.app/join';
   
   // Signing secret (in production, use environment variable or secure storage)
   static const String _signingSecret = 'TAASCLUB_INVITE_SECRET_2024';
+  
+  /// Send a game invite to another user (FCM notification)
+  Future<bool> sendInvite({
+    required String toUserId,
+    required String roomId,
+    String? roomCode,
+    required String gameType,
+  }) async {
+    try {
+      final myUserId = authService.currentUser?.uid;
+      if (myUserId == null) return false;
+      
+      // Check if invite already sent
+      final existingInvite = await _firestore
+          .collection('game_invites')
+          .where('fromUserId', isEqualTo: myUserId)
+          .where('toUserId', isEqualTo: toUserId)
+          .where('roomId', isEqualTo: roomId)
+          .where('status', isEqualTo: 'pending')
+          .limit(1)
+          .get();
+      
+      if (existingInvite.docs.isNotEmpty) {
+        return false; // Already sent
+      }
+      
+      // Create invite
+      await _firestore.collection('game_invites').add({
+        'fromUserId': myUserId,
+        'toUserId': toUserId,
+        'roomId': roomId,
+        'roomCode': roomCode,
+        'gameType': gameType,
+        'status': 'pending',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
   
   /// Generate a signed invite link
   Future<InviteLink> generateInviteLink({

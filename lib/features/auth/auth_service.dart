@@ -2,6 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService();
@@ -57,6 +58,40 @@ class AuthService {
   /// Check if currently in test mode
   bool get isTestMode => TestMode.isEnabled;
 
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  /// Sign in with Google
+  Future<User?> signInWithGoogle() async {
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return null; // User canceled
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Create a new credential
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase with the Google User Credential
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      
+      // Clear test mode if active
+      if (TestMode.isEnabled) {
+        TestMode.isEnabled = false;
+        TestUser.clear();
+      }
+      
+      return userCredential.user;
+    } catch (e) {
+      debugPrint('Error signing in with Google: $e');
+      return null;
+    }
+  }
+
   /// Sign in anonymously - tries Firebase first, falls back to test mode
   Future<User?> signInAnonymously() async {
     try {
@@ -94,6 +129,7 @@ class AuthService {
     }
     
     try {
+      await _googleSignIn.signOut(); // Sign out from Google
       await _auth.signOut();
     } catch (e) {
       debugPrint('Firebase signOut error (ignored in test mode): $e');
@@ -185,19 +221,15 @@ class _TestModeUser implements User {
   @override
   Future<void> updateDisplayName(String? displayName) async {}
 
-  @override
   Future<void> updateEmail(String newEmail) async {}
 
-  @override
   Future<void> updatePassword(String newPassword) async {}
 
-  @override
   Future<void> updatePhoneNumber(PhoneAuthCredential phoneCredential) async {}
 
   @override
   Future<void> updatePhotoURL(String? photoURL) async {}
 
-  @override
   Future<void> updateProfile({String? displayName, String? photoURL}) async {}
 
   @override
@@ -218,12 +250,10 @@ class _TestModeUser implements User {
     throw UnimplementedError();
   }
 
-  @override
   Future<UserCredential> reauthenticateWithPopup(AuthProvider provider) {
     throw UnimplementedError();
   }
 
-  @override
   Future<void> reauthenticateWithRedirect(AuthProvider provider) {
     throw UnimplementedError();
   }

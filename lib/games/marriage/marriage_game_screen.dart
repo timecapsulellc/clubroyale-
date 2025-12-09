@@ -4,22 +4,28 @@
 
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:taasclub/config/casino_theme.dart';
-import 'package:taasclub/config/visual_effects.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
-import 'package:taasclub/core/card_engine/meld.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:taasclub/core/theme/app_theme.dart';
+import 'package:taasclub/games/base_game.dart';
+import 'package:taasclub/core/card_engine/meld.dart' as meld_engine;
+import 'package:taasclub/core/card_engine/pile.dart'; // For Card class
 import 'package:taasclub/games/marriage/marriage_game.dart';
-import 'package:taasclub/features/game/widgets/player_avatar.dart';
+import 'package:taasclub/features/game/ui/components/table_layout.dart';
+import 'package:taasclub/features/game/ui/components/player_avatar.dart';
+import 'package:taasclub/features/game/ui/components/game_log_overlay.dart';
+import 'package:taasclub/features/game/ui/components/casino_button.dart';
+import 'package:taasclub/features/game/ui/components/card_widget.dart';
+import 'package:taasclub/features/ai/ai_service.dart';
 
 /// Marriage game screen with test mode
-class MarriageGameScreen extends StatefulWidget {
+class MarriageGameScreen extends ConsumerStatefulWidget {
   const MarriageGameScreen({super.key});
 
   @override
-  State<MarriageGameScreen> createState() => _MarriageGameScreenState();
+  ConsumerState<MarriageGameScreen> createState() => _MarriageGameScreenState();
 }
 
-class _MarriageGameScreenState extends State<MarriageGameScreen> {
+class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   late MarriageGame _game;
   final String _playerId = 'player_1';
   final List<String> _botIds = ['bot_1', 'bot_2', 'bot_3'];
@@ -34,7 +40,7 @@ class _MarriageGameScreenState extends State<MarriageGameScreen> {
   
   void _initGame() {
     _game = MarriageGame();
-    _game.initialize([_playerId, ..._botIds]);
+    _game.initialize(<String>[_playerId, ..._botIds]);
     _game.startRound();
     
     // Check if bots need to play (if user doesn't start)
@@ -50,7 +56,7 @@ class _MarriageGameScreenState extends State<MarriageGameScreen> {
     final melds = _game.findMelds(_playerId);
     
     return Scaffold(
-      backgroundColor: CasinoColors.feltGreenDark,
+      backgroundColor: AppTheme.tableGreen,
       appBar: AppBar(
         backgroundColor: Colors.black.withOpacity(0.5),
         title: Row(
@@ -61,13 +67,36 @@ class _MarriageGameScreenState extends State<MarriageGameScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: CasinoColors.gold.withOpacity(0.2),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: CasinoColors.gold),
+                border: Border.all(color: AppTheme.gold.withOpacity(0.5)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(2, 4),
+                  ),
+                ],
               ),
-              child: Text(
-                'Round ${_game.currentRound}',
-                style: const TextStyle(color: CasinoColors.gold, fontSize: 12),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Card back pattern
+                  Container(
+                    margin: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [AppTheme.teal, Colors.black],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Center(
+                      child: Icon(Icons.style, color: AppTheme.gold.withOpacity(0.5), size: 32),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -107,275 +136,213 @@ class _MarriageGameScreenState extends State<MarriageGameScreen> {
           ),
         ],
       ),
-      body: ParticleBackground(
-        primaryColor: CasinoColors.gold,
-        secondaryColor: CasinoColors.feltGreenMid,
-        particleCount: 20,
-        child: Column(
-          children: [
-            // Other players
-            Expanded(
-              flex: 2,
-              child: _buildOpponentsArea(),
-            ),
-            
-            // Center - deck and discard
-            Expanded(
-              flex: 3,
-              child: _buildCenterArea(),
-            ),
-            
-            // Meld suggestions
-            if (melds.isNotEmpty)
-              _buildMeldSuggestions(melds),
-            
-            // My hand
-            _buildMyHand(myHand),
-            
-            // Action bar
-            _buildActionBar(),
-          ],
+      body: TableLayout(
+        child: SafeArea(
+          child: Stack(
+            children: [
+              // Header (Menu, Sound, Info)
+              Positioned(
+                top: 8,
+                left: 16,
+                child: Row(
+                  children: [
+                    _buildHeaderButton(Icons.menu, () { /* TODO: Menu */ }),
+                    const SizedBox(width: 8),
+                    _buildHeaderButton(Icons.volume_up, () { /* TODO: Sound */ }),
+                    const SizedBox(width: 8),
+                    _buildHeaderButton(Icons.info_outline, () { /* TODO: Info */ }),
+                  ],
+                ),
+              ),
+
+              // Game Logs (Left Side)
+              Positioned(
+                top: 80,
+                left: 16,
+                child: GameLogOverlay(
+                  logs: const [
+                    "Bot 1 picked card from deck",
+                    "Bot 2 threw card 4♥",
+                    "Bot 3 showed tunella",
+                  ], // Placeholder data, hook up to real game logs later
+                ),
+              ),
+              
+              Column(
+                children: [
+                  // Top Opponents
+                  const SizedBox(height: 10),
+                  Expanded(
+                    flex: 2,
+                    child: _buildOpponentsArea(),
+                  ),
+                  
+                  // Center Table (Deck/Discard/Pot)
+                  Expanded(
+                    flex: 4,
+                    child: _buildCenterArea(),
+                  ),
+                  
+                  // Bottom Player Area
+                  // Meld suggestions
+                  if (melds.isNotEmpty)
+                    _buildMeldSuggestions(melds),
+                  
+                  // My hand
+                  _buildMyHand(myHand),
+                  
+                  // Action bar
+                  _buildActionBar(),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-  
+
+  Widget _buildHeaderButton(IconData icon, VoidCallback onPressed) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.teal.withOpacity(0.8),
+        shape: BoxShape.circle,
+        border: Border.all(color: AppTheme.gold, width: 1.5),
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: Colors.white, size: 20),
+        onPressed: onPressed,
+        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+        padding: EdgeInsets.zero,
+      ),
+    );
+  }
+
   Widget _buildOpponentsArea() {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: _botIds.map((botId) {
-          final hand = _game.getHand(botId);
           final isCurrentTurn = _game.currentPlayerId == botId;
           return PlayerAvatar(
             name: _getBotName(botId),
             isCurrentTurn: isCurrentTurn,
-            isHost: false,
-            bid: null,
-            tricksWon: hand.length,
+            statusLabel: isCurrentTurn ? "Thinking..." : "Waiting", // Dynamic status
+            statusColor: isCurrentTurn ? AppTheme.goldDark : AppTheme.orange,
           ).animate().fadeIn(delay: 200.ms);
         }).toList(),
       ),
     );
   }
-  
+
   Widget _buildCenterArea() {
+    final topDiscard = _game.topDiscard;
+    final isMyTurn = _game.currentPlayerId == _playerId;
+    final canDrawFromDiscard = isMyTurn && topDiscard != null && _game.getHand(_playerId).length == 21;
+    final canDrawFromDeck = isMyTurn && _game.getHand(_playerId).length == 21;
+
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Deck
           GestureDetector(
-            onTap: _game.currentPlayerId == _playerId ? _drawFromDeck : null,
-            child: Container(
-              width: 80,
-              height: 110,
-              decoration: BoxDecoration(
-                color: CasinoColors.cardBackground,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: CasinoColors.gold.withOpacity(0.5)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(2, 4),
-                  ),
-                ],
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Card back pattern
-                  Container(
-                    margin: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [CasinoColors.richPurple, CasinoColors.deepPurple],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Center(
-                      child: Icon(Icons.style, color: CasinoColors.gold.withOpacity(0.5), size: 32),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 4,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        '${_game.cardsRemaining}',
-                        style: const TextStyle(color: Colors.white, fontSize: 10),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ).animate().scale(
-              begin: const Offset(0.95, 0.95),
-              end: const Offset(1.0, 1.0),
-              duration: 200.ms,
+            onTap: canDrawFromDeck ? _drawFromDeck : null,
+            child: CardWidget(
+              card: Card(rank: Rank.ace, suit: Suit.spades), // Dummy card for back
+              isFaceUp: false,
+              isSelectable: canDrawFromDeck,
+              isSelected: false,
             ),
           ),
-          
           const SizedBox(width: 20),
-          
-          // Discard pile
+          // Discard Pile
           GestureDetector(
-            onTap: _game.currentPlayerId == _playerId ? _drawFromDiscard : null,
-            child: Container(
-              width: 80,
-              height: 110,
-              decoration: BoxDecoration(
-                color: _game.topDiscard != null 
-                    ? Colors.white 
-                    : CasinoColors.cardBackground.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: _game.topDiscard != null 
-                      ? CasinoColors.gold 
-                      : CasinoColors.gold.withOpacity(0.3),
-                ),
-              ),
-              child: _game.topDiscard != null
-                  ? _buildCard(_game.topDiscard!, false, isLarge: true)
-                  : Center(
-                      child: Text(
-                        'Discard',
-                        style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
-                      ),
-                    ),
+            onTap: canDrawFromDiscard ? _drawFromDiscard : null,
+            child: CardWidget(
+              card: topDiscard ?? Card(rank: Rank.ace, suit: Suit.spades), // Show back styled dummy if no discard
+              isFaceUp: topDiscard != null,
+              isSelectable: canDrawFromDiscard,
+              isSelected: false,
             ),
           ),
         ],
       ),
     );
   }
-  
-  Widget _buildMeldSuggestions(List<Meld> melds) {
+
+  Widget _buildMeldSuggestions(List<meld_engine.Meld> melds) {
     return Container(
-      height: 40,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: melds.length,
-        itemBuilder: (context, index) {
-          final meld = melds[index];
-          return Container(
-            margin: const EdgeInsets.only(right: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: _getMeldColor(meld.type).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: _getMeldColor(meld.type)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _getMeldTypeName(meld.type),
-                  style: TextStyle(color: _getMeldColor(meld.type), fontSize: 12),
-                ),
-                const SizedBox(width: 8),
-                ...meld.cards.take(3).map((c) => Padding(
-                  padding: const EdgeInsets.only(right: 2),
-                  child: Text(
-                    c.displayName,
-                    style: TextStyle(
-                      color: c.suit.isRed ? Colors.red : Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                )),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-  
-  Widget _buildMyHand(List<Card> cards) {
-    return Container(
-      height: 130,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      color: Colors.black.withValues(alpha: 0.4),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: cards.asMap().entries.map((entry) {
-            final index = entry.key;
-            final card = entry.value;
-            final isSelected = _selectedCardId == card.id;
-            
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedCardId = isSelected ? null : card.id;
-                });
-              },
-              child: Transform.translate(
-                offset: Offset(index > 0 ? -25.0 * index : 0, isSelected ? -15 : 0),
-                child: _buildCard(card, isSelected),
+          children: melds.map((meld) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: _getMeldColor(meld.type).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: _getMeldColor(meld.type)),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _getMeldTypeName(meld.type),
+                      style: const TextStyle(color: Colors.white70, fontSize: 10),
+                    ),
+                    Row(
+                      children: meld.cards.map((card) => CardWidget(card: card, isFaceUp: true, width: 30, height: 45)).toList(),
+                    ),
+                  ],
+                ),
               ),
-            ).animate().fadeIn(delay: Duration(milliseconds: 50 * index));
+            );
           }).toList(),
         ),
       ),
     );
   }
-  
-  Widget _buildCard(Card card, bool isSelected, {bool isLarge = false}) {
-    final size = isLarge ? const Size(70, 100) : const Size(60, 85);
-    
+
+  Widget _buildMyHand(List<Card> hand) {
     return Container(
-      width: size.width,
-      height: size.height,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isSelected ? CasinoColors.gold : Colors.grey.shade300,
-          width: isSelected ? 2 : 1,
+      height: 120,
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      color: Colors.black.withOpacity(0.6),
+      child: Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: hand.map((card) {
+              final isSelected = _selectedCardId == card.id;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedCardId = isSelected ? null : card.id;
+                    });
+                  },
+                  child: CardWidget(
+                    card: card,
+                    isFaceUp: true,
+                    isSelected: isSelected,
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: isSelected 
-                ? CasinoColors.gold.withOpacity(0.4) 
-                : Colors.black.withOpacity(0.2),
-            blurRadius: isSelected ? 8 : 4,
-            offset: const Offset(1, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            card.rank.symbol,
-            style: TextStyle(
-              color: card.suit.isRed ? Colors.red : Colors.black,
-              fontSize: isLarge ? 24 : 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            card.suit.symbol,
-            style: TextStyle(
-              color: card.suit.isRed ? Colors.red : Colors.black,
-              fontSize: isLarge ? 20 : 16,
-            ),
-          ),
-        ],
       ),
     );
   }
-  
+
   Widget _buildActionBar() {
     final isMyTurn = _game.currentPlayerId == _playerId;
     
@@ -383,44 +350,34 @@ class _MarriageGameScreenState extends State<MarriageGameScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.5),
-        border: Border(top: BorderSide(color: CasinoColors.gold.withOpacity(0.3))),
+        border: Border(top: BorderSide(color: AppTheme.gold.withOpacity(0.3))),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           // Discard button
-          ElevatedButton.icon(
+          CasinoButton(
+            label: 'Discard',
             onPressed: isMyTurn && _selectedCardId != null ? _discardCard : null,
-            icon: const Icon(Icons.arrow_upward),
-            label: const Text('Discard'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: CasinoColors.gold,
-              foregroundColor: Colors.black,
-              disabledBackgroundColor: Colors.grey.shade700,
-            ),
+            backgroundColor: AppTheme.gold,
+            borderColor: AppTheme.goldDark,
           ),
           
           // Sort button
-          OutlinedButton.icon(
+           CasinoButton(
+            label: 'Sort',
             onPressed: () => setState(() {}),
-            icon: const Icon(Icons.sort),
-            label: const Text('Sort'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              side: BorderSide(color: Colors.white.withOpacity(0.5)),
-            ),
+            backgroundColor: AppTheme.teal,
+            borderColor: Colors.white.withOpacity(0.5),
           ),
           
           // Declare button
-          ElevatedButton.icon(
+          CasinoButton(
+            label: 'Declare',
             onPressed: isMyTurn ? _tryDeclare : null,
-            icon: const Icon(Icons.check_circle),
-            label: const Text('Declare'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.grey.shade700,
-            ),
+            backgroundColor: Colors.green,
+            borderColor: Colors.lightGreen,
+            isLarge: true,
           ),
         ],
       ),
@@ -460,23 +417,95 @@ class _MarriageGameScreenState extends State<MarriageGameScreen> {
     });
   }
   
-  void _playBotTurns() {
-    // Simple bot AI - each bot draws and discards
-    for (final botId in _botIds) {
-      if (_game.currentPlayerId == botId) {
-        // Draw from deck
-        _game.drawFromDeck(botId);
-        
-        // Discard highest card
-        final hand = _game.getHand(botId);
-        if (hand.isNotEmpty) {
-          final toDiscard = hand.reduce((a, b) => 
-              a.rank.points > b.rank.points ? a : b);
-          _game.playCard(botId, toDiscard);
+  // Helper to convert Card to AI-friendly string (e.g., "AS", "10H")
+  String _toAiString(Card card) {
+    if (card.isJoker) return 'Joker';
+    return '${card.rank.symbol}${card.suit.name[0].toUpperCase()}';
+  }
+
+  Future<void> _playBotTurns() async {
+    // Check if it's a bot's turn
+    if (!_botIds.contains(_game.currentPlayerId)) return;
+    
+    final botId = _game.currentPlayerId!;
+    await Future.delayed(const Duration(milliseconds: 1000));
+    if (!mounted) return;
+
+    try {
+      final aiService = ref.read(aiServiceProvider);
+      final difficulty = 'medium'; 
+      
+      final currentHand = _game.getHand(botId);
+      // Serialize hand to "AS", "10H", etc.
+      final handStrings = currentHand.map(_toAiString).toList();
+      
+      final gameState = {
+        'phase': _game.currentPhase == GamePhase.playing ? 'drawing' : 'discarding',
+        'tiplu': _game.tiplu != null ? _toAiString(_game.tiplu!) : null,
+        'topDiscard': _game.topDiscard != null ? _toAiString(_game.topDiscard!) : null,
+        'cardsInDeck': _game.cardsRemaining,
+        'roundNumber': _game.currentRound,
+      };
+
+      // Determine phase logic (same as before)
+      final isDrawing = currentHand.length == 21;
+      gameState['phase'] = isDrawing ? 'drawing' : 'discarding';
+      
+      final decision = await aiService.getMarriageBotPlay(
+        difficulty: difficulty,
+        hand: handStrings,
+        gameState: gameState,
+      );
+      
+      if (!mounted) return;
+      
+      setState(() {
+        if (isDrawing) {
+          if (decision.action == 'drawDiscard' && _game.topDiscard != null) {
+            _game.drawFromDiscard(botId);
+          } else {
+            _game.drawFromDeck(botId);
+          }
+          // Recursively call for discard phase
+           WidgetsBinding.instance.addPostFrameCallback((_) => _playBotTurns());
+           return;
+        } else {
+          // Discarding
+          if (decision.action == 'discard') {
+             // Find matching card in hand
+             // AI returns "AS", we look for any card that maps to "AS"
+             final cardToDiscard = currentHand.firstWhere(
+               (c) => _toAiString(c) == decision.card,
+               orElse: () => currentHand.last, // Fallback
+             );
+             _game.playCard(botId, cardToDiscard);
+          } else if (decision.action == 'declare') {
+             _tryBotDeclare(botId);
+          }
         }
-      }
+      });
+      
+    } catch (e) {
+      debugPrint('AI Error: $e');
+      setState(() {
+         // Fallback logic
+         if (_game.getHand(botId).length == 21) {
+           _game.drawFromDeck(botId);
+         } else {
+           _game.playCard(botId, _game.getHand(botId).last);
+         }
+      });
     }
-    setState(() {});
+  }
+  
+  void _tryBotDeclare(String botId) {
+    if (_game.declare(botId)) {
+      _showWinDialog(winnerName: _getBotName(botId));
+    } else {
+      // Failed to declare, discard something
+      final hand = _game.getHand(botId);
+      _game.playCard(botId, hand.last);
+    }
   }
   
   void _tryDeclare() {
@@ -493,21 +522,21 @@ class _MarriageGameScreenState extends State<MarriageGameScreen> {
     }
   }
   
-  void _showWinDialog() {
+  void _showWinDialog({String? winnerName}) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: CasinoColors.cardBackground,
-        title: const Text('🎉 You Win!', style: TextStyle(color: CasinoColors.gold)),
+        backgroundColor: AppTheme.teal,
+        title: Text('🎉 ${winnerName ?? 'You'} Win!', style: const TextStyle(color: AppTheme.gold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text('Congratulations!', style: TextStyle(color: Colors.white)),
             const SizedBox(height: 16),
-            ..._game.calculateScores().entries.map((e) => 
-              Text('${_getPlayerName(e.key)}: ${e.value} points',
-                   style: const TextStyle(color: Colors.white70)),
-            ),
+              ..._game.calculateScores().entries.map((e) => 
+                Text('${_getPlayerName(e.key)}: ${e.value} points',
+                     style: TextStyle(color: AppTheme.gold.withValues(alpha: 0.7))),
+              ),
           ],
         ),
         actions: [
@@ -533,21 +562,21 @@ class _MarriageGameScreenState extends State<MarriageGameScreen> {
     return _getBotName(id);
   }
   
-  Color _getMeldColor(MeldType type) {
+  Color _getMeldColor(meld_engine.MeldType type) {
     switch (type) {
-      case MeldType.set: return Colors.blue;
-      case MeldType.run: return Colors.green;
-      case MeldType.tunnel: return Colors.orange;
-      case MeldType.marriage: return Colors.pink;
+      case meld_engine.MeldType.set: return Colors.blue;
+      case meld_engine.MeldType.run: return Colors.green;
+      case meld_engine.MeldType.tunnel: return Colors.orange;
+      case meld_engine.MeldType.marriage: return Colors.pink;
     }
   }
   
-  String _getMeldTypeName(MeldType type) {
+  String _getMeldTypeName(meld_engine.MeldType type) {
     switch (type) {
-      case MeldType.set: return 'Trial';
-      case MeldType.run: return 'Sequence';
-      case MeldType.tunnel: return 'Tunnel';
-      case MeldType.marriage: return 'Marriage';
+      case meld_engine.MeldType.set: return 'Trial';
+      case meld_engine.MeldType.run: return 'Sequence';
+      case meld_engine.MeldType.tunnel: return 'Tunnel';
+      case meld_engine.MeldType.marriage: return 'Marriage';
     }
   }
 }

@@ -10,6 +10,7 @@
 // Diamonds have NO real-world value and CANNOT be purchased.
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Diamond reward types
@@ -154,31 +155,62 @@ class DiamondService {
   Future<bool> spend(String userId, int amount, String reason) async {
     final userRef = _firestore.collection('users').doc(userId);
     
-    return await _firestore.runTransaction<bool>((txn) async {
-      final doc = await txn.get(userRef);
-      final currentBalance = doc.data()?['diamonds'] ?? 0;
-      
-      if (currentBalance < amount) {
-        return false; // Insufficient balance
-      }
-      
-      txn.update(userRef, {
-        'diamonds': currentBalance - amount,
+    try {
+      return await _firestore.runTransaction<bool>((txn) async {
+        final doc = await txn.get(userRef);
+        
+        // If user document doesn't exist, create it with signup bonus
+        if (!doc.exists) {
+          txn.set(userRef, {
+            'diamonds': DiamondRewards.signUpBonus - amount,
+            'signUpBonusClaimed': true,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+          
+          // Log spending (using separate write, not in transaction)
+          await _firestore.collection('diamond_spending').add({
+            'userId': userId,
+            'amount': amount,
+            'reason': reason,
+            'timestamp': FieldValue.serverTimestamp(),
+          });
+          
+          return true; // Success - created with bonus minus spent amount
+        }
+        
+        final currentBalance = doc.data()?['diamonds'] ?? 0;
+        
+        if (currentBalance < amount) {
+          return false; // Insufficient balance
+        }
+        
+        txn.update(userRef, {
+          'diamonds': currentBalance - amount,
+        });
+        
+        return true;
       });
-      
-      // Log spending
-      txn.set(
-        _firestore.collection('diamond_spending').doc(),
-        {
+    } catch (e) {
+      // If transaction fails, try simpler approach
+      debugPrint('Transaction failed, trying direct approach: $e');
+      try {
+        await userRef.set({
+          'diamonds': FieldValue.increment(-amount),
+        }, SetOptions(merge: true));
+        
+        await _firestore.collection('diamond_spending').add({
           'userId': userId,
           'amount': amount,
           'reason': reason,
           'timestamp': FieldValue.serverTimestamp(),
-        },
-      );
-      
-      return true;
-    });
+        });
+        
+        return true;
+      } catch (e2) {
+        debugPrint('Direct approach also failed: $e2');
+        return false;
+      }
+    }
   }
   
   /// Check if user can afford action

@@ -9,6 +9,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import '../auth/auth_service.dart';
 import '../wallet/diamond_balance_widget.dart';
+import '../store/ui/theme_store_bottom_sheet.dart';
 import 'profile_service.dart';
 import 'user_profile.dart';
 
@@ -115,6 +116,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   }
                 },
                 child: const Text('Save'),
+              ),
+              const SizedBox(height: 32),
+              // Theme Store Section
+              const Divider(),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.palette_outlined, color: Colors.amber.shade700),
+                ),
+                title: const Text('Customize Table', style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: const Text('Change themes and card skins'),
+                trailing: Icon(Icons.chevron_right, color: Colors.grey.shade600),
+                onTap: () {
+                  // Import and show theme store bottom sheet
+                  showThemeStoreBottomSheet(context);
+                },
               ),
             ],
           ),

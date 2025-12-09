@@ -18,7 +18,7 @@
 | | | |
 | **GenKit AI** | | |
 | getBotPlay flow | ✅ Exists | Game-specific prompts needed |
-| marriageBotPlayFlow (dedicated) | ⚠️ Missing | Create separate Marriage AI flow |
+| marriageBotPlayFlow (dedicated) | ✅ Implemented | None |
 | 4 difficulty levels | ✅ Implemented | In ai_difficulty_service.dart |
 | Bid suggestion | ✅ Exists | getBidSuggestion function |
 | | | |
@@ -26,7 +26,7 @@
 | validateMove function | ✅ Exists | Complete |
 | validateBid function | ✅ Exists | Complete |
 | Server-authoritative | ✅ Implemented | Complete |
-| Audit log | ⚠️ Partial | Need suspiciousActivity tracking |
+| Audit log | ✅ Implemented | Cloud Functions Triggers + EnhancedAuditService |
 | IP/GPS checks | ❌ Missing | Not implemented |
 | | | |
 | **Data Model** | | |

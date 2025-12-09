@@ -27,6 +27,9 @@ import { callBreakBotPlayFlow, CallBreakBotInput } from './genkit/callBreakBotPl
 // Import audit service
 import { AuditService, logMove, logSuspiciousActivity } from './services/auditService';
 
+// Import Triggers
+export { auditGameUpdate } from './triggers/auditTriggers';
+
 // Export LiveKit token functions
 export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenService';
 
@@ -80,6 +83,35 @@ export const getBotPlay = onCall(async (request) => {
     } catch (error) {
         console.error('Bot play error:', error);
         throw new HttpsError('internal', 'Failed to get bot play');
+    }
+});
+
+/**
+ * Get Marriage AI bot's play
+ */
+export const marriageBotPlay = onCall(async (request) => {
+    const userId = request.auth?.uid;
+    if (!userId) {
+        throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    const input: MarriageBotInput = request.data;
+
+    // Basic validation
+    if (!input.hand || !Array.isArray(input.hand)) {
+        throw new HttpsError('invalid-argument', 'Hand is required');
+    }
+
+    if (!input.gameState) {
+        throw new HttpsError('invalid-argument', 'Game state is required');
+    }
+
+    try {
+        const result = await marriageBotPlayFlow(input);
+        return { success: true, ...result };
+    } catch (error) {
+        console.error('Marriage bot play error:', error);
+        throw new HttpsError('internal', 'Failed to get marriage bot play');
     }
 });
 

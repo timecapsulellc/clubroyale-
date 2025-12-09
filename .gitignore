@@ -73,3 +73,4 @@ macos/Flutter/generated_plugins.cmake
 .env.local
 .env.*.local
 functions/.env
+lib/firebase_options.dart

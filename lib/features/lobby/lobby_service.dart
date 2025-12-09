@@ -119,7 +119,13 @@ class LobbyService {
       'roomCode': roomCode,
       'status': GameStatus.waiting.name,
       'gameType': room.gameType,
-      'config': room.config.toJson(), // CRITICAL: Explicit toJson()
+      'config': {
+        'pointValue': room.config.pointValue,
+        'maxPlayers': room.config.maxPlayers,
+        'allowAds': room.config.allowAds,
+        'totalRounds': room.config.totalRounds,
+        'bootAmount': room.config.bootAmount,
+      },
       'players': playersWithProfiles.map((p) => {
         'id': p.id,
         'name': p.name,

@@ -34,7 +34,7 @@ class LobbyScreen extends ConsumerWidget {
             floating: false,
             pinned: true,
             stretch: true,
-            backgroundColor: Colors.deepPurple,
+            backgroundColor: const Color(0xFF0D4A2E), // Deep Casino Green
             leading: IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(8),
@@ -64,8 +64,9 @@ class LobbyScreen extends ConsumerWidget {
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: Colors.amber.withValues(alpha: 0.3), // Gold accent
                     shape: BoxShape.circle,
+                    border: Border.all(color: Colors.amber.shade600),
                   ),
                   child: const Icon(Icons.pin_outlined, color: Colors.white),
                 ),
@@ -80,27 +81,28 @@ class LobbyScreen extends ConsumerWidget {
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
+                  shadows: [Shadow(color: Colors.black54, blurRadius: 4)],
                 ),
               ),
               centerTitle: true,
               background: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Colors.deepPurple.shade400,
-                      Colors.deepPurple.shade700,
-                      Colors.purple.shade900,
+                      Color(0xFF1A6B4A), // Lighter casino green
+                      Color(0xFF0D4A2E), // Deep casino green
+                      Color(0xFF083323), // Darkest green
                     ],
                   ),
                 ),
                 child: Stack(
                   children: [
-                    // Pattern overlay
+                    // Pattern overlay - card suits
                     Positioned.fill(
                       child: Opacity(
-                        opacity: 0.1,
+                        opacity: 0.08,
                         child: GridView.builder(
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -108,25 +110,31 @@ class LobbyScreen extends ConsumerWidget {
                           ),
                           itemCount: 64,
                           itemBuilder: (context, index) {
-                            return Icon(
-                              index % 3 == 0 ? Icons.sports_esports : Icons.videogame_asset,
-                              color: Colors.white,
-                              size: 20,
+                            final suits = ['♠', '♥', '♣', '♦'];
+                            return Center(
+                              child: Text(
+                                suits[index % 4],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                ),
+                              ),
                             );
                           },
                         ),
                       ),
                     ),
-                    // Center icon
+                    // Center icon - cards
                     Center(
                       child: Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
+                          color: Colors.amber.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
+                          border: Border.all(color: Colors.amber.shade400, width: 2),
                         ),
                         child: const Icon(
-                          Icons.sports_esports_rounded,
+                          Icons.style_rounded, // Card stack icon
                           size: 56,
                           color: Colors.white,
                         ),
@@ -149,7 +157,7 @@ class LobbyScreen extends ConsumerWidget {
                     child: _QuickActionButton(
                       icon: Icons.add_rounded,
                       label: 'Create Room',
-                      color: Colors.deepPurple,
+                      color: const Color(0xFF1A6B4A), // Casino green
                       onTap: () => _showCreateGameDialog(context, ref),
                     ).animate(delay: 100.ms).fadeIn().slideX(begin: -0.2),
                   ),
@@ -158,7 +166,7 @@ class LobbyScreen extends ConsumerWidget {
                     child: _QuickActionButton(
                       icon: Icons.pin_rounded,
                       label: 'Join by Code',
-                      color: Colors.teal,
+                      color: Colors.amber.shade700, // Gold
                       onTap: () => _showJoinByCodeDialog(context, ref),
                     ).animate(delay: 200.ms).fadeIn().slideX(begin: 0.2),
                   ),
@@ -191,9 +199,9 @@ class LobbyScreen extends ConsumerWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircularProgressIndicator(color: Colors.deepPurple),
+                        CircularProgressIndicator(color: Colors.amber),
                         SizedBox(height: 16),
-                        Text('Finding rooms...'),
+                        Text('Finding rooms...', style: TextStyle(color: Colors.white70)),
                       ],
                     ),
                   ),
@@ -219,7 +227,13 @@ class LobbyScreen extends ConsumerWidget {
 
               return SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: SliverList(
+                sliver: SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, // 2 columns for mobile
+                    childAspectRatio: 0.85,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final game = games[index];
@@ -244,7 +258,7 @@ class LobbyScreen extends ConsumerWidget {
                         },
                         onJoin: isInGame ? null : () => _joinGame(context, ref, game),
                         onShareCode: game.roomCode != null ? () => _shareRoomCode(context, game) : null,
-                      ).animate(delay: (100 * index).ms).fadeIn().slideX(begin: 0.1);
+                      ).animate(delay: (100 * index).ms).fadeIn().scale(begin: const Offset(0.9, 0.9));
                     },
                     childCount: games.length,
                   ),
@@ -261,7 +275,8 @@ class LobbyScreen extends ConsumerWidget {
         onPressed: () => _showCreateGameDialog(context, ref),
         icon: const Icon(Icons.add),
         label: const Text('New Room'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.amber.shade700, // Gold FAB
+        foregroundColor: Colors.black, // Dark text for contrast
         elevation: 8,
       ).animate().fadeIn(delay: 500.ms).scale(),
     );
@@ -274,21 +289,27 @@ class LobbyScreen extends ConsumerWidget {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF0D4A2E), // Casino green
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: Colors.amber.shade600, width: 2),
+        ),
         icon: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.teal.shade50,
+            color: Colors.amber.withValues(alpha: 0.2),
             shape: BoxShape.circle,
+            border: Border.all(color: Colors.amber.shade600, width: 2),
           ),
-          child: Icon(Icons.pin_rounded, size: 48, color: Colors.teal.shade600),
+          child: Icon(Icons.pin_rounded, size: 48, color: Colors.amber.shade400),
         ),
-        title: const Text('Join by Room Code'),
+        title: const Text('Join by Room Code', style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               'Enter the 6-digit code shared by the host',
-              style: TextStyle(color: Colors.grey.shade600),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
             ),
             const SizedBox(height: 24),
             TextField(
@@ -299,6 +320,7 @@ class LobbyScreen extends ConsumerWidget {
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 letterSpacing: 8,
                 fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
@@ -306,16 +328,17 @@ class LobbyScreen extends ConsumerWidget {
               ],
               decoration: InputDecoration(
                 hintText: '000000',
+                hintStyle: TextStyle(color: Colors.grey.shade400),
                 counterText: '',
                 filled: true,
-                fillColor: Colors.grey.shade100,
+                fillColor: Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.teal, width: 2),
+                  borderSide: BorderSide(color: Colors.amber.shade600, width: 2),
                 ),
               ),
               autofocus: true,
@@ -325,7 +348,7 @@ class LobbyScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
           ),
           FilledButton(
             onPressed: () {
@@ -333,7 +356,10 @@ class LobbyScreen extends ConsumerWidget {
                 Navigator.pop(context, codeController.text);
               }
             },
-            style: FilledButton.styleFrom(backgroundColor: Colors.teal),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.amber.shade700,
+              foregroundColor: Colors.black,
+            ),
             child: const Text('Join Room'),
           ),
         ],
@@ -355,15 +381,21 @@ class LobbyScreen extends ConsumerWidget {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
+          backgroundColor: const Color(0xFF0D4A2E), // Casino green
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: Colors.amber.shade600, width: 2),
+          ),
           icon: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.deepPurple.shade50,
+              color: Colors.amber.withValues(alpha: 0.2),
               shape: BoxShape.circle,
+              border: Border.all(color: Colors.amber.shade600, width: 2),
             ),
-            child: Icon(Icons.settings_rounded, size: 48, color: Colors.deepPurple.shade600),
+            child: Icon(Icons.add_rounded, size: 48, color: Colors.amber.shade400),
           ),
-          title: const Text('Create Room'),
+          title: const Text('Create Room', style: TextStyle(color: Colors.white)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -373,6 +405,7 @@ class LobbyScreen extends ConsumerWidget {
                 Text('Game Type',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: Colors.amber.shade400,
                     )),
                 const SizedBox(height: 12),
                 Row(
@@ -429,6 +462,7 @@ class LobbyScreen extends ConsumerWidget {
                 Text('Point Value (Units per point)',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: Colors.amber.shade400,
                     )),
                 const SizedBox(height: 12),
                 SegmentedButton<double>(
@@ -443,7 +477,9 @@ class LobbyScreen extends ConsumerWidget {
                     setState(() => pointValue = values.first);
                   },
                   style: SegmentedButton.styleFrom(
-                    selectedBackgroundColor: Colors.deepPurple.shade100,
+                    selectedBackgroundColor: Colors.amber.shade700,
+                    selectedForegroundColor: Colors.black,
+                    foregroundColor: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -452,6 +488,7 @@ class LobbyScreen extends ConsumerWidget {
                 Text('Number of Rounds',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: Colors.amber.shade400,
                     )),
                 const SizedBox(height: 12),
                 SegmentedButton<int>(
@@ -465,7 +502,9 @@ class LobbyScreen extends ConsumerWidget {
                     setState(() => totalRounds = values.first);
                   },
                   style: SegmentedButton.styleFrom(
-                    selectedBackgroundColor: Colors.deepPurple.shade100,
+                    selectedBackgroundColor: Colors.amber.shade700,
+                    selectedForegroundColor: Colors.black,
+                    foregroundColor: Colors.white,
                   ),
                 ),
 
@@ -474,18 +513,18 @@ class LobbyScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
+                  color: Colors.amber.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.amber.shade200),
+                  border: Border.all(color: Colors.amber.shade600),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.diamond, color: Colors.amber.shade700),
+                    Icon(Icons.diamond, color: Colors.amber.shade400),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'Creating a room costs ${DiamondService.roomCreationCost} diamonds',
-                        style: TextStyle(color: Colors.amber.shade800),
+                        style: TextStyle(color: Colors.amber.shade200),
                       ),
                     ),
                   ],
@@ -497,7 +536,7 @@ class LobbyScreen extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text('Cancel', style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
             ),
             FilledButton.icon(
               onPressed: () {
@@ -514,7 +553,10 @@ class LobbyScreen extends ConsumerWidget {
               },
               icon: const Icon(Icons.add),
               label: const Text('Create'),
-              style: FilledButton.styleFrom(backgroundColor: Colors.deepPurple),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.amber.shade700,
+                foregroundColor: Colors.black,
+              ),
             ),
           ],
         ),
