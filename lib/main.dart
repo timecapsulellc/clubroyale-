@@ -35,7 +35,9 @@ import 'package:taasclub/features/wallet/screens/transfer_screen.dart';
 import 'package:taasclub/features/admin/screens/admin_panel_screen.dart';
 import 'package:taasclub/features/admin/screens/grant_request_screen.dart';
 import 'package:taasclub/features/admin/screens/pending_approvals_screen.dart';
+import 'package:taasclub/features/settings/settings_screen.dart';
 // TODO: Fix chat screen API mismatches before enabling
+
 // import 'package:taasclub/features/admin/screens/admin_chat_screen.dart';
 // import 'package:taasclub/features/wallet/screens/user_support_chat_screen.dart';
 
@@ -100,6 +102,15 @@ final GoRouter _router = GoRouter(
             return const ProfileScreen();
           },
         ),
+        // Settings route
+        GoRoute(
+          path: 'settings',
+          builder: (BuildContext context, GoRouterState state) {
+            // Import at top: import 'features/settings/settings_screen.dart';
+            return const SettingsScreen();
+          },
+        ),
+
         GoRoute(
           path: 'game/:gameId/play',
           builder: (BuildContext context, GoRouterState state) {

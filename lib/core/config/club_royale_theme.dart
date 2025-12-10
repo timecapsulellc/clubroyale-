@@ -154,10 +154,11 @@ class ClubRoyaleTheme {
       titleTextStyle: headingMedium,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(style: goldButton),
-    cardTheme: CardTheme(
+    cardTheme: const CardThemeData(
       color: deepPurple,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
     ),
+
     textTheme: const TextTheme(
       headlineLarge: headingLarge,
       headlineMedium: headingMedium,
