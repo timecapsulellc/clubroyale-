@@ -1,7 +1,7 @@
 /// Game Themes and Card Skins
 /// 
 /// Defines available table themes and card customization options
-/// for the TaasClub Game Store feature.
+/// for the ClubRoyale Game Store feature.
 
 import 'package:flutter/material.dart';
 
@@ -111,7 +111,8 @@ enum CardSkin {
     previewAsset: 'assets/cards/nepali_preview.png',
     cardFaceStyle: CardFaceStyle.nepali,
     cardBackColor: Color(0xFF4A2C6E),
-    isExclusive: true, // TaasClub exclusive!
+    isExclusive: true, // ClubRoyale exclusive!
+
   ),
   minimalist(
     id: 'minimalist',

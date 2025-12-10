@@ -66,17 +66,17 @@ class WebShareService {
     final gameDisplayName = _getGameDisplayName(gameType);
     
     final message = '''
-🎴 Join my $gameDisplayName game on TaasClub!
+🎴 Join my $gameDisplayName game on ClubRoyale!
 
 📍 Room Code: $roomCode
 👤 Host: $hostName
 
 👉 Click to join: $inviteUrl
 
-Or open TaasClub and enter the room code!
+Or open ClubRoyale and enter the room code!
 ''';
 
-    return shareText(text: message, subject: 'Join my TaasClub game!');
+    return shareText(text: message, subject: 'Join my ClubRoyale game!');
   }
 
   /// Share game settlement

@@ -167,7 +167,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
     if (game.roomCode == null) return;
     
     Share.share(
-      'Join my TaasClub game!\n\n'
+      'Join my ClubRoyale game!\n\n'
       '🎮 Room: ${game.name}\n'
       '🔢 Code: ${game.roomCode}\n'
       '💰 Point Value: ${game.config.pointValue.toInt()} units\n\n'

@@ -878,7 +878,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
     if (room.roomCode == null) return;
     
     Share.share(
-      'Join my TaasClub game!\n\nRoom Code: ${room.roomCode}\n\nOpen the app and enter this code to join.',
+      'Join my ClubRoyale game!\n\nRoom Code: ${room.roomCode}\n\nOpen the app and enter this code to join.',
       subject: 'Join my game: ${room.name}',
     );
   }

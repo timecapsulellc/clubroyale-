@@ -110,7 +110,7 @@ class _PWAInstallBannerState extends State<PWAInstallBanner> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
-                      'Install TaasClub',
+                      'Install ClubRoyale',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -200,7 +200,7 @@ class PWAInstallButton extends StatelessWidget {
           return ListTile(
             leading: const Icon(Icons.check_circle, color: Colors.green),
             title: const Text('App Installed'),
-            subtitle: const Text('TaasClub is installed on your device'),
+            subtitle: const Text('ClubRoyale is installed on your device'),
           );
         }
 
@@ -208,14 +208,14 @@ class PWAInstallButton extends StatelessWidget {
           return ListTile(
             leading: const Icon(Icons.install_mobile),
             title: const Text('Install App'),
-            subtitle: const Text('Add TaasClub to your home screen'),
+            subtitle: const Text('Add ClubRoyale to your home screen'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () async {
               final success = await pwaService.promptInstall();
               if (success && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('TaasClub installed!'),
+                    content: Text('ClubRoyale installed!'),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -255,7 +255,7 @@ class PWAInstallDialog extends StatelessWidget {
             color: Colors.deepPurple,
           ),
           const SizedBox(width: 12),
-          const Text('Install TaasClub'),
+          const Text('Install ClubRoyale'),
         ],
       ),
       content: Column(
@@ -263,7 +263,7 @@ class PWAInstallDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Install TaasClub for the best experience:',
+            'Install ClubRoyale for the best experience:',
             style: TextStyle(fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 16),

@@ -1,13 +1,13 @@
 // Legal Disclaimers & Compliance Constants
 //
 // Safe Harbor disclaimers and banned terms for Google Play compliance.
-// TaasClub is a FREE scorekeeper - NO in-app purchases!
+// ClubRoyale is a FREE scorekeeper - NO in-app purchases!
 
 /// Central disclaimers for legal compliance
 class Disclaimers {
   /// Safe Harbor disclaimer for game start
   static const String safeHarbor = '''
-TaasClub is a FREE social entertainment app for tracking card game scores.
+ClubRoyale is a FREE social entertainment app for tracking card game scores.
 
 • This app does NOT process payments
 • This app does NOT facilitate gambling
@@ -19,7 +19,7 @@ All settlements shown are informational only. Users settle privately outside the
 
   /// Short disclaimer for UI elements
   static const String shortDisclaimer = 
-      'TaasClub is a free scorekeeper. Diamonds are free and have no cash value.';
+      'ClubRoyale is a free scorekeeper. Diamonds are free and have no cash value.';
 
   /// Store disclaimer (DEPRECATED - no store, diamonds are FREE)
   static const String storeDisclaimer = 
@@ -33,7 +33,7 @@ All settlements shown are informational only. Users settle privately outside the
   /// Settlement disclaimer
   static const String settlementDisclaimer = '''
 This settlement summary is for informational purposes only. 
-TaasClub does not process payments or facilitate money transfers.
+ClubRoyale does not process payments or facilitate money transfers.
 Any settlements between players occur privately outside this app.
 ''';
 
@@ -44,7 +44,7 @@ Any settlements between players occur privately outside this app.
 
   /// Terms acceptance text
   static const String termsAcceptance = 
-      'By using TaasClub, you agree that this is a skill-based entertainment app '
+      'By using ClubRoyale, you agree that this is a skill-based entertainment app '
       'and not a gambling platform. You confirm you are 18+ years old.';
 
   /// WhatsApp share footer

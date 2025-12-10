@@ -1,4 +1,4 @@
-/// Custom exceptions for TaasClub game operations
+/// Custom exceptions for ClubRoyale game operations
 library;
 
 /// Base exception for all game-related errors

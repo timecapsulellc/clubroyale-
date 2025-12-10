@@ -9,7 +9,7 @@ class ShareService {
     required BuildContext context,
   }) async {
     final shareText = '''
-🎮 Join me on TaasClub - The Ultimate Card Gaming App! 🎮
+🎮 Join me on ClubRoyale - The Ultimate Card Gaming App! 🎮
 
 Use my referral code: $referralCode
 
@@ -26,7 +26,7 @@ See you at the tables! 🃏
     try {
       await Share.share(
         shareText,
-        subject: 'Join me on TaasClub!',
+        subject: 'Join me on ClubRoyale!',
       );
 
       if (context.mounted) {
@@ -56,12 +56,12 @@ See you at the tables! 🃏
     required BuildContext context,
   }) async {
     final shareText = '''
-🎮 Join my $gameName game on TaasClub! 🎮
+🎮 Join my $gameName game on ClubRoyale! 🎮
 
 Room Code: $roomCode
 
 Quick join:
-1. Open TaasClub app
+1. Open ClubRoyale app
 2. Tap "Join Room"
 3. Enter code: $roomCode
 
@@ -103,7 +103,7 @@ Let's play! 🃏
   }) async {
     final shareText = customMessage ??
         '''
-🎮 Check out TaasClub - Best Card Gaming App! 🎮
+🎮 Check out ClubRoyale - Best Card Gaming App! 🎮
 
 ✨ Free diamonds on signup
 ✨ Real-time multiplayer
@@ -117,7 +117,7 @@ Join thousands of players! 🃏
 ''';
 
     try {
-      await Share.share(shareText, subject: 'TaasClub - Card Gaming App');
+      await Share.share(shareText, subject: 'ClubRoyale - Card Gaming App');
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -140,7 +140,7 @@ Join thousands of players! 🃏
       await Share.shareXFiles(
         [file],
         text: text,
-        subject: 'TaasClub',
+        subject: 'ClubRoyale',
       );
     } catch (e) {
       if (context.mounted) {

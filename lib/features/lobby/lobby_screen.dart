@@ -750,7 +750,7 @@ class LobbyScreen extends ConsumerWidget {
     
     // ignore: deprecated_member_use
     Share.share(
-      'Join my TaasClub game! 🎮\n\nRoom Code: ${game.roomCode}\n\nOpen the app and enter this code to join.',
+      'Join my ClubRoyale game! 🎮\n\nRoom Code: ${game.roomCode}\n\nOpen the app and enter this code to join.',
     );
   }
 }

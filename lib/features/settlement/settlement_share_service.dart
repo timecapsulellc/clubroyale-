@@ -33,7 +33,7 @@ class SettlementShareService {
   /// Share settlement to WhatsApp (or other apps)
   static Future<void> shareSettlement(SettlementData data) async {
     final message = _buildSettlementMessage(data);
-    await Share.share(message, subject: 'TaasClub Game Settlement');
+    await Share.share(message, subject: 'ClubRoyale Game Settlement');
   }
 
   /// Build the viral settlement message
@@ -92,7 +92,7 @@ class SettlementShareService {
     required String gameType,
   }) async {
     final message = '''
-🎴 Join my ${_getGameName(gameType)} game on TaasClub!
+🎴 Join my ${_getGameName(gameType)} game on ClubRoyale!
 
 📍 Room Code: $roomCode
 👤 Host: $hostName
@@ -104,13 +104,13 @@ class SettlementShareService {
 ${Disclaimers.shareFooter}
 ''';
     
-    await Share.share(message, subject: 'Join my TaasClub game!');
+    await Share.share(message, subject: 'Join my ClubRoyale game!');
   }
 
   /// Quick share room code only
   static Future<void> shareRoomCode(String roomCode) async {
     final message = '''
-Join my game on TaasClub!
+Join my game on ClubRoyale!
 
 🎴 Room Code: $roomCode
 🔗 https://taasclub.app/join?room=$roomCode
@@ -125,7 +125,7 @@ ${Disclaimers.shareFooter}
   static Future<void> shareReferralLink(String userId) async {
     final refCode = userId.substring(0, 8).toUpperCase();
     final message = '''
-🎴 Play card games with me on TaasClub!
+🎴 Play card games with me on ClubRoyale!
 
 I'm playing Marriage & Call Break online with friends.
 Join me and we both get free diamonds! 💎
@@ -137,7 +137,7 @@ Join me and we both get free diamonds! 💎
 ${Disclaimers.shareFooter}
 ''';
     
-    await Share.share(message, subject: 'Join me on TaasClub!');
+    await Share.share(message, subject: 'Join me on ClubRoyale!');
   }
 
   // Helper methods

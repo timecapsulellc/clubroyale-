@@ -107,7 +107,7 @@ class BillSplitterService {
   static String generateWhatsAppText(SettlementBill bill) {
     final buffer = StringBuffer();
     
-    buffer.writeln('🎴 TaasClub Settlement');
+    buffer.writeln('🎴 ClubRoyale Settlement');
     buffer.writeln('Room: ${bill.roomCode}');
     buffer.writeln('Game: ${bill.gameType}');
     buffer.writeln('');
@@ -124,7 +124,7 @@ class BillSplitterService {
     buffer.writeln('');
     buffer.writeln('Settle via your preferred app');
     buffer.writeln('---');
-    buffer.writeln('Powered by TaasClub');
+    buffer.writeln('Powered by ClubRoyale');
     
     return buffer.toString();
   }
@@ -167,7 +167,7 @@ class SettlementReceiptWidget extends StatelessWidget {
             const Icon(Icons.receipt_long, size: 48, color: Colors.deepPurple),
             const SizedBox(height: 8),
             const Text(
-              '🎴 TaasClub',
+              '🎴 ClubRoyale',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -289,7 +289,7 @@ class SettlementReceiptWidget extends StatelessWidget {
     
     await Share.shareXFiles(
       [XFile(file.path)],
-      text: 'TaasClub Settlement - Room ${bill.roomCode}',
+      text: 'ClubRoyale Settlement - Room ${bill.roomCode}',
     );
   }
 }

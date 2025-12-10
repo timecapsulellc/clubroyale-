@@ -275,7 +275,7 @@ class _AgeGateWrapperState extends State<AgeGateWrapper> {
       builder: (context) => AlertDialog(
         title: const Text('Access Denied'),
         content: const Text(
-          'You must be 18+ and accept the terms to use TaasClub.',
+          'You must be 18+ and accept the terms to use ClubRoyale.',
         ),
         actions: [
           FilledButton(

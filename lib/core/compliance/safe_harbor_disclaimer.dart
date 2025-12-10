@@ -1,7 +1,7 @@
 // Safe Harbor Disclaimer Widget
 //
 // Mandatory modal shown on app launch to comply with Google Play guidelines.
-// Ensures TaasClub is classified as a "scorekeeping utility" not gambling.
+// Ensures ClubRoyale is classified as a "scorekeeping utility" not gambling.
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -58,7 +58,7 @@ class SafeHarborDisclaimer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Text(
-                'TaasClub is a scorekeeping utility for private card games.\n\n'
+                'ClubRoyale is a scorekeeping utility for private card games.\n\n'
                 '• All point settlements are private and offline\n'
                 '• We do not process real-money transactions\n'
                 '• Users are responsible for their own offline settlements\n'
