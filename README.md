@@ -264,7 +264,7 @@ ClubRoyale/
 
 ## 📄 License
 
-Proprietary - TimeCapsule LLC
+Proprietary - Metaweb Technologies
 
 ---
 

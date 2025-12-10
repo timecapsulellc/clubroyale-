@@ -480,7 +480,7 @@ class AboutScreen extends ConsumerWidget {
       child: Column(
         children: [
           Text(
-            '© 2025 TimeCapsule LLC',
+            '© 2025 Metaweb Technologies',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -489,7 +489,7 @@ class AboutScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Made with ❤️ in India',
+            'Made with ❤️ by Metaweb Technologies',
             style: TextStyle(color: themeColors.textSecondary),
           ),
           const SizedBox(height: 16),

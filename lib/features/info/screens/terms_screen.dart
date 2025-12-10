@@ -120,7 +120,7 @@ class TermsScreen extends ConsumerWidget {
             _buildTermsSection(
               '7. Intellectual Property',
               'All content, graphics, code, and trademarks within ClubRoyale are the '
-              'property of TimeCapsule LLC. Users may not:\n\n'
+              'property of Metaweb Technologies. Users may not:\n\n'
               '• Copy, modify, or distribute App content without permission\n'
               '• Use our branding for commercial purposes\n'
               '• Reverse engineer the application',
@@ -147,7 +147,7 @@ class TermsScreen extends ConsumerWidget {
             
             _buildTermsSection(
               '10. Limitation of Liability',
-              'TimeCapsule LLC shall not be liable for:\n\n'
+              'Metaweb Technologies shall not be liable for:\n\n'
               '• Any indirect, incidental, or consequential damages\n'
               '• Loss of data, profits, or goodwill\n'
               '• Any monetary losses from external transactions\n'
@@ -174,7 +174,7 @@ class TermsScreen extends ConsumerWidget {
               '13. Contact',
               'For questions or concerns about these Terms:\n\n'
               '📧 Email: legal@clubroyale.app\n'
-              '🏢 TimeCapsule LLC\n'
+              '🏢 Metaweb Technologies\n'
               '📍 Bengaluru, India',
               themeColors,
             ),

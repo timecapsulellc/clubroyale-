@@ -58,7 +58,7 @@ class PrivacyScreen extends ConsumerWidget {
             // Privacy Sections
             _buildSection(
               '1. Introduction',
-              'TimeCapsule LLC ("we," "us," or "our") operates ClubRoyale. This Privacy Policy '
+              'Metaweb Technologies ("we," "us," or "our") operates ClubRoyale. This Privacy Policy '
               'describes how we collect, use, and protect your information when you use our app.',
               themeColors,
             ),
@@ -164,7 +164,7 @@ class PrivacyScreen extends ConsumerWidget {
               '11. Contact Us',
               'For privacy questions or concerns:\n\n'
               '📧 Email: privacy@clubroyale.app\n'
-              '🏢 TimeCapsule LLC\n'
+              '🏢 Metaweb Technologies\n'
               '📍 Bengaluru, India',
               themeColors,
             ),

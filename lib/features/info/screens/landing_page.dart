@@ -637,7 +637,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
           ),
           const SizedBox(height: 24),
           Text(
-            '© 2025 TimeCapsule LLC • Made with ❤️ in India',
+            '© 2025 Metaweb Technologies • Made with ❤️',
             style: TextStyle(color: themeColors.textSecondary, fontSize: 12),
           ),
         ],
