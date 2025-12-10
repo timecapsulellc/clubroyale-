@@ -1,4 +1,4 @@
-// Basic app smoke test for TaasClub
+// Basic app smoke test for ClubRoyale
 //
 // Tests that the app can start without errors
 

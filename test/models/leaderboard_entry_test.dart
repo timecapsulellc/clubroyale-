@@ -1,6 +1,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:taasclub/features/leaderboard/leaderboard_screen.dart';
+import 'package:clubroyale/features/leaderboard/leaderboard_screen.dart';
 
 void main() {
   group('LeaderboardEntry Tests', () {

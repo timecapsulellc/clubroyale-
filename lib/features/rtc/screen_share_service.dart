@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Screen sharing service provider
 final screenShareServiceProvider = Provider<ScreenShareService>((ref) {

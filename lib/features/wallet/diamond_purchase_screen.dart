@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/features/wallet/diamond_service.dart';
-import 'package:taasclub/features/wallet/diamond_wallet.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/features/wallet/diamond_service.dart';
+import 'package:clubroyale/features/wallet/diamond_wallet.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Screen for purchasing diamonds via RevenueCat IAP
 /// Placeholder implementation - requires RevenueCat configuration

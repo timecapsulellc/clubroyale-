@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/features/ai/ai_service.dart';
+import 'package:clubroyale/features/ai/ai_service.dart';
 
 /// Widget that displays AI game tip suggestions
 class AiTipWidget extends ConsumerStatefulWidget {

@@ -4,8 +4,8 @@
 
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
-import 'package:taasclub/games/call_break/call_break_game.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
+import 'package:clubroyale/games/call_break/call_break_game.dart';
 
 class CallBreakGameScreen extends StatefulWidget {
   final String? gameId;

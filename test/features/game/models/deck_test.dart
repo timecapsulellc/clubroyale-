@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:taasclub/features/game/engine/models/card.dart';
-import 'package:taasclub/features/game/engine/models/deck.dart';
+import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/features/game/engine/models/deck.dart';
 
 void main() {
   group('Deck', () {

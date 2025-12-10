@@ -4,7 +4,7 @@
 // Customized for iOS, Android, and Desktop.
 
 import 'package:flutter/material.dart';
-import 'package:taasclub/core/services/pwa_service.dart';
+import 'package:clubroyale/core/services/pwa_service.dart';
 
 /// PWA Install Prompt Banner
 class PWAInstallBanner extends StatefulWidget {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/config/admin_config.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
-import 'package:taasclub/features/admin/admin_chat_service.dart';
-import 'package:taasclub/features/admin/screens/grant_request_screen.dart'; // Reuse for quick grant
+import 'package:clubroyale/core/config/admin_config.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/features/admin/admin_chat_service.dart';
+import 'package:clubroyale/features/admin/screens/grant_request_screen.dart'; // Reuse for quick grant
 import 'package:intl/intl.dart';
 
 /// Screen for admins to manage support chats

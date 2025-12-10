@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/features/game/game_room.dart';
-import 'package:taasclub/features/game/game_config.dart';
-import 'package:taasclub/features/lobby/room_waiting_screen.dart';
-import 'package:taasclub/features/lobby/lobby_service.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/features/game/game_room.dart';
+import 'package:clubroyale/features/game/game_config.dart';
+import 'package:clubroyale/features/lobby/room_waiting_screen.dart';
+import 'package:clubroyale/features/lobby/lobby_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 void main() {

@@ -2,14 +2,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/features/game/game_room.dart';
-import 'package:taasclub/features/game/game_config.dart';
-import 'package:taasclub/features/game/call_break_service.dart';
-import 'package:taasclub/features/game/models/game_state.dart';
-import 'package:taasclub/features/game/engine/models/deck.dart';
-import 'package:taasclub/features/profile/profile_service.dart';
-import 'package:taasclub/features/lobby/room_code_service.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/features/game/game_room.dart';
+import 'package:clubroyale/features/game/game_config.dart';
+import 'package:clubroyale/features/game/call_break_service.dart';
+import 'package:clubroyale/features/game/models/game_state.dart';
+import 'package:clubroyale/features/game/engine/models/deck.dart';
+import 'package:clubroyale/features/profile/profile_service.dart';
+import 'package:clubroyale/features/lobby/room_code_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 import 'dart:async';
 import 'dart:math';
 

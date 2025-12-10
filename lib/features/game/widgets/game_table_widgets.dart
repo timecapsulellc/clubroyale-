@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:taasclub/features/game/models/game_state.dart';
-import 'package:taasclub/features/game/animations/card_animations.dart';
+import 'package:clubroyale/features/game/models/game_state.dart';
+import 'package:clubroyale/features/game/animations/card_animations.dart';
 import 'card_widgets.dart';
 
 /// Widget to display the current trick (cards played in center)

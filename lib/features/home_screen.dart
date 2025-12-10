@@ -3,15 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'auth/auth_service.dart';
-import 'package:taasclub/features/wallet/diamond_service.dart';
-import 'package:taasclub/config/casino_theme.dart';
-import 'package:taasclub/config/visual_effects.dart';
-import 'package:taasclub/core/config/club_royale_theme.dart';
-import 'package:taasclub/features/game/services/test_game_service.dart';
-import 'package:taasclub/features/game/widgets/player_avatar.dart';
-import 'package:taasclub/core/responsive/responsive_utils.dart';
+import 'package:clubroyale/features/wallet/diamond_service.dart';
+import 'package:clubroyale/config/casino_theme.dart';
+import 'package:clubroyale/config/visual_effects.dart';
+import 'package:clubroyale/core/config/club_royale_theme.dart';
+import 'package:clubroyale/features/game/services/test_game_service.dart';
+import 'package:clubroyale/features/game/widgets/player_avatar.dart';
+import 'package:clubroyale/core/responsive/responsive_utils.dart';
 // Stories import
-import 'package:taasclub/features/stories/widgets/story_bar.dart';
+import 'package:clubroyale/features/stories/widgets/story_bar.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});

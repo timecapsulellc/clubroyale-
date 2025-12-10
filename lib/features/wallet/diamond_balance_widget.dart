@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/features/wallet/diamond_service.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/features/wallet/diamond_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Widget to display user's diamond balance with shimmer effect
 class DiamondBalanceWidget extends ConsumerWidget {

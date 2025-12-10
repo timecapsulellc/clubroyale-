@@ -3,9 +3,9 @@
 /// Implementation of the popular South Asian trick-taking card game
 /// 4 players, 13 cards each, spades are always trump
 
-import 'package:taasclub/games/base_game.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
-import 'package:taasclub/core/card_engine/deck.dart';
+import 'package:clubroyale/games/base_game.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
+import 'package:clubroyale/core/card_engine/deck.dart';
 
 /// Call Break game phase
 enum CallBreakPhase {

@@ -6,18 +6,18 @@
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/theme/app_theme.dart';
-import 'package:taasclub/core/config/game_terminology.dart';
-import 'package:taasclub/games/base_game.dart';
-import 'package:taasclub/core/card_engine/meld.dart' as meld_engine;
-import 'package:taasclub/core/card_engine/pile.dart'; // For Card class
-import 'package:taasclub/games/marriage/marriage_game.dart';
-import 'package:taasclub/features/game/ui/components/table_layout.dart';
-import 'package:taasclub/features/game/ui/components/player_avatar.dart';
-import 'package:taasclub/features/game/ui/components/game_log_overlay.dart';
-import 'package:taasclub/features/game/ui/components/casino_button.dart';
-import 'package:taasclub/features/game/ui/components/card_widget.dart';
-import 'package:taasclub/features/ai/ai_service.dart';
+import 'package:clubroyale/core/theme/app_theme.dart';
+import 'package:clubroyale/core/config/game_terminology.dart';
+import 'package:clubroyale/games/base_game.dart';
+import 'package:clubroyale/core/card_engine/meld.dart' as meld_engine;
+import 'package:clubroyale/core/card_engine/pile.dart'; // For Card class
+import 'package:clubroyale/games/marriage/marriage_game.dart';
+import 'package:clubroyale/features/game/ui/components/table_layout.dart';
+import 'package:clubroyale/features/game/ui/components/player_avatar.dart';
+import 'package:clubroyale/features/game/ui/components/game_log_overlay.dart';
+import 'package:clubroyale/features/game/ui/components/casino_button.dart';
+import 'package:clubroyale/features/game/ui/components/card_widget.dart';
+import 'package:clubroyale/features/ai/ai_service.dart';
 
 /// Marriage game screen with test mode
 class MarriageGameScreen extends ConsumerStatefulWidget {

@@ -4,9 +4,9 @@
 
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:taasclub/games/in_between/in_between_bot.dart';
-import 'package:taasclub/games/in_between/in_between_service.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
+import 'package:clubroyale/games/in_between/in_between_bot.dart';
+import 'package:clubroyale/games/in_between/in_between_service.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
 
 /// Controller for In Between bot automation
 class InBetweenBotController {

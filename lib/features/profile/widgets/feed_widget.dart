@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/features/profile/user_profile.dart';
-import 'package:taasclub/features/profile/profile_service.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/features/profile/user_profile.dart';
+import 'package:clubroyale/features/profile/profile_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 /// Feed widget showing posts from followed users

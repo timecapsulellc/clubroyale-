@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
-import 'package:taasclub/features/game/game_room.dart';
-import 'package:taasclub/features/game/game_config.dart';
-import 'package:taasclub/features/lobby/lobby_service.dart';
-import 'package:taasclub/games/marriage/marriage_service.dart';
-import 'package:taasclub/games/teen_patti/teen_patti_service.dart';
-import 'package:taasclub/games/in_between/in_between_service.dart';
-import 'package:taasclub/features/chat/widgets/chat_overlay.dart';
-import 'package:taasclub/features/rtc/widgets/audio_controls.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/features/game/game_room.dart';
+import 'package:clubroyale/features/game/game_config.dart';
+import 'package:clubroyale/features/lobby/lobby_service.dart';
+import 'package:clubroyale/games/marriage/marriage_service.dart';
+import 'package:clubroyale/games/teen_patti/teen_patti_service.dart';
+import 'package:clubroyale/games/in_between/in_between_service.dart';
+import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
+import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:taasclub/core/services/share_service.dart';
+import 'package:clubroyale/core/services/share_service.dart';
 
 class RoomWaitingScreen extends ConsumerStatefulWidget {
   final String roomId;

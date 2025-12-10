@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/config/admin_config.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
-import 'package:taasclub/features/admin/admin_diamond_service.dart';
+import 'package:clubroyale/core/config/admin_config.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/features/admin/admin_diamond_service.dart';
 
 /// Screen showing pending grant requests needing approval
 class PendingApprovalsScreen extends ConsumerWidget {

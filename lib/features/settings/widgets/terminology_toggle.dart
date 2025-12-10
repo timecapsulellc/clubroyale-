@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/config/game_terminology.dart';
-import 'package:taasclub/core/config/game_settings.dart';
-import 'package:taasclub/core/config/club_royale_theme.dart';
+import 'package:clubroyale/core/config/game_terminology.dart';
+import 'package:clubroyale/core/config/game_settings.dart';
+import 'package:clubroyale/core/config/club_royale_theme.dart';
 
 /// Terminology Toggle Widget for Settings Screen
 /// 

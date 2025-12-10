@@ -20,7 +20,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     // IMPORTANT: namespace must match applicationId for launcher to find MainActivity
-    namespace = "com.example.myapp"
+    namespace = "app.clubroyale"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -34,8 +34,8 @@ android {
     }
 
     defaultConfig {
-        // TODO: Change back to com.taasclub.app after updating Firebase
-        applicationId = "com.example.myapp"
+        // ClubRoyale app package ID
+        applicationId = "app.clubroyale"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

@@ -9,8 +9,8 @@
 // NO PURCHASES - Diamonds are free!
 
 import 'package:flutter/material.dart';
-import 'package:taasclub/features/store/diamond_service.dart';
-import 'package:taasclub/core/constants/disclaimers.dart';
+import 'package:clubroyale/features/store/diamond_service.dart';
+import 'package:clubroyale/core/constants/disclaimers.dart';
 
 /// Earn Diamonds Screen
 class DiamondRewardsScreen extends StatefulWidget {

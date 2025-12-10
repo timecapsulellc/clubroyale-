@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/features/social/matchmaking_service.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/features/social/matchmaking_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 
 class QuickMatchButton extends ConsumerStatefulWidget {
   final String gameType;

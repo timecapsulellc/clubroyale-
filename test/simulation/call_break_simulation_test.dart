@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:taasclub/features/game/engine/models/card.dart';
-import 'package:taasclub/features/game/engine/models/deck.dart';
-import 'package:taasclub/features/game/models/game_state.dart';
-import 'package:taasclub/features/game/logic/call_break_logic.dart';
-import 'package:taasclub/features/game/services/card_validation_service.dart';
+import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/features/game/engine/models/deck.dart';
+import 'package:clubroyale/features/game/models/game_state.dart';
+import 'package:clubroyale/features/game/logic/call_break_logic.dart';
+import 'package:clubroyale/features/game/services/card_validation_service.dart';
 
 void main() {
   group('Call Break Simulation', () {

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:taasclub/firebase_options.dart';
+import 'package:clubroyale/firebase_options.dart';
 import 'core/services/analytics_service.dart';
 
 import 'features/lobby/lobby_screen.dart';
@@ -32,28 +32,28 @@ import 'features/game/settlement/settlement_preview_screen.dart';
 import 'config/revenuecat_config.dart';
 // Diamond Economy imports
 import 'features/wallet/screens/earn_diamonds_screen.dart';
-import 'package:taasclub/features/wallet/screens/transfer_screen.dart';
-import 'package:taasclub/features/admin/screens/admin_panel_screen.dart';
-import 'package:taasclub/features/admin/screens/grant_request_screen.dart';
-import 'package:taasclub/features/admin/screens/pending_approvals_screen.dart';
-import 'package:taasclub/features/settings/settings_screen.dart';
-import 'package:taasclub/core/config/game_settings.dart';
+import 'package:clubroyale/features/wallet/screens/transfer_screen.dart';
+import 'package:clubroyale/features/admin/screens/admin_panel_screen.dart';
+import 'package:clubroyale/features/admin/screens/grant_request_screen.dart';
+import 'package:clubroyale/features/admin/screens/pending_approvals_screen.dart';
+import 'package:clubroyale/features/settings/settings_screen.dart';
+import 'package:clubroyale/core/config/game_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // Stories imports
-import 'package:taasclub/features/stories/screens/story_viewer_screen.dart';
-import 'package:taasclub/features/stories/screens/story_creator_screen.dart';
-import 'package:taasclub/features/stories/models/story.dart';
+import 'package:clubroyale/features/stories/screens/story_viewer_screen.dart';
+import 'package:clubroyale/features/stories/screens/story_creator_screen.dart';
+import 'package:clubroyale/features/stories/models/story.dart';
 // Voice Room imports
-import 'package:taasclub/features/social/voice_rooms/screens/voice_room_screen.dart';
+import 'package:clubroyale/features/social/voice_rooms/screens/voice_room_screen.dart';
 // Enhanced Profile imports
-import 'package:taasclub/features/profile/screens/profile_view_screen.dart';
-import 'package:taasclub/features/profile/screens/followers_list_screen.dart';
-import 'package:taasclub/features/profile/screens/create_post_screen.dart';
+import 'package:clubroyale/features/profile/screens/profile_view_screen.dart';
+import 'package:clubroyale/features/profile/screens/followers_list_screen.dart';
+import 'package:clubroyale/features/profile/screens/create_post_screen.dart';
 // TODO: Fix chat screen API mismatches before enabling
 
 
-// import 'package:taasclub/features/admin/screens/admin_chat_screen.dart';
-// import 'package:taasclub/features/wallet/screens/user_support_chat_screen.dart';
+// import 'package:clubroyale/features/admin/screens/admin_chat_screen.dart';
+// import 'package:clubroyale/features/wallet/screens/user_support_chat_screen.dart';
 
 // Analytics service singleton for screen tracking
 final _analyticsService = AnalyticsService();

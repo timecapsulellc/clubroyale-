@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:taasclub/features/game/engine/models/card.dart';
+import 'package:clubroyale/features/game/engine/models/card.dart';
 
 /// Helper to get asset path
 String _getCardAssetPath(PlayingCard card) {

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/features/game/game_service.dart';
+import 'package:clubroyale/features/game/game_service.dart';
 
 /// Provider for leaderboard data - aggregates scores across all finished games
 final leaderboardProvider = FutureProvider<List<LeaderboardEntry>>((ref) async {

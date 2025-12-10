@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:taasclub/features/social/voice_rooms/models/voice_room.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
-import 'package:taasclub/features/rtc/audio_service.dart';
+import 'package:clubroyale/features/social/voice_rooms/models/voice_room.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/features/rtc/audio_service.dart';
 
 /// Voice room service provider
 final voiceRoomServiceProvider = Provider<VoiceRoomService>((ref) {

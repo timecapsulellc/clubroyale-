@@ -1,6 +1,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:taasclub/features/profile/user_profile.dart';
+import 'package:clubroyale/features/profile/user_profile.dart';
 
 void main() {
   group('UserProfile Model Tests', () {

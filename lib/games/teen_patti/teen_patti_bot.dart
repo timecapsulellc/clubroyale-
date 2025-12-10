@@ -4,9 +4,9 @@
 /// Includes betting, folding, sideshow, and showdown logic
 
 import 'dart:math';
-import 'package:taasclub/games/teen_patti/teen_patti_game.dart';
-import 'package:taasclub/games/teen_patti/teen_patti_hand.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
+import 'package:clubroyale/games/teen_patti/teen_patti_game.dart';
+import 'package:clubroyale/games/teen_patti/teen_patti_hand.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
 
 /// Bot difficulty level
 enum BotDifficulty {

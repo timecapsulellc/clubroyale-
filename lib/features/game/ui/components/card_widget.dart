@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:taasclub/core/theme/app_theme.dart';
+import 'package:clubroyale/core/theme/app_theme.dart';
 // content for card engine import might vary, assuming Card is imported from core/card_engine/pile.dart but `Card` name conflicts with Flutter Material Card.
 // The game screen logic used `import 'package:flutter/material.dart' hide Card;`
-import 'package:taasclub/core/card_engine/pile.dart' as game;
+import 'package:clubroyale/core/card_engine/pile.dart' as game;
 
 class CardWidget extends StatelessWidget {
   final game.Card card;

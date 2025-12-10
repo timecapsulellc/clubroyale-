@@ -1,7 +1,7 @@
 {
     "name": "ClubRoyale - Marriage & Call Break",
     "short_name": "ClubRoyale",
-    "id": "/taasclub-app",
+    "id": "/clubroyale-app",
     "start_url": ".",
     "scope": "/",
     "display": "standalone",
@@ -128,8 +128,8 @@
     "related_applications": [
         {
             "platform": "play",
-            "url": "https://play.google.com/store/apps/details?id=app.taasclub",
-            "id": "app.taasclub"
+            "url": "https://play.google.com/store/apps/details?id=app.clubroyale",
+            "id": "app.clubroyale"
         }
     ],
     "handle_links": "preferred",

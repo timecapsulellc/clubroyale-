@@ -11,13 +11,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/config/casino_theme.dart';
-import 'package:taasclub/core/config/game_terminology.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
-import 'package:taasclub/features/game/game_room.dart';
-import 'package:taasclub/features/game/game_config.dart';
-import 'package:taasclub/features/lobby/lobby_service.dart';
-import 'package:taasclub/features/wallet/diamond_service.dart';
+import 'package:clubroyale/config/casino_theme.dart';
+import 'package:clubroyale/core/config/game_terminology.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/features/game/game_room.dart';
+import 'package:clubroyale/features/game/game_config.dart';
+import 'package:clubroyale/features/lobby/lobby_service.dart';
+import 'package:clubroyale/features/wallet/diamond_service.dart';
 
 class MarriageEntryScreen extends ConsumerStatefulWidget {
   const MarriageEntryScreen({super.key});

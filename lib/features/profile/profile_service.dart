@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/features/profile/user_profile.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/features/profile/user_profile.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Profile service provider
 final profileServiceProvider = Provider<ProfileService>((ref) => ProfileService(ref));

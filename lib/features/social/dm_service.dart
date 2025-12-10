@@ -7,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Provider for DM service
 final dmServiceProvider = Provider<DirectMessageService>((ref) {

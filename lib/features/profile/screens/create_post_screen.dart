@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:taasclub/features/profile/profile_service.dart';
-import 'package:taasclub/features/profile/user_profile.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/features/profile/profile_service.dart';
+import 'package:clubroyale/features/profile/user_profile.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Screen for creating a new post
 class CreatePostScreen extends ConsumerStatefulWidget {

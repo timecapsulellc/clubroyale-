@@ -5,8 +5,8 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/theme/game_themes.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/core/theme/game_themes.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Provider for the theme store service
 final themeStoreServiceProvider = Provider<ThemeStoreService>((ref) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/features/auth/auth_screen.dart';
+import 'package:clubroyale/features/auth/auth_screen.dart';
 
 void main() {
   group('AuthScreen Widget Tests', () {
@@ -23,7 +23,7 @@ void main() {
 
     testWidgets('should display app title', (WidgetTester tester) async {
       await buildAuthScreen(tester);
-      expect(find.text('TaasClub'), findsOneWidget);
+      expect(find.text('ClubRoyale'), findsOneWidget);
     });
 
     testWidgets('should display subtitle', (WidgetTester tester) async {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/features/profile/user_profile.dart';
-import 'package:taasclub/features/profile/profile_service.dart';
+import 'package:clubroyale/features/profile/user_profile.dart';
+import 'package:clubroyale/features/profile/profile_service.dart';
 
 /// Screen to display followers or following list
 class FollowersListScreen extends ConsumerWidget {

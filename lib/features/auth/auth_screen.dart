@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:taasclub/config/casino_theme.dart';
+import 'package:clubroyale/config/casino_theme.dart';
 
 import 'auth_service.dart';
 

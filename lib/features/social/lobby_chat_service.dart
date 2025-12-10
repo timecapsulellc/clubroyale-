@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/features/chat/chat_message.dart';
+import 'package:clubroyale/features/chat/chat_message.dart';
 
 /// Provider for lobby chat service
 final lobbyChatServiceProvider = Provider.family<LobbyChatService, LobbyChatParams>(

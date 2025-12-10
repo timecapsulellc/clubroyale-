@@ -1,8 +1,8 @@
 /// Call Break Game Unit Tests
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:taasclub/games/call_break/call_break_game.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
+import 'package:clubroyale/games/call_break/call_break_game.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
 
 void main() {
   group('CallBreakGame - Initialization', () {

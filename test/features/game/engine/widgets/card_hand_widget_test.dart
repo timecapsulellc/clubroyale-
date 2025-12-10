@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:taasclub/features/game/engine/models/card.dart';
+import 'package:clubroyale/features/game/engine/models/card.dart';
 // Note: CardHandWidget has a known issue with negative margins in test environment.
 // These tests verify only the basic instantiation without rendering the actual widget.
 

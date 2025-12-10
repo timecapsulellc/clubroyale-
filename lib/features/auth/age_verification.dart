@@ -6,7 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:taasclub/core/constants/disclaimers.dart';
+import 'package:clubroyale/core/constants/disclaimers.dart';
 
 /// Age verification state management
 class AgeVerificationService {

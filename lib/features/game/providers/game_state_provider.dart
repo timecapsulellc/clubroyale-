@@ -1,14 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/features/game/game_room.dart';
-import 'package:taasclub/features/game/game_service.dart';
-import 'package:taasclub/features/game/engine/models/card.dart';
-import 'package:taasclub/features/game/models/game_state.dart';
-import 'package:taasclub/features/game/call_break_service.dart';
-import 'package:taasclub/features/game/services/card_validation_service.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/features/game/game_room.dart';
+import 'package:clubroyale/features/game/game_service.dart';
+import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/features/game/models/game_state.dart';
+import 'package:clubroyale/features/game/call_break_service.dart';
+import 'package:clubroyale/features/game/services/card_validation_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 
 // Re-export the callBreakServiceProvider from call_break_service.dart
-export 'package:taasclub/features/game/call_break_service.dart' show callBreakServiceProvider;
+export 'package:clubroyale/features/game/call_break_service.dart' show callBreakServiceProvider;
 
 /// Stream provider for the current game room
 final currentGameProvider = StreamProvider.family<GameRoom?, String>((ref, gameId) {

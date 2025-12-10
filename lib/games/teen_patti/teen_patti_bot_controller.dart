@@ -4,10 +4,10 @@
 
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:taasclub/games/teen_patti/teen_patti_bot.dart';
-import 'package:taasclub/games/teen_patti/teen_patti_service.dart';
-import 'package:taasclub/games/teen_patti/teen_patti_game.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
+import 'package:clubroyale/games/teen_patti/teen_patti_bot.dart';
+import 'package:clubroyale/games/teen_patti/teen_patti_service.dart';
+import 'package:clubroyale/games/teen_patti/teen_patti_game.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
 
 /// Controller for Teen Patti bot automation
 class TeenPattiBotController {

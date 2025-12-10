@@ -1,5 +1,5 @@
-import 'package:taasclub/features/game/engine/models/card.dart';
-import 'package:taasclub/features/game/models/game_state.dart';
+import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/features/game/models/game_state.dart';
 
 /// Pure logic for Call Break game rules
 class CallBreakLogic {

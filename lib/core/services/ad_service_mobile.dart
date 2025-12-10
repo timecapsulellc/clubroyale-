@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:taasclub/core/config/diamond_config.dart';
+import 'package:clubroyale/core/config/diamond_config.dart';
 
 /// Mobile (iOS/Android) implementation of AdService
 class AdServiceMobile implements _AdServiceInterface {

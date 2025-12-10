@@ -4,9 +4,9 @@
 /// Simple betting game - guess if card falls between two dealt cards
 /// Based on open source implementations from ranjeetabh/Card-Games
 
-import 'package:taasclub/games/base_game.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
-import 'package:taasclub/core/card_engine/deck.dart';
+import 'package:clubroyale/games/base_game.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
+import 'package:clubroyale/core/card_engine/deck.dart';
 
 /// In Between game state
 enum InBetweenPhase {

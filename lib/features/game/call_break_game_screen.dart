@@ -2,28 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
-import 'package:taasclub/features/game/call_break_service.dart';
-import 'package:taasclub/features/game/game_room.dart';
-import 'package:taasclub/features/game/engine/models/card.dart';
-import 'package:taasclub/features/game/models/game_state.dart';
-import 'package:taasclub/features/lobby/lobby_service.dart';
-import 'package:taasclub/config/casino_theme.dart';
-import 'package:taasclub/config/visual_effects.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/features/game/call_break_service.dart';
+import 'package:clubroyale/features/game/game_room.dart';
+import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/features/game/models/game_state.dart';
+import 'package:clubroyale/features/lobby/lobby_service.dart';
+import 'package:clubroyale/config/casino_theme.dart';
+import 'package:clubroyale/config/visual_effects.dart';
 import 'widgets/card_widgets.dart';
 import 'widgets/bidding_dialog.dart';
 import 'widgets/game_table_widgets.dart';
 import 'widgets/player_avatar.dart';
 
-import 'package:taasclub/features/game/services/bot_service.dart';
+import 'package:clubroyale/features/game/services/bot_service.dart';
 
 // RTC, Chat, and AI imports
-import 'package:taasclub/features/chat/widgets/chat_overlay.dart';
-import 'package:taasclub/features/chat/chat_service.dart';
-import 'package:taasclub/features/rtc/widgets/audio_controls.dart';
-import 'package:taasclub/features/rtc/signaling_service.dart';
-import 'package:taasclub/features/ai/ai_service.dart';
-import 'package:taasclub/features/ai/ai_tip_widget.dart';
+import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
+import 'package:clubroyale/features/chat/chat_service.dart';
+import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
+import 'package:clubroyale/features/rtc/signaling_service.dart';
+import 'package:clubroyale/features/ai/ai_service.dart';
+import 'package:clubroyale/features/ai/ai_tip_widget.dart';
 
 /// Main screen for Call Break gameplay
 class CallBreakGameScreen extends ConsumerStatefulWidget {

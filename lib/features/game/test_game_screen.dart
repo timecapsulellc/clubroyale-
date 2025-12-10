@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/features/game/services/test_game_service.dart';
-import 'package:taasclub/features/game/game_room.dart';
-import 'package:taasclub/features/game/models/game_state.dart';
-import 'package:taasclub/features/game/engine/models/card.dart';
-import 'package:taasclub/features/game/widgets/card_widgets.dart';
-import 'package:taasclub/config/casino_theme.dart';
+import 'package:clubroyale/features/game/services/test_game_service.dart';
+import 'package:clubroyale/features/game/game_room.dart';
+import 'package:clubroyale/features/game/models/game_state.dart';
+import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/features/game/widgets/card_widgets.dart';
+import 'package:clubroyale/config/casino_theme.dart';
 
 /// Test Game Screen - plays using in-memory TestGameService
 class TestGameScreen extends ConsumerStatefulWidget {

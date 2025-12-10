@@ -7,18 +7,18 @@ import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/config/casino_theme.dart';
-import 'package:taasclub/config/visual_effects.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
-import 'package:taasclub/core/card_engine/deck.dart';
-import 'package:taasclub/core/config/game_terminology.dart';
-import 'package:taasclub/games/marriage/marriage_service.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
-import 'package:taasclub/core/card_engine/meld.dart';
-import 'package:taasclub/features/game/widgets/player_avatar.dart';
-import 'package:taasclub/features/chat/widgets/chat_overlay.dart';
-import 'package:taasclub/features/rtc/widgets/audio_controls.dart';
-import 'package:taasclub/features/video/widgets/video_grid.dart';
+import 'package:clubroyale/config/casino_theme.dart';
+import 'package:clubroyale/config/visual_effects.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
+import 'package:clubroyale/core/card_engine/deck.dart';
+import 'package:clubroyale/core/config/game_terminology.dart';
+import 'package:clubroyale/games/marriage/marriage_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/core/card_engine/meld.dart';
+import 'package:clubroyale/features/game/widgets/player_avatar.dart';
+import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
+import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
+import 'package:clubroyale/features/video/widgets/video_grid.dart';
 
 
 /// Multiplayer Marriage game screen

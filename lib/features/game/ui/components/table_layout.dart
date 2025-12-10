@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/theme/game_themes.dart';
-import 'package:taasclub/features/store/theme_store_provider.dart';
+import 'package:clubroyale/core/theme/game_themes.dart';
+import 'package:clubroyale/features/store/theme_store_provider.dart';
 
 /// Dynamic table layout that uses the user's selected theme
 class TableLayout extends ConsumerWidget {

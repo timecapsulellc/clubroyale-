@@ -4,7 +4,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/card_engine/deck.dart';
+import 'package:clubroyale/core/card_engine/deck.dart';
 
 /// Provider for TeenPattiService
 final teenPattiServiceProvider = Provider((ref) => TeenPattiService());

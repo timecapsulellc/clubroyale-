@@ -1,8 +1,8 @@
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:taasclub/games/marriage/marriage_game.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
-import 'package:taasclub/core/card_engine/meld.dart';
+import 'package:clubroyale/games/marriage/marriage_game.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
+import 'package:clubroyale/core/card_engine/meld.dart';
 
 // Test subclass to expose internal state for testing
 class TestMarriageGame extends MarriageGame {

@@ -5,10 +5,10 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
-import 'package:taasclub/core/card_engine/deck.dart';
-import 'package:taasclub/core/card_engine/meld.dart';
-import 'package:taasclub/features/game/game_room.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
+import 'package:clubroyale/core/card_engine/deck.dart';
+import 'package:clubroyale/core/card_engine/meld.dart';
+import 'package:clubroyale/features/game/game_room.dart';
 
 /// Provider for Royal Meld (Marriage) Service
 final marriageServiceProvider = Provider((ref) => MarriageService());

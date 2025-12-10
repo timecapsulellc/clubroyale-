@@ -3,8 +3,8 @@
 /// Riverpod providers for managing selected theme and card skin state.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/theme/game_themes.dart';
-import 'package:taasclub/features/store/theme_store_service.dart';
+import 'package:clubroyale/core/theme/game_themes.dart';
+import 'package:clubroyale/features/store/theme_store_service.dart';
 
 /// Provider for the current user's customization (stream-based)
 final userCustomizationProvider = StreamProvider<UserCustomization>((ref) {

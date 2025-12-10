@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:taasclub/config/casino_theme.dart';
+import 'package:clubroyale/config/casino_theme.dart';
 
 /// Animated particle background for premium casino feel
 class ParticleBackground extends StatefulWidget {

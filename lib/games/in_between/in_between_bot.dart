@@ -4,8 +4,8 @@
 /// Probability-based betting based on card spread
 
 import 'dart:math';
-import 'package:taasclub/games/in_between/in_between_game.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
+import 'package:clubroyale/games/in_between/in_between_game.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
 
 /// Bot difficulty level
 enum InBetweenBotDifficulty {

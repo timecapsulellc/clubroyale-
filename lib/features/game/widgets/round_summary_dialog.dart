@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:taasclub/features/game/game_room.dart';
-import 'package:taasclub/features/game/models/game_state.dart';
+import 'package:clubroyale/features/game/game_room.dart';
+import 'package:clubroyale/features/game/models/game_state.dart';
 
 /// Dialog showing round results
 class RoundSummaryDialog extends StatelessWidget {

@@ -2,7 +2,7 @@
 /// 
 /// This defines the contract that all games must implement
 
-import 'package:taasclub/core/card_engine/pile.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
 
 /// Game phases common to most card games
 enum GamePhase {

@@ -7,10 +7,10 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/features/game/game_room.dart';
-import 'package:taasclub/features/ledger/ledger_service.dart';
-import 'package:taasclub/features/ledger/settlement_service.dart';
-import 'package:taasclub/features/ledger/transaction_model.dart';
+import 'package:clubroyale/features/game/game_room.dart';
+import 'package:clubroyale/features/ledger/ledger_service.dart';
+import 'package:clubroyale/features/ledger/settlement_service.dart';
+import 'package:clubroyale/features/ledger/transaction_model.dart';
 import 'package:share_plus/share_plus.dart';
 // import 'package:path_provider/path_provider.dart'; // Removed for web compatibility
 

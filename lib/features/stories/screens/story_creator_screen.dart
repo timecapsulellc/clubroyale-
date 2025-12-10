@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:taasclub/features/stories/models/story.dart';
-import 'package:taasclub/features/stories/services/story_service.dart';
+import 'package:clubroyale/features/stories/models/story.dart';
+import 'package:clubroyale/features/stories/services/story_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 /// Screen for creating and posting a new story

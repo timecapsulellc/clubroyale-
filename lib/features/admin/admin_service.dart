@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/config/admin_config.dart';
+import 'package:clubroyale/core/config/admin_config.dart';
 
 /// Provider for admin service
 final adminServiceProvider = Provider<AdminService>((ref) => AdminService());

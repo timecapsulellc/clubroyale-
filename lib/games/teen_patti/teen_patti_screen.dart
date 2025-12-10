@@ -6,12 +6,12 @@ import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/config/casino_theme.dart';
-import 'package:taasclub/config/visual_effects.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
-import 'package:taasclub/core/card_engine/deck.dart';
-import 'package:taasclub/games/teen_patti/teen_patti_service.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
+import 'package:clubroyale/config/casino_theme.dart';
+import 'package:clubroyale/config/visual_effects.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
+import 'package:clubroyale/core/card_engine/deck.dart';
+import 'package:clubroyale/games/teen_patti/teen_patti_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class TeenPattiScreen extends ConsumerStatefulWidget {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
-import 'package:taasclub/features/admin/admin_chat_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/features/admin/admin_chat_service.dart';
 import 'package:intl/intl.dart';
 
 /// Screen for users to chat with admin support

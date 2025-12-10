@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/features/stories/models/story.dart';
-import 'package:taasclub/features/stories/services/story_service.dart';
+import 'package:clubroyale/features/stories/models/story.dart';
+import 'package:clubroyale/features/stories/services/story_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 /// Full-screen story viewer with progress bar and navigation

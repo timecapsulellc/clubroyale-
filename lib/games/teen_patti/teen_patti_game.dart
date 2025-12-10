@@ -3,9 +3,9 @@
 /// Implementation of Indian Teen Patti (Three Patti) card game
 /// 52 cards, 3 cards per player, betting-based gameplay
 
-import 'package:taasclub/games/base_game.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
-import 'package:taasclub/core/card_engine/deck.dart';
+import 'package:clubroyale/games/base_game.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
+import 'package:clubroyale/core/card_engine/deck.dart';
 import 'teen_patti_hand.dart';
 
 /// Player status in Teen Patti

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taasclub/core/config/club_royale_theme.dart';
-import 'package:taasclub/features/settings/widgets/terminology_toggle.dart';
+import 'package:clubroyale/core/config/club_royale_theme.dart';
+import 'package:clubroyale/features/settings/widgets/terminology_toggle.dart';
 
 /// Settings Screen
 /// 

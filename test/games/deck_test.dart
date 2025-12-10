@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:taasclub/core/card_engine/deck.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
+import 'package:clubroyale/core/card_engine/deck.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
 
 /// Tests for Deck configuration with Marriage game
 void main() {

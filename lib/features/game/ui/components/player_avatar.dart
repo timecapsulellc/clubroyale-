@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:taasclub/core/theme/app_theme.dart';
+import 'package:clubroyale/core/theme/app_theme.dart';
 
 class PlayerAvatar extends StatelessWidget {
   final String name;

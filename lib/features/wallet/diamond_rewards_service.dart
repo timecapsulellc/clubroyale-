@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/config/diamond_config.dart';
+import 'package:clubroyale/core/config/diamond_config.dart';
 
 /// Provider for diamond rewards service
 final diamondRewardsServiceProvider = Provider<DiamondRewardsService>(

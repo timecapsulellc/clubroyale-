@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:taasclub/games/marriage/marriage_game.dart';
-import 'package:taasclub/games/base_game.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
+import 'package:clubroyale/games/marriage/marriage_game.dart';
+import 'package:clubroyale/games/base_game.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
 
 /// Tests for Marriage Game Logic
 void main() {

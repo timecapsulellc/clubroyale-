@@ -3,7 +3,7 @@
 /// Based on Indian card game Teen Patti (Three Patti)
 /// Port from JavaScript/Python open source patterns
 
-import 'package:taasclub/core/card_engine/pile.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
 
 /// Teen Patti hand types (highest to lowest)
 enum TeenPattiHandType {

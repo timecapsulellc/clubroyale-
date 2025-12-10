@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/config/diamond_config.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
-import 'package:taasclub/features/wallet/diamond_rewards_service.dart';
-import 'package:taasclub/core/services/ad_service.dart';
-import 'package:taasclub/core/services/share_service.dart';
+import 'package:clubroyale/core/config/diamond_config.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/features/wallet/diamond_rewards_service.dart';
+import 'package:clubroyale/core/services/ad_service.dart';
+import 'package:clubroyale/core/services/share_service.dart';
 
 /// Screen for earning free diamonds
 class EarnDiamondsScreen extends ConsumerStatefulWidget {

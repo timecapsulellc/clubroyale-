@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:taasclub/core/services/feedback_service.dart';
+import 'package:clubroyale/core/services/feedback_service.dart';
 
 /// Dialog for collecting user feedback
 class FeedbackDialog extends StatefulWidget {

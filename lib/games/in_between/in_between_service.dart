@@ -4,8 +4,8 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taasclub/core/card_engine/deck.dart';
-import 'package:taasclub/core/card_engine/pile.dart';
+import 'package:clubroyale/core/card_engine/deck.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
 
 /// Provider for InBetweenService
 final inBetweenServiceProvider = Provider((ref) => InBetweenService());

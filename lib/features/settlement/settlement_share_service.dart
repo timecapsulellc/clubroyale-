@@ -4,7 +4,7 @@
 // This is the CORE viral feature - settlement includes app link!
 
 import 'package:share_plus/share_plus.dart';
-import 'package:taasclub/core/constants/disclaimers.dart';
+import 'package:clubroyale/core/constants/disclaimers.dart';
 
 /// Settlement data for sharing
 class SettlementData {

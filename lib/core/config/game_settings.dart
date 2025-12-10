@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:taasclub/core/config/game_terminology.dart';
+import 'package:clubroyale/core/config/game_terminology.dart';
 
 /// Provider for GameSettings
 final gameSettingsProvider = Provider<GameSettings>((ref) {

@@ -1,6 +1,6 @@
 import 'dart:math' as dart;
 import 'package:flutter/material.dart';
-import 'package:taasclub/config/casino_theme.dart';
+import 'package:clubroyale/config/casino_theme.dart';
 
 /// Player avatar widget positioned around the game table
 class PlayerAvatar extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:taasclub/features/agents/models/agent.dart';
+import 'package:clubroyale/features/agents/models/agent.dart';
 import 'package:uuid/uuid.dart';
 
 /// Architect Agent service provider

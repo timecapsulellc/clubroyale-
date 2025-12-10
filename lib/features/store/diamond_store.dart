@@ -5,7 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:taasclub/core/constants/disclaimers.dart';
+import 'package:clubroyale/core/constants/disclaimers.dart';
 
 /// Diamond pack definitions
 class DiamondPack {

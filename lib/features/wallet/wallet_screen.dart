@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:taasclub/core/config/diamond_config.dart';
-import 'package:taasclub/features/wallet/diamond_rewards_service.dart';
+import 'package:clubroyale/core/config/diamond_config.dart';
+import 'package:clubroyale/features/wallet/diamond_rewards_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:taasclub/features/auth/auth_service.dart';
-import 'package:taasclub/features/wallet/diamond_service.dart';
-import 'package:taasclub/features/wallet/diamond_wallet.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/features/wallet/diamond_service.dart';
+import 'package:clubroyale/features/wallet/diamond_wallet.dart';
 
 class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});
