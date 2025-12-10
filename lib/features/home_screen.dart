@@ -25,9 +25,12 @@ class HomeScreen extends ConsumerWidget {
       backgroundColor: CasinoColors.darkPurple,
       bottomNavigationBar: GameBottomNav(
         onAccountTap: () => context.go('/profile'),
-        onSettingsTap: () => context.go('/profile'),
+        onSettingsTap: () => context.go('/settings'),
         onStoreTap: () => context.go('/wallet'),
-        onBackTap: () => authService.signOut(),
+        onBackTap: () async {
+          await authService.signOut();
+          if (context.mounted) context.go('/auth');
+        },
       ),
       body: ParticleBackground(
         primaryColor: CasinoColors.gold,
@@ -50,7 +53,7 @@ class HomeScreen extends ConsumerWidget {
                   StretchMode.blurBackground,
                 ],
                 title: Text(
-                  'TaasClub',
+                  'ClubRoyale',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w900,
@@ -131,6 +134,7 @@ class HomeScreen extends ConsumerWidget {
                     icon: const Icon(Icons.logout, color: Colors.white),
                     onPressed: () async {
                       await authService.signOut();
+                      if (context.mounted) context.go('/auth');
                     },
                     tooltip: 'Sign Out',
                   ),

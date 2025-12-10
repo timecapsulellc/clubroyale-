@@ -92,7 +92,8 @@ class SettingsScreen extends ConsumerWidget {
                   context: context,
                   applicationName: 'ClubRoyale',
                   applicationVersion: '1.0.0',
-                  applicationLegalese: '© 2025 TaasClub',
+                  applicationLegalese: '© 2025 ClubRoyale',
+
                   children: [
                     const SizedBox(height: 16),
                     const Text('Your Private Card Club - The Ultimate Card Experience'),

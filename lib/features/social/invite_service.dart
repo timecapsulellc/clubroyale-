@@ -256,7 +256,7 @@ class InviteService {
     final gameDisplayName = _getGameDisplayName(invite.gameType);
     
     final message = '''
-🎴 Join my $gameDisplayName game on TaasClub!
+🍴 Join my $gameDisplayName game on ClubRoyale!
 
 📍 Room Code: ${invite.roomCode}
 👤 Host: ${invite.hostName}
@@ -264,10 +264,10 @@ class InviteService {
 
 👉 Tap to join: ${invite.deepLink}
 
-Or open TaasClub and enter the room code!
+Or open ClubRoyale and enter the room code!
 ''';
     
-    await Share.share(message, subject: 'Join my TaasClub game!');
+    await Share.share(message, subject: 'Join my ClubRoyale game!');
   }
   
   /// Share via WhatsApp specifically
