@@ -1,9 +1,10 @@
-/// Marriage Game Entry Screen
+/// Royal Meld (Marriage) Game Entry Screen
 /// 
-/// Entry point for Marriage game with options to:
+/// Entry point for Royal Meld game with options to:
 /// - Practice (single-player with bots - free)
 /// - Create Room (multiplayer - costs diamonds)
 /// - Join Room (multiplayer - by room code)
+/// Uses GameTerminology for multi-region localization
 
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taasclub/config/casino_theme.dart';
+import 'package:taasclub/core/config/game_terminology.dart';
 import 'package:taasclub/features/auth/auth_service.dart';
 import 'package:taasclub/features/game/game_room.dart';
 import 'package:taasclub/features/game/game_config.dart';
@@ -49,11 +51,13 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('👰', style: TextStyle(fontSize: 24)),
+            // Use GameTerminology emoji based on region
+            Text(GameTerminology.currentRegion == GameRegion.southAsia ? '👰' : '👑', 
+              style: const TextStyle(fontSize: 24)),
             const SizedBox(width: 8),
-            const Text(
-              'Marriage',
-              style: TextStyle(
+            Text(
+              GameTerminology.royalMeldGame,
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
                 fontSize: 22,
@@ -146,9 +150,10 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
         children: [
           const Icon(Icons.auto_stories, size: 48, color: Colors.amber),
           const SizedBox(height: 16),
-          const Text(
-            'Nepali Rummy',
-            style: TextStyle(
+          // Use GameTerminology for game description
+          Text(
+            GameTerminology.royalMeldDescription,
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -156,9 +161,9 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Create melds, find the Tiplu, and declare to win!',
+            'Create melds, find the ${GameTerminology.wildCard}, and ${GameTerminology.declare.toLowerCase()} to win!',
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: Colors.white70,
             ),
@@ -384,9 +389,9 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
               children: [
                 const Icon(Icons.smart_toy, color: Colors.grey, size: 20),
                 const SizedBox(width: 12),
-                const Text(
-                  'Practice with Bots',
-                  style: TextStyle(
+                Text(
+                  GameTerminology.practiceMode,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: Colors.grey,

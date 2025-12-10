@@ -1,11 +1,13 @@
-/// Marriage Game Screen
+/// Royal Meld (Marriage) Practice Screen
 /// 
-/// UI for playing Marriage card game (Nepali Rummy)
+/// UI for playing Royal Meld card game
+/// Uses GameTerminology for multi-region localization
 
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taasclub/core/theme/app_theme.dart';
+import 'package:taasclub/core/config/game_terminology.dart';
 import 'package:taasclub/games/base_game.dart';
 import 'package:taasclub/core/card_engine/meld.dart' as meld_engine;
 import 'package:taasclub/core/card_engine/pile.dart'; // For Card class
@@ -62,7 +64,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Marriage', style: TextStyle(fontWeight: FontWeight.bold)),
+            // Use GameTerminology for game name
+            Text(GameTerminology.royalMeldGame, style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(width: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -102,7 +105,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           ],
         ),
         actions: [
-          // Tiplu indicator
+          // Wild Card indicator (Tiplu)
           if (_game.tiplu != null)
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
@@ -115,7 +118,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Tiplu: ', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                  Text('${GameTerminology.wildCard}: ', style: const TextStyle(color: Colors.white70, fontSize: 12)),
                   Text(
                     _game.tiplu!.displayName,
                     style: TextStyle(
@@ -371,9 +374,9 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
             borderColor: Colors.white.withOpacity(0.5),
           ),
           
-          // Declare button
+          // Declare button (Go Royale in global mode)
           CasinoButton(
-            label: 'Declare',
+            label: GameTerminology.declare,
             onPressed: isMyTurn ? _tryDeclare : null,
             backgroundColor: Colors.green,
             borderColor: Colors.lightGreen,
@@ -572,11 +575,12 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   }
   
   String _getMeldTypeName(meld_engine.MeldType type) {
+    // Use GameTerminology for multi-region support
     switch (type) {
-      case meld_engine.MeldType.set: return 'Trial';
-      case meld_engine.MeldType.run: return 'Sequence';
-      case meld_engine.MeldType.tunnel: return 'Tunnel';
-      case meld_engine.MeldType.marriage: return 'Marriage';
+      case meld_engine.MeldType.set: return GameTerminology.trial;
+      case meld_engine.MeldType.run: return GameTerminology.sequence;
+      case meld_engine.MeldType.tunnel: return GameTerminology.triple;
+      case meld_engine.MeldType.marriage: return GameTerminology.royalSequenceShort;
     }
   }
 }

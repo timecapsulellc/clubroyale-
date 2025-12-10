@@ -10,6 +10,7 @@ import 'package:taasclub/features/lobby/lobby_service.dart';
 import 'package:taasclub/features/wallet/diamond_service.dart';
 import 'package:taasclub/features/wallet/diamond_balance_widget.dart';
 import 'package:taasclub/features/feedback/feedback_dialog.dart';
+import 'package:taasclub/core/config/game_terminology.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:math';
 
@@ -422,7 +423,8 @@ class LobbyScreen extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: _GameTypeOption(
-                        title: 'Marriage',
+                        // Use GameTerminology for multi-region support
+                        title: GameTerminology.royalMeldGame,
                         subtitle: 'Rummy-style',
                         icon: Icons.layers_rounded,
                         isSelected: gameType == 'marriage',
@@ -627,7 +629,8 @@ class LobbyScreen extends ConsumerWidget {
       }
     }
 
-    final gameTypeName = gameType == 'marriage' ? 'Marriage' : 'Call Break';
+    // Use GameTerminology for multi-region game name
+    final gameTypeName = gameType == 'marriage' ? GameTerminology.royalMeldGame : 'Call Break';
     final newGameRoom = GameRoom(
       name: '$gameTypeName #${Random().nextInt(1000)}',
       hostId: user.uid,
