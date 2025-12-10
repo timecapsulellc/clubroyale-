@@ -97,23 +97,58 @@ class SettingsScreen extends ConsumerWidget {
               themeColors: themeColors,
             ),
             
+            const SizedBox(height: 24),
+            
+            // Info Section Header
+            _buildSectionHeader('Info & Help', themeColors),
+            
+            // FAQ
+            _buildListTile(
+              icon: Icons.help_outline,
+              title: 'FAQ',
+              subtitle: 'Frequently asked questions',
+              onTap: () => context.push('/faq'),
+              themeColors: themeColors,
+            ),
+            
+            // How to Play
+            _buildListTile(
+              icon: Icons.school,
+              title: 'How to Play Marriage',
+              subtitle: 'Learn the rules and strategy',
+              onTap: () => context.push('/how-to-play'),
+              themeColors: themeColors,
+            ),
+            
             // About
             _buildListTile(
               icon: Icons.info,
               title: 'About ClubRoyale',
-              subtitle: 'Version 1.0.0',
-              onTap: () {
-                showAboutDialog(
-                  context: context,
-                  applicationName: 'ClubRoyale',
-                  applicationVersion: '1.0.0',
-                  applicationLegalese: '© 2025 ClubRoyale',
-                  children: [
-                    const SizedBox(height: 16),
-                    const Text('Your Private Card Club - The Ultimate Card Experience'),
-                  ],
-                );
-              },
+              subtitle: 'Version 1.0.0 • Architecture • Stats',
+              onTap: () => context.push('/about'),
+              themeColors: themeColors,
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Legal Section Header
+            _buildSectionHeader('Legal', themeColors),
+            
+            // Terms
+            _buildListTile(
+              icon: Icons.description,
+              title: 'Terms & Conditions',
+              subtitle: 'User agreement',
+              onTap: () => context.push('/terms'),
+              themeColors: themeColors,
+            ),
+            
+            // Privacy
+            _buildListTile(
+              icon: Icons.privacy_tip,
+              title: 'Privacy Policy',
+              subtitle: 'How we handle your data',
+              onTap: () => context.push('/privacy'),
               themeColors: themeColors,
             ),
             

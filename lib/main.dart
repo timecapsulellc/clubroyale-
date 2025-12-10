@@ -56,6 +56,15 @@ import 'package:clubroyale/features/profile/screens/create_post_screen.dart';
 // import 'package:clubroyale/features/admin/screens/admin_chat_screen.dart';
 // import 'package:clubroyale/features/wallet/screens/user_support_chat_screen.dart';
 
+// Info Screens imports
+import 'package:clubroyale/features/info/screens/faq_screen.dart';
+import 'package:clubroyale/features/info/screens/how_to_play_screen.dart';
+import 'package:clubroyale/features/info/screens/terms_screen.dart';
+import 'package:clubroyale/features/info/screens/about_screen.dart';
+import 'package:clubroyale/features/info/screens/landing_page.dart';
+import 'package:clubroyale/features/info/screens/privacy_screen.dart';
+
+
 // Analytics service singleton for screen tracking
 final _analyticsService = AnalyticsService();
 
@@ -292,6 +301,44 @@ final GoRouter _router = GoRouter(
         //     return const UserSupportChatScreen();
         //   },
         // ),
+        
+        // Info Screens Routes
+        GoRoute(
+          path: 'faq',
+          builder: (BuildContext context, GoRouterState state) {
+            return const FAQScreen();
+          },
+        ),
+        GoRoute(
+          path: 'how-to-play',
+          builder: (BuildContext context, GoRouterState state) {
+            return const HowToPlayMarriageScreen();
+          },
+        ),
+        GoRoute(
+          path: 'terms',
+          builder: (BuildContext context, GoRouterState state) {
+            return const TermsScreen();
+          },
+        ),
+        GoRoute(
+          path: 'privacy',
+          builder: (BuildContext context, GoRouterState state) {
+            return const PrivacyScreen();
+          },
+        ),
+        GoRoute(
+          path: 'about',
+          builder: (BuildContext context, GoRouterState state) {
+            return const AboutScreen();
+          },
+        ),
+        GoRoute(
+          path: 'landing',
+          builder: (BuildContext context, GoRouterState state) {
+            return const LandingPage();
+          },
+        ),
       ],
     ),
   ],
