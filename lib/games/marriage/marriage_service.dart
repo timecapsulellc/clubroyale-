@@ -21,6 +21,9 @@ class MarriageGameState {
   final String currentPlayerId;
   final int currentRound;
   final String phase;  // 'dealing', 'playing', 'scoring'
+  final String turnPhase;  // 'drawing' or 'discarding' - P0 FIX
+  final String? lastDrawnCardId;  // Track what was drawn this turn
+  final DateTime? turnStartTime;  // For turn timer
   
   MarriageGameState({
     required this.tipluCardId,
@@ -30,6 +33,9 @@ class MarriageGameState {
     required this.currentPlayerId,
     required this.currentRound,
     required this.phase,
+    this.turnPhase = 'drawing',
+    this.lastDrawnCardId,
+    this.turnStartTime,
   });
   
   factory MarriageGameState.fromJson(Map<String, dynamic> json) {
@@ -43,6 +49,11 @@ class MarriageGameState {
       currentPlayerId: json['currentPlayerId'] ?? '',
       currentRound: json['currentRound'] ?? 1,
       phase: json['phase'] ?? 'waiting',
+      turnPhase: json['turnPhase'] ?? 'drawing',
+      lastDrawnCardId: json['lastDrawnCardId'],
+      turnStartTime: json['turnStartTime'] != null 
+          ? DateTime.tryParse(json['turnStartTime']) 
+          : null,
     );
   }
   
@@ -54,8 +65,21 @@ class MarriageGameState {
     'currentPlayerId': currentPlayerId,
     'currentRound': currentRound,
     'phase': phase,
+    'turnPhase': turnPhase,
+    'lastDrawnCardId': lastDrawnCardId,
+    'turnStartTime': turnStartTime?.toIso8601String(),
   };
+  
+  /// Check if player has drawn this turn
+  bool get hasDrawnThisTurn => turnPhase == 'discarding';
+  
+  /// Check if in drawing phase
+  bool get isDrawingPhase => turnPhase == 'drawing';
+  
+  /// Check if in discarding phase
+  bool get isDiscardingPhase => turnPhase == 'discarding';
 }
+
 
 class MarriageService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -92,7 +116,7 @@ class MarriageService {
     // Remaining deck
     final deckCards = deck.cards.map((c) => c.id).toList();
     
-    // Create game state
+    // Create game state with turnPhase initialized to 'drawing'
     final gameState = MarriageGameState(
       tipluCardId: tiplu?.id ?? '',
       playerHands: playerHands,
@@ -101,6 +125,8 @@ class MarriageService {
       currentPlayerId: playerIds.first,
       currentRound: 1,
       phase: 'playing',
+      turnPhase: 'drawing',  // P0 FIX: Start in drawing phase
+      turnStartTime: DateTime.now(),  // P1: Turn timer start
     );
     
     // Save to Firestore
@@ -137,6 +163,8 @@ class MarriageService {
     
     if (state.currentPlayerId != playerId) return null;
     if (state.deckCards.isEmpty) return null;
+    // P0 FIX: Validate player is in drawing phase
+    if (state.turnPhase != 'drawing') return null;
     
     // Draw top card
     final drawnCardId = state.deckCards.last;
@@ -146,10 +174,12 @@ class MarriageService {
     final newHands = Map<String, List<String>>.from(state.playerHands);
     newHands[playerId] = [...(newHands[playerId] ?? []), drawnCardId];
     
-    // Update Firestore
+    // Update Firestore - P0 FIX: Set turnPhase to 'discarding'
     await _firestore.collection('games').doc(roomId).update({
       'marriageState.deckCards': newDeck,
       'marriageState.playerHands.$playerId': newHands[playerId],
+      'marriageState.turnPhase': 'discarding',
+      'marriageState.lastDrawnCardId': drawnCardId,
     });
     
     return drawnCardId;
@@ -167,6 +197,8 @@ class MarriageService {
     
     if (state.currentPlayerId != playerId) return null;
     if (state.discardPile.isEmpty) return null;
+    // P0 FIX: Validate player is in drawing phase
+    if (state.turnPhase != 'drawing') return null;
     
     // Draw top card from discard
     final drawnCardId = state.discardPile.last;
@@ -176,10 +208,12 @@ class MarriageService {
     final newHands = Map<String, List<String>>.from(state.playerHands);
     newHands[playerId] = [...(newHands[playerId] ?? []), drawnCardId];
     
-    // Update Firestore
+    // Update Firestore - P0 FIX: Set turnPhase to 'discarding'
     await _firestore.collection('games').doc(roomId).update({
       'marriageState.discardPile': newDiscard,
       'marriageState.playerHands.$playerId': newHands[playerId],
+      'marriageState.turnPhase': 'discarding',
+      'marriageState.lastDrawnCardId': drawnCardId,
     });
     
     return drawnCardId;
@@ -196,6 +230,8 @@ class MarriageService {
     );
     
     if (state.currentPlayerId != playerId) return;
+    // P0 FIX: Validate player is in discarding phase
+    if (state.turnPhase != 'discarding') return;
     
     // Remove from player's hand
     final newHands = Map<String, List<String>>.from(state.playerHands);
@@ -210,13 +246,17 @@ class MarriageService {
     final nextIndex = (currentIndex + 1) % playerIds.length;
     final nextPlayerId = playerIds[nextIndex];
     
-    // Update Firestore
+    // Update Firestore - P0 FIX: Reset turnPhase to 'drawing' for next player
     await _firestore.collection('games').doc(roomId).update({
       'marriageState.discardPile': newDiscard,
       'marriageState.playerHands.$playerId': newHands[playerId],
       'marriageState.currentPlayerId': nextPlayerId,
+      'marriageState.turnPhase': 'drawing',  // Reset for next player
+      'marriageState.lastDrawnCardId': null,  // Clear drawn card
+      'marriageState.turnStartTime': DateTime.now().toIso8601String(),  // P1: Reset timer
     });
   }
+
   
   /// Declare/show hand (attempt to win)
   Future<bool> declare(String roomId, String playerId) async {

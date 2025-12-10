@@ -34,12 +34,14 @@ class MarriageMultiplayerScreen extends ConsumerStatefulWidget {
 class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerScreen> {
   String? _selectedCardId;
   bool _isProcessing = false;
-  bool _hasDrawn = false;  // Can't discard until drawn
+  // REMOVED: _hasDrawn flag - now using state.turnPhase from Firestore (P0 FIX)
   bool _isChatExpanded = false;
   bool _showVideoGrid = false;
+  Set<String> _highlightedCardIds = {};  // P2: Cards to highlight in meld suggestions
   
   // Card lookup cache
   final Map<String, Card> _cardCache = {};
+
   
   @override
   void initState() {
@@ -140,31 +142,37 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
               ],
             ),
             actions: [
-              // Tiplu indicator
+              // P1 FIX: Enhanced Tiplu indicator with Jhiplu/Poplu info
               if (tiplu != null)
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('Tiplu: ', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                      Text(
-                        tiplu.displayName,
-                        style: TextStyle(
-                          color: tiplu.suit.isRed ? Colors.red : Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                GestureDetector(
+                  onTap: () => _showTipluDialog(tiplu),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('👑 ', style: TextStyle(fontSize: 12)),
+                        Text(
+                          tiplu.displayName,
+                          style: TextStyle(
+                            color: tiplu.suit.isRed ? Colors.red.shade300 : Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 4),
+                        Icon(Icons.info_outline, color: Colors.white54, size: 14),
+                      ],
+                    ),
                   ),
                 ),
+
                 
               // Video Toggle
               IconButton(
@@ -189,13 +197,17 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                     // Turn indicator
                     _buildTurnIndicator(state, currentUser.uid),
                     
+                    // P0 FIX: Phase indicator (what action to take)
+                    if (isMyTurn)
+                      _buildPhaseIndicator(state),
+                    
                     // Other players (Scrollable for 8 players)
                     Expanded(
                       flex: 2,
                       child: _buildOpponentsArea(state, currentUser.uid),
                     ),
                     
-                    // Center - deck and discard
+                    // Center - deck and discard (use state.isDrawingPhase instead of local _hasDrawn)
                     Expanded(
                       flex: 3,
                       child: _buildCenterArea(state, topDiscard, isMyTurn),
@@ -211,6 +223,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                     _buildActionBar(isMyTurn, state, currentUser.uid),
                   ],
                 ),
+
                 
                 // Video Grid Overlay
                 if (_showVideoGrid)
@@ -321,6 +334,51 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     }
   }
   
+  /// P0 FIX: Phase indicator showing draw/discard phase
+  Widget _buildPhaseIndicator(MarriageGameState state) {
+    final isDrawingPhase = state.isDrawingPhase;
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: isDrawingPhase 
+            ? Colors.blue.withOpacity(0.85) 
+            : Colors.orange.withOpacity(0.85),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: (isDrawingPhase ? Colors.blue : Colors.orange).withOpacity(0.4),
+            blurRadius: 12,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            isDrawingPhase ? Icons.download_rounded : Icons.upload_rounded,
+            color: Colors.white,
+            size: 24,
+          ),
+          const SizedBox(width: 10),
+          Text(
+            isDrawingPhase ? '📥 DRAW A CARD' : '📤 DISCARD A CARD',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 300.ms).scale(begin: const Offset(0.9, 0.9));
+  }
+
+  
   Widget _buildTurnIndicator(MarriageGameState state, String myId) {
     final isMyTurn = state.currentPlayerId == myId;
     
@@ -383,27 +441,31 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   }
   
   Widget _buildCenterArea(MarriageGameState state, Card? topDiscard, bool isMyTurn) {
+    // P0 FIX: Use state.isDrawingPhase instead of local _hasDrawn
+    final canDraw = isMyTurn && state.isDrawingPhase;
+    
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Deck
           GestureDetector(
-            onTap: isMyTurn && !_hasDrawn ? _drawFromDeck : null,
-            child: _buildDeckPile(state.deckCards.length, isMyTurn && !_hasDrawn),
+            onTap: canDraw ? _drawFromDeck : null,
+            child: _buildDeckPile(state.deckCards.length, canDraw),
           ),
           
           const SizedBox(width: 20),
           
           // Discard pile
           GestureDetector(
-            onTap: isMyTurn && !_hasDrawn && topDiscard != null ? _drawFromDiscard : null,
-            child: _buildDiscardPile(topDiscard, isMyTurn && !_hasDrawn),
+            onTap: canDraw && topDiscard != null ? _drawFromDiscard : null,
+            child: _buildDiscardPile(topDiscard, canDraw),
           ),
         ],
       ),
     );
   }
+
   
   Widget _buildDeckPile(int count, bool canDraw) {
     return Container(
@@ -579,6 +641,10 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   }
   
   Widget _buildActionBar(bool isMyTurn, MarriageGameState state, String myId) {
+    // P0 FIX: Use state.isDiscardingPhase instead of local _hasDrawn
+    final canDiscard = isMyTurn && state.isDiscardingPhase && _selectedCardId != null;
+    final canDeclare = isMyTurn && state.isDiscardingPhase;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -590,9 +656,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
         children: [
           // Discard button
           ElevatedButton.icon(
-            onPressed: isMyTurn && _hasDrawn && _selectedCardId != null 
-                ? _discardCard 
-                : null,
+            onPressed: canDiscard ? _discardCard : null,
             icon: const Icon(Icons.arrow_upward),
             label: const Text('Discard'),
             style: ElevatedButton.styleFrom(
@@ -615,7 +679,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
           
           // Declare button
           ElevatedButton.icon(
-            onPressed: isMyTurn && _hasDrawn ? _declare : null,
+            onPressed: canDeclare ? _declare : null,
             icon: const Icon(Icons.check_circle),
             label: const Text('Declare'),
             style: ElevatedButton.styleFrom(
@@ -630,7 +694,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   }
   
   Future<void> _drawFromDeck() async {
-    if (_isProcessing || _hasDrawn) return;
+    if (_isProcessing) return;
+    // P0 FIX: No need to check _hasDrawn - service validates turnPhase
     
     setState(() => _isProcessing = true);
     
@@ -641,7 +706,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       
       if (userId != null) {
         await marriageService.drawFromDeck(widget.roomId, userId);
-        setState(() => _hasDrawn = true);
+        // P0 FIX: No need to set _hasDrawn - state updates from Firestore stream
       }
     } catch (e) {
       if (mounted) {
@@ -655,7 +720,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   }
   
   Future<void> _drawFromDiscard() async {
-    if (_isProcessing || _hasDrawn) return;
+    if (_isProcessing) return;
+    // P0 FIX: No need to check _hasDrawn - service validates turnPhase
     
     setState(() => _isProcessing = true);
     
@@ -666,7 +732,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       
       if (userId != null) {
         await marriageService.drawFromDiscard(widget.roomId, userId);
-        setState(() => _hasDrawn = true);
+        // P0 FIX: No need to set _hasDrawn - state updates from Firestore stream
       }
     } catch (e) {
       if (mounted) {
@@ -680,7 +746,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   }
   
   Future<void> _discardCard() async {
-    if (_selectedCardId == null || _isProcessing || !_hasDrawn) return;
+    if (_selectedCardId == null || _isProcessing) return;
+    // P0 FIX: No need to check _hasDrawn - service validates turnPhase
     
     setState(() => _isProcessing = true);
     
@@ -693,7 +760,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
         await marriageService.discardCard(widget.roomId, userId, _selectedCardId!);
         setState(() {
           _selectedCardId = null;
-          _hasDrawn = false; // Reset for next turn
+          // P0 FIX: No need to reset _hasDrawn - state updates from Firestore stream
         });
       }
     } catch (e) {
@@ -759,6 +826,117 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
           ),
         ],
       ),
+    );
+  }
+  
+  /// P1 FIX: Show detailed Tiplu/Jhiplu/Poplu dialog
+  void _showTipluDialog(Card tiplu) {
+    // Calculate Jhiplu (tiplu - 1) and Poplu (tiplu + 1)
+    final tipluValue = tiplu.rank.value;
+    final jhipluRank = Rank.values.firstWhere(
+      (r) => r.value == tipluValue - 1,
+      orElse: () => Rank.ace,
+    );
+    final popluRank = Rank.values.firstWhere(
+      (r) => r.value == tipluValue + 1,
+      orElse: () => Rank.king,
+    );
+    
+    final suitColor = tiplu.suit.isRed ? Colors.red : Colors.white;
+    final suitSymbol = tiplu.suit.symbol;
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: CasinoColors.cardBackground,
+        title: Row(
+          children: [
+            const Text('👑 ', style: TextStyle(fontSize: 24)),
+            Text('Wild Cards', style: TextStyle(color: CasinoColors.gold, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Tiplu
+            _buildWildCardRow('TIPLU (Wild)', tiplu.rank.symbol, suitSymbol, suitColor, 'Can substitute any card'),
+            const SizedBox(height: 12),
+            
+            // Jhiplu
+            _buildWildCardRow('JHIPLU', jhipluRank.symbol, suitSymbol, suitColor, 'One rank below Tiplu'),
+            const SizedBox(height: 12),
+            
+            // Poplu
+            _buildWildCardRow('POPLU', popluRank.symbol, suitSymbol, suitColor, 'One rank above Tiplu'),
+            
+            const SizedBox(height: 20),
+            
+            // Marriage Bonus
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.pink.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.pink),
+              ),
+              child: Column(
+                children: [
+                  const Text('💒 MARRIAGE BONUS', 
+                    style: TextStyle(color: Colors.pink, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${jhipluRank.symbol}$suitSymbol + ${tiplu.rank.symbol}$suitSymbol + ${popluRank.symbol}$suitSymbol',
+                    style: TextStyle(color: suitColor, fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text('= 100 BONUS POINTS! 🎉',
+                    style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('GOT IT', style: TextStyle(color: CasinoColors.gold)),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildWildCardRow(String label, String rank, String suit, Color color, String desc) {
+    return Row(
+      children: [
+        Container(
+          width: 40,
+          height: 55,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4),
+            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(rank, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(suit, style: TextStyle(color: color, fontSize: 14)),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              Text(desc, style: TextStyle(color: Colors.white54, fontSize: 11)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
