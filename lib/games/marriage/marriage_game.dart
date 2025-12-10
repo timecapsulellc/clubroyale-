@@ -1,21 +1,25 @@
-/// Marriage Game Engine
+/// Royal Meld (Marriage) Game Engine
 /// 
-/// Implementation of Nepali Marriage card game
+/// Implementation of Royal Meld (Marriage) card game
 /// 3 decks (156 cards) + 6 jokers, 21 cards per player
+/// Uses GameTerminology for multi-region support
 
 import 'package:taasclub/games/base_game.dart';
 import 'package:taasclub/core/card_engine/pile.dart';
 import 'package:taasclub/core/card_engine/deck.dart';
 import 'package:taasclub/core/card_engine/meld.dart';
 import 'package:taasclub/core/card_engine/player_strategy.dart';
+import 'package:taasclub/core/config/game_terminology.dart';
 
-/// Marriage Game state
+/// Royal Meld (Marriage) Game state
 class MarriageGame implements BaseGame {
   @override
   String get gameType => 'marriage';
   
   @override
-  String get displayName => 'Marriage';
+  // Use GameTerminology for multi-region support
+  String get displayName => GameTerminology.royalMeldGame;
+
   
   @override
   int get minPlayers => 2;

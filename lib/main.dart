@@ -36,7 +36,10 @@ import 'package:taasclub/features/admin/screens/admin_panel_screen.dart';
 import 'package:taasclub/features/admin/screens/grant_request_screen.dart';
 import 'package:taasclub/features/admin/screens/pending_approvals_screen.dart';
 import 'package:taasclub/features/settings/settings_screen.dart';
+import 'package:taasclub/core/config/game_settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // TODO: Fix chat screen API mismatches before enabling
+
 
 // import 'package:taasclub/features/admin/screens/admin_chat_screen.dart';
 // import 'package:taasclub/features/wallet/screens/user_support_chat_screen.dart';
@@ -266,8 +269,19 @@ void main() async {
     debugPrint('⚠️ RevenueCat initialization failed: $e');
     // Continue anyway - app can work without IAP
   }
+  // Initialize GameSettings for locale detection
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final gameSettings = GameSettings(prefs);
+    await gameSettings.init();
+    debugPrint('✅ GameSettings initialized (region: ${gameSettings.region})');
+  } catch (e) {
+    debugPrint('⚠️ GameSettings initialization failed: $e');
+    // Continue with default (global) region
+  }
   
   runApp(
+
     const ProviderScope(
       child: MyApp(),
     ),
@@ -281,10 +295,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: _router,
-      title: 'TaasClub',
+      title: 'ClubRoyale', // Updated branding
       theme: AppTheme.theme, // Use the new Casino Theme
       darkTheme: AppTheme.theme, // Force the same theme for now
       themeMode: ThemeMode.light, // Default to our defined theme
     );
+
   }
 }

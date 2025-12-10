@@ -1,6 +1,7 @@
-/// Marriage Service - Firebase sync for multiplayer Marriage game
+/// Royal Meld (Marriage) Service - Firebase sync for multiplayer game
 /// 
 /// Handles real-time game state synchronization via Firestore
+/// Supports both ClubRoyale (Global) and Marriage (South Asian) terminology
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,11 +10,12 @@ import 'package:taasclub/core/card_engine/deck.dart';
 import 'package:taasclub/core/card_engine/meld.dart';
 import 'package:taasclub/features/game/game_room.dart';
 
-/// Provider for MarriageService
+/// Provider for Royal Meld (Marriage) Service
 final marriageServiceProvider = Provider((ref) => MarriageService());
 
-/// Marriage-specific game state stored in Firestore
+/// Royal Meld (Marriage) game state stored in Firestore
 class MarriageGameState {
+
   final String tipluCardId;  // The wild card for this round
   final Map<String, List<String>> playerHands;  // playerId -> card IDs
   final List<String> deckCards;  // Remaining deck cards
