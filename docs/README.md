@@ -1,28 +1,31 @@
 # TaasClub - Documentation Hub
 
-> **Version:** 1.0 | **Date:** December 9, 2025 17:48 IST  
-> **Status:** 98% Complete (A+ Grade) | **Live:** https://taasclub-app.web.app  
-> **📊 Latest Audit:** [ULTIMATE_AUDIT_REPORT.md](./ULTIMATE_AUDIT_REPORT.md) | **🎯 Tasks:** [REMAINING_TASKS.md](./REMAINING_TASKS.md)
+> **Version:** 1.1 | **Date:** December 10, 2025  
+> **Status:** 99% Complete (A+ Grade) | **Live:** https://taasclub-app.web.app  
+> **📊 Latest Audit:** [ULTIMATE_AUDIT_REPORT.md](./ULTIMATE_AUDIT_REPORT.md) | **📋 Whitepaper:** [PROJECT_TECHNICAL_SUMMARY.md](./PROJECT_TECHNICAL_SUMMARY.md)
 
 ---
 
 ## 📊 Current Implementation Analysis
 
-### ✅ What's DONE (98% Complete)
+### ✅ What's DONE (99% Complete)
 
 | Component | Status | Logic |
 |-----------|--------|-------|
-| **4 Games** | ✅ | Marriage, Call Break, Teen Patti, Rummy |
+| **4 Games** | ✅ | Marriage, Call Break, Teen Patti, In-Between |
 | **Settlement Service** | ✅ | Calculates "who owes whom" with min transactions |
-| **Diamond Wallet** | ✅ | RevenueCat IAP, spend for rooms |
-| **GenKit AI** | ✅ | 5 flows (bot play, tips, moderation, bid suggest) |
+| **Diamond Wallet** | ✅ | RevenueCat IAP ready, spend for rooms |
+| **GenKit AI** | ✅ | 6 flows (bot play, tips, moderation, matchmaking) |
 | **Social Features** | ✅ | Friends, DMs, presence, global chat |
 | **Anti-Cheat** | ✅ | Server-side validation, rate limiting |
 | **Responsive Design** | ✅ | Mobile/Tablet/Desktop breakpoints |
 | **12 Cloud Functions** | ✅ | Deployed and working |
 | **169 Tests** | ✅ | All passing |
+| **Android APK** | ✅ | Built and tested on device |
+| **Web PWA** | ✅ | Live at taasclub-app.web.app |
 
 ---
+
 
 ## 🎯 Core Logic (Strategy A)
 
