@@ -1,17 +1,44 @@
 /**
- * Marriage Bot Play Flow
+ * Royal Meld / Marriage Bot Play Flow
  * 
- * Dedicated GenKit AI flow for Marriage card game with
+ * Dedicated GenKit AI flow for Royal Meld (Marriage) card game with
  * game-specific strategy prompts for different difficulty levels.
+ * 
+ * Supports dual terminology:
+ * - Global: Royal Meld, Wild Card, High Wild, Low Wild, Royal Sequence, Go Royale
+ * - South Asia: Marriage, Tiplu, Poplu, Jhiplu, Marriage, Declare
  */
 
 import { z } from 'zod';
 import { ai, geminiPro } from './config';
 
-// Input schema for Marriage bot
+// Terminology configurations for each region
+const terminology = {
+    global: {
+        gameName: 'Royal Meld',
+        wildCard: 'Wild Card',
+        highWild: 'High Wild',
+        lowWild: 'Low Wild',
+        royalSequence: 'Royal Sequence',
+        declare: 'Go Royale',
+        description: 'card game',
+    },
+    southAsia: {
+        gameName: 'Marriage',
+        wildCard: 'Tiplu',
+        highWild: 'Poplu',
+        lowWild: 'Jhiplu',
+        royalSequence: 'Marriage',
+        declare: 'Declare',
+        description: 'Nepali card game',
+    },
+};
+
+// Input schema for bot - now includes region
 const MarriageBotInputSchema = z.object({
     difficulty: z.enum(['easy', 'medium', 'hard', 'expert']),
     hand: z.array(z.string()),
+    region: z.enum(['global', 'southAsia']).default('global'),
     gameState: z.object({
         phase: z.enum(['drawing', 'discarding', 'declaring']),
         tiplu: z.string().optional(),
@@ -34,37 +61,40 @@ const MarriageBotOutputSchema = z.object({
 
 export type MarriageBotOutput = z.infer<typeof MarriageBotOutputSchema>;
 
-// Strategy prompts based on difficulty
-const strategyPrompts: Record<string, string> = {
-    easy: `Play casually. Make simple decisions. 
+// Strategy prompts generator based on difficulty and terminology
+const getStrategyPrompt = (difficulty: string, terms: typeof terminology.global): string => {
+    const strategies: Record<string, string> = {
+        easy: `Play casually. Make simple decisions. 
         - Draw from deck randomly
         - Discard high point cards first
         - Don't track opponent cards`,
 
-    medium: `Play with basic strategy.
+        medium: `Play with basic strategy.
         - Try to form melds (sets of 3+ same rank, runs of 3+ same suit)
         - Keep cards that might form melds
         - Discard unrelated high-point cards
-        - Notice tiplu (wild card) opportunities`,
+        - Notice ${terms.wildCard} (wild card) opportunities`,
 
-    hard: `Play strategically.
+        hard: `Play strategically.
         - Track which cards have been played
         - Calculate probability of completing melds
-        - Use tiplu (wild card) optimally
+        - Use ${terms.wildCard} (wild card) optimally
         - Block opponents by not discarding their likely needs
-        - Consider declaring when deadwood < 10 points`,
+        - Consider ${terms.declare.toLowerCase()}ing when deadwood < 10 points`,
 
-    expert: `Play like a Marriage champion.
+        expert: `Play like a ${terms.gameName} champion.
         - Perfect card memory - know what's left in deck
         - Probabilistic meld completion analysis
         - Opponent hand estimation based on picks/discards
-        - Optimal tiplu placement in melds
-        - Precise timing for declaration
+        - Optimal ${terms.wildCard} placement in melds
+        - Precise timing for ${terms.declare}
         - Bluffing via strategic discards
         - Minimize opponent's meld opportunities`,
+    };
+    return strategies[difficulty] || strategies.medium;
 };
 
-// Marriage bot play flow
+// Royal Meld / Marriage bot play flow
 export const marriageBotPlayFlow = ai.defineFlow(
     {
         name: 'marriageBotPlayFlow',
@@ -72,26 +102,27 @@ export const marriageBotPlayFlow = ai.defineFlow(
         outputSchema: MarriageBotOutputSchema,
     },
     async (input: MarriageBotInput): Promise<MarriageBotOutput> => {
-        const { difficulty, hand, gameState } = input;
-        const strategy = strategyPrompts[difficulty];
+        const { difficulty, hand, gameState, region = 'global' } = input;
+        const terms = terminology[region];
+        const strategy = getStrategyPrompt(difficulty, terms);
 
-        const prompt = `You are an AI playing Nepali Marriage card game at ${difficulty} difficulty.
+        const prompt = `You are an AI playing ${terms.gameName} ${terms.description} at ${difficulty} difficulty.
 
 STRATEGY: ${strategy}
 
 YOUR HAND: ${hand.join(', ')}
-TIPLU (Wild Card): ${gameState.tiplu || 'Not drawn yet'}
+${terms.wildCard.toUpperCase()} (Wild Card): ${gameState.tiplu || 'Not drawn yet'}
 TOP DISCARD: ${gameState.topDiscard || 'None'}
 CARDS IN DECK: ${gameState.cardsInDeck}
 ROUND: ${gameState.roundNumber}
 
 GAME PHASE: ${gameState.phase}
 
-MARRIAGE RULES:
+${terms.gameName.toUpperCase()} RULES:
 - Form melds: Sets (3+ same rank) or Runs (3+ consecutive same suit)
-- Tiplu acts as a wild card in any meld
-- K+Q of same suit in a meld = Marriage bonus (40 trump, 20 non-trump)
-- Declare when all 21 cards form valid non-overlapping melds
+- ${terms.wildCard} acts as a wild card in any meld
+- ${terms.lowWild} + ${terms.wildCard} + ${terms.highWild} of same suit = ${terms.royalSequence} bonus (40 trump, 20 non-trump)
+- ${terms.declare} when all 21 cards form valid non-overlapping melds
 
 ${gameState.phase === 'drawing' ? `
 DRAWING PHASE - Choose one:
@@ -109,14 +140,14 @@ DISCARDING PHASE - Choose a card to discard:
 ` : ''}
 
 ${gameState.phase === 'declaring' ? `
-Should you DECLARE? Only if all 21 cards form valid melds.
+Should you ${terms.declare.toUpperCase()}? Only if all 21 cards form valid melds.
 If not ready, continue discarding.
 ` : ''}
 
 Return JSON ONLY:
 ${gameState.phase === 'drawing'
                 ? '{"action": "drawDeck" | "drawDiscard", "reasoning": "brief explanation"}'
-                : '{"action": "discard" | "declare", "card": "card code if discarding", "reasoning": "brief explanation"}'}`;
+                : `{"action": "discard" | "declare", "card": "card code if discarding", "reasoning": "brief explanation"}`}`;
 
         try {
             const { output } = await ai.generate({

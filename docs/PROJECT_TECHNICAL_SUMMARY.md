@@ -1,7 +1,7 @@
-# TaasClub - Project Technical Summary
+# ClubRoyale (TaasClub) - Project Technical Summary
 ## Comprehensive Whitepaper for Stakeholders
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Date:** December 10, 2025  
 **Status:** Production Ready (99/100 Quality Score)
 
@@ -22,16 +22,18 @@
 
 # Executive Overview
 
-## What is TaasClub?
+## What is ClubRoyale?
 
-TaasClub is a **multiplayer card game platform** that digitizes the traditional "Home Game" experience. It enables users to:
+ClubRoyale (formerly TaasClub) is a **premium multiplayer card game platform** that digitizes the traditional "Home Game" experience. It enables users to:
 
 - **Host** private card game rooms for friends
-- **Play** 4 popular South Asian card games online
+- **Play** 4 popular card games online
 - **Track** scores in real-time with AI assistance
 - **Settle** debts by generating shareable settlement receipts
 
-> **One-liner:** A digital scorekeeper and social platform for private card games.
+> **One-liner:** Your Private Card Club - the ultimate digital scorekeeper for private card games.
+
+> **Tagline:** "Your Private Card Club"
 
 ## Key Highlights
 
@@ -72,10 +74,20 @@ TaasClub is a **multiplayer card game platform** that digitizes the traditional 
 ### 3. Feature Inventory
 
 #### Games (4 Complete)
-- ✅ **Marriage** - 2-8 players, 52 passing tests
+- ✅ **Royal Meld** (Marriage) - 2-8 players, 52 passing tests
 - ✅ **Call Break** - 4 players, 20 passing tests
 - ✅ **Teen Patti** - 2-8 players, AI bots
 - ✅ **In-Between** - 2-8 players, pot management
+
+#### Multi-Region Terminology Support
+| Global (ClubRoyale) | South Asia (Traditional) |
+|---------------------|--------------------------|
+| Royal Meld | Marriage |
+| Wild Card | Tiplu |
+| High Wild | Poplu |
+| Low Wild | Jhiplu |
+| Royal Sequence | Marriage |
+| Go Royale | Declare |
 
 #### Core Platform
 - ✅ **Authentication** - Google Sign-in + Anonymous
@@ -249,11 +261,12 @@ Total Files:             220+
 
 ## 🎴 Available Games
 
-### 1. Marriage (Taas)
+### 1. Royal Meld (Marriage/Taas)
 - **Players:** 2-8
 - **Type:** Rummy-style with melds
-- **Special:** Marriage bonus (K+Q same suit)
+- **Special:** Royal Sequence bonus (Wild trilogy)
 - **AI Bots:** Yes
+- **Terminology:** Dual-region support (Global + South Asian)
 
 ### 2. Call Break
 - **Players:** 4 (fixed)
@@ -386,13 +399,14 @@ Total Files:             220+
 | **Lobby** | Join by Code | ✅ |
 | **Lobby** | Public Rooms | ✅ |
 | **Lobby** | ELO Matchmaking | ✅ |
-| **Games** | Marriage | ✅ |
+| **Games** | Royal Meld (Marriage) | ✅ |
 | **Games** | Call Break | ✅ |
 | **Games** | Teen Patti | ✅ |
 | **Games** | In-Between | ✅ |
 | **AI** | Bot Opponents | ✅ |
 | **AI** | Game Tips | ✅ |
 | **AI** | Bid Suggestions | ✅ |
+| **AI** | Multi-Region Prompts | ✅ |
 | **Social** | Friends List | ✅ |
 | **Social** | Online Presence | ✅ |
 | **Social** | Game Invites | ✅ |
@@ -420,7 +434,7 @@ Total Files:             220+
 
 | Category | Tests | Status |
 |----------|-------|--------|
-| Marriage Game | 52 | ✅ Pass |
+| Royal Meld (Marriage) | 52 | ✅ Pass |
 | Call Break | 20 | ✅ Pass |
 | Widget Tests | 40 | ✅ Pass |
 | Service Tests | 57 | ✅ Pass |
@@ -506,7 +520,7 @@ Total Files:             220+
 ---
 
 **Document Prepared:** December 10, 2025  
-**Author:** TaasClub Development Team  
+**Author:** ClubRoyale Development Team  
 **Status:** Production Ready  
 **Quality Score:** 99/100
 

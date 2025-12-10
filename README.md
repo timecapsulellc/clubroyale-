@@ -1,6 +1,6 @@
-# TaasClub
+# ClubRoyale (TaasClub)
 
-> **The Private Club Ledger** - A multiplayer card game platform with AI-powered gameplay
+> **Your Private Card Club** - A multiplayer card game platform with AI-powered gameplay
 
 [![Live](https://img.shields.io/badge/Live-taasclub--app.web.app-brightgreen)](https://taasclub-app.web.app)
 [![Android](https://img.shields.io/badge/Android-APK%20Ready-green)](https://taasclub-app.web.app/download.html)
@@ -9,16 +9,17 @@
 
 ---
 
-## 🎮 What is TaasClub?
+## 🎮 What is ClubRoyale?
 
-TaasClub is a **multiplayer card game platform** that digitizes the "Home Game" experience. Host private rooms, play popular card games with friends, and settle scores seamlessly.
+ClubRoyale is a **premium multiplayer card game platform** that digitizes the "Home Game" experience. Host private rooms, play popular card games with friends, and settle scores seamlessly.
 
 ### For Players
-- 🃏 **Play 4 Games**: Marriage, Call Break, Teen Patti, In-Between
+- 🃏 **Play 4 Games**: Royal Meld (Marriage), Call Break, Teen Patti, In-Between
 - 👥 **Multiplayer**: 2-8 players per room
 - 🤖 **AI Opponents**: Smart bots fill empty seats
 - 💬 **Social**: Chat, voice, video during games
 - 📱 **Anywhere**: Web, Android, iOS (coming soon)
+- 🌍 **Multi-Region**: Global (ClubRoyale) and South Asian (Traditional) terminology
 
 ### For Hosts
 - 🏠 **Private Rooms**: Share 6-digit code with friends
@@ -74,10 +75,20 @@ flutter build apk --release
 ### Games (4 Complete)
 | Game | Players | AI Bots | Tests |
 |------|---------|---------|-------|
-| **Marriage** | 2-8 | ✅ | 52 |
+| **Royal Meld** (Marriage) | 2-8 | ✅ | 52 |
 | **Call Break** | 4 | ✅ | 20 |
 | **Teen Patti** | 2-8 | ✅ | ✅ |
 | **In-Between** | 2-8 | ✅ | ✅ |
+
+### Multi-Region Terminology
+| Global (ClubRoyale) | South Asia (Traditional) |
+|---------------------|--------------------------|
+| Royal Meld | Marriage |
+| Wild Card | Tiplu |
+| High Wild | Poplu |
+| Low Wild | Jhiplu |
+| Royal Sequence | Marriage (meld) |
+| Go Royale | Declare |
 
 ### Core Features
 - ✅ **Lobby System** - Create/join rooms with 6-digit codes
@@ -97,6 +108,7 @@ flutter build apk --release
 | `moderationFlow` | Chat content filtering |
 | `bidSuggestionFlow` | Bid recommendations |
 | `matchmakingFlow` | ELO-based player matching |
+
 
 ---
 
