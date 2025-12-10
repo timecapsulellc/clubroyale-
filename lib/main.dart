@@ -13,6 +13,7 @@ import 'features/lobby/lobby_screen.dart';
 import 'features/lobby/room_waiting_screen.dart';
 import 'features/game/game_screen.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/multi_theme.dart';
 import 'core/config/club_royale_theme.dart';
 import 'features/game/game_history_screen.dart';
 import 'games/call_break/call_break_screen.dart';
@@ -356,19 +357,24 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch theme changes from provider
+    final themeData = ref.watch(themeDataProvider);
+    final themeState = ref.watch(themeProvider);
+    
     return MaterialApp.router(
       routerConfig: _router,
       title: 'ClubRoyale',
-      theme: ClubRoyaleTheme.theme, // Premium ClubRoyale Theme
-      darkTheme: ClubRoyaleTheme.theme, // Premium dark theme
-      themeMode: ThemeMode.dark, // Dark mode for premium casino feel
+      theme: themeData, // Dynamic theme from provider
+      darkTheme: themeData, // Same theme for dark mode
+      themeMode: themeState.mode == AppThemeMode.light 
+          ? ThemeMode.light 
+          : ThemeMode.dark,
     );
-
-
   }
 }
+

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/core/config/club_royale_theme.dart';
+import 'package:clubroyale/core/theme/multi_theme.dart';
+import 'package:clubroyale/core/widgets/theme_selector.dart';
 import 'package:clubroyale/features/settings/widgets/terminology_toggle.dart';
 
 /// Settings Screen
@@ -12,8 +14,10 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeColors = ref.watch(themeColorsProvider);
+    
     return Scaffold(
-      backgroundColor: ClubRoyaleTheme.deepPurple,
+      backgroundColor: themeColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -23,20 +27,30 @@ class SettingsScreen extends ConsumerWidget {
         ),
         title: const Text('Settings', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         centerTitle: true,
+        actions: const [
+          ThemeToggleButton(), // Quick day/night toggle
+        ],
       ),
       body: Container(
-        decoration: const BoxDecoration(gradient: ClubRoyaleTheme.royalGradient),
+        decoration: BoxDecoration(gradient: themeColors.primaryGradient),
         child: ListView(
           children: [
             const SizedBox(height: 16),
             
+            // Theme Section Header
+            _buildSectionHeader('Appearance', themeColors),
+            
+            // Theme Selector Widget
+            const ThemeSelectorWidget(),
+            
+            const SizedBox(height: 24),
+            
             // Game Section Header
-            _buildSectionHeader('Game'),
+            _buildSectionHeader('Game', themeColors),
             
             // Terminology Toggle
             TerminologyToggle(
               onChanged: () {
-                // Force rebuild when terminology changes
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Terminology updated! Restart the game for full effect.'),
@@ -49,7 +63,7 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             
             // Account Section Header
-            _buildSectionHeader('Account'),
+            _buildSectionHeader('Account', themeColors),
             
             // Profile Settings
             _buildListTile(
@@ -57,6 +71,7 @@ class SettingsScreen extends ConsumerWidget {
               title: 'Edit Profile',
               subtitle: 'Change display name and avatar',
               onTap: () => context.push('/profile'),
+              themeColors: themeColors,
             ),
             
             // Wallet
@@ -65,21 +80,21 @@ class SettingsScreen extends ConsumerWidget {
               title: 'Wallet',
               subtitle: 'Manage diamonds and transactions',
               onTap: () => context.push('/wallet'),
+              themeColors: themeColors,
             ),
             
             const SizedBox(height: 24),
             
             // App Section Header
-            _buildSectionHeader('App'),
+            _buildSectionHeader('App', themeColors),
             
             // Notifications
             _buildListTile(
               icon: Icons.notifications,
               title: 'Notifications',
               subtitle: 'Game invites, friend requests',
-              onTap: () {
-                // TODO: Notifications settings
-              },
+              onTap: () {},
+              themeColors: themeColors,
             ),
             
             // About
@@ -93,13 +108,13 @@ class SettingsScreen extends ConsumerWidget {
                   applicationName: 'ClubRoyale',
                   applicationVersion: '1.0.0',
                   applicationLegalese: '© 2025 ClubRoyale',
-
                   children: [
                     const SizedBox(height: 16),
                     const Text('Your Private Card Club - The Ultimate Card Experience'),
                   ],
                 );
               },
+              themeColors: themeColors,
             ),
             
             const SizedBox(height: 32),
@@ -109,13 +124,13 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
   
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, ThemeColors themeColors) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       child: Text(
         title.toUpperCase(),
-        style: const TextStyle(
-          color: ClubRoyaleTheme.gold,
+        style: TextStyle(
+          color: themeColors.gold,
           fontSize: 12,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.5,
@@ -129,17 +144,18 @@ class SettingsScreen extends ConsumerWidget {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
+    required ThemeColors themeColors,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
-        leading: Icon(icon, color: ClubRoyaleTheme.gold),
+        leading: Icon(icon, color: themeColors.gold),
         title: Text(title, style: const TextStyle(color: Colors.white)),
-        subtitle: Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12)),
+        subtitle: Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
         trailing: const Icon(Icons.chevron_right, color: Colors.white54),
         onTap: onTap,
       ),
