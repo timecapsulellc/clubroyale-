@@ -1,6 +1,7 @@
-/// Marriage Multiplayer Screen
+/// Royal Meld (Marriage) Multiplayer Screen
 /// 
-/// Real-time multiplayer Marriage game connected to Firebase
+/// Real-time multiplayer card game connected to Firebase
+/// Uses GameTerminology for multi-region localization
 
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,7 @@ import 'package:taasclub/config/casino_theme.dart';
 import 'package:taasclub/config/visual_effects.dart';
 import 'package:taasclub/core/card_engine/pile.dart';
 import 'package:taasclub/core/card_engine/deck.dart';
+import 'package:taasclub/core/config/game_terminology.dart';
 import 'package:taasclub/games/marriage/marriage_service.dart';
 import 'package:taasclub/features/auth/auth_service.dart';
 import 'package:taasclub/core/card_engine/meld.dart';
@@ -17,6 +19,7 @@ import 'package:taasclub/features/game/widgets/player_avatar.dart';
 import 'package:taasclub/features/chat/widgets/chat_overlay.dart';
 import 'package:taasclub/features/rtc/widgets/audio_controls.dart';
 import 'package:taasclub/features/video/widgets/video_grid.dart';
+
 
 /// Multiplayer Marriage game screen
 class MarriageMultiplayerScreen extends ConsumerStatefulWidget {
@@ -125,7 +128,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             title: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Marriage', style: TextStyle(fontWeight: FontWeight.bold)),
+                // Use GameTerminology for multi-region support
+                Text(GameTerminology.royalMeldGame, style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(width: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -326,13 +330,15 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   }
   
   String _getMeldTypeName(MeldType type) {
+    // Use GameTerminology for multi-region support
     switch (type) {
-      case MeldType.set: return 'Trial';
-      case MeldType.run: return 'Sequence';
-      case MeldType.tunnel: return 'Tunnel';
-      case MeldType.marriage: return 'Marriage';
+      case MeldType.set: return GameTerminology.trial;
+      case MeldType.run: return GameTerminology.sequence;
+      case MeldType.tunnel: return GameTerminology.triple;
+      case MeldType.marriage: return GameTerminology.royalSequenceShort;
     }
   }
+
   
   /// P0 FIX: Phase indicator showing draw/discard phase
   Widget _buildPhaseIndicator(MarriageGameState state) {
@@ -677,17 +683,18 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             ),
           ),
           
-          // Declare button
+          // Declare button (Go Royale in global mode)
           ElevatedButton.icon(
             onPressed: canDeclare ? _declare : null,
             icon: const Icon(Icons.check_circle),
-            label: const Text('Declare'),
+            label: Text(GameTerminology.declare),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
               disabledBackgroundColor: Colors.grey.shade700,
             ),
           ),
+
         ],
       ),
     );
@@ -852,27 +859,28 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
         title: Row(
           children: [
             const Text('👑 ', style: TextStyle(fontSize: 24)),
-            Text('Wild Cards', style: TextStyle(color: CasinoColors.gold, fontWeight: FontWeight.bold)),
+            // Use GameTerminology for multi-region support
+            Text('${GameTerminology.wildCardFull}s', style: TextStyle(color: CasinoColors.gold, fontWeight: FontWeight.bold)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Tiplu
-            _buildWildCardRow('TIPLU (Wild)', tiplu.rank.symbol, suitSymbol, suitColor, 'Can substitute any card'),
+            // Wild Card (Tiplu)
+            _buildWildCardRow('${GameTerminology.wildCard.toUpperCase()} (${GameTerminology.wildCardFull})', tiplu.rank.symbol, suitSymbol, suitColor, 'Can substitute any card'),
             const SizedBox(height: 12),
             
-            // Jhiplu
-            _buildWildCardRow('JHIPLU', jhipluRank.symbol, suitSymbol, suitColor, 'One rank below Tiplu'),
+            // Low Wild (Jhiplu)
+            _buildWildCardRow(GameTerminology.lowWild.toUpperCase(), jhipluRank.symbol, suitSymbol, suitColor, 'One rank below ${GameTerminology.wildCard}'),
             const SizedBox(height: 12),
             
-            // Poplu
-            _buildWildCardRow('POPLU', popluRank.symbol, suitSymbol, suitColor, 'One rank above Tiplu'),
+            // High Wild (Poplu)
+            _buildWildCardRow(GameTerminology.highWild.toUpperCase(), popluRank.symbol, suitSymbol, suitColor, 'One rank above ${GameTerminology.wildCard}'),
             
             const SizedBox(height: 20),
             
-            // Marriage Bonus
+            // Royal Sequence Bonus (Marriage)
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -882,8 +890,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
               ),
               child: Column(
                 children: [
-                  const Text('💒 MARRIAGE BONUS', 
-                    style: TextStyle(color: Colors.pink, fontWeight: FontWeight.bold)),
+                  Text('💒 ${GameTerminology.royalSequence.toUpperCase()} BONUS', 
+                    style: const TextStyle(color: Colors.pink, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   Text(
                     '${jhipluRank.symbol}$suitSymbol + ${tiplu.rank.symbol}$suitSymbol + ${popluRank.symbol}$suitSymbol',
@@ -892,6 +900,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                   const SizedBox(height: 4),
                   const Text('= 100 BONUS POINTS! 🎉',
                     style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+
                 ],
               ),
             ),
