@@ -20,7 +20,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     // IMPORTANT: namespace must match applicationId for launcher to find MainActivity
-    namespace = "app.clubroyale"
+    // Using com.example.myapp to match Firebase config. Update Firebase to use app.clubroyale later.
+    namespace = "com.example.myapp"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -34,8 +35,8 @@ android {
     }
 
     defaultConfig {
-        // ClubRoyale app package ID
-        applicationId = "app.clubroyale"
+        // Using com.example.myapp to match Firebase. Update Firebase to app.clubroyale later.
+        applicationId = "com.example.myapp"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
