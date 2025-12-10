@@ -45,6 +45,15 @@ abstract class ChatMessage with _$ChatMessage {
     
     /// Preview of replied message
     String? replyPreview,
+    
+    /// List of user IDs who have read this message
+    @Default([]) List<String> readBy,
+    
+    /// Whether message was edited
+    @Default(false) bool isEdited,
+    
+    /// Original sender photo URL for display
+    String? senderPhotoUrl,
   }) = _ChatMessage;
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) =>
@@ -69,6 +78,9 @@ abstract class ChatMessage with _$ChatMessage {
       isDeleted: data['isDeleted'] as bool? ?? false,
       replyToId: data['replyToId'] as String?,
       replyPreview: data['replyPreview'] as String?,
+      readBy: List<String>.from(data['readBy'] ?? []),
+      isEdited: data['isEdited'] as bool? ?? false,
+      senderPhotoUrl: data['senderPhotoUrl'] as String?,
     );
   }
 
@@ -86,6 +98,9 @@ abstract class ChatMessage with _$ChatMessage {
       'isDeleted': isDeleted,
       'replyToId': replyToId,
       'replyPreview': replyPreview,
+      'readBy': readBy,
+      'isEdited': isEdited,
+      'senderPhotoUrl': senderPhotoUrl,
     };
   }
 }

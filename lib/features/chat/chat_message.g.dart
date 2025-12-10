@@ -27,6 +27,11 @@ _ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) => _ChatMessage(
   isDeleted: json['isDeleted'] as bool? ?? false,
   replyToId: json['replyToId'] as String?,
   replyPreview: json['replyPreview'] as String?,
+  readBy:
+      (json['readBy'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+  isEdited: json['isEdited'] as bool? ?? false,
+  senderPhotoUrl: json['senderPhotoUrl'] as String?,
 );
 
 Map<String, dynamic> _$ChatMessageToJson(_ChatMessage instance) =>
@@ -43,6 +48,9 @@ Map<String, dynamic> _$ChatMessageToJson(_ChatMessage instance) =>
       'isDeleted': instance.isDeleted,
       'replyToId': instance.replyToId,
       'replyPreview': instance.replyPreview,
+      'readBy': instance.readBy,
+      'isEdited': instance.isEdited,
+      'senderPhotoUrl': instance.senderPhotoUrl,
     };
 
 const _$MessageTypeEnumMap = {

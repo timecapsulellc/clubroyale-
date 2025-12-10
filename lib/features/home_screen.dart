@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -7,9 +6,12 @@ import 'auth/auth_service.dart';
 import 'package:taasclub/features/wallet/diamond_service.dart';
 import 'package:taasclub/config/casino_theme.dart';
 import 'package:taasclub/config/visual_effects.dart';
+import 'package:taasclub/core/config/club_royale_theme.dart';
 import 'package:taasclub/features/game/services/test_game_service.dart';
 import 'package:taasclub/features/game/widgets/player_avatar.dart';
 import 'package:taasclub/core/responsive/responsive_utils.dart';
+// Stories import
+import 'package:taasclub/features/stories/widgets/story_bar.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -33,9 +35,9 @@ class HomeScreen extends ConsumerWidget {
         },
       ),
       body: ParticleBackground(
-        primaryColor: CasinoColors.gold,
-        secondaryColor: CasinoColors.richPurple,
-        particleCount: 35,
+        primaryColor: ClubRoyaleTheme.gold,
+        secondaryColor: ClubRoyaleTheme.royalPurple,
+        particleCount: 40,
         child: SafeArea(
           child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -52,19 +54,25 @@ class HomeScreen extends ConsumerWidget {
                   StretchMode.zoomBackground,
                   StretchMode.blurBackground,
                 ],
-                title: Text(
-                  'ClubRoyale',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.2,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        offset: const Offset(0, 2),
-                        blurRadius: 4,
-                      ),
-                    ],
+                title: ShaderMask(
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [ClubRoyaleTheme.gold, ClubRoyaleTheme.champagne, ClubRoyaleTheme.gold],
+                  ).createShader(bounds),
+                  child: const Text(
+                    'ClubRoyale',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 24,
+                      letterSpacing: 2.0,
+                      shadows: [
+                        Shadow(
+                          color: Color(0x66D4AF37),
+                          offset: Offset(0, 2),
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 centerTitle: true,
@@ -193,6 +201,21 @@ class HomeScreen extends ConsumerWidget {
                       ],
                     ),
                   ).animate().fadeIn().slideX(),
+
+                  const SizedBox(height: 16),
+
+                  // 📖 Stories Bar (Super App Feature)
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: -16),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.2),
+                      border: Border(
+                        top: BorderSide(color: CasinoColors.gold.withOpacity(0.2)),
+                        bottom: BorderSide(color: CasinoColors.gold.withOpacity(0.2)),
+                      ),
+                    ),
+                    child: const StoryBar(),
+                  ).animate().fadeIn(delay: 150.ms),
 
                   const SizedBox(height: 32),
 

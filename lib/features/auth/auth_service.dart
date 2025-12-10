@@ -11,6 +11,22 @@ final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService();
 });
 
+/// Current user ID provider - returns null if not logged in
+final currentUserIdProvider = Provider<String?>((ref) {
+  final authService = ref.watch(authServiceProvider);
+  return authService.currentUser?.uid;
+});
+
+/// Auth state stream provider
+final authStateProvider = StreamProvider<User?>((ref) {
+  final authService = ref.watch(authServiceProvider);
+  if (TestMode.isEnabled) {
+    // Return a stream with the test user
+    return Stream.value(authService.currentUser);
+  }
+  return authService.authStateChanges;
+});
+
 /// Mock user for test mode - stored globally
 class TestUser {
   static String? uid;

@@ -194,6 +194,90 @@ class ChatService {
     }
   }
 
+  /// Mark a message as read by the current user
+  Future<void> markAsRead(String messageId) async {
+    await _chatRef.doc(messageId).update({
+      'readBy': FieldValue.arrayUnion([userId]),
+    });
+  }
+
+  /// Mark multiple messages as read
+  Future<void> markMultipleAsRead(List<String> messageIds) async {
+    final batch = _firestore.batch();
+    for (final id in messageIds) {
+      batch.update(_chatRef.doc(id), {
+        'readBy': FieldValue.arrayUnion([userId]),
+      });
+    }
+    await batch.commit();
+  }
+
+  /// Set typing indicator for current user
+  Future<void> setTyping(bool isTyping) async {
+    final typingRef = _firestore
+        .collection('games')
+        .doc(roomId)
+        .collection('typing')
+        .doc(userId);
+
+    if (isTyping) {
+      await typingRef.set({
+        'userId': userId,
+        'userName': userName,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } else {
+      await typingRef.delete();
+    }
+  }
+
+  /// Stream of currently typing users
+  Stream<List<TypingUser>> get typingUsersStream {
+    return _firestore
+        .collection('games')
+        .doc(roomId)
+        .collection('typing')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .where((doc) => doc.id != userId) // Exclude self
+            .map((doc) {
+              final data = doc.data();
+              final timestamp = (data['timestamp'] as Timestamp?)?.toDate();
+              // Only include if typed within last 5 seconds
+              if (timestamp != null && 
+                  DateTime.now().difference(timestamp).inSeconds < 5) {
+                return TypingUser(
+                  userId: doc.id,
+                  userName: data['userName'] as String? ?? 'Someone',
+                );
+              }
+              return null;
+            })
+            .whereType<TypingUser>()
+            .toList());
+  }
+
+  /// Edit a message (only own messages)
+  Future<void> editMessage(String messageId, String newContent) async {
+    final doc = await _chatRef.doc(messageId).get();
+    final message = ChatMessage.fromFirestore(doc);
+
+    if (message.senderId == userId) {
+      // Moderate the edited message
+      final moderationResult = await _moderateMessage(newContent);
+      if (!moderationResult.isAllowed) {
+        throw Exception(moderationResult.reason ?? 'Edit blocked');
+      }
+
+      final finalContent = moderationResult.editedMessage ?? newContent;
+      
+      await _chatRef.doc(messageId).update({
+        'content': finalContent,
+        'isEdited': true,
+      });
+    }
+  }
+
   /// Moderate a message using AI
   Future<ModerationResult> _moderateMessage(String content) async {
     try {
@@ -274,6 +358,14 @@ class ModerationResult {
   });
 }
 
+/// Typing user info
+class TypingUser {
+  final String userId;
+  final String userName;
+
+  TypingUser({required this.userId, required this.userName});
+}
+
 // =====================================================
 // RIVERPOD PROVIDERS
 // =====================================================
@@ -315,5 +407,13 @@ final chatMessagesProvider = StreamProvider.family<List<ChatMessage>, ChatServic
   (ref, params) {
     final chatService = ref.watch(chatServiceProvider(params));
     return chatService.messagesStream;
+  },
+);
+
+/// Provider for typing users stream
+final typingUsersProvider = StreamProvider.family<List<TypingUser>, ChatServiceParams>(
+  (ref, params) {
+    final chatService = ref.watch(chatServiceProvider(params));
+    return chatService.typingUsersStream;
   },
 );

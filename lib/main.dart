@@ -13,6 +13,7 @@ import 'features/lobby/lobby_screen.dart';
 import 'features/lobby/room_waiting_screen.dart';
 import 'features/game/game_screen.dart';
 import 'core/theme/app_theme.dart';
+import 'core/config/club_royale_theme.dart';
 import 'features/game/game_history_screen.dart';
 import 'games/call_break/call_break_screen.dart';
 import 'features/leaderboard/leaderboard_screen.dart';
@@ -38,6 +39,16 @@ import 'package:taasclub/features/admin/screens/pending_approvals_screen.dart';
 import 'package:taasclub/features/settings/settings_screen.dart';
 import 'package:taasclub/core/config/game_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+// Stories imports
+import 'package:taasclub/features/stories/screens/story_viewer_screen.dart';
+import 'package:taasclub/features/stories/screens/story_creator_screen.dart';
+import 'package:taasclub/features/stories/models/story.dart';
+// Voice Room imports
+import 'package:taasclub/features/social/voice_rooms/screens/voice_room_screen.dart';
+// Enhanced Profile imports
+import 'package:taasclub/features/profile/screens/profile_view_screen.dart';
+import 'package:taasclub/features/profile/screens/followers_list_screen.dart';
+import 'package:taasclub/features/profile/screens/create_post_screen.dart';
 // TODO: Fix chat screen API mismatches before enabling
 
 
@@ -210,6 +221,63 @@ final GoRouter _router = GoRouter(
             return const PendingApprovalsScreen();
           },
         ),
+        // Stories routes
+        GoRoute(
+          path: 'stories/create',
+          builder: (BuildContext context, GoRouterState state) {
+            return const StoryCreatorScreen();
+          },
+        ),
+        GoRoute(
+          path: 'stories/view',
+          builder: (BuildContext context, GoRouterState state) {
+            final extra = state.extra as Map<String, dynamic>?;
+            final stories = (extra?['stories'] as List<Story>?) ?? [];
+            final initialIndex = (extra?['initialIndex'] as int?) ?? 0;
+            final isOwn = (extra?['isOwn'] as bool?) ?? false;
+            return StoryViewerScreen(
+              stories: stories,
+              initialIndex: initialIndex,
+              isOwn: isOwn,
+            );
+          },
+        ),
+        // Voice Room route
+        GoRoute(
+          path: 'voice-room/:roomId',
+          builder: (BuildContext context, GoRouterState state) {
+            final String roomId = state.pathParameters['roomId']!;
+            return VoiceRoomScreen(roomId: roomId);
+          },
+        ),
+        // Enhanced Profile routes
+        GoRoute(
+          path: 'user/:userId',
+          builder: (BuildContext context, GoRouterState state) {
+            final String userId = state.pathParameters['userId']!;
+            return ProfileViewScreen(userId: userId);
+          },
+        ),
+        GoRoute(
+          path: 'followers/:userId',
+          builder: (BuildContext context, GoRouterState state) {
+            final String userId = state.pathParameters['userId']!;
+            return FollowersListScreen(userId: userId, isFollowers: true);
+          },
+        ),
+        GoRoute(
+          path: 'following/:userId',
+          builder: (BuildContext context, GoRouterState state) {
+            final String userId = state.pathParameters['userId']!;
+            return FollowersListScreen(userId: userId, isFollowers: false);
+          },
+        ),
+        GoRoute(
+          path: 'create-post',
+          builder: (BuildContext context, GoRouterState state) {
+            return const CreatePostScreen();
+          },
+        ),
         // TODO: Fix chat screen API mismatches before enabling
         // GoRoute(
         //   path: 'admin/chats',
@@ -295,11 +363,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: _router,
-      title: 'ClubRoyale', // Updated branding
-      theme: AppTheme.theme, // Use the new Casino Theme
-      darkTheme: AppTheme.theme, // Force the same theme for now
-      themeMode: ThemeMode.light, // Default to our defined theme
+      title: 'ClubRoyale',
+      theme: ClubRoyaleTheme.theme, // Premium ClubRoyale Theme
+      darkTheme: ClubRoyaleTheme.theme, // Premium dark theme
+      themeMode: ThemeMode.dark, // Dark mode for premium casino feel
     );
+
 
   }
 }

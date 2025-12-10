@@ -27,7 +27,10 @@ mixin _$ChatMessage {
  DateTime? get timestamp;/// Whether message is deleted (soft delete)
  bool get isDeleted;/// ID of message being replied to
  String? get replyToId;/// Preview of replied message
- String? get replyPreview;
+ String? get replyPreview;/// List of user IDs who have read this message
+ List<String> get readBy;/// Whether message was edited
+ bool get isEdited;/// Original sender photo URL for display
+ String? get senderPhotoUrl;
 /// Create a copy of ChatMessage
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -40,16 +43,16 @@ $ChatMessageCopyWith<ChatMessage> get copyWith => _$ChatMessageCopyWithImpl<Chat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatMessage&&(identical(other.id, id) || other.id == id)&&(identical(other.senderId, senderId) || other.senderId == senderId)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.content, content) || other.content == content)&&(identical(other.type, type) || other.type == type)&&const DeepCollectionEquality().equals(other.reactions, reactions)&&(identical(other.isModerated, isModerated) || other.isModerated == isModerated)&&(identical(other.moderationReason, moderationReason) || other.moderationReason == moderationReason)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.isDeleted, isDeleted) || other.isDeleted == isDeleted)&&(identical(other.replyToId, replyToId) || other.replyToId == replyToId)&&(identical(other.replyPreview, replyPreview) || other.replyPreview == replyPreview));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatMessage&&(identical(other.id, id) || other.id == id)&&(identical(other.senderId, senderId) || other.senderId == senderId)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.content, content) || other.content == content)&&(identical(other.type, type) || other.type == type)&&const DeepCollectionEquality().equals(other.reactions, reactions)&&(identical(other.isModerated, isModerated) || other.isModerated == isModerated)&&(identical(other.moderationReason, moderationReason) || other.moderationReason == moderationReason)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.isDeleted, isDeleted) || other.isDeleted == isDeleted)&&(identical(other.replyToId, replyToId) || other.replyToId == replyToId)&&(identical(other.replyPreview, replyPreview) || other.replyPreview == replyPreview)&&const DeepCollectionEquality().equals(other.readBy, readBy)&&(identical(other.isEdited, isEdited) || other.isEdited == isEdited)&&(identical(other.senderPhotoUrl, senderPhotoUrl) || other.senderPhotoUrl == senderPhotoUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,senderId,senderName,content,type,const DeepCollectionEquality().hash(reactions),isModerated,moderationReason,timestamp,isDeleted,replyToId,replyPreview);
+int get hashCode => Object.hash(runtimeType,id,senderId,senderName,content,type,const DeepCollectionEquality().hash(reactions),isModerated,moderationReason,timestamp,isDeleted,replyToId,replyPreview,const DeepCollectionEquality().hash(readBy),isEdited,senderPhotoUrl);
 
 @override
 String toString() {
-  return 'ChatMessage(id: $id, senderId: $senderId, senderName: $senderName, content: $content, type: $type, reactions: $reactions, isModerated: $isModerated, moderationReason: $moderationReason, timestamp: $timestamp, isDeleted: $isDeleted, replyToId: $replyToId, replyPreview: $replyPreview)';
+  return 'ChatMessage(id: $id, senderId: $senderId, senderName: $senderName, content: $content, type: $type, reactions: $reactions, isModerated: $isModerated, moderationReason: $moderationReason, timestamp: $timestamp, isDeleted: $isDeleted, replyToId: $replyToId, replyPreview: $replyPreview, readBy: $readBy, isEdited: $isEdited, senderPhotoUrl: $senderPhotoUrl)';
 }
 
 
@@ -60,7 +63,7 @@ abstract mixin class $ChatMessageCopyWith<$Res>  {
   factory $ChatMessageCopyWith(ChatMessage value, $Res Function(ChatMessage) _then) = _$ChatMessageCopyWithImpl;
 @useResult
 $Res call({
- String? id, String senderId, String senderName, String content, MessageType type, Map<String, String> reactions, bool isModerated, String? moderationReason, DateTime? timestamp, bool isDeleted, String? replyToId, String? replyPreview
+ String? id, String senderId, String senderName, String content, MessageType type, Map<String, String> reactions, bool isModerated, String? moderationReason, DateTime? timestamp, bool isDeleted, String? replyToId, String? replyPreview, List<String> readBy, bool isEdited, String? senderPhotoUrl
 });
 
 
@@ -77,7 +80,7 @@ class _$ChatMessageCopyWithImpl<$Res>
 
 /// Create a copy of ChatMessage
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? senderId = null,Object? senderName = null,Object? content = null,Object? type = null,Object? reactions = null,Object? isModerated = null,Object? moderationReason = freezed,Object? timestamp = freezed,Object? isDeleted = null,Object? replyToId = freezed,Object? replyPreview = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? senderId = null,Object? senderName = null,Object? content = null,Object? type = null,Object? reactions = null,Object? isModerated = null,Object? moderationReason = freezed,Object? timestamp = freezed,Object? isDeleted = null,Object? replyToId = freezed,Object? replyPreview = freezed,Object? readBy = null,Object? isEdited = null,Object? senderPhotoUrl = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,senderId: null == senderId ? _self.senderId : senderId // ignore: cast_nullable_to_non_nullable
@@ -91,6 +94,9 @@ as String?,timestamp: freezed == timestamp ? _self.timestamp : timestamp // igno
 as DateTime?,isDeleted: null == isDeleted ? _self.isDeleted : isDeleted // ignore: cast_nullable_to_non_nullable
 as bool,replyToId: freezed == replyToId ? _self.replyToId : replyToId // ignore: cast_nullable_to_non_nullable
 as String?,replyPreview: freezed == replyPreview ? _self.replyPreview : replyPreview // ignore: cast_nullable_to_non_nullable
+as String?,readBy: null == readBy ? _self.readBy : readBy // ignore: cast_nullable_to_non_nullable
+as List<String>,isEdited: null == isEdited ? _self.isEdited : isEdited // ignore: cast_nullable_to_non_nullable
+as bool,senderPhotoUrl: freezed == senderPhotoUrl ? _self.senderPhotoUrl : senderPhotoUrl // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -176,10 +182,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String senderId,  String senderName,  String content,  MessageType type,  Map<String, String> reactions,  bool isModerated,  String? moderationReason,  DateTime? timestamp,  bool isDeleted,  String? replyToId,  String? replyPreview)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String senderId,  String senderName,  String content,  MessageType type,  Map<String, String> reactions,  bool isModerated,  String? moderationReason,  DateTime? timestamp,  bool isDeleted,  String? replyToId,  String? replyPreview,  List<String> readBy,  bool isEdited,  String? senderPhotoUrl)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChatMessage() when $default != null:
-return $default(_that.id,_that.senderId,_that.senderName,_that.content,_that.type,_that.reactions,_that.isModerated,_that.moderationReason,_that.timestamp,_that.isDeleted,_that.replyToId,_that.replyPreview);case _:
+return $default(_that.id,_that.senderId,_that.senderName,_that.content,_that.type,_that.reactions,_that.isModerated,_that.moderationReason,_that.timestamp,_that.isDeleted,_that.replyToId,_that.replyPreview,_that.readBy,_that.isEdited,_that.senderPhotoUrl);case _:
   return orElse();
 
 }
@@ -197,10 +203,10 @@ return $default(_that.id,_that.senderId,_that.senderName,_that.content,_that.typ
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String senderId,  String senderName,  String content,  MessageType type,  Map<String, String> reactions,  bool isModerated,  String? moderationReason,  DateTime? timestamp,  bool isDeleted,  String? replyToId,  String? replyPreview)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String senderId,  String senderName,  String content,  MessageType type,  Map<String, String> reactions,  bool isModerated,  String? moderationReason,  DateTime? timestamp,  bool isDeleted,  String? replyToId,  String? replyPreview,  List<String> readBy,  bool isEdited,  String? senderPhotoUrl)  $default,) {final _that = this;
 switch (_that) {
 case _ChatMessage():
-return $default(_that.id,_that.senderId,_that.senderName,_that.content,_that.type,_that.reactions,_that.isModerated,_that.moderationReason,_that.timestamp,_that.isDeleted,_that.replyToId,_that.replyPreview);case _:
+return $default(_that.id,_that.senderId,_that.senderName,_that.content,_that.type,_that.reactions,_that.isModerated,_that.moderationReason,_that.timestamp,_that.isDeleted,_that.replyToId,_that.replyPreview,_that.readBy,_that.isEdited,_that.senderPhotoUrl);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -217,10 +223,10 @@ return $default(_that.id,_that.senderId,_that.senderName,_that.content,_that.typ
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String senderId,  String senderName,  String content,  MessageType type,  Map<String, String> reactions,  bool isModerated,  String? moderationReason,  DateTime? timestamp,  bool isDeleted,  String? replyToId,  String? replyPreview)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String senderId,  String senderName,  String content,  MessageType type,  Map<String, String> reactions,  bool isModerated,  String? moderationReason,  DateTime? timestamp,  bool isDeleted,  String? replyToId,  String? replyPreview,  List<String> readBy,  bool isEdited,  String? senderPhotoUrl)?  $default,) {final _that = this;
 switch (_that) {
 case _ChatMessage() when $default != null:
-return $default(_that.id,_that.senderId,_that.senderName,_that.content,_that.type,_that.reactions,_that.isModerated,_that.moderationReason,_that.timestamp,_that.isDeleted,_that.replyToId,_that.replyPreview);case _:
+return $default(_that.id,_that.senderId,_that.senderName,_that.content,_that.type,_that.reactions,_that.isModerated,_that.moderationReason,_that.timestamp,_that.isDeleted,_that.replyToId,_that.replyPreview,_that.readBy,_that.isEdited,_that.senderPhotoUrl);case _:
   return null;
 
 }
@@ -232,7 +238,7 @@ return $default(_that.id,_that.senderId,_that.senderName,_that.content,_that.typ
 @JsonSerializable()
 
 class _ChatMessage extends ChatMessage {
-  const _ChatMessage({this.id, required this.senderId, required this.senderName, required this.content, this.type = MessageType.text, final  Map<String, String> reactions = const {}, this.isModerated = false, this.moderationReason, this.timestamp, this.isDeleted = false, this.replyToId, this.replyPreview}): _reactions = reactions,super._();
+  const _ChatMessage({this.id, required this.senderId, required this.senderName, required this.content, this.type = MessageType.text, final  Map<String, String> reactions = const {}, this.isModerated = false, this.moderationReason, this.timestamp, this.isDeleted = false, this.replyToId, this.replyPreview, final  List<String> readBy = const [], this.isEdited = false, this.senderPhotoUrl}): _reactions = reactions,_readBy = readBy,super._();
   factory _ChatMessage.fromJson(Map<String, dynamic> json) => _$ChatMessageFromJson(json);
 
 /// Firestore document ID
@@ -266,6 +272,19 @@ class _ChatMessage extends ChatMessage {
 @override final  String? replyToId;
 /// Preview of replied message
 @override final  String? replyPreview;
+/// List of user IDs who have read this message
+ final  List<String> _readBy;
+/// List of user IDs who have read this message
+@override@JsonKey() List<String> get readBy {
+  if (_readBy is EqualUnmodifiableListView) return _readBy;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_readBy);
+}
+
+/// Whether message was edited
+@override@JsonKey() final  bool isEdited;
+/// Original sender photo URL for display
+@override final  String? senderPhotoUrl;
 
 /// Create a copy of ChatMessage
 /// with the given fields replaced by the non-null parameter values.
@@ -280,16 +299,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatMessage&&(identical(other.id, id) || other.id == id)&&(identical(other.senderId, senderId) || other.senderId == senderId)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.content, content) || other.content == content)&&(identical(other.type, type) || other.type == type)&&const DeepCollectionEquality().equals(other._reactions, _reactions)&&(identical(other.isModerated, isModerated) || other.isModerated == isModerated)&&(identical(other.moderationReason, moderationReason) || other.moderationReason == moderationReason)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.isDeleted, isDeleted) || other.isDeleted == isDeleted)&&(identical(other.replyToId, replyToId) || other.replyToId == replyToId)&&(identical(other.replyPreview, replyPreview) || other.replyPreview == replyPreview));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatMessage&&(identical(other.id, id) || other.id == id)&&(identical(other.senderId, senderId) || other.senderId == senderId)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.content, content) || other.content == content)&&(identical(other.type, type) || other.type == type)&&const DeepCollectionEquality().equals(other._reactions, _reactions)&&(identical(other.isModerated, isModerated) || other.isModerated == isModerated)&&(identical(other.moderationReason, moderationReason) || other.moderationReason == moderationReason)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.isDeleted, isDeleted) || other.isDeleted == isDeleted)&&(identical(other.replyToId, replyToId) || other.replyToId == replyToId)&&(identical(other.replyPreview, replyPreview) || other.replyPreview == replyPreview)&&const DeepCollectionEquality().equals(other._readBy, _readBy)&&(identical(other.isEdited, isEdited) || other.isEdited == isEdited)&&(identical(other.senderPhotoUrl, senderPhotoUrl) || other.senderPhotoUrl == senderPhotoUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,senderId,senderName,content,type,const DeepCollectionEquality().hash(_reactions),isModerated,moderationReason,timestamp,isDeleted,replyToId,replyPreview);
+int get hashCode => Object.hash(runtimeType,id,senderId,senderName,content,type,const DeepCollectionEquality().hash(_reactions),isModerated,moderationReason,timestamp,isDeleted,replyToId,replyPreview,const DeepCollectionEquality().hash(_readBy),isEdited,senderPhotoUrl);
 
 @override
 String toString() {
-  return 'ChatMessage(id: $id, senderId: $senderId, senderName: $senderName, content: $content, type: $type, reactions: $reactions, isModerated: $isModerated, moderationReason: $moderationReason, timestamp: $timestamp, isDeleted: $isDeleted, replyToId: $replyToId, replyPreview: $replyPreview)';
+  return 'ChatMessage(id: $id, senderId: $senderId, senderName: $senderName, content: $content, type: $type, reactions: $reactions, isModerated: $isModerated, moderationReason: $moderationReason, timestamp: $timestamp, isDeleted: $isDeleted, replyToId: $replyToId, replyPreview: $replyPreview, readBy: $readBy, isEdited: $isEdited, senderPhotoUrl: $senderPhotoUrl)';
 }
 
 
@@ -300,7 +319,7 @@ abstract mixin class _$ChatMessageCopyWith<$Res> implements $ChatMessageCopyWith
   factory _$ChatMessageCopyWith(_ChatMessage value, $Res Function(_ChatMessage) _then) = __$ChatMessageCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String senderId, String senderName, String content, MessageType type, Map<String, String> reactions, bool isModerated, String? moderationReason, DateTime? timestamp, bool isDeleted, String? replyToId, String? replyPreview
+ String? id, String senderId, String senderName, String content, MessageType type, Map<String, String> reactions, bool isModerated, String? moderationReason, DateTime? timestamp, bool isDeleted, String? replyToId, String? replyPreview, List<String> readBy, bool isEdited, String? senderPhotoUrl
 });
 
 
@@ -317,7 +336,7 @@ class __$ChatMessageCopyWithImpl<$Res>
 
 /// Create a copy of ChatMessage
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? senderId = null,Object? senderName = null,Object? content = null,Object? type = null,Object? reactions = null,Object? isModerated = null,Object? moderationReason = freezed,Object? timestamp = freezed,Object? isDeleted = null,Object? replyToId = freezed,Object? replyPreview = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? senderId = null,Object? senderName = null,Object? content = null,Object? type = null,Object? reactions = null,Object? isModerated = null,Object? moderationReason = freezed,Object? timestamp = freezed,Object? isDeleted = null,Object? replyToId = freezed,Object? replyPreview = freezed,Object? readBy = null,Object? isEdited = null,Object? senderPhotoUrl = freezed,}) {
   return _then(_ChatMessage(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,senderId: null == senderId ? _self.senderId : senderId // ignore: cast_nullable_to_non_nullable
@@ -331,6 +350,9 @@ as String?,timestamp: freezed == timestamp ? _self.timestamp : timestamp // igno
 as DateTime?,isDeleted: null == isDeleted ? _self.isDeleted : isDeleted // ignore: cast_nullable_to_non_nullable
 as bool,replyToId: freezed == replyToId ? _self.replyToId : replyToId // ignore: cast_nullable_to_non_nullable
 as String?,replyPreview: freezed == replyPreview ? _self.replyPreview : replyPreview // ignore: cast_nullable_to_non_nullable
+as String?,readBy: null == readBy ? _self._readBy : readBy // ignore: cast_nullable_to_non_nullable
+as List<String>,isEdited: null == isEdited ? _self.isEdited : isEdited // ignore: cast_nullable_to_non_nullable
+as bool,senderPhotoUrl: freezed == senderPhotoUrl ? _self.senderPhotoUrl : senderPhotoUrl // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

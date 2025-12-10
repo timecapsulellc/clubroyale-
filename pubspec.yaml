@@ -55,6 +55,7 @@ dependencies:
   web: ^1.1.1
   google_sign_in: ^6.2.1
   firebase_messaging: ^16.0.4
+  timeago: ^3.7.1
 
 dev_dependencies:
   flutter_test:
