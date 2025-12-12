@@ -118,7 +118,7 @@ Status: Live and deployed
 | **Lines of Code** | 64,619 |
 | **Features** | 20 modules |
 | **Games** | 4 complete |
-| **Tests** | 162/169 passing |
+| **Tests** | 169/169 passing |
 | **Cloud Functions** | 12 deployed |
 | **AI Flows** | 6 GenKit |
 | **Theme Presets** | 5 |
