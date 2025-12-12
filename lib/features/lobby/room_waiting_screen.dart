@@ -13,6 +13,7 @@ import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
 import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:clubroyale/core/services/share_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RoomWaitingScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -297,6 +298,42 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                                   color: Colors.white.withOpacity(0.7),
                                   fontSize: 12,
                                 ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          // Share buttons row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // WhatsApp Button
+                              _ShareButton(
+                                icon: Icons.message_rounded,
+                                label: 'WhatsApp',
+                                color: const Color(0xFF25D366),
+                                onTap: () => _shareToWhatsApp(context, room),
+                              ),
+                              const SizedBox(width: 12),
+                              // Copy Link Button
+                              _ShareButton(
+                                icon: Icons.link_rounded,
+                                label: 'Copy Link',
+                                color: Colors.amber,
+                                onTap: () => _copyInviteLink(context, room),
+                              ),
+                              const SizedBox(width: 12),
+                              // More Share Options
+                              _ShareButton(
+                                icon: Icons.share_rounded,
+                                label: 'More',
+                                color: Colors.deepPurple.shade300,
+                                onTap: () async {
+                                  await ShareService.shareGameRoomCode(
+                                    room.roomCode!,
+                                    room.gameType.toUpperCase(),
+                                    context: context,
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -947,5 +984,119 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
         );
       }
     }
+  }
+
+  /// Share to WhatsApp directly using wa.me URL
+  void _shareToWhatsApp(BuildContext context, GameRoom room) async {
+    if (room.roomCode == null) return;
+    
+    final gameTypeName = room.gameType == 'marriage' ? 'Marriage' : 'Call Break';
+    final message = Uri.encodeComponent(
+      '🎮 Join my $gameTypeName game on ClubRoyale!\n\n'
+      '🔢 Room Code: ${room.roomCode}\n\n'
+      '👉 Open ClubRoyale app and enter this code to join!\n\n'
+      '📱 Download: https://clubroyale-app.web.app'
+    );
+    
+    final whatsappUrl = Uri.parse('https://wa.me/?text=$message');
+    
+    try {
+      if (await canLaunchUrl(whatsappUrl)) {
+        await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+      } else {
+        // Fallback: copy to clipboard
+        await Clipboard.setData(ClipboardData(text: message));
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('WhatsApp not available. Link copied to clipboard!'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Copy invite link to clipboard
+  void _copyInviteLink(BuildContext context, GameRoom room) async {
+    if (room.roomCode == null) return;
+    
+    final gameTypeName = room.gameType == 'marriage' ? 'Marriage' : 'Call Break';
+    final inviteText = '🎮 Join my $gameTypeName game!\n'
+        '🔢 Room Code: ${room.roomCode}\n'
+        '📱 https://clubroyale-app.web.app';
+    
+    await Clipboard.setData(ClipboardData(text: inviteText));
+    
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 8),
+              Text('Invite link copied! Paste it anywhere'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+}
+
+/// Stylish share button widget
+class _ShareButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ShareButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.5)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 18),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

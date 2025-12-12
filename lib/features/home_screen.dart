@@ -262,9 +262,20 @@ class HomeScreen extends ConsumerWidget {
                   
                   const SizedBox(height: 12),
 
-                  // Game Type Cards - Row 1
+                  // Game Type Cards - Row 1 (Featured Games)
                   Row(
                     children: [
+                      Expanded(
+                        child: _GameTypeCard(
+                          icon: Icons.layers_rounded,
+                          title: 'Marriage',
+                          subtitle: 'Rummy-style',
+                          color: Colors.pink,
+                          isFeatured: true,
+                          onTap: () => context.go('/marriage'),
+                        ).animate().fadeIn(delay: 400.ms).slideX(begin: -0.1),
+                      ),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: _GameTypeCard(
                           icon: Icons.style_rounded,
@@ -272,16 +283,6 @@ class HomeScreen extends ConsumerWidget {
                           subtitle: 'Trick-taking',
                           color: CasinoColors.gold,
                           onTap: () => context.go('/lobby'),
-                        ).animate().fadeIn(delay: 400.ms).slideX(begin: -0.1),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _GameTypeCard(
-                          icon: Icons.layers_rounded,
-                          title: 'Marriage',
-                          subtitle: 'Rummy-style',
-                          color: Colors.pink,
-                          onTap: () => context.go('/marriage'),
                         ).animate().fadeIn(delay: 450.ms).slideX(begin: 0.1),
                       ),
                     ],
@@ -1631,6 +1632,7 @@ class _GameTypeCard extends StatelessWidget {
   final String subtitle;
   final Color color;
   final bool isNew;
+  final bool isFeatured;
   final VoidCallback onTap;
 
   const _GameTypeCard({
@@ -1639,14 +1641,15 @@ class _GameTypeCard extends StatelessWidget {
     required this.subtitle,
     required this.color,
     this.isNew = false,
+    this.isFeatured = false,
     required this.onTap,
   });
 
   // Get player count info based on game type
   String get _playerInfo {
     switch (title) {
+      case 'Marriage': return '2-8 players';
       case 'Call Break': return '4 players';
-      case 'Marriage': return '2-5 players';
       case 'Teen Patti': return '3-6 players';
       case 'In Between': return '2-8 players';
       default: return '2-6 players';
@@ -1655,9 +1658,13 @@ class _GameTypeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Use gold border/glow for featured games
+    final borderColor = isFeatured ? ClubRoyaleTheme.gold : color.withOpacity(0.4);
+    final borderWidth = isFeatured ? 2.0 : 1.5;
+    
     return Card(
-      elevation: 6,
-      shadowColor: color.withOpacity(0.4),
+      elevation: isFeatured ? 10 : 6,
+      shadowColor: isFeatured ? ClubRoyaleTheme.gold.withOpacity(0.5) : color.withOpacity(0.4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: InkWell(
         onTap: onTap,
@@ -1666,15 +1673,21 @@ class _GameTypeCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                CasinoColors.cardBackground,
-                color.withOpacity(0.15),
-              ],
+              colors: isFeatured
+                  ? [ClubRoyaleTheme.deepPurple, color.withOpacity(0.25)]
+                  : [CasinoColors.cardBackground, color.withOpacity(0.15)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: color.withOpacity(0.4), width: 1.5),
+            border: Border.all(color: borderColor, width: borderWidth),
+            boxShadow: isFeatured ? [
+              BoxShadow(
+                color: ClubRoyaleTheme.gold.withOpacity(0.3),
+                blurRadius: 12,
+                spreadRadius: 2,
+              ),
+            ] : null,
           ),
           child: Stack(
             children: [
@@ -1701,11 +1714,11 @@ class _GameTypeCard extends StatelessWidget {
                     child: Icon(icon, color: color, size: 26),
                   ),
                   const SizedBox(height: 10),
-                  // Title
+                  // Title with optional gold text for featured
                   Text(
                     title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
+                      color: isFeatured ? ClubRoyaleTheme.gold : Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
                     ),
@@ -1737,6 +1750,32 @@ class _GameTypeCard extends StatelessWidget {
                   ),
                 ],
               ),
+              // Featured badge (crown icon)
+              if (isFeatured)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [ClubRoyaleTheme.gold, ClubRoyaleTheme.champagne],
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: ClubRoyaleTheme.gold.withOpacity(0.5),
+                          blurRadius: 6,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.star_rounded,
+                      color: Color(0xFF2D1B4E),
+                      size: 14,
+                    ),
+                  ),
+                ),
               // NEW badge
               if (isNew)
                 Positioned(
