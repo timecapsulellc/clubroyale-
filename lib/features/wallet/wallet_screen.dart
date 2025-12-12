@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:clubroyale/core/config/diamond_config.dart';
+import 'package:clubroyale/core/config/club_royale_theme.dart';
 import 'package:clubroyale/features/wallet/diamond_rewards_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -219,15 +220,16 @@ class WalletScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(24),
         gradient: LinearGradient(
            colors: [
-             colorScheme.primary,
-             Color.lerp(colorScheme.primary, Colors.black, 0.3)!,
+             ClubRoyaleTheme.royalPurple,
+             ClubRoyaleTheme.deepPurple,
            ],
            begin: Alignment.topLeft,
            end: Alignment.bottomRight,
         ),
+        border: Border.all(color: ClubRoyaleTheme.gold.withOpacity(0.5), width: 2),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withValues(alpha: 0.3),
+            color: ClubRoyaleTheme.gold.withOpacity(0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -241,10 +243,10 @@ class WalletScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: ClubRoyaleTheme.gold.withOpacity(0.3),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.diamond_outlined, color: Colors.white, size: 20),
+                child: Icon(Icons.diamond_outlined, color: ClubRoyaleTheme.gold, size: 20),
               ),
               const SizedBox(width: 12),
               Text(

@@ -1,11 +1,10 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-// import 'dart:io'; // Removed for web compatibility
+import 'package:clubroyale/core/config/club_royale_theme.dart';
 
 import '../auth/auth_service.dart';
 import '../wallet/diamond_balance_widget.dart';
@@ -76,11 +75,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             children: [
               GestureDetector(
                 onTap: _pickImage,
-                child: CircleAvatar(
-                  radius: 50,
-                  // Use MemoryImage which works on usage both platforms without dart:io
-                  backgroundImage: _imageBytes != null ? MemoryImage(_imageBytes!) : null,
-                  child: _imageBytes == null ? const Icon(Icons.add_a_photo, size: 50) : null,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: ClubRoyaleTheme.gold, width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: ClubRoyaleTheme.gold.withOpacity(0.3),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: ClubRoyaleTheme.deepPurple,
+                    backgroundImage: _imageBytes != null ? MemoryImage(_imageBytes!) : null,
+                    child: _imageBytes == null 
+                        ? Icon(Icons.add_a_photo, size: 50, color: ClubRoyaleTheme.gold) 
+                        : null,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -144,16 +158,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withValues(alpha: 0.2),
+                    color: ClubRoyaleTheme.gold.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: ClubRoyaleTheme.gold.withOpacity(0.3)),
                   ),
-                  child: Icon(Icons.palette_outlined, color: Colors.amber.shade700),
+                  child: Icon(Icons.palette_outlined, color: ClubRoyaleTheme.gold),
                 ),
-                title: const Text('Customize Table', style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: const Text('Change themes and card skins'),
-                trailing: Icon(Icons.chevron_right, color: Colors.grey.shade600),
+                title: Text('Customize Table', style: TextStyle(fontWeight: FontWeight.bold, color: ClubRoyaleTheme.champagne)),
+                subtitle: Text('Change themes and card skins', style: TextStyle(color: Colors.white70)),
+                trailing: Icon(Icons.chevron_right, color: ClubRoyaleTheme.gold),
                 onTap: () {
-                  // Import and show theme store bottom sheet
                   showThemeStoreBottomSheet(context);
                 },
               ),
