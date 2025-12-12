@@ -64,6 +64,12 @@ import 'package:clubroyale/features/info/screens/about_screen.dart';
 import 'package:clubroyale/features/info/screens/landing_page.dart';
 import 'package:clubroyale/features/info/screens/privacy_screen.dart';
 
+// Social & Gaming Features imports
+import 'package:clubroyale/features/social/screens/activity_feed_screen.dart';
+import 'package:clubroyale/features/tournament/screens/tournament_lobby_screen.dart';
+import 'package:clubroyale/features/clubs/screens/clubs_list_screen.dart';
+import 'package:clubroyale/features/replay/screens/replay_list_screen.dart';
+
 
 // Analytics service singleton for screen tracking
 final _analyticsService = AnalyticsService();
@@ -337,6 +343,31 @@ final GoRouter _router = GoRouter(
           path: 'landing',
           builder: (BuildContext context, GoRouterState state) {
             return const LandingPage();
+          },
+        ),
+        // Social & Gaming Feature Routes
+        GoRoute(
+          path: 'activity',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ActivityFeedScreen();
+          },
+        ),
+        GoRoute(
+          path: 'tournaments',
+          builder: (BuildContext context, GoRouterState state) {
+            return const TournamentLobbyScreen();
+          },
+        ),
+        GoRoute(
+          path: 'clubs',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ClubsListScreen();
+          },
+        ),
+        GoRoute(
+          path: 'replays',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ReplayListScreen();
           },
         ),
       ],

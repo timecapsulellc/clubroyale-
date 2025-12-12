@@ -104,12 +104,115 @@ Or open ClubRoyale and enter the room code!
     buffer.writeln('${'─' * 20}');
     buffer.writeln(summary);
     buffer.writeln();
-    buffer.writeln('Play at: taasclub.app');
+    buffer.writeln('Play at: clubroyale.app');
     
     return shareText(
       text: buffer.toString(),
       subject: '$gameDisplayName Game Results',
     );
+  }
+
+  /// Share game result with rich formatting
+  static Future<ShareResult> shareGameResult({
+    required String gameType,
+    required String playerName,
+    required int score,
+    required bool isWinner,
+    required Map<String, int> allScores,
+    String? roomCode,
+  }) async {
+    final gameDisplayName = _getGameDisplayName(gameType);
+    final gameEmoji = _getGameEmoji(gameType);
+    
+    final buffer = StringBuffer();
+    
+    if (isWinner) {
+      buffer.writeln('🏆 I WON! 🏆');
+    }
+    buffer.writeln('$gameEmoji $gameDisplayName on ClubRoyale');
+    buffer.writeln('${'─' * 25}');
+    
+    // Sort by score
+    final sortedScores = allScores.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    
+    for (var i = 0; i < sortedScores.length; i++) {
+      final entry = sortedScores[i];
+      final medal = i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '  ';
+      final isMe = entry.key == playerName ? ' ⭐' : '';
+      buffer.writeln('$medal ${entry.key}: ${entry.value} pts$isMe');
+    }
+    
+    buffer.writeln('${'─' * 25}');
+    buffer.writeln();
+    buffer.writeln('📱 Play with me: clubroyale.app');
+    if (roomCode != null) {
+      buffer.writeln('🔗 Room: $roomCode');
+    }
+    buffer.writeln();
+    buffer.writeln('#ClubRoyale #$gameDisplayName #CardGames');
+    
+    return shareText(
+      text: buffer.toString(),
+      subject: isWinner 
+          ? 'I won $gameDisplayName on ClubRoyale! 🏆' 
+          : '$gameDisplayName Results',
+    );
+  }
+
+  /// Share achievement unlock
+  static Future<ShareResult> shareAchievement({
+    required String achievementTitle,
+    required String achievementDescription,
+    required String rarity,
+  }) async {
+    final rarityEmoji = _getRarityEmoji(rarity);
+    
+    final buffer = StringBuffer();
+    buffer.writeln('🏅 Achievement Unlocked! 🏅');
+    buffer.writeln();
+    buffer.writeln('$rarityEmoji $achievementTitle');
+    buffer.writeln('📝 $achievementDescription');
+    buffer.writeln();
+    buffer.writeln('🎮 Playing on ClubRoyale');
+    buffer.writeln('📱 Join me: clubroyale.app');
+    buffer.writeln();
+    buffer.writeln('#ClubRoyale #Achievement #Gaming');
+    
+    return shareText(
+      text: buffer.toString(),
+      subject: 'I unlocked "$achievementTitle" on ClubRoyale!',
+    );
+  }
+
+  static String _getGameEmoji(String gameType) {
+    switch (gameType) {
+      case 'marriage':
+        return '💒';
+      case 'call_break':
+        return '♠️';
+      case 'teen_patti':
+        return '🃏';
+      case 'in_between':
+        return '🎰';
+      default:
+        return '🎴';
+    }
+  }
+
+  static String _getRarityEmoji(String rarity) {
+    switch (rarity.toLowerCase()) {
+      case 'legendary':
+        return '🌟';
+      case 'epic':
+        return '💜';
+      case 'rare':
+        return '💙';
+      case 'uncommon':
+        return '💚';
+      default:
+        return '⚪';
+    }
   }
 
   /// Copy text to clipboard

@@ -29,10 +29,9 @@ class HomeScreen extends ConsumerWidget {
         onAccountTap: () => context.go('/profile'),
         onSettingsTap: () => context.go('/settings'),
         onStoreTap: () => context.go('/wallet'),
-        onBackTap: () async {
-          await authService.signOut();
-          if (context.mounted) context.go('/auth');
-        },
+        onActivityTap: () => context.go('/activity'),
+        onTournamentTap: () => context.go('/tournaments'),
+        onClubsTap: () => context.go('/clubs'),
       ),
       body: ParticleBackground(
         primaryColor: ClubRoyaleTheme.gold,

@@ -258,6 +258,9 @@ class GameBottomNav extends StatelessWidget {
   final VoidCallback? onSettingsTap;
   final VoidCallback? onStoreTap;
   final VoidCallback? onBackTap;
+  final VoidCallback? onActivityTap;
+  final VoidCallback? onTournamentTap;
+  final VoidCallback? onClubsTap;
   
   const GameBottomNav({
     super.key,
@@ -265,12 +268,15 @@ class GameBottomNav extends StatelessWidget {
     this.onSettingsTap,
     this.onStoreTap,
     this.onBackTap,
+    this.onActivityTap,
+    this.onTournamentTap,
+    this.onClubsTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.7),
         border: Border(
@@ -286,20 +292,33 @@ class GameBottomNav extends StatelessWidget {
               label: 'Account',
               onTap: onAccountTap,
             ),
+            if (onActivityTap != null)
+              _NavItem(
+                icon: Icons.dynamic_feed,
+                label: 'Activity',
+                onTap: onActivityTap,
+              ),
+            if (onTournamentTap != null)
+              _NavItem(
+                icon: Icons.emoji_events,
+                label: 'Tourneys',
+                onTap: onTournamentTap,
+              ),
+            if (onClubsTap != null)
+              _NavItem(
+                icon: Icons.groups,
+                label: 'Clubs',
+                onTap: onClubsTap,
+              ),
             _NavItem(
-              icon: Icons.settings,
-              label: 'Settings',
-              onTap: onSettingsTap,
-            ),
-            _NavItem(
-              icon: Icons.shopping_cart,
+              icon: Icons.diamond,
               label: 'Store',
               onTap: onStoreTap,
             ),
             _NavItem(
-              icon: Icons.arrow_back,
-              label: 'Go Back',
-              onTap: onBackTap ?? () => Navigator.of(context).pop(),
+              icon: Icons.settings,
+              label: 'Settings',
+              onTap: onSettingsTap,
             ),
           ],
         ),

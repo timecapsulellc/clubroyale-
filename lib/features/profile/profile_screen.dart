@@ -12,6 +12,8 @@ import '../wallet/diamond_balance_widget.dart';
 import '../store/ui/theme_store_bottom_sheet.dart';
 import 'profile_service.dart';
 import 'user_profile.dart';
+import 'widgets/badges_grid.dart';
+
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -118,6 +120,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: const Text('Save'),
               ),
               const SizedBox(height: 32),
+              // Achievements Section
+              if (user != null) ...[
+                const Divider(),
+                const SizedBox(height: 8),
+                BadgesGrid(
+                  userId: user.uid,
+                  onSeeAllTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AllAchievementsScreen(userId: user.uid),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+              ],
               // Theme Store Section
               const Divider(),
               const SizedBox(height: 16),
