@@ -2,22 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CLIENT_ID</key>
-	<string>194696695724-l96v6blfj5as6vn0voo7cn9k96ijava5.apps.googleusercontent.com</string>
-	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.194696695724-l96v6blfj5as6vn0voo7cn9k96ijava5</string>
 	<key>API_KEY</key>
-	<string>AIzaSyAydEKLaBAcDYfDLCQ0-hrU3Sst1bvJJHI</string>
+	<string>AIzaSyB6HyOAa4pN3_cUsSehZiE4-p2ClAsIluw</string>
 	<key>GCM_SENDER_ID</key>
-	<string>194696695724</string>
+	<string>691812216238</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.taasclub.app</string>
 	<key>PROJECT_ID</key>
-	<string>taasclub-app</string>
+	<string>clubroyale-app</string>
 	<key>STORAGE_BUCKET</key>
-	<string>taasclub-app.firebasestorage.app</string>
+	<string>clubroyale-app.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:194696695724:ios:5470b4d3661bce1dc37409</string>
+	<string>1:691812216238:ios:5fe504f10d20860b722c3f</string>
 </dict>
 </plist>

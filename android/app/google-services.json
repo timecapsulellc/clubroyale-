@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "194696695724",
-    "project_id": "taasclub-app",
-    "storage_bucket": "taasclub-app.firebasestorage.app"
+    "project_number": "691812216238",
+    "project_id": "clubroyale-app",
+    "storage_bucket": "clubroyale-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:194696695724:android:af9dcabd3b1ea340c37409",
+        "mobilesdk_app_id": "1:691812216238:android:b094feb74e94bde0722c3f",
         "android_client_info": {
           "package_name": "com.example.myapp"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyD8WUZlOR-3M7KyBGpmNwxnEnADxPmQ8Cw"
+          "current_key": "AIzaSyAkttmP2AuhEJob4PZ44SKnygEuC-VTNaY"
         }
       ],
       "services": {
