@@ -1,82 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart';
-import 'package:clubroyale/features/wallet/diamond_wallet.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/core/config/diamond_config.dart';
 
-/// Screen for purchasing diamonds via RevenueCat IAP
-/// Placeholder implementation - requires RevenueCat configuration
-class DiamondPurchaseScreen extends ConsumerStatefulWidget {
+/// Diamond Info Screen - ClubRoyale uses FREE diamonds only
+/// 
+/// Safe Harbor Model: No real money transactions
+/// Diamonds are earned for FREE through:
+/// - Welcome bonus (100💎)
+/// - Daily login (10💎)
+/// - Watching ads (20💎 x 6/day)
+/// - Completing games (5💎 x 15/day)
+/// - Referrals (50💎)
+/// - Weekly bonus (100💎 on Sundays)
+class DiamondPurchaseScreen extends ConsumerWidget {
   const DiamondPurchaseScreen({super.key});
 
   @override
-  ConsumerState<DiamondPurchaseScreen> createState() => _DiamondPurchaseScreenState();
-}
-
-class _DiamondPurchaseScreenState extends ConsumerState<DiamondPurchaseScreen> {
-  bool _isPurchasing = false;
-
-  // Diamond packages (placeholder)
-  final List<DiamondPackage> packages = [
-    DiamondPackage(diamonds: 50, price: '₹100', productId: 'diamonds_50'),
-    DiamondPackage(diamonds: 120, price: '₹200', productId: 'diamonds_120', bonus: 20),
-    DiamondPackage(diamonds: 300, price: '₹500', productId: 'diamonds_300', bonus: 50, popular: true),
-    DiamondPackage(diamonds: 650, price: '₹1000', productId: 'diamonds_650', bonus: 150),
-  ];
-
-  Future<void> _purchasePackage(DiamondPackage package) async {
-    setState(() => _isPurchasing = true);
-
-    try {
-      // TODO: Integrate with RevenueCat
-      // final offerings = await Purchases.getOfferings();
-      // final package = offerings.current?.availablePackages.firstWhere(...)
-      // await Purchases.purchasePackage(package);
-      
-      // Placeholder: Simulate purchase success
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // For demo purposes, add diamonds directly
-      final authService = ref.read(authServiceProvider);
-      final userId = authService.currentUser?.uid;
-      
-      if (userId != null && mounted) {
-        final diamondService = ref.read(diamondServiceProvider);
-        await diamondService.addDiamonds(
-          userId,
-          package.diamonds,
-          DiamondTransactionType.purchase,
-          description: 'Purchased ${package.diamonds} diamonds',
-        );
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('✨ Successfully purchased ${package.diamonds} diamonds!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          Navigator.pop(context);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Purchase failed: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isPurchasing = false);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final authService = ref.watch(authServiceProvider);
@@ -85,7 +27,7 @@ class _DiamondPurchaseScreenState extends ConsumerState<DiamondPurchaseScreen> {
     if (userId == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Get Diamonds')),
-        body: const Center(child: Text('Please sign in to purchase diamonds')),
+        body: const Center(child: Text('Please sign in')),
       );
     }
 
@@ -148,22 +90,126 @@ class _DiamondPurchaseScreenState extends ConsumerState<DiamondPurchaseScreen> {
 
                 const SizedBox(height: 24),
 
-                // Info banner
+                // FREE APP Banner
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.green, width: 2),
+                  ),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.check_circle, color: Colors.green, size: 48),
+                      const SizedBox(height: 12),
+                      Text(
+                        '100% FREE!',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'ClubRoyale is completely free!\nDiamonds cannot be purchased - earn them for FREE!',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // How to Earn Diamonds
+                Text(
+                  '✨ Earn Diamonds FREE',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                _buildEarnOption(
+                  context,
+                  icon: Icons.card_giftcard,
+                  title: 'Welcome Bonus',
+                  subtitle: 'One-time new user reward',
+                  diamonds: DiamondConfig.signupBonus,
+                  color: Colors.purple,
+                ),
+                _buildEarnOption(
+                  context,
+                  icon: Icons.calendar_today,
+                  title: 'Daily Login',
+                  subtitle: 'Log in every day',
+                  diamonds: DiamondConfig.dailyLogin,
+                  color: Colors.blue,
+                ),
+                _buildEarnOption(
+                  context,
+                  icon: Icons.play_circle,
+                  title: 'Watch Ads',
+                  subtitle: 'Up to ${DiamondConfig.maxAdsPerDay} per day',
+                  diamonds: DiamondConfig.perAdWatch,
+                  color: Colors.orange,
+                ),
+                _buildEarnOption(
+                  context,
+                  icon: Icons.games,
+                  title: 'Complete Games',
+                  subtitle: 'Up to ${DiamondConfig.maxGamesPerDay} per day',
+                  diamonds: DiamondConfig.perGameComplete,
+                  color: Colors.green,
+                ),
+                _buildEarnOption(
+                  context,
+                  icon: Icons.people,
+                  title: 'Refer Friends',
+                  subtitle: 'Invite friends to join',
+                  diamonds: DiamondConfig.referralBonus,
+                  color: Colors.pink,
+                ),
+                _buildEarnOption(
+                  context,
+                  icon: Icons.weekend,
+                  title: 'Weekly Bonus',
+                  subtitle: 'Every Sunday',
+                  diamonds: DiamondConfig.weeklyBonus,
+                  color: Colors.indigo,
+                ),
+
+                const SizedBox(height: 24),
+
+                // Maximum earnings info
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: colorScheme.primaryContainer.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: colorScheme.outline.withOpacity(0.2)),
                   ),
-                  child: Row(
+                  child: Column(
                     children: [
-                      Icon(Icons.info_outline, color: colorScheme.primary),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Use diamonds to create rooms and unlock premium features!',
-                          style: theme.textTheme.bodyMedium,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.diamond, color: Colors.amber, size: 24),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Max ${DiamondConfig.maxDailyFreeEarnings}💎/day',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '~${DiamondConfig.maxMonthlyFreeEarnings}💎/month',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -172,26 +218,24 @@ class _DiamondPurchaseScreenState extends ConsumerState<DiamondPurchaseScreen> {
 
                 const SizedBox(height: 24),
 
-                // Package list
-                Text(
-                  'Choose a Package',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                // Go to Earn Screen button
+                FilledButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/earn-diamonds');
+                  },
+                  icon: const Icon(Icons.diamond),
+                  label: const Text('Start Earning Now'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                 ),
+
                 const SizedBox(height: 16),
 
-                ...packages.map((package) => _PackageCard(
-                  package: package,
-                  onPurchase: () => _purchasePackage(package),
-                  isPurchasing: _isPurchasing,
-                )),
-
-                const SizedBox(height: 24),
-
-                // Disclaimer
+                // Safe Harbor notice
                 Text(
-                  '💎 RevenueCat IAP integration required for production',
+                  '⚖️ Safe Harbor Model\nThis app is a score tracking utility only. '
+                  'Diamonds have no real-world monetary value and cannot be purchased or redeemed for cash.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontStyle: FontStyle.italic,
@@ -205,139 +249,72 @@ class _DiamondPurchaseScreenState extends ConsumerState<DiamondPurchaseScreen> {
       ),
     );
   }
-}
 
-class DiamondPackage {
-  final int diamonds;
-  final String price;
-  final String productId;
-  final int bonus;
-  final bool popular;
-
-  DiamondPackage({
-    required this.diamonds,
-    required this.price,
-    required this.productId,
-    this.bonus = 0,
-    this.popular = false,
-  });
-
-  int get totalDiamonds => diamonds + bonus;
-}
-
-class _PackageCard extends StatelessWidget {
-  final DiamondPackage package;
-  final VoidCallback onPurchase;
-  final bool isPurchasing;
-
-  const _PackageCard({
-    required this.package,
-    required this.onPurchase,
-    required this.isPurchasing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildEarnOption(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required int diamonds,
+    required Color color,
+  }) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: package.popular
-            ? colorScheme.primaryContainer.withOpacity(0.5)
-            : colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: package.popular
-              ? colorScheme.primary
-              : colorScheme.outline.withOpacity(0.2),
-          width: package.popular ? 2 : 1,
-        ),
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
-      child: Stack(
+      child: Row(
         children: [
-          if (package.popular)
-            Positioned(
-              top: 0,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: colorScheme.primary,
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
-                ),
-                child: Text(
-                  'POPULAR',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onPrimary,
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 28),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ),
-          Padding(
-            padding: const EdgeInsets.all(16),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.amber,
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Diamond icon
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
+                const Icon(Icons.diamond, size: 16, color: Colors.white),
+                const SizedBox(width: 4),
+                Text(
+                  '+$diamonds',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
-                  child: const Icon(Icons.diamond, size: 32, color: Colors.amber),
-                ),
-                const SizedBox(width: 16),
-                // Details
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            '${package.diamonds}',
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (package.bonus > 0) ...[
-                            const SizedBox(width: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '+${package.bonus}',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                          const SizedBox(width: 4),
-                          const Text('Diamonds'),
-                        ],
-                      ),
-                      if (package.bonus > 0)
-                        Text(
-                          '${package.bonus} bonus diamonds!',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.green,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                // Purchase button
-                FilledButton(
-                  onPressed: isPurchasing ? null : onPurchase,
-                  child: Text(package.price),
                 ),
               ],
             ),

@@ -30,7 +30,7 @@ import 'games/marriage/marriage_multiplayer_screen.dart';
 import 'games/teen_patti/teen_patti_screen.dart';
 import 'games/in_between/in_between_screen.dart';
 import 'features/game/settlement/settlement_preview_screen.dart';
-import 'config/revenuecat_config.dart';
+// RevenueCat removed - app is FREE with ads only
 // Diamond Economy imports
 import 'features/wallet/screens/earn_diamonds_screen.dart';
 import 'package:clubroyale/features/wallet/screens/transfer_screen.dart';
@@ -408,14 +408,9 @@ void main() async {
     }
   }
   
-  // Initialize RevenueCat (will skip if not configured)
-  try {
-    await RevenueCatConfig.initialize();
-    debugPrint('✅ RevenueCat initialized successfully');
-  } catch (e) {
-    debugPrint('⚠️ RevenueCat initialization failed: $e');
-    // Continue anyway - app can work without IAP
-  }
+  // App is FREE - no IAP/subscriptions (Safe Harbor model)
+  // Revenue comes from AdMob ads only
+  debugPrint('ℹ️ App runs in FREE mode (ads only)');
   // Initialize GameSettings for locale detection
   try {
     final prefs = await SharedPreferences.getInstance();
