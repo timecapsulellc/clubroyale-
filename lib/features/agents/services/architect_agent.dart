@@ -9,10 +9,9 @@ final architectAgentProvider = Provider<ArchitectAgent>((ref) {
   return ArchitectAgent(ref);
 });
 
-/// Agent metrics provider
-final agentMetricsProvider = StateNotifierProvider<AgentMetricsNotifier, Map<AgentType, AgentMetrics>>((ref) {
-  return AgentMetricsNotifier();
-});
+/// Agent metrics provider - Riverpod 3.x Notifier pattern
+final agentMetricsProvider = NotifierProvider<AgentMetricsNotifier, Map<AgentType, AgentMetrics>>(
+    AgentMetricsNotifier.new);
 
 /// Architect Agent - The Meta-Orchestrator
 /// Routes requests to specialized agents and manages the agent ecosystem
@@ -393,9 +392,10 @@ class ArchitectAgent {
   }
 }
 
-/// Metrics state notifier
-class AgentMetricsNotifier extends StateNotifier<Map<AgentType, AgentMetrics>> {
-  AgentMetricsNotifier() : super({});
+/// Metrics notifier - Riverpod 3.x Notifier pattern
+class AgentMetricsNotifier extends Notifier<Map<AgentType, AgentMetrics>> {
+  @override
+  Map<AgentType, AgentMetrics> build() => {};
 
   void recordRequest(AgentType agent, bool success, int responseTimeMs, {String? error}) {
     final current = state[agent] ?? AgentMetrics(agent: agent);
