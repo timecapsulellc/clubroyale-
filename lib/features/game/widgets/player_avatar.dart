@@ -344,24 +344,25 @@ class _NavItem extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(0.5)),
+                border: Border.all(color: CasinoColors.gold.withOpacity(0.5)),
               ),
-              child: Icon(icon, color: Colors.white, size: 20),
+              child: Icon(icon, color: CasinoColors.gold, size: 18),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 11,
+              style: TextStyle(
+                color: CasinoColors.gold.withOpacity(0.9),
+                fontSize: 9,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -370,3 +371,4 @@ class _NavItem extends StatelessWidget {
     );
   }
 }
+

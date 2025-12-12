@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Brand Colors
-  static const Color tableGreen = Color(0xFF1B5E20); // Darker Green for background
-  static const Color tableLightGreen = Color(0xFF2E7D32); // Lighter green for gradients
-  static const Color gold = Color(0xFFFFD700);
-  static const Color goldDark = Color(0xFFFFA000);
+  // ClubRoyale Brand Colors
+  static const Color tableGreen = Color(0xFF2D1B4E); // ClubRoyale deep purple (replaces green)
+  static const Color tableLightGreen = Color(0xFF4A1C6F); // ClubRoyale royal purple
+  static const Color gold = Color(0xFFD4AF37); // ClubRoyale rich gold
+  static const Color goldDark = Color(0xFFB8860B); // Dark gold accent
   static const Color orange = Color(0xFFFF6F00);
-  static const Color teal = Color(0xFF004D40);
+  static const Color teal = Color(0xFF4A1C6F); // Using royal purple instead of teal
   
   static const Color creamWhite = Color(0xFFF5F5F5);
+  static const Color champagne = Color(0xFFF7E7CE); // ClubRoyale champagne
+
 
   static ThemeData get theme {
     return ThemeData(

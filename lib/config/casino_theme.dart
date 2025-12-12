@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
 
 /// Casino-themed color palette for premium gaming experience
+/// Aligned with ClubRoyale brand: Royal Purple + Gold
 class CasinoColors {
-  // Primary Colors - Purple Theme (matching branding mockup)
-  static const Color deepPurple = Color(0xFF1a0a2e); // Dark purple
-  static const Color darkPurple = Color(0xFF0d051a); // Very dark purple
-  static const Color richPurple = Color(0xFF2d1b4e); // Rich purple
+  // Primary Colors - ClubRoyale Brand
+  static const Color deepPurple = Color(0xFF2D1B4E); // ClubRoyale deep purple
+  static const Color darkPurple = Color(0xFF1a0a2e); // Very dark purple
+  static const Color richPurple = Color(0xFF4A1C6F); // ClubRoyale royal purple
   
   // Purple Table Colors
-  static const Color feltGreenDark = Color(0xFF1f1035);   // Purple dark (was green)
+  static const Color feltGreenDark = Color(0xFF1f1035);   // Purple dark
   static const Color feltGreenMid = Color(0xFF3b2066);    // Purple mid
   static const Color feltGreenLight = Color(0xFF5a3a87);  // Purple light
-  static const Color tableEdge = Color(0xFF3d2814);       // Wood brown (keep)
+  static const Color tableEdge = Color(0xFF3d2814);       // Wood brown
   
-  // Accent Colors
-  static const Color gold = Color(0xFFffd700);
-  static const Color lightGold = Color(0xFFffdf4f);
-  static const Color bronzeGold = Color(0xFFcd9b1d);
+  // Accent Colors - ClubRoyale Gold
+  static const Color gold = Color(0xFFD4AF37);         // ClubRoyale rich gold
+  static const Color lightGold = Color(0xFFF7E7CE);    // ClubRoyale champagne
+  static const Color bronzeGold = Color(0xFFB8860B);   // Dark gold bronze
   
   // Supporting Colors
   static const Color velvetRed = Color(0xFF8b0000);
-  static const Color feltGreen = Color(0xFF4a2875); // Purple accent
+  static const Color feltGreen = Color(0xFF4a2875);    // Purple accent
   static const Color neonPink = Color(0xFFff1493);
   static const Color silverGray = Color(0xFF9e9e9e);
   
@@ -28,6 +29,7 @@ class CasinoColors {
   static const Color cardBackground = Color(0xFF251540); // Purple card bg
   static const Color cardBackgroundLight = Color(0xFF3a2560); // Lighter purple
   static const Color surfaceDark = Color(0xFF0a0514);
+
   
   // Gradients - Purple Theme
   static const LinearGradient primaryGradient = LinearGradient(
