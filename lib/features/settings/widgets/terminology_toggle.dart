@@ -23,33 +23,32 @@ class TerminologyToggle extends ConsumerStatefulWidget {
 class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
   @override
   Widget build(BuildContext context) {
-    final settingsAsync = ref.watch(gameSettingsInitProvider);
+    final settingsState = ref.watch(gameSettingsProvider);
     
-    return settingsAsync.when(
-      loading: () => const ListTile(
+    if (!settingsState.isInitialized) {
+       return const ListTile(
         leading: Icon(Icons.language, color: ClubRoyaleTheme.gold),
         title: Text('Game Terminology'),
         trailing: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)),
-      ),
-      error: (e, s) => ListTile(
-        leading: const Icon(Icons.error, color: Colors.red),
-        title: const Text('Error loading settings'),
-        subtitle: Text(e.toString()),
-      ),
-      data: (settings) => _buildToggle(settings),
-    );
+      );
+    }
+    
+    return _buildToggle(settingsState.region);
   }
   
-  Widget _buildToggle(GameSettings settings) {
-    final isSouthAsian = settings.isSouthAsian;
+  Widget _buildToggle(GameRegion region) {
+    final isSouthAsian = region == GameRegion.southAsia;
+    final regionDisplayName = isSouthAsian 
+        ? 'Marriage (दक्षिण एशिया)' 
+        : 'ClubRoyale (International)';
     
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ClubRoyaleTheme.deepPurple.withValues(alpha: 0.5),
+        color: ClubRoyaleTheme.deepPurple.withOpacity(0.5),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ClubRoyaleTheme.gold.withValues(alpha: 0.3)),
+        border: Border.all(color: ClubRoyaleTheme.gold.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,8 +70,8 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
                       ),
                     ),
                     Text(
-                      settings.regionDisplayName,
-                      style: TextStyle(color: ClubRoyaleTheme.textMuted, fontSize: 12),
+                      regionDisplayName,
+                      style: const TextStyle(color: ClubRoyaleTheme.textMuted, fontSize: 12),
                     ),
                   ],
                 ),
@@ -97,7 +96,7 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
                     label: 'ClubRoyale',
                     subtitle: 'International',
                     isSelected: !isSouthAsian,
-                    onTap: () => _setRegion(GameRegion.global, settings),
+                    onTap: () => _setRegion(GameRegion.global),
                   ),
                 ),
                 Expanded(
@@ -106,7 +105,7 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
                     label: 'Marriage',
                     subtitle: 'दक्षिण एशिया',
                     isSelected: isSouthAsian,
-                    onTap: () => _setRegion(GameRegion.southAsia, settings),
+                    onTap: () => _setRegion(GameRegion.southAsia),
                   ),
                 ),
               ],
@@ -153,7 +152,7 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
             Text(
               subtitle,
               style: TextStyle(
-                color: isSelected ? ClubRoyaleTheme.deepPurple.withValues(alpha: 0.7) : Colors.white38,
+                color: isSelected ? ClubRoyaleTheme.deepPurple.withOpacity(0.7) : Colors.white38,
                 fontSize: 10,
               ),
             ),
@@ -207,9 +206,8 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
     );
   }
   
-  Future<void> _setRegion(GameRegion region, GameSettings settings) async {
-    await settings.setRegion(region);
-    setState(() {});
+  Future<void> _setRegion(GameRegion region) async {
+    await ref.read(gameSettingsProvider.notifier).setRegion(region);
     widget.onChanged?.call();
   }
 }

@@ -13,6 +13,9 @@ import 'package:clubroyale/core/card_engine/deck.dart';
 import 'package:clubroyale/games/teen_patti/teen_patti_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
+import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
+import 'package:clubroyale/features/video/widgets/video_grid.dart';
 
 class TeenPattiScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -30,6 +33,8 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
   bool _isProcessing = false;
   bool _hasSeenCards = false;
   int _betAmount = 1;
+  bool _isChatExpanded = false;
+  bool _showVideoGrid = false;
   
   // Card lookup cache
   final Map<String, Card> _cardCache = {};
@@ -123,35 +128,59 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
             ),
             actions: [
               _buildStakeBadge(state.currentStake),
-              const SizedBox(width: 8),
+              IconButton( // Toggle Video
+                icon: Icon(_showVideoGrid ? Icons.videocam_off : Icons.videocam),
+                onPressed: () => setState(() => _showVideoGrid = !_showVideoGrid),
+              ),
+              AudioFloatingButton(roomId: widget.roomId, userId: currentUser.uid),
             ],
           ),
           body: ParticleBackground(
             primaryColor: CasinoColors.gold,
             secondaryColor: CasinoColors.richPurple,
             particleCount: 15,
-            child: Column(
+            child: Stack(
               children: [
-                // Turn indicator
-                _buildTurnIndicator(isMyTurn, myStatus),
-                
-                // Other players
-                Expanded(
-                  flex: 2,
-                  child: _buildOpponentsArea(state, currentUser.uid),
+                Column(
+                  children: [
+                    _buildTurnIndicator(isMyTurn, myStatus),
+                    Expanded(flex: 2, child: _buildOpponentsArea(state, currentUser.uid)),
+                    _buildPotArea(state.pot),
+                    Expanded(flex: 3, child: _buildMyCards(myHand, myStatus)),
+                    _buildActionBar(isMyTurn, myStatus, state),
+                  ],
                 ),
-                
-                // Center pot display
-                _buildPotArea(state.pot),
-                
-                // My cards
-                Expanded(
-                  flex: 3,
-                  child: _buildMyCards(myHand, myStatus),
+                // Video Grid Overlay
+                if (_showVideoGrid)
+                  Positioned(
+                    top: 60,
+                    right: 16,
+                    width: 200,
+                    height: 300,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: VideoGridWidget(
+                        roomId: widget.roomId,
+                        userId: currentUser.uid,
+                        userName: currentUser.displayName ?? 'Player',
+                      ),
+                    ),
+                  ),
+                // Chat Overlay
+                Positioned(
+                  bottom: 140, // Above hand
+                  left: 16,
+                  child: ChatOverlay(
+                    roomId: widget.roomId,
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName ?? 'Player',
+                    isExpanded: _isChatExpanded,
+                    onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
+                  ),
                 ),
-                
-                // Action bar
-                _buildActionBar(isMyTurn, myStatus, state),
               ],
             ),
           ),

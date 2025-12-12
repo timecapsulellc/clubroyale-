@@ -53,7 +53,7 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
       final chatService = ref.read(adminChatServiceProvider);
       final chatId = await chatService.startChat(
         userId: user.uid,
-        userEmail: user.email ?? 'Unknown',
+        userName: user.displayName ?? 'User', // Fixed: was userEmail
         subject: 'Diamond Support Request',
       );
       
@@ -84,6 +84,7 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
       await chatService.sendMessage(
         chatId: _activeChatId!,
         senderId: user.uid,
+        senderName: user.displayName ?? 'User', // Fixed: added senderName
         content: content,
         isAdmin: false,
       );
@@ -236,7 +237,9 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final timeStr = DateFormat('HH:mm').format(message.timestamp);
+    final timeStr = message.createdAt != null 
+      ? DateFormat('HH:mm').format(message.createdAt!) 
+      : '';
 
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,

@@ -14,6 +14,8 @@ import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:math';
 
+import 'package:clubroyale/core/responsive/responsive_utils.dart';
+
 import '../auth/auth_service.dart';
 
 class LobbyScreen extends ConsumerWidget {
@@ -228,13 +230,13 @@ class LobbyScreen extends ConsumerWidget {
 
               return SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // 2 columns for mobile
-                    childAspectRatio: 0.85,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                  ),
+                  sliver: SliverGrid(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: context.responsive(mobile: 1, tablet: 2, desktop: 4),
+                      childAspectRatio: context.responsive(mobile: 1.1, tablet: 0.9, desktop: 0.85),
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final game = games[index];
@@ -413,7 +415,7 @@ class LobbyScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: _GameTypeOption(
-                        title: 'Call Break',
+                        title: GameTerminology.callBreakGame,
                         subtitle: 'Trick-taking',
                         icon: Icons.style_rounded,
                         isSelected: gameType == 'call_break',
@@ -438,7 +440,7 @@ class LobbyScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: _GameTypeOption(
-                        title: 'Teen Patti',
+                        title: GameTerminology.teenPattiGame,
                         subtitle: 'Betting',
                         icon: Icons.casino_rounded,
                         isSelected: gameType == 'teen_patti',
@@ -448,8 +450,8 @@ class LobbyScreen extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: _GameTypeOption(
-                        title: 'In Between',
-                        subtitle: 'Quick bet',
+                        title: GameTerminology.inBetweenGame,
+                        subtitle: GameTerminology.inBetweenDescription,
                         icon: Icons.unfold_more_rounded,
                         isSelected: gameType == 'in_between',
                         isNew: true,
@@ -1064,7 +1066,7 @@ class _EnhancedGameCard extends StatelessWidget {
                                 radius: 12,
                                 backgroundColor: isCurrentHost ? Colors.amber : Colors.deepPurple.shade200,
                                 child: Text(
-                                  p.name[0].toUpperCase(),
+                                  p.name.isNotEmpty ? p.name[0].toUpperCase() : '?',
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,

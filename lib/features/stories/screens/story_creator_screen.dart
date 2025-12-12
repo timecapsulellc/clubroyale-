@@ -326,6 +326,16 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
 
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: _selectedMediaBytes == null 
+        ? AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.close, color: Colors.white),
+              onPressed: () => context.pop(),
+            ),
+          )
+        : null,
       body: _selectedMediaBytes == null
           ? Center(
               child: Column(

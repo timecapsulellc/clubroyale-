@@ -12,6 +12,7 @@ import 'package:clubroyale/features/game/widgets/player_avatar.dart';
 import 'package:clubroyale/core/responsive/responsive_utils.dart';
 // Stories import
 import 'package:clubroyale/features/stories/widgets/story_bar.dart';
+import 'package:clubroyale/core/config/game_terminology.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -307,8 +308,8 @@ class HomeScreen extends ConsumerWidget {
                       Expanded(
                         child: _GameTypeCard(
                           icon: Icons.unfold_more_rounded,
-                          title: 'In Between',
-                          subtitle: 'Quick Bet',
+                          title: GameTerminology.inBetweenGame,
+                          subtitle: GameTerminology.inBetweenDescription,
                           color: Colors.green,
                           isNew: true,
                           onTap: () => context.go('/lobby'),
@@ -1409,7 +1410,7 @@ void _showHowToPlayDialog(BuildContext context) {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'How to Play Call Break',
+                    'How to Play Marriage',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -1423,44 +1424,37 @@ void _showHowToPlayDialog(BuildContext context) {
               // Steps
               _HowToPlayStep(
                 number: 1,
-                title: 'Enter the Lobby',
-                description: 'Tap "Enter Lobby" on the home screen to see available rooms or create your own.',
-                icon: Icons.meeting_room,
+                title: 'Objective',
+                description: 'Collect 3 Tunnellas (sets of 3 cards) to unlock or end the game. Be the first to show your cards.',
+                icon: Icons.emoji_events,
               ),
               
               _HowToPlayStep(
                 number: 2,
-                title: 'Create or Join a Room',
-                description: 'Create a new room (costs diamonds) or join an existing room using a 6-digit code.',
-                icon: Icons.add_circle,
-              ),
-              
-              _HowToPlayStep(
-                number: 3,
-                title: 'Wait for Players',
-                description: 'Wait for 4 players to join. You can also add bots to fill empty slots.',
-                icon: Icons.people,
-              ),
-              
-              _HowToPlayStep(
-                number: 4,
-                title: 'Place Your Bid',
-                description: 'Each player bids how many tricks they expect to win (1-13). Spades are trump!',
-                icon: Icons.gavel,
-              ),
-              
-              _HowToPlayStep(
-                number: 5,
-                title: 'Play Your Cards',
-                description: 'Follow suit when possible. The highest card (or trump) wins the trick.',
+                title: 'The Tunnellas',
+                description: 'Pure Sequence (e.g., 2-3-4 ♥️), Tunnella (e.g., 7-7-7 ♦️), or Dublee (e.g., 9-9 ♣️). You need 3 combinations!',
                 icon: Icons.style,
               ),
               
               _HowToPlayStep(
-                number: 6,
-                title: 'Score Points',
-                description: 'Meet your bid = earn points. Fail = lose points. Highest score after all rounds wins!',
-                icon: Icons.emoji_events,
+                number: 3,
+                title: 'The Tiplu (Joker)',
+                description: 'The Tiplu card can replace any other card to complete sets. Use it wisely!',
+                icon: Icons.star,
+              ),
+              
+              _HowToPlayStep(
+                number: 4,
+                title: 'Game Play',
+                description: 'Draw a card, discard a card. Keep your hand organized into potential sets.',
+                icon: Icons.swipe,
+              ),
+              
+              _HowToPlayStep(
+                number: 5,
+                title: 'Points & Maal',
+                description: 'Points are based on the value of cards in your sets (Maal). Tunnellas are worth the most.',
+                icon: Icons.monetization_on,
               ),
               
               const SizedBox(height: 24),
@@ -1490,10 +1484,10 @@ void _showHowToPlayDialog(BuildContext context) {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    _TipItem(text: 'Spades (♠) are always trump'),
-                    _TipItem(text: 'You must follow the led suit if you can'),
-                    _TipItem(text: 'Bid conservatively in early rounds'),
-                    _TipItem(text: 'Save your high cards for key tricks'),
+                    _TipItem(text: 'Always check if you have a "Tiplu"'),
+                    _TipItem(text: 'Focus on forming Pure Sequences first'),
+                    _TipItem(text: 'Discard high-value cards if not useful'),
+                    _TipItem(text: 'Watch what others discard!'),
                   ],
                 ),
               ),
@@ -1506,7 +1500,7 @@ void _showHowToPlayDialog(BuildContext context) {
                 child: FilledButton.icon(
                   onPressed: () {
                     Navigator.pop(context);
-                    context.go('/lobby');
+                    context.go('/marriage');
                   },
                   icon: const Icon(Icons.play_arrow),
                   label: const Text('Start Playing Now'),

@@ -2,6 +2,7 @@
 /// 
 /// This defines the contract that all games must implement
 
+import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 
 /// Game phases common to most card games
@@ -79,14 +80,28 @@ abstract class BaseGame {
 
 /// Supported game types
 enum GameType {
-  callBreak('call_break', 'Call Break'),
-  marriage('marriage', 'Marriage'),
-  teenPatti('teen_patti', 'Teen Patti'),
-  inBetween('in_between', 'In Between'),
-  dhumbal('dhumbal', 'Dhumbal');
+  callBreak('call_break'),
+  marriage('marriage'),
+  teenPatti('teen_patti'),
+  inBetween('in_between'),
+  dhumbal('dhumbal');
   
   final String id;
-  final String displayName;
   
-  const GameType(this.id, this.displayName);
+  const GameType(this.id);
+  
+  String get displayName {
+    switch (this) {
+      case GameType.callBreak:
+        return GameTerminology.callBreakGame;
+      case GameType.marriage:
+        return GameTerminology.royalMeldGame;
+      case GameType.teenPatti:
+        return GameTerminology.teenPattiGame;
+      case GameType.inBetween:
+        return GameTerminology.inBetweenGame;
+      case GameType.dhumbal:
+        return GameTerminology.dhumbalGame;
+    }
+  }
 }

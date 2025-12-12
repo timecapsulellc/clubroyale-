@@ -45,7 +45,7 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
 
     await ref.read(spectatorServiceProvider.notifier).joinAsSpectator(
       roomId: widget.roomId,
-      oderId: user.uid,
+      userId: user.uid,
       userName: user.displayName ?? 'Spectator',
     );
   }
@@ -56,7 +56,7 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
     if (user == null) return;
 
     await ref.read(spectatorServiceProvider.notifier).leaveSpectating(
-      oderId: user.uid,
+      userId: user.uid,
     );
   }
 
@@ -65,6 +65,8 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
     final spectatorState = ref.watch(spectatorServiceProvider);
     final gameStateAsync = ref.watch(spectatorGameStateProvider(widget.roomId));
     final spectatorCountAsync = ref.watch(spectatorCountProvider(widget.roomId));
+
+    final user = ref.read(authServiceProvider).currentUser;
 
     return Scaffold(
       appBar: AppBar(
@@ -104,7 +106,7 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
           // Main game view
           _buildGameView(spectatorState, gameStateAsync),
           // Chat overlay
-          if (_showChat)
+          if (_showChat && user != null)
             Positioned(
               right: 0,
               top: 0,
@@ -112,7 +114,10 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
               width: 300,
               child: ChatOverlay(
                 roomId: widget.roomId,
-                isSpectator: true,
+                userId: user.uid,
+                userName: user.displayName ?? 'Spectator',
+                isExpanded: true, // Always expanded in side panel mode
+                onToggle: () => setState(() => _showChat = false),
               ),
             ),
           // Spectator badge

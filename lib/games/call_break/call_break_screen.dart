@@ -6,6 +6,7 @@ import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/games/call_break/call_break_game.dart';
+import 'package:clubroyale/core/config/game_terminology.dart';
 
 class CallBreakGameScreen extends StatefulWidget {
   final String? gameId;
@@ -143,7 +144,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Call Break - Round ${_game.currentRound}'),
+        title: Text('${GameTerminology.callBreakGame} - Round ${_game.currentRound}'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

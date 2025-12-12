@@ -24,6 +24,7 @@ import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:clubroyale/features/rtc/signaling_service.dart';
 import 'package:clubroyale/features/ai/ai_service.dart';
 import 'package:clubroyale/features/ai/ai_tip_widget.dart';
+import 'package:clubroyale/features/video/widgets/video_grid.dart';
 
 /// Main screen for Call Break gameplay
 class CallBreakGameScreen extends ConsumerStatefulWidget {
@@ -40,6 +41,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
   bool _isProcessing = false;
   bool _botServiceStarted = false;
   bool _isChatExpanded = false;
+  bool _showVideoGrid = false;
 
   @override
   void dispose() {
@@ -125,6 +127,12 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                 onPressed: () => _showScoreboard(context, game, playerNames),
                 tooltip: 'Scoreboard',
               ),
+              // Video Toggle
+              IconButton(
+                icon: Icon(_showVideoGrid ? Icons.videocam_off : Icons.videocam),
+                onPressed: () => setState(() => _showVideoGrid = !_showVideoGrid),
+                tooltip: _showVideoGrid ? 'Hide Video' : 'Show Video',
+              ),
             ],
           ),
           body: Stack(
@@ -159,6 +167,26 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                   onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
                 ),
               ),
+              
+              // Video Grid Overlay
+              if (_showVideoGrid)
+                Positioned(
+                  top: 60,
+                  right: 16,
+                  width: 200,
+                  height: 300,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black87,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: VideoGridWidget(
+                      roomId: widget.gameId,
+                      userId: currentUserId!,
+                      userName: playerNames[currentUserId] ?? 'Player',
+                    ),
+                  ),
+                ),
               
               // AI Tip Widget (shown when it's user's turn during playing phase)
               if (isMyTurn && game.gamePhase == GamePhase.playing && myHand.isNotEmpty)

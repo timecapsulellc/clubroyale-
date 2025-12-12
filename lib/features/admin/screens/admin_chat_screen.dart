@@ -60,7 +60,7 @@ class AdminChatScreen extends ConsumerWidget {
                   child: const Icon(Icons.person, color: Colors.white),
                 ),
                 title: Text(
-                  chat.userEmail,
+                  chat.userName,
                   style: TextStyle(
                     fontWeight: chat.unreadByAdmin ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -71,7 +71,9 @@ class AdminChatScreen extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 trailing: Text(
-                  DateFormat('MMM d').format(chat.lastMessageAt),
+                  chat.lastMessageAt != null 
+                    ? DateFormat('MMM d').format(chat.lastMessageAt!) 
+                    : '',
                   style: const TextStyle(fontSize: 12),
                 ),
                 onTap: () {
@@ -117,6 +119,7 @@ class _AdminChatDetailScreenState extends ConsumerState<AdminChatDetailScreen> {
     await chatService.sendMessage(
       chatId: widget.chat.id,
       senderId: user.uid,
+      senderName: user.displayName ?? 'Admin',
       content: content,
       isAdmin: true,
     );
@@ -134,6 +137,9 @@ class _AdminChatDetailScreenState extends ConsumerState<AdminChatDetailScreen> {
   }
 
   Future<void> _closeChat() async {
+    final user = ref.read(authServiceProvider).currentUser;
+    if (user == null) return;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -154,7 +160,7 @@ class _AdminChatDetailScreenState extends ConsumerState<AdminChatDetailScreen> {
 
     if (confirmed == true && mounted) {
       final chatService = ref.read(adminChatServiceProvider);
-      await chatService.closeChat(widget.chat.id);
+      await chatService.closeChat(widget.chat.id, user.email ?? 'admin');
       if (mounted) Navigator.pop(context);
     }
   }
@@ -166,7 +172,7 @@ class _AdminChatDetailScreenState extends ConsumerState<AdminChatDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.chat.userEmail),
+        title: Text(widget.chat.userName),
         actions: [
           IconButton(
             icon: const Icon(Icons.check_circle_outline),
@@ -275,7 +281,9 @@ class _AdminMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final timeStr = DateFormat('HH:mm').format(message.timestamp);
+    final timeStr = message.createdAt != null 
+        ? DateFormat('HH:mm').format(message.createdAt!)
+        : '';
 
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,

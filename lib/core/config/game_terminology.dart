@@ -43,10 +43,26 @@ class GameTerminology {
   static String get teenPattiGame => 'Teen Patti';
   static String get teenPattiDescription => 'Three Card Poker';
   
-  static String get inBetweenGame => 'In-Between';
-  static String get inBetweenDescription => 'Hi-Lo Betting Game';
+  static String get inBetweenGame {
+    switch (currentRegion) {
+      case GameRegion.global:
+        return 'In-Between';
+      case GameRegion.southAsia:
+        return 'Bahir';
+    }
+  }
   
-  // ============ WILD CARD TERMS ============
+  static String get inBetweenDescription {
+    switch (currentRegion) {
+      case GameRegion.global:
+        return 'Hi-Lo Betting Game';
+      case GameRegion.southAsia:
+        return 'Andar Bahir Style';
+    }
+  }
+  
+  static String get dhumbalGame => 'Dhumbal';
+  static String get dhumbalDescription => 'Jhyaap Style';
   
   static String get wildCard {
     switch (currentRegion) {

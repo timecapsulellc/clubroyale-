@@ -13,6 +13,10 @@ import 'package:clubroyale/core/card_engine/deck.dart';
 import 'package:clubroyale/games/in_between/in_between_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
+import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
+import 'package:clubroyale/features/video/widgets/video_grid.dart';
+import 'package:clubroyale/core/config/game_terminology.dart';
 
 class InBetweenScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -30,6 +34,8 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
   bool _isProcessing = false;
   int _betAmount = 0;
   String? _lastResult;
+  bool _isChatExpanded = false;
+  bool _showVideoGrid = false;
   
   // Audio player
   final _audioPlayer = AudioPlayer();
@@ -98,7 +104,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
             backgroundColor: CasinoColors.feltGreenDark,
             appBar: AppBar(
               backgroundColor: Colors.black54,
-              title: const Text('In Between'),
+              title: Text(GameTerminology.inBetweenGame),
             ),
             body: const Center(
               child: Text('Waiting for game...', style: TextStyle(color: Colors.white70)),
@@ -121,13 +127,21 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
             title: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('In Between', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(GameTerminology.inBetweenGame, style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(width: 12),
                 _buildChipsBadge(myChips),
               ],
             ),
             actions: [
               _buildPotBadge(state.pot),
+              // Video Toggle
+              IconButton(
+                icon: Icon(_showVideoGrid ? Icons.videocam_off : Icons.videocam),
+                onPressed: () => setState(() => _showVideoGrid = !_showVideoGrid),
+                tooltip: _showVideoGrid ? 'Hide Video' : 'Show Video',
+              ),
+              // Audio Mute/Unmute
+              AudioFloatingButton(roomId: widget.roomId, userId: currentUser.uid),
               const SizedBox(width: 8),
             ],
           ),
@@ -135,7 +149,9 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
             primaryColor: CasinoColors.gold,
             secondaryColor: Colors.green,
             particleCount: 15,
-            child: Column(
+            child: Stack(
+              children: [
+                Column(
               children: [
                 // Turn indicator
                 _buildTurnIndicator(isMyTurn, state.phase),
@@ -156,7 +172,40 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
                   _buildBettingArea(state.pot, myChips, maxBet),
                 
                 // Action buttons
-                _buildActionBar(isMyTurn, state),
+                  _buildActionBar(isMyTurn, state),
+                  ],
+                ),
+                // Video Grid Overlay
+                if (_showVideoGrid)
+                  Positioned(
+                    top: 60,
+                    right: 16,
+                    width: 200,
+                    height: 300,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: VideoGridWidget(
+                        roomId: widget.roomId,
+                        userId: currentUser.uid,
+                        userName: currentUser.displayName ?? 'Player',
+                      ),
+                    ),
+                  ),
+                // Chat Overlay
+                Positioned(
+                  bottom: 140, // Above hand
+                  left: 16,
+                  child: ChatOverlay(
+                    roomId: widget.roomId,
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName ?? 'Player',
+                    isExpanded: _isChatExpanded,
+                    onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
+                  ),
+                ),
               ],
             ),
           ),
@@ -585,6 +634,12 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
         _lastResult = null;
         _betAmount = 0;
       });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
@@ -602,6 +657,12 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       final userId = ref.read(authServiceProvider).currentUser?.uid;
       if (userId != null) {
         await service.placeBet(widget.roomId, userId, _betAmount);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error placing bet: $e'), backgroundColor: Colors.red),
+        );
       }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
@@ -630,6 +691,12 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
           await _playSound('ding.mp3');
         }
       }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error revealing card: $e'), backgroundColor: Colors.red),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
@@ -646,6 +713,12 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
         _lastResult = null;
         _betAmount = 0;
       });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }

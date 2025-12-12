@@ -228,6 +228,35 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow write: if false;
     }
+
+    // ============ CLUBS ============
+    
+    match /clubs/{clubId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated() && (resource.data.ownerId == request.auth.uid);
+      
+      match /members/{memberId} {
+        allow read: if isAuthenticated();
+        // Allow members to join/leave (create/delete their own doc) or update their stats
+        allow write: if isAuthenticated();
+      }
+      
+      match /activity/{activityId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated();
+        allow update: if isAuthenticated(); // For likes
+        allow delete: if false;
+      }
+    }
+    
+    match /club_invites/{inviteId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
     
     // ============ TRANSACTIONS ============
     
@@ -236,6 +265,38 @@ service cloud.firestore {
       allow create: if isAuthenticated();
       allow update: if false;
       allow delete: if false;
+    }
+
+    // ============ TOURNAMENTS ============
+    
+    match /tournaments/{tournamentId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin(); // Only admins can create tournaments
+      allow update: if isAdmin(); // Only admins can update
+      allow delete: if false;
+
+      match /participants/{participantId} {
+        allow read: if isAuthenticated();
+        // Allow users to join (create their participant doc)
+        allow create: if isAuthenticated() && (request.auth.uid == participantId);
+        allow update: if isAuthenticated() && (request.auth.uid == participantId);
+        allow delete: if false;
+      }
+    }
+
+    // ============ ACTIVITY FEED ============
+    
+    match /feeds/{userId}/items/{itemId} {
+       allow read: if isAuthenticated() && (request.auth.uid == userId);
+       allow create: if isAuthenticated(); // Server or other users trigger feed items
+       allow update: if false;
+       allow delete: if false;
+    }
+    
+    match /activities/{activityId} {
+       allow read: if isAuthenticated();
+       allow create: if isAuthenticated();
+       allow update: if isAuthenticated();
     }
     
     // ============ DIAMOND ECONOMY ============
@@ -295,6 +356,26 @@ service cloud.firestore {
       allow create: if isAuthenticated();
       allow update: if false;
       allow delete: if false;
+    }
+    // ============ REPLAYS ============
+    
+    match /replays/{replayId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated(); // Should ideally be server-side, but client upload common for mvp
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ============ PROFILES SUBCOLLECTIONS ============
+
+    match /profiles/{userId}/following/{followingId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && isOwner(userId);
+    }
+    
+    match /profiles/{userId}/followers/{followerId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated(); // Others write to this when they follow
     }
   }
 }

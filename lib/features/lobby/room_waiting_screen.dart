@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +15,7 @@ import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:clubroyale/core/services/share_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:clubroyale/features/video/widgets/video_grid.dart';
 
 class RoomWaitingScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -31,6 +33,68 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
   bool _isTogglingReady = false;
   bool _isStarting = false;
   bool _isChatExpanded = false;
+  bool _isVideoEnabled = false;
+  
+  StreamSubscription<GameRoom?>? _gameSubscription;
+  Set<String>? _knownPlayerIds;
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen for game updates to show notifications
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final lobbyService = ref.read(lobbyServiceProvider);
+      _gameSubscription = lobbyService.watchRoom(widget.roomId).listen((room) {
+        if (room != null && mounted) {
+          _checkPlayerUpdates(room);
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _gameSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _checkPlayerUpdates(GameRoom room) {
+    final currentIds = room.players.map((p) => p.id).toSet();
+    
+    // Initialize if first load
+    if (_knownPlayerIds == null) {
+      _knownPlayerIds = currentIds;
+      return;
+    }
+
+    // Check for new players
+    final newIds = currentIds.difference(_knownPlayerIds!);
+    for (final id in newIds) {
+      final player = room.players.firstWhere((p) => p.id == id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${player.name} joined the room!'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+    
+    // Check for players leaving
+    final leftIds = _knownPlayerIds!.difference(currentIds);
+    if (leftIds.isNotEmpty) {
+       ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${leftIds.length} player(s) left'),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+
+    _knownPlayerIds = currentIds;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,27 +233,66 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Audio Controls Card at top
+                    // Media Controls Card
                     Card(
                       margin: const EdgeInsets.only(bottom: 16),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.headset_mic, color: Colors.deepPurple),
-                            const SizedBox(width: 12),
-                            const Expanded(
-                              child: Text(
-                                'Voice Chat',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.headset_mic, color: Colors.deepPurple),
+                                const SizedBox(width: 12),
+                                const Expanded(
+                                  child: Text(
+                                    'Voice Chat',
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                AudioFloatingButton(
+                                  roomId: widget.roomId,
+                                  userId: currentUser.uid,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Divider(height: 1),
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.videocam, color: Colors.deepPurple),
+                                const SizedBox(width: 12),
+                                const Expanded(
+                                  child: Text(
+                                    'Video Chat',
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Switch(
+                                  value: _isVideoEnabled,
+                                  onChanged: (value) => setState(() => _isVideoEnabled = value),
+                                  activeColor: Colors.deepPurple,
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (_isVideoEnabled)
+                            Container(
+                              height: 300,
+                              decoration: BoxDecoration(
+                                color: Colors.black87,
+                                border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.2))),
+                              ),
+                              child: VideoGridWidget(
+                                roomId: widget.roomId,
+                                userId: currentUser.uid,
+                                userName: currentUser.displayName ?? 'Player',
                               ),
                             ),
-                            AudioFloatingButton(
-                              roomId: widget.roomId,
-                              userId: currentUser.uid,
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
                     

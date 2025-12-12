@@ -33,6 +33,7 @@ import 'features/game/settlement/settlement_preview_screen.dart';
 // RevenueCat removed - app is FREE with ads only
 // Diamond Economy imports
 import 'features/wallet/screens/earn_diamonds_screen.dart';
+import 'features/wallet/diamond_purchase_screen.dart';
 import 'package:clubroyale/features/wallet/screens/transfer_screen.dart';
 import 'package:clubroyale/features/admin/screens/admin_panel_screen.dart';
 import 'package:clubroyale/features/admin/screens/grant_request_screen.dart';
@@ -217,6 +218,12 @@ final GoRouter _router = GoRouter(
           path: 'transfer',
           builder: (BuildContext context, GoRouterState state) {
             return const TransferScreen();
+          },
+        ),
+        GoRoute(
+          path: 'diamond-store',
+          builder: (BuildContext context, GoRouterState state) {
+            return const DiamondPurchaseScreen();
           },
         ),
         GoRoute(
@@ -410,17 +417,8 @@ void main() async {
   
   // App is FREE - no IAP/subscriptions (Safe Harbor model)
   // Revenue comes from AdMob ads only
+  // initialized in ProviderScope
   debugPrint('ℹ️ App runs in FREE mode (ads only)');
-  // Initialize GameSettings for locale detection
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final gameSettings = GameSettings(prefs);
-    await gameSettings.init();
-    debugPrint('✅ GameSettings initialized (region: ${gameSettings.region})');
-  } catch (e) {
-    debugPrint('⚠️ GameSettings initialization failed: $e');
-    // Continue with default (global) region
-  }
   
   runApp(
 

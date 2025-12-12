@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/lobby/lobby_service.dart';
 import 'package:clubroyale/features/game/game_room.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/core/config/game_terminology.dart';
 
 /// Provider for public rooms
 final publicRoomsProvider = StreamProvider<List<GameRoom>>((ref) {
@@ -157,7 +158,7 @@ class _PublicRoomTile extends ConsumerWidget {
       case 'teen_patti':
         return 'Teen Patti';
       case 'in_between':
-        return 'In Between';
+        return GameTerminology.inBetweenGame;
       default:
         return gameType;
     }

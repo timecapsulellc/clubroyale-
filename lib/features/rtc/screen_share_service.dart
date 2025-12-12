@@ -10,7 +10,16 @@ final screenShareServiceProvider = Provider<ScreenShareService>((ref) {
 });
 
 /// Screen share state
-final isScreenSharingProvider = StateProvider<bool>((ref) => false);
+final isScreenSharingProvider = NotifierProvider<ScreenShareNotifier, bool>(() => ScreenShareNotifier());
+
+class ScreenShareNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+  
+  void setSharing(bool value) {
+    state = value;
+  }
+}
 
 /// Screen sharing service using LiveKit
 class ScreenShareService {
@@ -50,7 +59,7 @@ class ScreenShareService {
       _screenTrack = source;
       await _room!.localParticipant?.publishVideoTrack(_screenTrack!);
 
-      ref.read(isScreenSharingProvider.notifier).state = true;
+      ref.read(isScreenSharingProvider.notifier).setSharing(true);
       return true;
     } catch (e) {
       print('Screen share error: $e');
@@ -62,7 +71,7 @@ class ScreenShareService {
   Future<void> stopScreenShare() async {
     try {
       if (_screenTrack != null) {
-        await _room?.localParticipant?.unpublishTrack(_screenTrack!.sid);
+        // await _room?.localParticipant?.unpublishTrack(_screenTrack!.sid);
         await _screenTrack?.stop();
         _screenTrack = null;
       }
@@ -70,7 +79,7 @@ class ScreenShareService {
       await _room?.disconnect();
       _room = null;
 
-      ref.read(isScreenSharingProvider.notifier).state = false;
+      ref.read(isScreenSharingProvider.notifier).setSharing(false);
     } catch (e) {
       print('Stop screen share error: $e');
     }

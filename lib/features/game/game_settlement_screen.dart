@@ -7,6 +7,7 @@ import 'package:clubroyale/features/game/game_room.dart';
 import 'package:clubroyale/features/game/providers/game_state_provider.dart';
 import 'package:clubroyale/features/ledger/services/settlement_service.dart';
 import 'package:clubroyale/features/game/services/sound_service.dart';
+import 'package:clubroyale/core/services/share_service.dart';
 
 class GameSettlementScreen extends ConsumerStatefulWidget {
   final String gameId;
@@ -647,9 +648,20 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
           // Share button
           OutlinedButton.icon(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Share feature coming soon!')),
-              );
+               // Calculate winner details for sharing
+               final gameAsync = ref.read(currentGameProvider(widget.gameId));
+               gameAsync.whenData((game) {
+                 if (game == null) return;
+                 final sorted = List<Player>.from(game.players)..sort((a,b) => (game.scores[b.id]??0).compareTo(game.scores[a.id]??0));
+                 final winner = sorted.first;
+                 final score = game.scores[winner.id];
+                 final message = "🏆 Game Over in ClubRoyale! ${winner.name} won with $score points! 🃏 Play now: https://clubroyale-app.web.app";
+                 
+                 ShareService.shareAppDownload(
+                   context: context,
+                   customMessage: message,
+                 );
+               });
             },
             icon: const Icon(Icons.share),
             label: const Text('Share Results'),
