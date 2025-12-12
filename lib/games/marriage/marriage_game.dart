@@ -29,12 +29,10 @@ class MarriageGame implements BaseGame {
   
   @override
   int get deckCount {
-    // Chief Architect Audit: Proper stockpile buffer calculation
-    // 2-4 players: 3 decks (156 cards) - 84 dealt, 72 buffer (46%)
-    // 5-6 players: 4 decks (208 cards) - 126 dealt, 82 buffer (39%)
-    // 7-8 players: 5 decks (260 cards) - 168 dealt, 92 buffer (35%)
-    if (_playerIds.length >= 7) return 5;
-    if (_playerIds.length >= 5) return 4;
+    // Deck scaling by player count:
+    // 2-5 players: 3 decks (156 cards)
+    // 6-8 players: 4 decks (208 cards)
+    if (_playerIds.length >= 6) return 4;
     return 3;
   }
   
@@ -72,8 +70,8 @@ class MarriageGame implements BaseGame {
   /// Get the current wild card
   Card? get tiplu => _tiplu;
   
-  /// Get current round number (1-indexed)
-  int get currentRound => _currentRound;
+  /// Get current round number (1-indexed for display)
+  int get currentRound => _currentRound + 1;
   
   /// Get top card of discard pile
   Card? get topDiscard => _discardPile.topCard;
