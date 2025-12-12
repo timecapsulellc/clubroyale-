@@ -49,7 +49,7 @@ Any settlements between players occur privately outside this app.
 
   /// WhatsApp share footer
   static const String shareFooter = 
-      '🎴 Play free at taasclub.app';
+      '🎴 Play free at clubroyale-app.web.app';
 }
 
 /// Banned terms that should be sanitized for Google Play compliance

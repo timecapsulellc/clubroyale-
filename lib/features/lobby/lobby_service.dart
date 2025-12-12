@@ -330,12 +330,16 @@ class LobbyService {
       if (!doc.exists) return;
 
       final game = doc.data()!;
+      // Remove player from list
       final updatedPlayers = game.players.where((p) => p.id != playerId).toList();
+      // Remove player from scores
       final updatedScores = Map<String, int>.from(game.scores)..remove(playerId);
 
-      await _gamesRef.doc(gameId).update(
-        game.copyWith(players: updatedPlayers, scores: updatedScores).toJson(),
-      );
+      // Perform partial update to avoid serialization issues with nested objects
+      await _gamesRef.doc(gameId).update({
+        'players': updatedPlayers.map((p) => p.toJson()).toList(),
+        'scores': updatedScores,
+      });
     } catch (e) {
       debugPrint('Error leaving game: $e');
       rethrow;
@@ -424,6 +428,7 @@ class LobbyService {
 
       // Validate player exists in room
       if (!updatedPlayers.any((p) => p.id == playerId)) {
+        debugPrint('ERROR: Player $playerId not found in room $gameId. Players: ${game.players.map((p) => p.id).toList()}');
         throw Exception('Player not in this room');
       }
 

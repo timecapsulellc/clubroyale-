@@ -79,7 +79,7 @@ class SettlementShareService {
     buffer.writeln();
     
     // VIRAL CTA - This is the growth loop!
-    buffer.writeln('🎮 Play free at: taasclub.app');
+    buffer.writeln('🎮 Play free at: clubroyale-app.web.app');
     buffer.writeln('📲 No install needed - works in browser!');
     
     return buffer.toString();
@@ -97,7 +97,7 @@ class SettlementShareService {
 📍 Room Code: $roomCode
 👤 Host: $hostName
 
-👉 Join now: https://taasclub.app/join?room=$roomCode
+👉 Join now: https://clubroyale-app.web.app/join?room=$roomCode
 
 📲 No download needed - play in your browser!
 
@@ -113,7 +113,7 @@ ${Disclaimers.shareFooter}
 Join my game on ClubRoyale!
 
 🎴 Room Code: $roomCode
-🔗 https://taasclub.app/join?room=$roomCode
+🔗 https://clubroyale-app.web.app/join?room=$roomCode
 
 ${Disclaimers.shareFooter}
 ''';
@@ -130,7 +130,7 @@ ${Disclaimers.shareFooter}
 I'm playing Marriage & Call Break online with friends.
 Join me and we both get free diamonds! 💎
 
-🔗 https://taasclub.app/join?ref=$refCode
+🔗 https://clubroyale-app.web.app/join?ref=$refCode
 
 📲 Free to play, no install needed!
 

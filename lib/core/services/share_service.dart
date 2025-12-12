@@ -18,7 +18,7 @@ Use my referral code: $referralCode
 ✨ Real-time multiplayer with voice chat
 ✨ Win diamonds and climb the leaderboard
 
-Download now: https://taasclub.app
+Download now: https://clubroyale-app.web.app
 
 See you at the tables! 🃏
 ''';
@@ -65,7 +65,7 @@ Quick join:
 2. Tap "Join Room"
 3. Enter code: $roomCode
 
-Don't have the app? Download: https://taasclub.app
+Don't have the app? Download: https://clubroyale-app.web.app
 
 Let's play! 🃏
 ''';
@@ -111,7 +111,7 @@ Let's play! 🃏
 ✨ Voice chat while playing
 ✨ Win tournaments & prizes
 
-Download: https://taasclub.app
+Download: https://clubroyale-app.web.app
 
 Join thousands of players! 🃏
 ''';

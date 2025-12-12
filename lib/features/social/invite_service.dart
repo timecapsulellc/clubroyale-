@@ -97,10 +97,10 @@ class InviteService {
   InviteService({required this.authService});
   
   // Base URL for deep links
-  static const String _baseUrl = 'https://taasclub.app/join';
+  static const String _baseUrl = 'https://clubroyale-app.web.app/join';
   
   // Signing secret (in production, use environment variable or secure storage)
-  static const String _signingSecret = 'TAASCLUB_INVITE_SECRET_2024';
+  static const String _signingSecret = 'CLUBROYALE_INVITE_SECRET_2024';
   
   /// Send a game invite to another user (FCM notification)
   Future<bool> sendInvite({

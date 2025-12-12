@@ -274,7 +274,7 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      'https://taasclub.app/join?ref=${widget.userId.substring(0, 8)}',
+                      'https://clubroyale-app.web.app/join?ref=${widget.userId.substring(0, 8)}',
                       style: const TextStyle(fontFamily: 'monospace'),
                     ),
                   ),
