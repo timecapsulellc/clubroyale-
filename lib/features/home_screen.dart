@@ -205,7 +205,6 @@ class HomeScreen extends ConsumerWidget {
 
                   // 📖 Stories Bar (Super App Feature)
                   Container(
-                    margin: const EdgeInsets.symmetric(horizontal: -16),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.2),
                       border: Border(
