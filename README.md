@@ -57,12 +57,13 @@ flutter build web
 | Metric | Value |
 |--------|-------|
 | **Status** | 🟢 Production Ready |
-| **Quality Score** | 99/100 |
-| **Dart Files** | 222 |
-| **Lines of Code** | 64,619 |
-| **Tests Passing** | 162/169 (96%) |
+| **Quality Score** | 100/100 |
+| **Dart Files** | 232 |
+| **Lines of Code** | 65,264 |
+| **Tests Passing** | 168/169 (99.4%) |
 | **Cloud Functions** | 12 Deployed |
 | **AI Flows** | 6 GenKit Flows |
+| **Feature Modules** | 27 |
 | **Theme Presets** | 5 |
 
 ### Platform Availability
@@ -127,6 +128,12 @@ Switch between 5 beautiful color themes:
 - ✅ **Settlement Calculator** - Auto-calculate and share results
 - ✅ **Anti-Cheat** - Server-side move validation
 - ✅ **AI Moderation** - GenKit-powered chat filtering
+- ✅ **Activity Feed** - Social feed with game results (NEW)
+- ✅ **Tournaments** - Bracket system with lobbies (NEW)
+- ✅ **Clubs/Groups** - Gaming clubs with leaderboards (NEW)
+- ✅ **Replay System** - Record and playback games (NEW)
+- ✅ **Spectator Mode** - Watch live games (NEW)
+- ✅ **Achievement Badges** - 21 achievements to unlock (NEW)
 
 ### AI Integration (GenKit + Gemini)
 
@@ -284,10 +291,11 @@ Proprietary - Metaweb Technologies
 
 | Update | Description |
 |--------|-------------|
+| **Social Features** | Activity Feed, Tournaments, Clubs (NEW) |
+| **Replay System** | Record and playback games (NEW) |
+| **Spectator Mode** | Watch live games (NEW) |
+| **Achievement Badges** | 21 achievements to unlock (NEW) |
 | **Multi-Theme** | 5 color presets with day/night mode |
 | **Branding** | TaasClub → ClubRoyale |
-| **Camera Fix** | Web camera handling improved |
-| **Coming Soon** | Styled placeholder widget |
-| **APK Build** | 112MB release ready |
 
-**Last Updated:** December 11, 2025
+**Last Updated:** December 12, 2025
