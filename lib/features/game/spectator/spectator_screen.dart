@@ -45,7 +45,7 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
 
     await ref.read(spectatorServiceProvider.notifier).joinAsSpectator(
       roomId: widget.roomId,
-      userId: user.uid,
+      oderId: user.uid,
       userName: user.displayName ?? 'Spectator',
     );
   }
@@ -56,7 +56,7 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
     if (user == null) return;
 
     await ref.read(spectatorServiceProvider.notifier).leaveSpectating(
-      userId: user.uid,
+      oderId: user.uid,
     );
   }
 

@@ -52,11 +52,10 @@ class SpectatorState {
 }
 
 /// Spectator Service - manage watching games
-class SpectatorService extends Notifier<SpectatorState> {
+class SpectatorService extends StateNotifier<SpectatorState> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   
-  @override
-  SpectatorState build() => const SpectatorState();
+  SpectatorService() : super(const SpectatorState());
 
   /// Get game room reference
   DocumentReference<Map<String, dynamic>> _roomRef(String roomId) =>
@@ -69,7 +68,7 @@ class SpectatorService extends Notifier<SpectatorState> {
   /// Join a game as spectator
   Future<bool> joinAsSpectator({
     required String roomId,
-    required String userId,
+    required String oderId,
     required String userName,
   }) async {
     try {
@@ -98,8 +97,8 @@ class SpectatorService extends Notifier<SpectatorState> {
       }
 
       // Add to spectators subcollection
-      await _spectatorsRef(roomId).doc(userId).set({
-        'userId': userId,
+      await _spectatorsRef(roomId).doc(oderId).set({
+        'oderId': oderId,
         'userName': userName,
         'joinedAt': FieldValue.serverTimestamp(),
       });
@@ -129,7 +128,7 @@ class SpectatorService extends Notifier<SpectatorState> {
 
   /// Leave spectating
   Future<void> leaveSpectating({
-    required String userId,
+    required String oderId,
   }) async {
     if (state.roomId == null) return;
 
@@ -137,7 +136,7 @@ class SpectatorService extends Notifier<SpectatorState> {
       final roomId = state.roomId!;
 
       // Remove from spectators collection
-      await _spectatorsRef(roomId).doc(userId).delete();
+      await _spectatorsRef(roomId).doc(oderId).delete();
 
       // Decrement spectator count
       await _roomRef(roomId).update({
@@ -191,7 +190,9 @@ class SpectatorService extends Notifier<SpectatorState> {
 
 /// Provider for spectator service
 final spectatorServiceProvider =
-    NotifierProvider<SpectatorService, SpectatorState>(SpectatorService.new);
+    StateNotifierProvider<SpectatorService, SpectatorState>((ref) {
+  return SpectatorService();
+});
 
 /// Provider for room spectator count
 final spectatorCountProvider = StreamProvider.family<int, String>((ref, roomId) {

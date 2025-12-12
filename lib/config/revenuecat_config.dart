@@ -1,24 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
-/// RevenueCat configuration and initialization for ClubRoyale
-///
-/// Entitlement: ClubRoyale Pro
-/// Products: monthly, yearly, lifetime
+/// RevenueCat configuration and initialization
+/// 
+/// IMPORTANT: This requires API keys from RevenueCat dashboard
+/// Visit https://app.revenuecat.com to get your keys
 class RevenueCatConfig {
-  // RevenueCat API keys
-  // Note: Using same key for iOS/Android if it's a public SDK key
-  static const String _iosApiKey = 'test_soLgPiwUukdTnldCzlTKYAuUwNU';
-  static const String _androidApiKey = 'test_soLgPiwUukdTnldCzlTKYAuUwNU';
-
-  // Entitlement identifier
-  static const String proEntitlement = 'ClubRoyale Pro';
-
-  // Product identifiers
-  static const String monthlyProductId = 'monthly';
-  static const String yearlyProductId = 'yearly';
-  static const String lifetimeProductId = 'lifetime';
-
+  // TODO: Replace with your actual API keys from RevenueCat dashboard
+  // These should be stored in environment variables in production
+  static const String _iosApiKey = 'YOUR_IOS_API_KEY_HERE';
+  static const String _androidApiKey = 'YOUR_ANDROID_API_KEY_HERE';
+  
   /// Initialize RevenueCat SDK
   /// Call this in main() before runApp()
   static Future<void> initialize() async {
@@ -30,7 +22,7 @@ class RevenueCatConfig {
     try {
       // Set log level (use debug for development, info for production)
       await Purchases.setLogLevel(kDebugMode ? LogLevel.debug : LogLevel.info);
-
+      
       // Configure SDK based on platform
       PurchasesConfiguration configuration;
       if (defaultTargetPlatform == TargetPlatform.iOS) {
@@ -41,121 +33,58 @@ class RevenueCatConfig {
         debugPrint('RevenueCat: Platform not supported');
         return;
       }
-
+      
       // Initialize
       await Purchases.configure(configuration);
-      debugPrint('✅ RevenueCat: Initialized successfully');
+      debugPrint('RevenueCat: Initialized successfully');
+      
     } catch (e) {
-      debugPrint('❌ RevenueCat initialization failed: $e');
+      debugPrint('RevenueCat initialization failed: $e');
       // Don't throw - app should continue without IAP
     }
   }
-
+  
   /// Set user identifier for RevenueCat
   /// Call this after user signs in
   static Future<void> setUserId(String userId) async {
-    if (kIsWeb) return;
+    if (kIsWeb) return; // Skip on web
 
     try {
-      final result = await Purchases.logIn(userId);
-      debugPrint('✅ RevenueCat: User logged in - $userId');
-      debugPrint('   Created: ${result.created}');
+      await Purchases.logIn(userId);
+      debugPrint('RevenueCat: User logged in - $userId');
     } catch (e) {
-      debugPrint('❌ RevenueCat login failed: $e');
+      debugPrint('RevenueCat login failed: $e');
     }
   }
-
+  
   /// Clear user identifier
   /// Call this when user signs out
   static Future<void> clearUserId() async {
-    if (kIsWeb) return;
+    if (kIsWeb) return; // Skip on web
 
     try {
       await Purchases.logOut();
-      debugPrint('✅ RevenueCat: User logged out');
+      debugPrint('RevenueCat: User logged out');
     } catch (e) {
-      debugPrint('❌ RevenueCat logout failed: $e');
+      debugPrint('RevenueCat logout failed: $e');
     }
   }
-
+  
   /// Get current customer info
   static Future<CustomerInfo?> getCustomerInfo() async {
-    if (kIsWeb) return null;
+    if (kIsWeb) return null; // Skip on web
 
     try {
       return await Purchases.getCustomerInfo();
     } catch (e) {
-      debugPrint('❌ Failed to get customer info: $e');
+      debugPrint('Failed to get customer info: $e');
       return null;
     }
   }
-
-  /// Check if user has ClubRoyale Pro entitlement
-  static Future<bool> hasProAccess() async {
-    if (kIsWeb) return false;
-
-    try {
-      final customerInfo = await Purchases.getCustomerInfo();
-      return customerInfo.entitlements.all[proEntitlement]?.isActive ?? false;
-    } catch (e) {
-      debugPrint('❌ Error checking pro access: $e');
-      return false;
-    }
-  }
-
-  /// Get available offerings (products)
-  static Future<Offerings?> getOfferings() async {
-    if (kIsWeb) return null;
-
-    try {
-      return await Purchases.getOfferings();
-    } catch (e) {
-      debugPrint('❌ Failed to get offerings: $e');
-      return null;
-    }
-  }
-
-  /// Purchase a package
-  static Future<CustomerInfo?> purchasePackage(Package package) async {
-    if (kIsWeb) return null;
-
-    try {
-      final result = await Purchases.purchasePackage(package);
-      debugPrint('✅ Purchase successful');
-      return result;
-    } on PurchasesErrorCode catch (e) {
-      debugPrint('❌ Purchase failed: ${e.name}');
-      return null;
-    } catch (e) {
-      debugPrint('❌ Purchase error: $e');
-      return null;
-    }
-  }
-
-  /// Restore purchases
-  static Future<CustomerInfo?> restorePurchases() async {
-    if (kIsWeb) return null;
-
-    try {
-      final customerInfo = await Purchases.restorePurchases();
-      debugPrint('✅ Purchases restored');
-      return customerInfo;
-    } catch (e) {
-      debugPrint('❌ Error restoring purchases: $e');
-      return null;
-    }
-  }
-
+  
   /// Check if RevenueCat is properly configured
   static bool get isConfigured {
-    return _iosApiKey != 'YOUR_IOS_API_KEY_HERE' &&
-        _androidApiKey != 'YOUR_ANDROID_API_KEY_HERE';
-  }
-}
-
-/// Extension for easy entitlement checking
-extension CustomerInfoExtension on CustomerInfo {
-  bool get hasProAccess {
-    return entitlements.all[RevenueCatConfig.proEntitlement]?.isActive ?? false;
+    return _iosApiKey != 'YOUR_IOS_API_KEY_HERE' && 
+           _androidApiKey != 'YOUR_ANDROID_API_KEY_HERE';
   }
 }

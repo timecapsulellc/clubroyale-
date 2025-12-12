@@ -67,12 +67,12 @@ class ReplayService {
   }
 
   /// Delete a replay
-  Future<void> deleteReplay(String replayId, String userId) async {
+  Future<void> deleteReplay(String replayId, String oderId) async {
     final doc = await _replaysRef.doc(replayId).get();
     if (!doc.exists) return;
     
     // Only the saver can delete
-    if (doc.data()!['savedBy'] != userId) {
+    if (doc.data()!['savedBy'] != oderId) {
       debugPrint('Unauthorized delete attempt');
       return;
     }
@@ -82,7 +82,7 @@ class ReplayService {
   }
 
   /// Toggle like on a replay
-  Future<void> toggleLike(String replayId, String userId) async {
+  Future<void> toggleLike(String replayId, String oderId) async {
     final doc = _replaysRef.doc(replayId);
     
     await _firestore.runTransaction((transaction) async {
@@ -91,10 +91,10 @@ class ReplayService {
       
       final likedBy = List<String>.from(snapshot.data()!['likedBy'] ?? []);
       
-      if (likedBy.contains(userId)) {
-        likedBy.remove(userId);
+      if (likedBy.contains(oderId)) {
+        likedBy.remove(oderId);
       } else {
-        likedBy.add(userId);
+        likedBy.add(oderId);
       }
       
       transaction.update(doc, {'likedBy': likedBy});
@@ -102,9 +102,9 @@ class ReplayService {
   }
 
   /// Get user's saved replays
-  Stream<List<GameReplay>> watchUserReplays(String userId) {
+  Stream<List<GameReplay>> watchUserReplays(String oderId) {
     return _replaysRef
-        .where('savedBy', isEqualTo: userId)
+        .where('savedBy', isEqualTo: oderId)
         .orderBy('gameDate', descending: true)
         .limit(50)
         .snapshots()
@@ -156,13 +156,12 @@ class ReplayService {
   }
 }
 
-/// Replay Playback Controller using Riverpod Notifier
-class ReplayPlaybackController extends Notifier<ReplayPlaybackState> {
+/// Replay Playback Controller
+class ReplayPlaybackController extends StateNotifier<ReplayPlaybackState> {
   GameReplay? _replay;
   Timer? _playbackTimer;
   
-  @override
-  ReplayPlaybackState build() => const ReplayPlaybackState();
+  ReplayPlaybackController() : super(const ReplayPlaybackState());
 
   /// Load replay for playback
   void loadReplay(GameReplay replay) {
@@ -294,16 +293,18 @@ class ReplayPlaybackController extends Notifier<ReplayPlaybackState> {
     return _replay!.events.sublist(0, state.currentEventIndex + 1);
   }
 
+  @override
   void dispose() {
     _playbackTimer?.cancel();
+    super.dispose();
   }
 }
 
 /// Providers
 final replayServiceProvider = Provider<ReplayService>((ref) => ReplayService());
 
-final userReplaysProvider = StreamProvider.family<List<GameReplay>, String>((ref, userId) {
-  return ref.watch(replayServiceProvider).watchUserReplays(userId);
+final userReplaysProvider = StreamProvider.family<List<GameReplay>, String>((ref, oderId) {
+  return ref.watch(replayServiceProvider).watchUserReplays(oderId);
 });
 
 final publicReplaysProvider = StreamProvider<List<GameReplay>>((ref) {
@@ -311,5 +312,6 @@ final publicReplaysProvider = StreamProvider<List<GameReplay>>((ref) {
 });
 
 final replayPlaybackProvider =
-    NotifierProvider<ReplayPlaybackController, ReplayPlaybackState>(
-        ReplayPlaybackController.new);
+    StateNotifierProvider<ReplayPlaybackController, ReplayPlaybackState>((ref) {
+  return ReplayPlaybackController();
+});
