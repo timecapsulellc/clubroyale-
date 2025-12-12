@@ -1,30 +1,37 @@
 # Google Play Store Listing
 
 ## App Name
-TaasClub - Marriage & Call Break
+ClubRoyale - Royal Meld & Card Games
 
 ## Short Description (80 chars max)
-Play classic South Asian card games FREE with friends! 🎴
+Play classic card games FREE with friends! Royal Meld, Call Break & more 🎴
 
 ## Full Description
 
-🎴 **TaasClub - Play Marriage & Call Break with Friends!**
+🎴 **ClubRoyale - Your Private Card Club!**
 
 100% FREE card games with friends - no payments, no gambling, just fun!
 
 ━━━━━━━━━━━━━━━━━━━━
 
-**🃏 GAMES**
+**🃏 GAMES (4 Complete)**
 
-• **Marriage (Nepali Rummy)** - The beloved 21-card game for 2-8 players
+• **Royal Meld (Marriage)** - The beloved 21-card game for 2-8 players
   - Form melds, sets, and runs
-  - Strategic Tiplu (wild card) usage
+  - Strategic wild card usage
   - Real-time multiplayer with friends
 
 • **Call Break** - The popular trick-taking game for 4 players
   - Bid wisely, win tricks
   - Spades are always trump
-  - Compete for highest score over 5 rounds
+  - Compete over 5 rounds
+
+• **Teen Patti** - The classic 3-card poker variant
+  - Multiple betting rounds
+  - Blind and seen play
+
+• **In-Between** - Quick and exciting betting game
+  - Simple rules, fast gameplay
 
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -32,10 +39,15 @@ Play classic South Asian card games FREE with friends! 🎴
 
 ✓ Create private rooms with 6-digit codes
 ✓ Invite friends via WhatsApp
-✓ Play against smart AI bots
+✓ Play against smart AI bots (GenKit powered!)
 ✓ Track scores and settlements
 ✓ Share results to WhatsApp
-✓ Works on web AND mobile - no install needed!
+✓ 5 beautiful color themes with day/night mode
+✓ Tournament mode with brackets
+✓ Gaming clubs with leaderboards
+✓ Game replay system
+✓ Watch games as spectator
+✓ 21 achievement badges to unlock
 
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -45,21 +57,23 @@ Earn diamonds through:
 • Daily login bonus
 • Completing games
 • Inviting friends
+• Tournament wins
 • Weekly rewards
 
-Use diamonds to create rooms and more!
+Use diamonds to create rooms and host tournaments!
 
 *Diamonds are FREE and cannot be purchased. Diamonds have no real-world value.*
 
 ━━━━━━━━━━━━━━━━━━━━
 
-**🎯 WHAT TAASCLUB IS**
+**🎯 WHAT CLUBROYALE IS**
 
 ✅ A FREE social card game app
 ✅ A score tracking utility
 ✅ A way to play with friends anywhere
+✅ 5 theme options including Royal Green
 
-**❌ WHAT TAASCLUB IS NOT**
+**❌ WHAT CLUBROYALE IS NOT**
 
 ❌ NOT a gambling app
 ❌ NO real money involved
@@ -81,11 +95,11 @@ This app is a **social scorekeeper** for entertainment purposes only.
 
 **📧 SUPPORT**
 
-Questions? Contact us at: support@taasclub.app
+Questions? Contact us at: support@clubroyale.app
 
 ━━━━━━━━━━━━━━━━━━━━
 
-Download TaasClub FREE and play with friends! 🎴
+Download ClubRoyale FREE and play with friends! 🎴
 
 ---
 
@@ -93,7 +107,7 @@ Download TaasClub FREE and play with friends! 🎴
 Card Games
 
 ## Tags
-card games, marriage, call break, free multiplayer, social games, rummy, nepali games, indian card games, friends, free games
+card games, marriage, call break, teen patti, free multiplayer, social games, rummy, nepali games, indian card games, friends, free games, tournament, clubs
 
 ## Content Rating
 Teen (simulated gambling themes)
@@ -104,13 +118,32 @@ Teen (simulated gambling themes)
 ---
 
 ## Promotional Text (170 chars)
-Play Marriage & Call Break FREE with friends! Create rooms, share to WhatsApp, track scores. 100% free - no payments, no gambling. Just fun!
+Play Royal Meld, Call Break & more FREE with friends! Create rooms, tournaments, clubs. 5 beautiful themes. 100% free - no gambling. Just fun!
 
 ---
 
-## What's New
+## What's New (v1.0.0 - December 2025)
+• 4 complete card games: Royal Meld, Call Break, Teen Patti, In-Between
+• Tournament mode with brackets
+• Gaming clubs & leaderboards
+• Game replay system
+• Spectator mode
+• 21 achievement badges
+• 5 color themes with day/night mode
+• Smart AI opponents (GenKit powered)
 • 100% FREE - no in-app purchases!
-• Earn diamonds through daily login
-• Share settlements to WhatsApp
-• New: 8-player Marriage support
-• Smart AI opponents
+
+---
+
+## Screenshots Needed
+
+| Screen | Description |
+|--------|-------------|
+| 1 | Home screen with game options |
+| 2 | Royal Meld (Marriage) gameplay |
+| 3 | Tournament lobby with brackets |
+| 4 | Clubs screen with leaderboard |
+| 5 | Profile with achievement badges |
+| 6 | Settings with theme selector |
+| 7 | Settlement summary |
+| 8 | Activity feed |
