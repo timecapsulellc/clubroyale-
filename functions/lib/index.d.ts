@@ -6,90 +6,18 @@
  * - AI-powered game features (Genkit)
  * - Push notifications (FCM)
  */
+export { auditGameUpdate } from './triggers/auditTriggers';
 export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenService';
-/**
- * Get AI-powered game tip for current play
- */
-export declare const getGameTip: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
-    suggestedCard: string;
-    reasoning: string;
-    confidence: "high" | "medium" | "low";
-    alternativeCard?: string | undefined;
-    success: boolean;
-}>, unknown>;
-/**
- * Get AI bot's card selection
- */
-export declare const getBotPlay: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
-    selectedCard: string;
-    strategy: string;
-    success: boolean;
-}>, unknown>;
-/**
- * Moderate a chat message
- */
-export declare const moderateChat: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
-    isAllowed: boolean;
-    category: "clean" | "mild_language" | "profanity" | "harassment" | "spam" | "off_topic";
-    action: "allow" | "warn" | "block" | "mute_user";
-    reason?: string | undefined;
-    editedMessage?: string | undefined;
-    success: boolean;
-} | {
-    success: boolean;
-    isAllowed: boolean;
-    category: string;
-    action: string;
-}>, unknown>;
-/**
- * Get AI-powered bid suggestion
- */
-export declare const getBidSuggestion: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
-    reasoning: string;
-    confidence: "high" | "medium" | "low";
-    suggestedBid: number;
-    handStrength: "weak" | "average" | "strong" | "very_strong";
-    riskLevel: "safe" | "moderate" | "aggressive";
-    success: boolean;
-}>, unknown>;
-/**
- * Get AI-powered matchmaking suggestions
- */
-export declare const getMatchSuggestions: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
-    reasoning: string;
-    suggestions: string[];
-    waitTimeEstimate: number;
-    alternativeGameType?: string | undefined;
-    success: boolean;
-}>, unknown>;
-/**
- * Send push notification when a game invite is created
- */
-export declare const onInviteCreated: import("firebase-functions/core").CloudFunction<import("firebase-functions/v2/firestore").FirestoreEvent<import("firebase-functions/v2/firestore").QueryDocumentSnapshot | undefined, {
-    inviteId: string;
-}>>;
-/**
- * Send push notification for friend request
- */
-export declare const onFriendRequestCreated: import("firebase-functions/core").CloudFunction<import("firebase-functions/v2/firestore").FirestoreEvent<import("firebase-functions/v2/firestore").QueryDocumentSnapshot | undefined, {
-    requestId: string;
-}>>;
-/**
- * Validate a bid in Call Break
- */
-export declare const validateBid: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
-    success: boolean;
-    message: string;
-}>, unknown>;
-/**
- * Validate a card move in Call Break
- */
-export declare const validateMove: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
-    success: boolean;
-    message: string;
-}>, unknown>;
+export { validateTransfer } from './diamonds/validateTransfer';
+export { grantGameplayReward } from './diamonds/grantGameplayReward';
+export { claimDailyLogin } from './diamonds/claimDailyLogin';
+export { upgradeToVerified } from './diamonds/upgradeToVerified';
+export { checkTierUpgrade, monitorDiamondSupply } from './diamonds/scheduled';
+export { onGrantApproved, executeCooledGrants, notifyAdminNewChat } from './admin/diamondAdmin';
+export { weeklyTasks, dailyCleanup } from './scheduled/dailyTasks';
 /**
  * Process settlement after game ends
+ * UPDATED for Diamond Economy V5: Uses 'users' collection instead of 'wallets'
  */
 export declare const processSettlement: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
     success: boolean;

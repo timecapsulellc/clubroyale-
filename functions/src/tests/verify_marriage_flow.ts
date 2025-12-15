@@ -5,13 +5,14 @@ import { z } from 'zod';
 async function verifyMarriageBot() {
     console.log('🧪 Starting Marriage Bot Flow Verification...');
 
-    const testInput = {
-        difficulty: 'easy' as const,
-        hand: ['AS', 'KS', 'QS', 'JS', '10S', '9S', '8S', '7S', '6S', '5S', '4S', '3S', '2S'],
+    const testInput: any = {
+        hand: ['H2', 'H3', 'S10', 'SK', 'DQ'],
+        difficulty: 'easy',
+        region: 'global',
         gameState: {
-            phase: 'drawing' as const,
+            phase: 'drawing',
             cardsInDeck: 20,
-            roundNumber: 1
+            roundNumber: 1,
         }
     };
 

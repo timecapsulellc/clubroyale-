@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:async';
 
 /// Memoized widget builder - only rebuilds when dependencies change
 class MemoizedBuilder<T> extends StatefulWidget {

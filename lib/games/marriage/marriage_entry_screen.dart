@@ -17,6 +17,7 @@ import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/features/game/game_room.dart';
 import 'package:clubroyale/features/game/game_config.dart';
 import 'package:clubroyale/features/lobby/lobby_service.dart';
+import 'package:clubroyale/core/config/diamond_config.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart';
 
 class MarriageEntryScreen extends ConsumerStatefulWidget {
@@ -211,7 +212,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
 
   Widget _buildCreateRoomButton() {
     final isTestMode = TestMode.isEnabled;
-    final cost = isTestMode ? 'FREE' : '${DiamondService.roomCreationCost} 💎';
+    final cost = isTestMode ? 'FREE' : '${DiamondConfig.roomCreationCost} 💎';
     
     return Container(
       height: 72,
@@ -441,9 +442,10 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
     
     // Check diamond balance (skip in Test Mode)
     if (!isTestMode) {
+      final cost = DiamondConfig.roomCreationCost;
       final hasEnough = await diamondService.hasEnoughDiamonds(
         user.uid,
-        DiamondService.roomCreationCost,
+        cost,
       );
 
       if (!hasEnough && mounted) {
@@ -475,7 +477,17 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
 
       // Deduct diamonds after successful room creation (skip in Test Mode)
       if (!isTestMode) {
-        await diamondService.processRoomCreation(user.uid, newGameId);
+        final cost = DiamondConfig.roomCreationCost;
+        final success = await diamondService.deductDiamonds(
+          user.uid, 
+          cost,
+          description: 'Created Marriage Room'
+        );
+        if (!success) {
+          // This case should ideally not happen if hasEnoughDiamonds was checked
+          // but good to have a fallback.
+          debugPrint('Failed to deduct diamonds after room creation.');
+        }
       }
 
       if (mounted) {
@@ -487,7 +499,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
                 const SizedBox(width: 8),
                 Text(isTestMode 
                   ? 'Room created! (Test Mode - Free)' 
-                  : 'Room created! ${DiamondService.roomCreationCost} diamonds used.'),
+                  : 'Room created! Create for ${DiamondConfig.roomCreationCost} 💎'),
               ],
             ),
             backgroundColor: Colors.green,
@@ -525,7 +537,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
         ),
         title: const Text('Insufficient Diamonds'),
         content: Text(
-          'You need ${DiamondService.roomCreationCost} diamonds to create a room.\n\n'
+          'You need ${DiamondConfig.roomCreationCost} diamonds to create a room.\n\n'
           'Would you like to get more diamonds?',
         ),
         actions: [

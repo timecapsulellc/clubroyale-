@@ -4,12 +4,20 @@
 library;
 
 class DiamondConfig {
+  // ============ V5 ECONOMY CONSTANTS ============
+
+  /// Fee to upgrade to Verified Tier (burnt)
+  static const int verificationFee = 100;
+
+  /// P2P Transfer Burn Fee (5%)
+  static const double transferFeePercent = 0.05;
+
   // ============ EARNING (FREE TIER) ============
 
   /// One-time signup bonus
   static const int signupBonus = 100;
 
-  /// Daily login reward
+  /// Daily login reward (Base)
   static const int dailyLogin = 10;
 
   /// Reward per ad watched
@@ -23,6 +31,16 @@ class DiamondConfig {
 
   /// Weekly bonus (available on Sundays)
   static const int weeklyBonus = 100;
+  
+  /// Gameplay Rewards Mapping (Backend mirror)
+  static const Map<String, int> gameplayRewards = {
+    'callbreak_win': 20,
+    'callbreak_second': 5,
+    'teenpatti_win': 10,
+    'rummy_win': 15,
+    'poker_win': 25,
+    'marriage_win': 30,
+  };
 
   // ============ DAILY LIMITS ============
 
@@ -37,16 +55,14 @@ class DiamondConfig {
   /// Maximum referrals per month
   static const int maxReferralsPerMonth = 20; // 1000💎 max
 
-  // ============ WIN STREAK REWARDS (Progressive) ============
-
-  /// Win streak milestone rewards
+  // ============ WIN STREAK REWARDS (V5) ============
+  
+  /// V5 Streak Bonuses (7, 14, 30 days)
+  /// Backend source of truth: 7:50, 14:100, 30:500
   static const Map<int, int> streakRewards = {
-    3: 10, // 3 wins = 10💎
-    5: 20, // 5 wins = 20💎
-    7: 30, // 7 wins = 30💎
-    10: 50, // 10 wins = 50💎
-    15: 100, // 15 wins = 100💎
-    20: 200, // 20 wins = 200💎
+    7: 50,
+    14: 100,
+    30: 500,
   };
 
   // ============ SPENDING COSTS ============
@@ -69,7 +85,7 @@ class DiamondConfig {
   static const int transferReminderHours = 24;
 
   /// Minimum transfer amount
-  static const int minTransferAmount = 1;
+  static const int minTransferAmount = 10; // Bumped for V5 to make sense with fees
 
   /// Maximum transfer amount per transaction
   static const int maxTransferAmount = 100000;
@@ -89,8 +105,8 @@ class DiamondConfig {
   // = 6150 + 400 + 1000 = ~7,550💎/month
 
   /// Get streak reward for a given win count
-  static int? getStreakReward(int winCount) {
-    return streakRewards[winCount];
+  static int? getStreakReward(int days) {
+    return streakRewards[days];
   }
 
   /// Get next streak milestone after current count

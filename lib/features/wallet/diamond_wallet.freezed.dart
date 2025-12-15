@@ -15,12 +15,16 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DiamondWallet {
 
-/// User ID who owns this wallet
+/// User ID
  String get userId;/// Current diamond balance
- int get balance;/// Total diamonds purchased (lifetime)
- int get totalPurchased;/// Total diamonds spent (lifetime)
- int get totalSpent;/// Last transaction timestamp
-@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? get lastUpdated;
+@JsonKey(name: 'diamondBalance') int get balance;/// User Tier (V5)
+ UserTier get tier;/// Diamonds breakdown by origin (V5)
+ Map<String, int> get diamondsByOrigin;/// Daily limits tracking
+ int get dailyEarned; int get dailyTransferred; int get dailyReceived;/// Login streak tracking
+ int get loginStreak;/// Last daily login claim
+@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? get lastDailyLoginClaim;/// Verification timestamps
+@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? get verifiedAt;@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? get trustedAt;/// Legacy fields (kept for backward compatibility if needed)
+ int get totalPurchased; int get totalSpent;@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? get lastUpdated;
 /// Create a copy of DiamondWallet
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -33,16 +37,16 @@ $DiamondWalletCopyWith<DiamondWallet> get copyWith => _$DiamondWalletCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiamondWallet&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.balance, balance) || other.balance == balance)&&(identical(other.totalPurchased, totalPurchased) || other.totalPurchased == totalPurchased)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiamondWallet&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.balance, balance) || other.balance == balance)&&(identical(other.tier, tier) || other.tier == tier)&&const DeepCollectionEquality().equals(other.diamondsByOrigin, diamondsByOrigin)&&(identical(other.dailyEarned, dailyEarned) || other.dailyEarned == dailyEarned)&&(identical(other.dailyTransferred, dailyTransferred) || other.dailyTransferred == dailyTransferred)&&(identical(other.dailyReceived, dailyReceived) || other.dailyReceived == dailyReceived)&&(identical(other.loginStreak, loginStreak) || other.loginStreak == loginStreak)&&(identical(other.lastDailyLoginClaim, lastDailyLoginClaim) || other.lastDailyLoginClaim == lastDailyLoginClaim)&&(identical(other.verifiedAt, verifiedAt) || other.verifiedAt == verifiedAt)&&(identical(other.trustedAt, trustedAt) || other.trustedAt == trustedAt)&&(identical(other.totalPurchased, totalPurchased) || other.totalPurchased == totalPurchased)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userId,balance,totalPurchased,totalSpent,lastUpdated);
+int get hashCode => Object.hash(runtimeType,userId,balance,tier,const DeepCollectionEquality().hash(diamondsByOrigin),dailyEarned,dailyTransferred,dailyReceived,loginStreak,lastDailyLoginClaim,verifiedAt,trustedAt,totalPurchased,totalSpent,lastUpdated);
 
 @override
 String toString() {
-  return 'DiamondWallet(userId: $userId, balance: $balance, totalPurchased: $totalPurchased, totalSpent: $totalSpent, lastUpdated: $lastUpdated)';
+  return 'DiamondWallet(userId: $userId, balance: $balance, tier: $tier, diamondsByOrigin: $diamondsByOrigin, dailyEarned: $dailyEarned, dailyTransferred: $dailyTransferred, dailyReceived: $dailyReceived, loginStreak: $loginStreak, lastDailyLoginClaim: $lastDailyLoginClaim, verifiedAt: $verifiedAt, trustedAt: $trustedAt, totalPurchased: $totalPurchased, totalSpent: $totalSpent, lastUpdated: $lastUpdated)';
 }
 
 
@@ -53,7 +57,7 @@ abstract mixin class $DiamondWalletCopyWith<$Res>  {
   factory $DiamondWalletCopyWith(DiamondWallet value, $Res Function(DiamondWallet) _then) = _$DiamondWalletCopyWithImpl;
 @useResult
 $Res call({
- String userId, int balance, int totalPurchased, int totalSpent,@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? lastUpdated
+ String userId,@JsonKey(name: 'diamondBalance') int balance, UserTier tier, Map<String, int> diamondsByOrigin, int dailyEarned, int dailyTransferred, int dailyReceived, int loginStreak,@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? lastDailyLoginClaim,@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? verifiedAt,@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? trustedAt, int totalPurchased, int totalSpent,@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? lastUpdated
 });
 
 
@@ -70,11 +74,20 @@ class _$DiamondWalletCopyWithImpl<$Res>
 
 /// Create a copy of DiamondWallet
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? balance = null,Object? totalPurchased = null,Object? totalSpent = null,Object? lastUpdated = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? balance = null,Object? tier = null,Object? diamondsByOrigin = null,Object? dailyEarned = null,Object? dailyTransferred = null,Object? dailyReceived = null,Object? loginStreak = null,Object? lastDailyLoginClaim = freezed,Object? verifiedAt = freezed,Object? trustedAt = freezed,Object? totalPurchased = null,Object? totalSpent = null,Object? lastUpdated = freezed,}) {
   return _then(_self.copyWith(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,balance: null == balance ? _self.balance : balance // ignore: cast_nullable_to_non_nullable
-as int,totalPurchased: null == totalPurchased ? _self.totalPurchased : totalPurchased // ignore: cast_nullable_to_non_nullable
+as int,tier: null == tier ? _self.tier : tier // ignore: cast_nullable_to_non_nullable
+as UserTier,diamondsByOrigin: null == diamondsByOrigin ? _self.diamondsByOrigin : diamondsByOrigin // ignore: cast_nullable_to_non_nullable
+as Map<String, int>,dailyEarned: null == dailyEarned ? _self.dailyEarned : dailyEarned // ignore: cast_nullable_to_non_nullable
+as int,dailyTransferred: null == dailyTransferred ? _self.dailyTransferred : dailyTransferred // ignore: cast_nullable_to_non_nullable
+as int,dailyReceived: null == dailyReceived ? _self.dailyReceived : dailyReceived // ignore: cast_nullable_to_non_nullable
+as int,loginStreak: null == loginStreak ? _self.loginStreak : loginStreak // ignore: cast_nullable_to_non_nullable
+as int,lastDailyLoginClaim: freezed == lastDailyLoginClaim ? _self.lastDailyLoginClaim : lastDailyLoginClaim // ignore: cast_nullable_to_non_nullable
+as DateTime?,verifiedAt: freezed == verifiedAt ? _self.verifiedAt : verifiedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,trustedAt: freezed == trustedAt ? _self.trustedAt : trustedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,totalPurchased: null == totalPurchased ? _self.totalPurchased : totalPurchased // ignore: cast_nullable_to_non_nullable
 as int,totalSpent: null == totalSpent ? _self.totalSpent : totalSpent // ignore: cast_nullable_to_non_nullable
 as int,lastUpdated: freezed == lastUpdated ? _self.lastUpdated : lastUpdated // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -162,10 +175,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  int balance,  int totalPurchased,  int totalSpent, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? lastUpdated)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId, @JsonKey(name: 'diamondBalance')  int balance,  UserTier tier,  Map<String, int> diamondsByOrigin,  int dailyEarned,  int dailyTransferred,  int dailyReceived,  int loginStreak, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? lastDailyLoginClaim, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? verifiedAt, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? trustedAt,  int totalPurchased,  int totalSpent, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? lastUpdated)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DiamondWallet() when $default != null:
-return $default(_that.userId,_that.balance,_that.totalPurchased,_that.totalSpent,_that.lastUpdated);case _:
+return $default(_that.userId,_that.balance,_that.tier,_that.diamondsByOrigin,_that.dailyEarned,_that.dailyTransferred,_that.dailyReceived,_that.loginStreak,_that.lastDailyLoginClaim,_that.verifiedAt,_that.trustedAt,_that.totalPurchased,_that.totalSpent,_that.lastUpdated);case _:
   return orElse();
 
 }
@@ -183,10 +196,10 @@ return $default(_that.userId,_that.balance,_that.totalPurchased,_that.totalSpent
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  int balance,  int totalPurchased,  int totalSpent, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? lastUpdated)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId, @JsonKey(name: 'diamondBalance')  int balance,  UserTier tier,  Map<String, int> diamondsByOrigin,  int dailyEarned,  int dailyTransferred,  int dailyReceived,  int loginStreak, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? lastDailyLoginClaim, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? verifiedAt, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? trustedAt,  int totalPurchased,  int totalSpent, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? lastUpdated)  $default,) {final _that = this;
 switch (_that) {
 case _DiamondWallet():
-return $default(_that.userId,_that.balance,_that.totalPurchased,_that.totalSpent,_that.lastUpdated);case _:
+return $default(_that.userId,_that.balance,_that.tier,_that.diamondsByOrigin,_that.dailyEarned,_that.dailyTransferred,_that.dailyReceived,_that.loginStreak,_that.lastDailyLoginClaim,_that.verifiedAt,_that.trustedAt,_that.totalPurchased,_that.totalSpent,_that.lastUpdated);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +216,10 @@ return $default(_that.userId,_that.balance,_that.totalPurchased,_that.totalSpent
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  int balance,  int totalPurchased,  int totalSpent, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? lastUpdated)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId, @JsonKey(name: 'diamondBalance')  int balance,  UserTier tier,  Map<String, int> diamondsByOrigin,  int dailyEarned,  int dailyTransferred,  int dailyReceived,  int loginStreak, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? lastDailyLoginClaim, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? verifiedAt, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? trustedAt,  int totalPurchased,  int totalSpent, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)  DateTime? lastUpdated)?  $default,) {final _that = this;
 switch (_that) {
 case _DiamondWallet() when $default != null:
-return $default(_that.userId,_that.balance,_that.totalPurchased,_that.totalSpent,_that.lastUpdated);case _:
+return $default(_that.userId,_that.balance,_that.tier,_that.diamondsByOrigin,_that.dailyEarned,_that.dailyTransferred,_that.dailyReceived,_that.loginStreak,_that.lastDailyLoginClaim,_that.verifiedAt,_that.trustedAt,_that.totalPurchased,_that.totalSpent,_that.lastUpdated);case _:
   return null;
 
 }
@@ -218,18 +231,38 @@ return $default(_that.userId,_that.balance,_that.totalPurchased,_that.totalSpent
 @JsonSerializable()
 
 class _DiamondWallet implements DiamondWallet {
-  const _DiamondWallet({required this.userId, this.balance = 0, this.totalPurchased = 0, this.totalSpent = 0, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) this.lastUpdated});
+  const _DiamondWallet({required this.userId, @JsonKey(name: 'diamondBalance') this.balance = 0, this.tier = UserTier.basic, final  Map<String, int> diamondsByOrigin = const {}, this.dailyEarned = 0, this.dailyTransferred = 0, this.dailyReceived = 0, this.loginStreak = 0, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) this.lastDailyLoginClaim, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) this.verifiedAt, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) this.trustedAt, this.totalPurchased = 0, this.totalSpent = 0, @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) this.lastUpdated}): _diamondsByOrigin = diamondsByOrigin;
   factory _DiamondWallet.fromJson(Map<String, dynamic> json) => _$DiamondWalletFromJson(json);
 
-/// User ID who owns this wallet
+/// User ID
 @override final  String userId;
 /// Current diamond balance
-@override@JsonKey() final  int balance;
-/// Total diamonds purchased (lifetime)
+@override@JsonKey(name: 'diamondBalance') final  int balance;
+/// User Tier (V5)
+@override@JsonKey() final  UserTier tier;
+/// Diamonds breakdown by origin (V5)
+ final  Map<String, int> _diamondsByOrigin;
+/// Diamonds breakdown by origin (V5)
+@override@JsonKey() Map<String, int> get diamondsByOrigin {
+  if (_diamondsByOrigin is EqualUnmodifiableMapView) return _diamondsByOrigin;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_diamondsByOrigin);
+}
+
+/// Daily limits tracking
+@override@JsonKey() final  int dailyEarned;
+@override@JsonKey() final  int dailyTransferred;
+@override@JsonKey() final  int dailyReceived;
+/// Login streak tracking
+@override@JsonKey() final  int loginStreak;
+/// Last daily login claim
+@override@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) final  DateTime? lastDailyLoginClaim;
+/// Verification timestamps
+@override@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) final  DateTime? verifiedAt;
+@override@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) final  DateTime? trustedAt;
+/// Legacy fields (kept for backward compatibility if needed)
 @override@JsonKey() final  int totalPurchased;
-/// Total diamonds spent (lifetime)
 @override@JsonKey() final  int totalSpent;
-/// Last transaction timestamp
 @override@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) final  DateTime? lastUpdated;
 
 /// Create a copy of DiamondWallet
@@ -245,16 +278,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiamondWallet&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.balance, balance) || other.balance == balance)&&(identical(other.totalPurchased, totalPurchased) || other.totalPurchased == totalPurchased)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiamondWallet&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.balance, balance) || other.balance == balance)&&(identical(other.tier, tier) || other.tier == tier)&&const DeepCollectionEquality().equals(other._diamondsByOrigin, _diamondsByOrigin)&&(identical(other.dailyEarned, dailyEarned) || other.dailyEarned == dailyEarned)&&(identical(other.dailyTransferred, dailyTransferred) || other.dailyTransferred == dailyTransferred)&&(identical(other.dailyReceived, dailyReceived) || other.dailyReceived == dailyReceived)&&(identical(other.loginStreak, loginStreak) || other.loginStreak == loginStreak)&&(identical(other.lastDailyLoginClaim, lastDailyLoginClaim) || other.lastDailyLoginClaim == lastDailyLoginClaim)&&(identical(other.verifiedAt, verifiedAt) || other.verifiedAt == verifiedAt)&&(identical(other.trustedAt, trustedAt) || other.trustedAt == trustedAt)&&(identical(other.totalPurchased, totalPurchased) || other.totalPurchased == totalPurchased)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userId,balance,totalPurchased,totalSpent,lastUpdated);
+int get hashCode => Object.hash(runtimeType,userId,balance,tier,const DeepCollectionEquality().hash(_diamondsByOrigin),dailyEarned,dailyTransferred,dailyReceived,loginStreak,lastDailyLoginClaim,verifiedAt,trustedAt,totalPurchased,totalSpent,lastUpdated);
 
 @override
 String toString() {
-  return 'DiamondWallet(userId: $userId, balance: $balance, totalPurchased: $totalPurchased, totalSpent: $totalSpent, lastUpdated: $lastUpdated)';
+  return 'DiamondWallet(userId: $userId, balance: $balance, tier: $tier, diamondsByOrigin: $diamondsByOrigin, dailyEarned: $dailyEarned, dailyTransferred: $dailyTransferred, dailyReceived: $dailyReceived, loginStreak: $loginStreak, lastDailyLoginClaim: $lastDailyLoginClaim, verifiedAt: $verifiedAt, trustedAt: $trustedAt, totalPurchased: $totalPurchased, totalSpent: $totalSpent, lastUpdated: $lastUpdated)';
 }
 
 
@@ -265,7 +298,7 @@ abstract mixin class _$DiamondWalletCopyWith<$Res> implements $DiamondWalletCopy
   factory _$DiamondWalletCopyWith(_DiamondWallet value, $Res Function(_DiamondWallet) _then) = __$DiamondWalletCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, int balance, int totalPurchased, int totalSpent,@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? lastUpdated
+ String userId,@JsonKey(name: 'diamondBalance') int balance, UserTier tier, Map<String, int> diamondsByOrigin, int dailyEarned, int dailyTransferred, int dailyReceived, int loginStreak,@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? lastDailyLoginClaim,@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? verifiedAt,@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? trustedAt, int totalPurchased, int totalSpent,@JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson) DateTime? lastUpdated
 });
 
 
@@ -282,11 +315,20 @@ class __$DiamondWalletCopyWithImpl<$Res>
 
 /// Create a copy of DiamondWallet
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? balance = null,Object? totalPurchased = null,Object? totalSpent = null,Object? lastUpdated = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? balance = null,Object? tier = null,Object? diamondsByOrigin = null,Object? dailyEarned = null,Object? dailyTransferred = null,Object? dailyReceived = null,Object? loginStreak = null,Object? lastDailyLoginClaim = freezed,Object? verifiedAt = freezed,Object? trustedAt = freezed,Object? totalPurchased = null,Object? totalSpent = null,Object? lastUpdated = freezed,}) {
   return _then(_DiamondWallet(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,balance: null == balance ? _self.balance : balance // ignore: cast_nullable_to_non_nullable
-as int,totalPurchased: null == totalPurchased ? _self.totalPurchased : totalPurchased // ignore: cast_nullable_to_non_nullable
+as int,tier: null == tier ? _self.tier : tier // ignore: cast_nullable_to_non_nullable
+as UserTier,diamondsByOrigin: null == diamondsByOrigin ? _self._diamondsByOrigin : diamondsByOrigin // ignore: cast_nullable_to_non_nullable
+as Map<String, int>,dailyEarned: null == dailyEarned ? _self.dailyEarned : dailyEarned // ignore: cast_nullable_to_non_nullable
+as int,dailyTransferred: null == dailyTransferred ? _self.dailyTransferred : dailyTransferred // ignore: cast_nullable_to_non_nullable
+as int,dailyReceived: null == dailyReceived ? _self.dailyReceived : dailyReceived // ignore: cast_nullable_to_non_nullable
+as int,loginStreak: null == loginStreak ? _self.loginStreak : loginStreak // ignore: cast_nullable_to_non_nullable
+as int,lastDailyLoginClaim: freezed == lastDailyLoginClaim ? _self.lastDailyLoginClaim : lastDailyLoginClaim // ignore: cast_nullable_to_non_nullable
+as DateTime?,verifiedAt: freezed == verifiedAt ? _self.verifiedAt : verifiedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,trustedAt: freezed == trustedAt ? _self.trustedAt : trustedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,totalPurchased: null == totalPurchased ? _self.totalPurchased : totalPurchased // ignore: cast_nullable_to_non_nullable
 as int,totalSpent: null == totalSpent ? _self.totalSpent : totalSpent // ignore: cast_nullable_to_non_nullable
 as int,lastUpdated: freezed == lastUpdated ? _self.lastUpdated : lastUpdated // ignore: cast_nullable_to_non_nullable
 as DateTime?,

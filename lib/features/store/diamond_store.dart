@@ -6,6 +6,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clubroyale/core/constants/disclaimers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:clubroyale/features/wallet/diamond_wallet.dart';
+import 'package:clubroyale/features/wallet/diamond_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/features/wallet/services/user_tier_service.dart';
+import 'package:clubroyale/features/wallet/models/user_tier.dart';
+import 'package:clubroyale/core/config/diamond_config.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Diamond pack definitions
 class DiamondPack {
@@ -172,19 +180,14 @@ class DiamondStoreService {
 }
 
 /// Diamond Store Screen
-class DiamondStoreScreen extends StatefulWidget {
-  final String userId;
-  
-  const DiamondStoreScreen({
-    super.key,
-    required this.userId,
-  });
+class DiamondStoreScreen extends ConsumerStatefulWidget {
+  const DiamondStoreScreen({super.key});
 
   @override
-  State<DiamondStoreScreen> createState() => _DiamondStoreScreenState();
+  ConsumerState<DiamondStoreScreen> createState() => _DiamondStoreScreenState();
 }
 
-class _DiamondStoreScreenState extends State<DiamondStoreScreen> {
+class _DiamondStoreScreenState extends ConsumerState<DiamondStoreScreen> {
   final DiamondStoreService _storeService = DiamondStoreService();
   String? _purchasingProductId;
   
@@ -196,12 +199,19 @@ class _DiamondStoreScreenState extends State<DiamondStoreScreen> {
         centerTitle: true,
         actions: [
           // Current balance
-          StreamBuilder<int>(
-            stream: _storeService.watchDiamondBalance(widget.userId),
-            builder: (context, snapshot) {
-              final balance = snapshot.data ?? 0;
-              return Container(
-                margin: const EdgeInsets.only(right: 12),
+          Consumer(
+            builder: (context, ref, child) {
+              final currentUser = ref.watch(authServiceProvider).currentUser;
+              if (currentUser == null) return const SizedBox();
+              
+              final diamondService = ref.watch(diamondServiceProvider);
+              
+              return StreamBuilder<DiamondWallet>(
+                stream: diamondService.watchWallet(currentUser.uid),
+                builder: (context, snapshot) {
+                  final balance = snapshot.data?.balance ?? 0;
+                  return Container(
+                    margin: const EdgeInsets.only(right: 12),
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.amber.shade100,
@@ -221,6 +231,8 @@ class _DiamondStoreScreenState extends State<DiamondStoreScreen> {
                     ),
                   ],
                 ),
+              );
+                },
               );
             },
           ),

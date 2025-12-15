@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:clubroyale/core/config/diamond_config.dart';
 import 'package:clubroyale/core/config/club_royale_theme.dart';
 import 'package:clubroyale/config/casino_theme.dart';
-import 'package:clubroyale/features/wallet/diamond_rewards_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +8,9 @@ import 'package:intl/intl.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart';
 import 'package:clubroyale/features/wallet/diamond_wallet.dart';
+import 'package:clubroyale/features/wallet/services/user_tier_service.dart';
+import 'package:clubroyale/features/governance/governance_service.dart';
+import 'package:clubroyale/features/wallet/models/user_tier.dart';
 
 class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});
@@ -27,6 +28,8 @@ class WalletScreen extends ConsumerWidget {
     }
 
     final diamondService = ref.watch(diamondServiceProvider);
+    final userTierAsync = ref.watch(currentUserTierProvider);
+    final governanceService = ref.watch(governanceServiceProvider);
     
     return Scaffold(
       backgroundColor: CasinoColors.darkPurple,
@@ -73,7 +76,12 @@ class WalletScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     // Balance Card
-                    _buildPremiumBalanceCard(context, wallet),
+                    _buildPremiumBalanceCard(context, wallet, userTierAsync.value ?? UserTier.basic, governanceService),
+                    
+                    const SizedBox(height: 24),
+
+                    // Daily Limits & Tier Stats
+                    _buildDailyLimits(context, wallet, userTierAsync.value ?? UserTier.basic),
                     
                     const SizedBox(height: 32),
                     
@@ -107,10 +115,15 @@ class WalletScreen extends ConsumerWidget {
                         Expanded(
                           child: _PremiumActionButton(
                             icon: Icons.swap_horiz,
-                            label: 'Transfer', // Renamed from Withdraw as Withdraw is N/A
-                            gradient: LinearGradient(colors: [Colors.blue.shade400, Colors.blue.shade700]),
-                            onTap: () => context.push('/transfer'),
+                            label: 'Transfer', 
+                            gradient: (userTierAsync.value?.canTransfer ?? false)
+                                ? LinearGradient(colors: [Colors.blue.shade400, Colors.blue.shade700])
+                                : LinearGradient(colors: [Colors.grey.shade700, Colors.grey.shade800]),
+                            onTap: (userTierAsync.value?.canTransfer ?? false)
+                                ? () => context.push('/transfer')
+                                : () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Transfers require Verified Tier or higher!'))),
                             textColor: Colors.white,
+                            isLocked: !(userTierAsync.value?.canTransfer ?? false),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -119,7 +132,10 @@ class WalletScreen extends ConsumerWidget {
                             icon: Icons.support_agent,
                             label: 'Support',
                             gradient: LinearGradient(colors: [Colors.grey.shade700, Colors.grey.shade900]),
-                            onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Support chat coming soon'))), // context.push('/support'),
+                            onTap: () {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Support chat coming soon'))); // context.push('/support'),
+                            },
                             textColor: Colors.white,
                           ),
                         ),
@@ -204,7 +220,89 @@ class WalletScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPremiumBalanceCard(BuildContext context, DiamondWallet wallet) {
+  Widget _buildDailyLimits(BuildContext context, DiamondWallet wallet, UserTier tier) {
+    // Limits
+    final transferLimit = tier.dailyTransferLimit;
+    final earnLimit = tier.dailyEarningCap;
+    
+    // Usage
+    final transferred = wallet.dailyTransferred;
+    final earned = wallet.dailyEarned;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Daily Limits', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          
+          if (transferLimit > 0 || transferLimit == -1) ...[
+            _buildLimitBar(
+              'Transfers', 
+              transferred, 
+              transferLimit, 
+              Colors.blueAccent
+            ),
+            const SizedBox(height: 8),
+          ],
+          
+          if (earnLimit > 0 || earnLimit == -1)
+            _buildLimitBar(
+              'Free Earnings', 
+              earned, 
+              earnLimit, 
+              Colors.greenAccent
+            ),
+            
+          if (transferLimit == 0 && earnLimit == 0)
+            const Text('Upgrade tier to increase limits', style: TextStyle(color: Colors.grey, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLimitBar(String label, int current, int max, Color color) {
+    double progress = 0.0;
+    String statusText = '';
+    
+    if (max == -1) {
+      progress = 0.5; // Just show half bar for unlimited
+      statusText = '$current / ∞';
+    } else if (max > 0) {
+      progress = (current / max).clamp(0.0, 1.0);
+      statusText = '$current / $max';
+    } else {
+      statusText = 'Disabled';
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: const TextStyle(color: Colors.white60, fontSize: 12)),
+            Text(statusText, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        LinearProgressIndicator(
+          value: max == -1 ? null : progress, // null for indeterminate if unlimited? No, better show solid line or custom
+          backgroundColor: Colors.white10,
+          color: color,
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPremiumBalanceCard(BuildContext context, DiamondWallet wallet, UserTier tier, GovernanceService govService) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -260,6 +358,24 @@ class WalletScreen extends ConsumerWidget {
                       letterSpacing: 1,
                     ),
                   ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: tier.color.withValues(alpha: 0.2),
+                      border: Border.all(color: tier.color),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      tier.displayName.toUpperCase(),
+                      style: TextStyle(
+                        color: tier.color,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -288,6 +404,28 @@ class WalletScreen extends ConsumerWidget {
                   ),
                 ],
               ).animate().fadeIn().slideY(begin: 0.3),
+              
+              const SizedBox(height: 16),
+              
+              // Voting Power
+              FutureBuilder<double>(
+                future: govService.getVotingPower(wallet.userId),
+                builder: (context, snapshot) {
+                  return Row(
+                    children: [
+                      Icon(Icons.how_to_vote, size: 14, color: Colors.white.withValues(alpha: 0.5)),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Voting Power: ${snapshot.data?.toStringAsFixed(0) ?? "..."}',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              ),
             ],
           ),
         ],
@@ -302,6 +440,7 @@ class _PremiumActionButton extends StatelessWidget {
   final Gradient gradient;
   final VoidCallback onTap;
   final Color textColor;
+  final bool isLocked;
 
   const _PremiumActionButton({
     required this.icon,
@@ -309,6 +448,7 @@ class _PremiumActionButton extends StatelessWidget {
     required this.gradient,
     required this.onTap,
     required this.textColor,
+    this.isLocked = false,
   });
 
   @override
@@ -333,7 +473,10 @@ class _PremiumActionButton extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: textColor, size: 32),
+            if (isLocked)
+              const Icon(Icons.lock, color: Colors.white54, size: 24)
+            else
+              Icon(icon, color: textColor, size: 32),
             const SizedBox(height: 8),
             Text(
               label,

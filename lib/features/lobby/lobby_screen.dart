@@ -7,7 +7,9 @@ import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/game/game_room.dart';
 import 'package:clubroyale/features/game/game_config.dart';
 import 'package:clubroyale/features/lobby/lobby_service.dart';
+import 'package:clubroyale/core/config/diamond_config.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart';
+import 'package:clubroyale/features/wallet/diamond_wallet.dart';
 import 'package:clubroyale/features/wallet/diamond_balance_widget.dart';
 import 'package:clubroyale/features/feedback/feedback_dialog.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
@@ -517,7 +519,7 @@ class LobbyScreen extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Creating a room costs ${DiamondService.roomCreationCost} diamonds',
+                        'Creating a room costs ${DiamondConfig.roomCreationCost} diamonds',
                         style: TextStyle(color: Colors.amber.shade200),
                       ),
                     ),
@@ -579,7 +581,7 @@ class LobbyScreen extends ConsumerWidget {
       // Check diamond balance (only for real users)
       final hasEnough = await diamondService.hasEnoughDiamonds(
         user.uid,
-        DiamondService.roomCreationCost,
+        DiamondConfig.roomCreationCost,
       );
 
       if (!hasEnough && context.mounted) {
@@ -597,7 +599,7 @@ class LobbyScreen extends ConsumerWidget {
             ),
             title: const Text('Insufficient Diamonds'),
             content: Text(
-              'You need ${DiamondService.roomCreationCost} diamonds to create a room.\n\n'
+              'You need ${DiamondConfig.roomCreationCost} diamonds to create a room.\n\n'
               'Would you like to get more diamonds?',
             ),
             actions: [
@@ -640,7 +642,17 @@ class LobbyScreen extends ConsumerWidget {
 
       // Deduct diamonds after successful room creation (skip in Test Mode)
       if (!isTestMode) {
-        await diamondService.processRoomCreation(user.uid, newGameId);
+        final cost = DiamondConfig.roomCreationCost;
+        final success = await diamondService.deductDiamonds(
+          user.uid, 
+          cost,
+          description: 'Created room $gameType'
+        );
+        if (!success) {
+          // This case should ideally not be reached if hasEnoughDiamonds check passed,
+          // but good for robustness.
+          throw Exception('Failed to deduct diamonds for room creation.');
+        }
       }
 
       if (context.mounted) {
@@ -652,7 +664,7 @@ class LobbyScreen extends ConsumerWidget {
                 const SizedBox(width: 8),
                 Text(isTestMode 
                   ? 'Room created! (Test Mode - Free)' 
-                  : 'Room created! ${DiamondService.roomCreationCost} diamonds used.'),
+                  : 'Room created! ${DiamondConfig.roomCreationCost} diamonds used.'),
               ],
             ),
             backgroundColor: Colors.green,

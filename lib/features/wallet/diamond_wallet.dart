@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:clubroyale/features/wallet/models/user_tier.dart';
+import 'package:clubroyale/features/wallet/models/diamond_origin.dart';
 
 part 'diamond_wallet.freezed.dart';
 part 'diamond_wallet.g.dart';
@@ -21,24 +23,46 @@ DateTime _dateTimeFromJson(dynamic json) {
 String? _nullableDateTimeToJson(DateTime? dt) => dt?.toIso8601String();
 String _dateTimeToJson(DateTime dt) => dt.toIso8601String();
 
-/// Diamond wallet for virtual currency (monetization)
-/// Host buys diamonds via IAP to create rooms
+/// Diamond wallet for V5 Economy
+/// Now integrated directly into the `users` collection in Firestore.
 @freezed
 abstract class DiamondWallet with _$DiamondWallet {
   const factory DiamondWallet({
-    /// User ID who owns this wallet
+    /// User ID
     required String userId,
     
     /// Current diamond balance
+    @JsonKey(name: 'diamondBalance')
     @Default(0) int balance,
     
-    /// Total diamonds purchased (lifetime)
+    /// User Tier (V5)
+    @Default(UserTier.basic) UserTier tier,
+
+    /// Diamonds breakdown by origin (V5)
+    @Default({}) Map<String, int> diamondsByOrigin,
+    
+    /// Daily limits tracking
+    @Default(0) int dailyEarned,
+    @Default(0) int dailyTransferred,
+    @Default(0) int dailyReceived,
+
+    /// Login streak tracking
+    @Default(0) int loginStreak,
+    
+    /// Last daily login claim
+    @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)
+    DateTime? lastDailyLoginClaim,
+
+    /// Verification timestamps
+    @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)
+    DateTime? verifiedAt,
+    
+    @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)
+    DateTime? trustedAt,
+
+    /// Legacy fields (kept for backward compatibility if needed)
     @Default(0) int totalPurchased,
-    
-    /// Total diamonds spent (lifetime)
     @Default(0) int totalSpent,
-    
-    /// Last transaction timestamp
     @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)
     DateTime? lastUpdated,
   }) = _DiamondWallet;

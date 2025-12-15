@@ -8,6 +8,8 @@ import 'package:clubroyale/core/config/diamond_config.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/config/visual_effects.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
+import 'package:clubroyale/features/wallet/services/user_tier_service.dart';
+import 'package:clubroyale/features/wallet/models/user_tier.dart';
 
 /// Diamond Info Screen - ClubRoyale Vault
 /// 
@@ -62,6 +64,120 @@ class DiamondPurchaseScreen extends ConsumerWidget {
                   _buildBalanceCard(currentBalance).animate().fadeIn().scale(),
 
                   const SizedBox(height: 24),
+
+                  // Tier Upgrade Card (if Basic)
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final tierAsync = ref.watch(currentUserTierProvider);
+                      final tier = tierAsync.value;
+                      
+                      // Only show upgrade if data is loaded and user is Basic
+                      if (tier != UserTier.basic) return const SizedBox();
+                      
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 24),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.blue.shade900, Colors.blue.shade700],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.blueAccent.shade100, width: 1),
+                          boxShadow: [
+                             BoxShadow(color: Colors.blue.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))
+                          ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () async {
+                              final confirmed = await showDialog<bool>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  backgroundColor: Colors.grey.shade900,
+                                  title: const Text('Upgrade to Verified?', style: TextStyle(color: Colors.white)),
+                                  content: const Text(
+                                    'Unlock P2P Transfers and higher daily limits for 100 Diamonds.',
+                                    style: TextStyle(color: Colors.white70),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, false),
+                                      child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                                    ),
+                                    FilledButton(
+                                      onPressed: () => Navigator.pop(context, true),
+                                      style: FilledButton.styleFrom(backgroundColor: Colors.blueAccent),
+                                      child: const Text('Upgrade (100 💎)'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              
+                              if (confirmed == true) {
+                                try {
+                                  await ref.read(diamondServiceProvider).upgradeToVerified();
+                                  if (context.mounted) {
+                                   await SoundService.playRoundEnd(); // Level up sound
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('🎉 Congratulations! You are now Verified!'),
+                                        backgroundColor: Colors.green,
+                                      )
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Upgrade failed: ${e.toString().replaceAll("Exception:", "")}'), // Clean up error
+                                        backgroundColor: Colors.red,
+                                      )
+                                    );
+                                  }
+                                }
+                              }
+                            },
+                            borderRadius: BorderRadius.circular(16),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.verified, color: Colors.white, size: 28),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Unlock P2P Transfers',
+                                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          'Get Verified Status • 100 💎',
+                                          style: TextStyle(color: Colors.white70, fontSize: 13),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(Icons.chevron_right, color: Colors.white54),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ).animate().shimmer(delay: 2.seconds, duration: 2.seconds);
+                    }
+                  ),
 
                   // FREE APP Banner
                   _buildFreeBadge().animate().fadeIn(delay: 200.ms).slideY(begin: 0.2),
