@@ -135,7 +135,7 @@ class _ReplayCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: _getGameColor(replay.gameType).withOpacity(0.2),
+                      color: _getGameColor(replay.gameType).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -184,7 +184,7 @@ class _ReplayCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.2),
+                        color: Colors.amber.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -273,7 +273,7 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 80, color: Colors.grey.withOpacity(0.5)),
+          Icon(icon, size: 80, color: Colors.grey.withValues(alpha: 0.5)),
           const SizedBox(height: 24),
           Text(title, style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 8),

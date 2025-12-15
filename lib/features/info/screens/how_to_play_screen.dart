@@ -154,15 +154,15 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [themeColors.surface, themeColors.surfaceLight.withOpacity(0.5)],
+          colors: [themeColors.surface, themeColors.surfaceLight.withValues(alpha: 0.5)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: themeColors.gold.withOpacity(0.5)),
+        border: Border.all(color: themeColors.gold.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
-            color: themeColors.gold.withOpacity(0.2),
+            color: themeColors.gold.withValues(alpha: 0.2),
             blurRadius: 20,
             spreadRadius: 2,
           ),
@@ -174,7 +174,7 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: themeColors.gold.withOpacity(0.2),
+              color: themeColors.gold.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(Icons.style, size: 40, color: themeColors.gold),
@@ -220,7 +220,7 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: themeColors.gold.withOpacity(0.2),
+        color: themeColors.gold.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -239,7 +239,7 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.3),
+        color: themeColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -281,7 +281,7 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.3),
+        color: themeColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -303,7 +303,7 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
               return TableRow(
                 decoration: BoxDecoration(
                   color: isHeader 
-                      ? themeColors.gold.withOpacity(0.2) 
+                      ? themeColors.gold.withValues(alpha: 0.2) 
                       : Colors.transparent,
                 ),
                 children: entry.value.map((cell) => Padding(

@@ -2,6 +2,7 @@
 /// 
 /// Supports single deck (52 cards), double deck (104), triple deck (156)
 /// Based on gin_rummy Deck pattern
+library;
 
 import 'pile.dart';
 

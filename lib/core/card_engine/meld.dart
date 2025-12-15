@@ -2,6 +2,7 @@
 /// 
 /// Based on gin_rummy SetMeld and RunMeld patterns
 /// Extended for Marriage game with TunnelMeld and MarriageMeld
+library;
 
 import 'pile.dart';
 

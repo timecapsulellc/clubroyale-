@@ -14,7 +14,7 @@ class GameLogOverlay extends StatelessWidget {
       width: 200,
       constraints: const BoxConstraints(maxHeight: 150),
       decoration: BoxDecoration(
-        color: AppTheme.teal.withOpacity(0.5),
+        color: AppTheme.teal.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: CustomPaint(

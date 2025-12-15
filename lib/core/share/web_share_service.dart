@@ -25,10 +25,10 @@ class WebShareService {
     try {
       if (kIsWeb) {
         // Use share_plus which handles Web Share API
-        await Share.share(text, subject: subject);
+        await SharePlus.instance.share(ShareParams(text: text, subject: subject));
         return ShareResult.success;
       } else {
-        await Share.share(text, subject: subject);
+        await SharePlus.instance.share(ShareParams(text: text, subject: subject));
         return ShareResult.success;
       }
     } catch (e) {
@@ -47,7 +47,7 @@ class WebShareService {
   }) async {
     try {
       final content = text != null ? '$text\n$url' : url;
-      await Share.share(content, subject: title);
+      await SharePlus.instance.share(ShareParams(text: content, subject: title));
       return ShareResult.success;
     } catch (e) {
       debugPrint('Share URL error: $e');

@@ -85,7 +85,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              themeColors.primary.withOpacity(0.8),
+              themeColors.primary.withValues(alpha: 0.8),
               themeColors.background,
             ],
             begin: Alignment.topCenter,
@@ -103,7 +103,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: themeColors.gold.withOpacity(0.4),
+                    color: themeColors.gold.withValues(alpha: 0.4),
                     blurRadius: 30,
                     spreadRadius: 5,
                   ),
@@ -280,12 +280,12 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
       width: 180,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.5),
+        color: themeColors.surface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: themeColors.gold.withOpacity(0.3)),
+        border: Border.all(color: themeColors.gold.withValues(alpha: 0.3)),
         boxShadow: [
           BoxShadow(
-            color: themeColors.gold.withOpacity(0.1),
+            color: themeColors.gold.withValues(alpha: 0.1),
             blurRadius: 20,
           ),
         ],
@@ -313,7 +313,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: themeColors.gold.withOpacity(0.2),
+              color: themeColors.gold.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -338,7 +338,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
     
     return Container(
       padding: const EdgeInsets.all(40),
-      color: themeColors.surface.withOpacity(0.2),
+      color: themeColors.surface.withValues(alpha: 0.2),
       child: Column(
         children: [
           _buildSectionTitle('✨ Features', 'Everything you need for the ultimate card experience', themeColors),
@@ -359,9 +359,9 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
       width: 200,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: themeColors.background.withOpacity(0.5),
+        color: themeColors.background.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: themeColors.gold.withOpacity(0.2)),
+        border: Border.all(color: themeColors.gold.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -369,7 +369,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: themeColors.gold.withOpacity(0.2),
+              color: themeColors.gold.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(feature['icon'] as IconData, color: themeColors.gold),
@@ -408,9 +408,9 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
             constraints: const BoxConstraints(maxWidth: 700),
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: themeColors.surface.withOpacity(0.3),
+              color: themeColors.surface.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: themeColors.gold.withOpacity(0.3)),
+              border: Border.all(color: themeColors.gold.withValues(alpha: 0.3)),
             ),
             child: Column(
               children: [
@@ -432,10 +432,10 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: highlight ? themeColors.gold.withOpacity(0.1) : Colors.transparent,
+        color: highlight ? themeColors.gold.withValues(alpha: 0.1) : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: highlight ? themeColors.gold.withOpacity(0.3) : Colors.transparent,
+          color: highlight ? themeColors.gold.withValues(alpha: 0.3) : Colors.transparent,
         ),
       ),
       child: Row(
@@ -475,7 +475,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
     
     return Container(
       padding: const EdgeInsets.all(40),
-      color: themeColors.surface.withOpacity(0.2),
+      color: themeColors.surface.withValues(alpha: 0.2),
       child: Column(
         children: [
           _buildSectionTitle('🗺️ Roadmap', 'Our vision for the future of ClubRoyale', themeColors),
@@ -499,11 +499,11 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: isDone 
-            ? themeColors.gold.withOpacity(0.1) 
-            : themeColors.background.withOpacity(0.5),
+            ? themeColors.gold.withValues(alpha: 0.1) 
+            : themeColors.background.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDone ? themeColors.gold : themeColors.gold.withOpacity(0.3),
+          color: isDone ? themeColors.gold : themeColors.gold.withValues(alpha: 0.3),
           width: isDone ? 2 : 1,
         ),
       ),
@@ -605,7 +605,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
   Widget _buildFooter(ThemeColors themeColors) {
     return Container(
       padding: const EdgeInsets.all(32),
-      color: themeColors.surface.withOpacity(0.5),
+      color: themeColors.surface.withValues(alpha: 0.5),
       child: Column(
         children: [
           Wrap(

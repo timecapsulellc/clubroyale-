@@ -2,6 +2,7 @@
 /// 
 /// Centralized terminology for global audience
 /// Supports multiple regional modes for localization
+library;
 
 enum GameRegion {
   global,     // ClubRoyale international terms

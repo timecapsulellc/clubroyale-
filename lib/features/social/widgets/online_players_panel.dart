@@ -29,9 +29,9 @@ class OnlinePlayersPanel extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.deepPurple.withOpacity(0.3)),
+        border: Border.all(color: Colors.deepPurple.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -54,7 +54,7 @@ class OnlinePlayersPanel extends ConsumerWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.green.withOpacity(0.5),
+                        color: Colors.green.withValues(alpha: 0.5),
                         blurRadius: 6,
                       ),
                     ],
@@ -75,7 +75,7 @@ class OnlinePlayersPanel extends ConsumerWidget {
                   data: (users) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -168,10 +168,10 @@ class _OnlinePlayerTile extends ConsumerWidget {
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isFriend ? Colors.amber.withOpacity(0.5) : Colors.transparent,
+          color: isFriend ? Colors.amber.withValues(alpha: 0.5) : Colors.transparent,
           width: isFriend ? 1.5 : 0,
         ),
       ),
@@ -289,7 +289,7 @@ class _InviteButtonState extends ConsumerState<_InviteButton> {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.green.withOpacity(0.2),
+          color: Colors.green.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Row(
@@ -306,7 +306,7 @@ class _InviteButtonState extends ConsumerState<_InviteButton> {
     return TextButton.icon(
       onPressed: _isSending ? null : _sendInvite,
       style: TextButton.styleFrom(
-        backgroundColor: Colors.deepPurple.withOpacity(0.2),
+        backgroundColor: Colors.deepPurple.withValues(alpha: 0.2),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       ),
       icon: _isSending

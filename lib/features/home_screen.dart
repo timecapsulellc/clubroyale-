@@ -207,10 +207,10 @@ class HomeScreen extends ConsumerWidget {
                   // 📖 Stories Bar (Super App Feature)
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       border: Border(
-                        top: BorderSide(color: CasinoColors.gold.withOpacity(0.2)),
-                        bottom: BorderSide(color: CasinoColors.gold.withOpacity(0.2)),
+                        top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.2)),
+                        bottom: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.2)),
                       ),
                     ),
                     child: const StoryBar(),
@@ -676,7 +676,7 @@ class _LeaderboardPreview extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
           decoration: BoxDecoration(
-            color: (player['color'] as Color).withOpacity(0.1),
+            color: (player['color'] as Color).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Row(
@@ -773,12 +773,12 @@ class _SettingsActionBtn extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+          colors: [color.withValues(alpha: 0.15), color.withValues(alpha: 0.05)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Stack(
         children: [
@@ -789,7 +789,7 @@ class _SettingsActionBtn extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(icon, size: 22, color: color),
@@ -800,7 +800,7 @@ class _SettingsActionBtn extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: color.withOpacity(0.9),
+                    color: color.withValues(alpha: 0.9),
                   ),
                 ),
               ],
@@ -945,7 +945,7 @@ class _WalletCard extends ConsumerWidget {
                                   child: Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.green.withOpacity(0.05),
+                                      color: Colors.green.withValues(alpha: 0.05),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Column(
@@ -1653,12 +1653,12 @@ class _GameTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Use gold border/glow for featured games
-    final borderColor = isFeatured ? ClubRoyaleTheme.gold : color.withOpacity(0.4);
+    final borderColor = isFeatured ? ClubRoyaleTheme.gold : color.withValues(alpha: 0.4);
     final borderWidth = isFeatured ? 2.0 : 1.5;
     
     return Card(
       elevation: isFeatured ? 10 : 6,
-      shadowColor: isFeatured ? ClubRoyaleTheme.gold.withOpacity(0.5) : color.withOpacity(0.4),
+      shadowColor: isFeatured ? ClubRoyaleTheme.gold.withValues(alpha: 0.5) : color.withValues(alpha: 0.4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: InkWell(
         onTap: onTap,
@@ -1668,8 +1668,8 @@ class _GameTypeCard extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: isFeatured
-                  ? [ClubRoyaleTheme.deepPurple, color.withOpacity(0.25)]
-                  : [CasinoColors.cardBackground, color.withOpacity(0.15)],
+                  ? [ClubRoyaleTheme.deepPurple, color.withValues(alpha: 0.25)]
+                  : [CasinoColors.cardBackground, color.withValues(alpha: 0.15)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -1677,7 +1677,7 @@ class _GameTypeCard extends StatelessWidget {
             border: Border.all(color: borderColor, width: borderWidth),
             boxShadow: isFeatured ? [
               BoxShadow(
-                color: ClubRoyaleTheme.gold.withOpacity(0.3),
+                color: ClubRoyaleTheme.gold.withValues(alpha: 0.3),
                 blurRadius: 12,
                 spreadRadius: 2,
               ),
@@ -1694,12 +1694,12 @@ class _GameTypeCard extends StatelessWidget {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       gradient: RadialGradient(
-                        colors: [color.withOpacity(0.3), color.withOpacity(0.1)],
+                        colors: [color.withValues(alpha: 0.3), color.withValues(alpha: 0.1)],
                       ),
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: color.withOpacity(0.3),
+                          color: color.withValues(alpha: 0.3),
                           blurRadius: 8,
                           spreadRadius: 1,
                         ),
@@ -1730,12 +1730,12 @@ class _GameTypeCard extends StatelessWidget {
                   // Player count
                   Row(
                     children: [
-                      Icon(Icons.group, size: 12, color: color.withOpacity(0.8)),
+                      Icon(Icons.group, size: 12, color: color.withValues(alpha: 0.8)),
                       const SizedBox(width: 4),
                       Text(
                         _playerInfo,
                         style: TextStyle(
-                          color: color.withOpacity(0.9),
+                          color: color.withValues(alpha: 0.9),
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
                         ),
@@ -1758,7 +1758,7 @@ class _GameTypeCard extends StatelessWidget {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: ClubRoyaleTheme.gold.withOpacity(0.5),
+                          color: ClubRoyaleTheme.gold.withValues(alpha: 0.5),
                           blurRadius: 6,
                         ),
                       ],
@@ -1784,7 +1784,7 @@ class _GameTypeCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.green.withOpacity(0.3),
+                          color: Colors.green.withValues(alpha: 0.3),
                           blurRadius: 4,
                         ),
                       ],

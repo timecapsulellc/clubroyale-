@@ -1,6 +1,7 @@
 /// Admin Configuration for Diamond Economy
 /// 
 /// Defines admin emails, approval thresholds, and permissions.
+library;
 
 class AdminConfig {
   /// Primary admin emails with full permissions

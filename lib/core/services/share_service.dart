@@ -24,9 +24,11 @@ See you at the tables! 🃏
 ''';
 
     try {
-      await Share.share(
-        shareText,
-        subject: 'Join me on ClubRoyale!',
+      await SharePlus.instance.share(
+        ShareParams(
+          text: shareText,
+          subject: 'Join me on ClubRoyale!',
+        ),
       );
 
       if (context.mounted) {
@@ -71,9 +73,11 @@ Let's play! 🃏
 ''';
 
     try {
-      await Share.share(
-        shareText,
-        subject: 'Join my $gameName game!',
+      await SharePlus.instance.share(
+        ShareParams(
+          text: shareText,
+          subject: 'Join my $gameName game!',
+        ),
       );
 
       if (context.mounted) {
@@ -117,7 +121,9 @@ Join thousands of players! 🃏
 ''';
 
     try {
-      await Share.share(shareText, subject: 'ClubRoyale - Card Gaming App');
+      await SharePlus.instance.share(
+        ShareParams(text: shareText, subject: 'ClubRoyale - Card Gaming App'),
+      );
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -137,10 +143,12 @@ Join thousands of players! 🃏
     required BuildContext context,
   }) async {
     try {
-      await Share.shareXFiles(
-        [file],
-        text: text,
-        subject: 'ClubRoyale',
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [file],
+          text: text,
+          subject: 'ClubRoyale',
+        ),
       );
     } catch (e) {
       if (context.mounted) {

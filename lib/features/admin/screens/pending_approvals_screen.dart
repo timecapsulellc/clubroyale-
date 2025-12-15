@@ -195,7 +195,7 @@ class _RequestCard extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: _getStatusColor(request.status).withOpacity(0.2),
+                  backgroundColor: _getStatusColor(request.status).withValues(alpha: 0.2),
                   child: Icon(
                     _getStatusIcon(request.status),
                     color: _getStatusColor(request.status),

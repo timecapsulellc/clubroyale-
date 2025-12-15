@@ -11,6 +11,7 @@ import 'core/services/analytics_service.dart';
 
 import 'features/lobby/lobby_screen.dart';
 import 'features/lobby/room_waiting_screen.dart';
+import 'features/splash/splash_screen.dart';
 import 'features/game/game_screen.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/multi_theme.dart';
@@ -71,14 +72,30 @@ import 'package:clubroyale/features/tournament/screens/tournament_lobby_screen.d
 import 'package:clubroyale/features/clubs/screens/clubs_list_screen.dart';
 import 'package:clubroyale/features/replay/screens/replay_list_screen.dart';
 
+// Onboarding
+import 'package:clubroyale/features/onboarding/onboarding_screen.dart';
+
 
 // Analytics service singleton for screen tracking
 final _analyticsService = AnalyticsService();
 
 // 1. Define your routes
 final GoRouter _router = GoRouter(
+  initialLocation: '/splash', // Start with splash screen
   observers: [_analyticsService.observer],
   routes: <RouteBase>[
+    GoRoute(
+      path: '/splash',
+      builder: (BuildContext context, GoRouterState state) {
+        return const ClubRoyaleSplashScreen();
+      },
+    ),
+    GoRoute(
+      path: '/onboarding',
+      builder: (BuildContext context, GoRouterState state) {
+        return const OnboardingScreen();
+      },
+    ),
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {

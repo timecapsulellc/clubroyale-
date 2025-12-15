@@ -95,7 +95,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [CasinoColors.gold.withOpacity(0.8), CasinoColors.bronzeGold],
+                  colors: [CasinoColors.gold.withValues(alpha: 0.8), CasinoColors.bronzeGold],
                 ),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -116,11 +116,11 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                   margin: const EdgeInsets.only(right: 8),
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: CasinoColors.gold.withOpacity(0.2),
+                    color: CasinoColors.gold.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.star, color: CasinoColors.gold, size: 20),
-                ).animate().shimmer(duration: 2.seconds, color: CasinoColors.gold.withOpacity(0.3)),
+                ).animate().shimmer(duration: 2.seconds, color: CasinoColors.gold.withValues(alpha: 0.3)),
               // Show scores
               IconButton(
                 icon: const Icon(Icons.leaderboard, color: Colors.white),
@@ -243,7 +243,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: _getPhaseColor(game.gamePhase!).withOpacity(0.5),
+                              color: _getPhaseColor(game.gamePhase!).withValues(alpha: 0.5),
                               blurRadius: 12,
                               spreadRadius: 2,
                             ),
@@ -273,10 +273,10 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: isMyTurn ? CasinoColors.gold.withOpacity(0.2) : Colors.white.withOpacity(0.1),
+                          color: isMyTurn ? CasinoColors.gold.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: isMyTurn ? CasinoColors.gold : Colors.white.withOpacity(0.3),
+                            color: isMyTurn ? CasinoColors.gold : Colors.white.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
@@ -294,7 +294,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.5),
+                            color: Colors.black.withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -368,9 +368,9 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
             border: Border(
-              top: BorderSide(color: CasinoColors.gold.withOpacity(0.3)),
+              top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3)),
             ),
           ),
           child: Row(
@@ -408,7 +408,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                       Text(
                         'Bid: ${game.bids[currentUserId]?.amount ?? "-"}  |  Tricks: ${game.tricksWon[currentUserId] ?? 0}',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -419,7 +419,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: CasinoColors.gold.withOpacity(0.2),
+                    color: CasinoColors.gold.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: CasinoColors.gold),
                   ),

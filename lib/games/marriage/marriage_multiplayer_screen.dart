@@ -12,6 +12,7 @@ import 'package:clubroyale/config/visual_effects.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
+import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/games/marriage/marriage_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/core/card_engine/meld.dart';
@@ -19,6 +20,7 @@ import 'package:clubroyale/features/game/widgets/player_avatar.dart';
 import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
 import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
+import 'package:clubroyale/games/marriage/widgets/marriage_table_layout.dart';
 
 
 /// Multiplayer Marriage game screen
@@ -120,7 +122,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
 
           backgroundColor: CasinoColors.feltGreenDark,
           appBar: AppBar(
-            backgroundColor: Colors.black.withOpacity(0.5),
+            backgroundColor: Colors.black.withValues(alpha: 0.5),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () => context.go('/lobby'),
@@ -134,7 +136,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: CasinoColors.gold.withOpacity(0.2),
+                    color: CasinoColors.gold.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: CasinoColors.gold),
                   ),
@@ -154,7 +156,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                     margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.25),
+                      color: Colors.red.withValues(alpha: 0.25),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.red),
                     ),
@@ -196,36 +198,30 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             child: Stack(
               children: [
                 // Main Game Layer
-                Column(
-                  children: [
-                    // Turn indicator
-                    _buildTurnIndicator(state, currentUser.uid),
-                    
-                    // P0 FIX: Phase indicator (what action to take)
-                    if (isMyTurn)
-                      _buildPhaseIndicator(state),
-                    
-                    // Other players (Scrollable for 8 players)
-                    Expanded(
-                      flex: 2,
-                      child: _buildOpponentsArea(state, currentUser.uid),
-                    ),
-                    
-                    // Center - deck and discard (use state.isDrawingPhase instead of local _hasDrawn)
-                    Expanded(
-                      flex: 3,
-                      child: _buildCenterArea(state, topDiscard, isMyTurn),
-                    ),
-                    
-                    // Meld suggestions
-                    _buildMeldSuggestions(myHand, tiplu),
-                    
-                    // My hand
-                    _buildMyHand(myHand, isMyTurn),
-                    
-                    // Action bar
-                    _buildActionBar(isMyTurn, state, currentUser.uid),
-                  ],
+                // Main Game Layer
+                MarriageTableLayout(
+                  centerArea: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                       if (isMyTurn) _buildPhaseIndicator(state),
+                       // Center deck/discard
+                       _buildCenterArea(state, topDiscard, isMyTurn),
+                       // Meld suggestions
+                       _buildMeldSuggestions(myHand, tiplu),
+                    ],
+                  ),
+                  opponents: _buildOpponentWidgets(state, currentUser.uid),
+                  myHand: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Turn indicator
+                      _buildTurnIndicator(state, currentUser.uid),
+                      // Hand
+                      _buildMyHand(myHand, isMyTurn),
+                      // Action bar
+                      _buildActionBar(isMyTurn, state, currentUser.uid),
+                    ],
+                  ),
                 ),
 
                 
@@ -290,7 +286,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             margin: const EdgeInsets.only(right: 8),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: _getMeldColor(meld.type).withOpacity(0.2),
+              color: _getMeldColor(meld.type).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: _getMeldColor(meld.type)),
             ),
@@ -349,12 +345,12 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
         color: isDrawingPhase 
-            ? Colors.blue.withOpacity(0.85) 
-            : Colors.orange.withOpacity(0.85),
+            ? Colors.blue.withValues(alpha: 0.85) 
+            : Colors.orange.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: (isDrawingPhase ? Colors.blue : Colors.orange).withOpacity(0.4),
+            color: (isDrawingPhase ? Colors.blue : Colors.orange).withValues(alpha: 0.4),
             blurRadius: 12,
             spreadRadius: 2,
           ),
@@ -391,7 +387,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
-        color: isMyTurn ? Colors.green.withOpacity(0.3) : Colors.black.withOpacity(0.3),
+        color: isMyTurn ? Colors.green.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.3),
         border: Border(bottom: BorderSide(
           color: isMyTurn ? Colors.green : Colors.white24,
         )),
@@ -417,33 +413,21 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     ).animate().fadeIn();
   }
   
-  Widget _buildOpponentsArea(MarriageGameState state, String myId) {
+  List<Widget> _buildOpponentWidgets(MarriageGameState state, String myId) {
     final opponents = state.playerHands.keys.where((id) => id != myId).toList();
     
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: opponents.map((playerId) {
-            final cardCount = state.playerHands[playerId]?.length ?? 0;
-            final isCurrentTurn = state.currentPlayerId == playerId;
-            
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: PlayerAvatar(
-                name: 'Player ${opponents.indexOf(playerId) + 2}', // TODO: Get real name
-                isCurrentTurn: isCurrentTurn,
-                isHost: false, // TODO: Get host status
-                bid: null,
-                tricksWon: cardCount, // Showing card count as "score" for now
-              ).animate().fadeIn(delay: 200.ms),
-            );
-          }).toList(),
-        ),
-      ),
-    );
+    return opponents.map((playerId) {
+      final cardCount = state.playerHands[playerId]?.length ?? 0;
+      final isCurrentTurn = state.currentPlayerId == playerId;
+      
+      return PlayerAvatar(
+        name: 'Player ${opponents.indexOf(playerId) + 2}', // TODO: Get real name
+        isCurrentTurn: isCurrentTurn,
+        isHost: false, // TODO: Get host status
+        bid: null,
+        tricksWon: cardCount, // Showing card count as "score" for now
+      ).animate().fadeIn(delay: 200.ms);
+    }).toList();
   }
   
   Widget _buildCenterArea(MarriageGameState state, Card? topDiscard, bool isMyTurn) {
@@ -481,12 +465,12 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
         color: CasinoColors.cardBackground,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: canDraw ? CasinoColors.gold : CasinoColors.gold.withOpacity(0.3),
+          color: canDraw ? CasinoColors.gold : CasinoColors.gold.withValues(alpha: 0.3),
           width: canDraw ? 2 : 1,
         ),
         boxShadow: canDraw ? [
           BoxShadow(
-            color: CasinoColors.gold.withOpacity(0.4),
+            color: CasinoColors.gold.withValues(alpha: 0.4),
             blurRadius: 12,
           ),
         ] : null,
@@ -506,7 +490,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             ),
             child: Center(
               child: Icon(Icons.style, 
-                color: CasinoColors.gold.withOpacity(0.5), 
+                color: CasinoColors.gold.withValues(alpha: 0.5), 
                 size: 32,
               ),
             ),
@@ -516,7 +500,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
+                color: Colors.black.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -548,10 +532,10 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       width: 80,
       height: 110,
       decoration: BoxDecoration(
-        color: topCard != null ? Colors.white : CasinoColors.cardBackground.withOpacity(0.5),
+        color: topCard != null ? Colors.white : CasinoColors.cardBackground.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: canDraw && topCard != null ? CasinoColors.gold : CasinoColors.gold.withOpacity(0.3),
+          color: canDraw && topCard != null ? CasinoColors.gold : CasinoColors.gold.withValues(alpha: 0.3),
           width: canDraw && topCard != null ? 2 : 1,
         ),
       ),
@@ -560,7 +544,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
           : Center(
               child: Text(
                 'Discard',
-                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 10),
               ),
             ),
     );
@@ -616,8 +600,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
         boxShadow: [
           BoxShadow(
             color: isSelected 
-                ? CasinoColors.gold.withOpacity(0.4) 
-                : Colors.black.withOpacity(0.2),
+                ? CasinoColors.gold.withValues(alpha: 0.4) 
+                : Colors.black.withValues(alpha: 0.2),
             blurRadius: isSelected ? 8 : 4,
             offset: const Offset(1, 2),
           ),
@@ -654,8 +638,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.5),
-        border: Border(top: BorderSide(color: CasinoColors.gold.withOpacity(0.3))),
+        color: Colors.black.withValues(alpha: 0.5),
+        border: Border(top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3))),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -679,7 +663,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             label: const Text('Sort'),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.white,
-              side: BorderSide(color: Colors.white.withOpacity(0.5)),
+              side: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
             ),
           ),
           
@@ -713,6 +697,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       
       if (userId != null) {
         await marriageService.drawFromDeck(widget.roomId, userId);
+        SoundService.playCardSlide();
         // P0 FIX: No need to set _hasDrawn - state updates from Firestore stream
       }
     } catch (e) {
@@ -739,6 +724,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       
       if (userId != null) {
         await marriageService.drawFromDiscard(widget.roomId, userId);
+        SoundService.playCardSlide();
         // P0 FIX: No need to set _hasDrawn - state updates from Firestore stream
       }
     } catch (e) {
@@ -765,6 +751,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       
       if (userId != null) {
         await marriageService.discardCard(widget.roomId, userId, _selectedCardId!);
+        SoundService.playCardSlide();
         setState(() {
           _selectedCardId = null;
           // P0 FIX: No need to reset _hasDrawn - state updates from Firestore stream
@@ -793,8 +780,9 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       
       if (userId != null) {
         final success = await marriageService.declare(widget.roomId, userId);
-        if (success && mounted) {
-          _showWinDialog();
+        if (success) {
+          SoundService.playRoundEnd(); // Victory sound!
+          if (mounted) _showWinDialog();
         } else if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -884,7 +872,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.pink.withOpacity(0.2),
+                color: Colors.pink.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.pink),
               ),

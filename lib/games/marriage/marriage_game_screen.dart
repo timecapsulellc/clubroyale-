@@ -60,7 +60,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     return Scaffold(
       backgroundColor: AppTheme.tableGreen,
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.5),
+        backgroundColor: Colors.black.withValues(alpha: 0.5),
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -72,10 +72,10 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppTheme.gold.withOpacity(0.5)),
+                border: Border.all(color: AppTheme.gold.withValues(alpha: 0.5)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(2, 4),
                   ),
@@ -96,7 +96,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Center(
-                      child: Icon(Icons.style, color: AppTheme.gold.withOpacity(0.5), size: 32),
+                      child: Icon(Icons.style, color: AppTheme.gold.withValues(alpha: 0.5), size: 32),
                     ),
                   ),
                 ],
@@ -111,7 +111,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.2),
+                color: Colors.red.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.red),
               ),
@@ -208,7 +208,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   Widget _buildHeaderButton(IconData icon, VoidCallback onPressed) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.teal.withOpacity(0.8),
+        color: AppTheme.teal.withValues(alpha: 0.8),
         shape: BoxShape.circle,
         border: Border.all(color: AppTheme.gold, width: 1.5),
       ),
@@ -316,7 +316,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     return Container(
       height: 120,
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      color: Colors.black.withOpacity(0.6),
+      color: Colors.black.withValues(alpha: 0.6),
       child: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -352,8 +352,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.5),
-        border: Border(top: BorderSide(color: AppTheme.gold.withOpacity(0.3))),
+        color: Colors.black.withValues(alpha: 0.5),
+        border: Border(top: BorderSide(color: AppTheme.gold.withValues(alpha: 0.3))),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -371,7 +371,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
             label: 'Sort',
             onPressed: () => setState(() {}),
             backgroundColor: AppTheme.teal,
-            borderColor: Colors.white.withOpacity(0.5),
+            borderColor: Colors.white.withValues(alpha: 0.5),
           ),
           
           // Declare button (Go Royale in global mode)

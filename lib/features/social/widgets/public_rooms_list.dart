@@ -26,9 +26,9 @@ class PublicRoomsList extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.amber.withOpacity(0.3)),
+        border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -59,7 +59,7 @@ class PublicRoomsList extends ConsumerWidget {
                   data: (rooms) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -175,13 +175,13 @@ class _PublicRoomTile extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.deepPurple.shade800.withOpacity(0.5),
-            Colors.purple.shade600.withOpacity(0.3),
+            Colors.deepPurple.shade800.withValues(alpha: 0.5),
+            Colors.purple.shade600.withValues(alpha: 0.3),
           ],
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isFull ? Colors.red.withOpacity(0.3) : Colors.deepPurple.withOpacity(0.5),
+          color: isFull ? Colors.red.withValues(alpha: 0.3) : Colors.deepPurple.withValues(alpha: 0.5),
         ),
       ),
       child: Material(
@@ -197,7 +197,7 @@ class _PublicRoomTile extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(

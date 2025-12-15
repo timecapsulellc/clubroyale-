@@ -49,7 +49,7 @@ class DiamondBalanceWidget extends ConsumerWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.purple.withOpacity(0.3),
+                  color: Colors.purple.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -117,7 +117,7 @@ class DiamondBalanceBadge extends ConsumerWidget {
               '$balance',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            backgroundColor: Colors.amber.withOpacity(0.2),
+            backgroundColor: Colors.amber.withValues(alpha: 0.2),
             visualDensity: VisualDensity.compact,
           ),
         );

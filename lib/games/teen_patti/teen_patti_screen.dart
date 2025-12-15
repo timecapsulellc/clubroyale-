@@ -12,7 +12,7 @@ import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
 import 'package:clubroyale/games/teen_patti/teen_patti_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
 import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
@@ -37,10 +37,10 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
   bool _showVideoGrid = false;
   
   // Card lookup cache
+  // Card lookup cache
   final Map<String, Card> _cardCache = {};
   
-  // Audio players
-  final _audioPlayer = AudioPlayer();
+  // Audio players removed - using global SoundService
   
   @override
   void initState() {
@@ -50,7 +50,6 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
     super.dispose();
   }
   
@@ -113,7 +112,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
         return Scaffold(
           backgroundColor: CasinoColors.feltGreenDark,
           appBar: AppBar(
-            backgroundColor: Colors.black.withOpacity(0.7),
+            backgroundColor: Colors.black.withValues(alpha: 0.7),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () => context.go('/lobby'),
@@ -193,7 +192,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: CasinoColors.gold.withOpacity(0.2),
+        color: CasinoColors.gold.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: CasinoColors.gold),
       ),
@@ -215,7 +214,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.amber.withOpacity(0.2),
+        color: Colors.amber.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -231,7 +230,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: isMyTurn ? Colors.green.withOpacity(0.3) : Colors.black.withOpacity(0.3),
+        color: isMyTurn ? Colors.green.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.3),
         border: Border(bottom: BorderSide(
           color: isMyTurn ? Colors.green : Colors.white24,
         )),
@@ -281,7 +280,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
                     color: isCurrentTurn ? Colors.green : CasinoColors.cardBackground,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isCurrentTurn ? Colors.green : CasinoColors.gold.withOpacity(0.5),
+                      color: isCurrentTurn ? Colors.green : CasinoColors.gold.withValues(alpha: 0.5),
                       width: isCurrentTurn ? 3 : 1,
                     ),
                   ),
@@ -295,7 +294,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(status).withOpacity(0.3),
+                    color: _getStatusColor(status).withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -352,7 +351,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
                 margin: const EdgeInsets.only(top: 40),
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: CasinoColors.gold),
                 ),
@@ -367,20 +366,13 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
               ),
             ],
           ).animate(onPlay: (c) => c.repeat(reverse: true))
-           .shimmer(duration: 2.seconds, color: Colors.white.withOpacity(0.3)),
+           .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.3)),
         ],
       ),
     );
   }
 
-  Future<void> _playSound(String assetName) async {
-    try {
-      await _audioPlayer.stop(); // Stop any previous sound
-      await _audioPlayer.play(AssetSource('sounds/$assetName'));
-    } catch (e) {
-      debugPrint('Error playing sound: $e');
-    }
-  }
+  // Helper method removed - using SoundService directly
   
   Widget _buildMyCards(List<String> cardIds, String myStatus) {
     final showCards = myStatus == 'seen' || _hasSeenCards;
@@ -422,7 +414,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: CasinoColors.gold.withOpacity(0.3),
+            color: CasinoColors.gold.withValues(alpha: 0.3),
             blurRadius: 10,
             spreadRadius: 2,
           ),
@@ -462,12 +454,12 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: CasinoColors.gold.withOpacity(0.5)),
+        border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.5)),
       ),
       child: Center(
         child: Icon(
           Icons.question_mark,
-          color: CasinoColors.gold.withOpacity(0.5),
+          color: CasinoColors.gold.withValues(alpha: 0.5),
           size: 32,
         ),
       ),
@@ -482,8 +474,8 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
-        border: Border(top: BorderSide(color: CasinoColors.gold.withOpacity(0.3))),
+        color: Colors.black.withValues(alpha: 0.7),
+        border: Border(top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3))),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -609,7 +601,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     
     try {
       // Play card flip/slide sound
-      await _playSound('card_slide.mp3');
+      await SoundService.playCardSlide();
       
       final service = ref.read(teenPattiServiceProvider);
       final userId = ref.read(authServiceProvider).currentUser?.uid;
@@ -626,8 +618,8 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     setState(() => _isProcessing = true);
     
     try {
-      // Play chip bet sound (using ding as placeholder if custom sound not available)
-      await _playSound('ding.mp3'); 
+      // Play chip bet sound
+      await SoundService.playChipSound(); 
       
       final service = ref.read(teenPattiServiceProvider);
       final userId = ref.read(authServiceProvider).currentUser?.uid;
@@ -645,7 +637,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     
     try {
       // Play fold sound (using card_slide as placeholder)
-      await _playSound('card_slide.mp3');
+      await SoundService.playCardSlide();
       
       final service = ref.read(teenPattiServiceProvider);
       final userId = ref.read(authServiceProvider).currentUser?.uid;
@@ -663,7 +655,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     
     try {
       // Play showdown/win sound
-      await _playSound('tada.mp3');
+      await SoundService.playRoundEnd();
       
       final service = ref.read(teenPattiServiceProvider);
       final userId = ref.read(authServiceProvider).currentUser?.uid;

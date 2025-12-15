@@ -15,6 +15,7 @@ import 'package:share_plus/share_plus.dart';
 import 'dart:math';
 
 import 'package:clubroyale/core/responsive/responsive_utils.dart';
+import 'package:clubroyale/config/casino_theme.dart';
 
 import '../auth/auth_service.dart';
 
@@ -88,65 +89,54 @@ class LobbyScreen extends ConsumerWidget {
                 ),
               ),
               centerTitle: true,
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF1A6B4A), // Lighter casino green
-                      Color(0xFF0D4A2E), // Deep casino green
-                      Color(0xFF083323), // Darkest green
-                    ],
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    // Pattern overlay - card suits
-                    Positioned.fill(
-                      child: Opacity(
-                        opacity: 0.08,
-                        child: GridView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 8,
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Banner Image
+                      Image.asset(
+                        'assets/images/dashboard_banner.png',
+                        fit: BoxFit.cover,
+                      ),
+                      // Gradient Overlay for text readability
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withValues(alpha: 0.3),
+                              Colors.transparent,
+                              CasinoColors.deepPurple.withValues(alpha: 0.8),
+                            ],
                           ),
-                          itemCount: 64,
-                          itemBuilder: (context, index) {
-                            final suits = ['♠', '♥', '♣', '♦'];
-                            return Center(
-                              child: Text(
-                                suits[index % 4],
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            );
-                          },
                         ),
                       ),
-                    ),
-                    // Center icon - cards
-                    Center(
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.amber.withValues(alpha: 0.15),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.amber.shade400, width: 2),
-                        ),
-                        child: const Icon(
-                          Icons.style_rounded, // Card stack icon
-                          size: 56,
-                          color: Colors.white,
-                        ),
-                      ).animate(onPlay: (c) => c.repeat(reverse: true))
-                       .scale(duration: 1500.ms, begin: const Offset(0.95, 0.95), end: const Offset(1.05, 1.05)),
-                    ),
-                  ],
-                ),
-              ),
+                      // Center icon - cards (subtle animation)
+                      Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.5), width: 2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: CasinoColors.gold.withValues(alpha: 0.2),
+                                blurRadius: 20,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.style_rounded, // Card stack icon
+                            size: 48,
+                            color: CasinoColors.gold,
+                          ),
+                        ).animate(onPlay: (c) => c.repeat(reverse: true))
+                         .scale(duration: 2000.ms, begin: const Offset(0.95, 0.95), end: const Offset(1.05, 1.05)),
+                      ),
+                    ],
+                  ),
             ),
           ),
 

@@ -48,7 +48,7 @@ class _QuickMatchButtonState extends ConsumerState<QuickMatchButton>
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: (_isSearching ? Colors.orange : Colors.green).withOpacity(0.3),
+            color: (_isSearching ? Colors.orange : Colors.green).withValues(alpha: 0.3),
             blurRadius: 12,
             spreadRadius: 2,
           ),
@@ -235,7 +235,7 @@ class EloRatingBadge extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [rankColor.withOpacity(0.8), rankColor.withOpacity(0.5)],
+              colors: [rankColor.withValues(alpha: 0.8), rankColor.withValues(alpha: 0.5)],
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: rankColor, width: 2),

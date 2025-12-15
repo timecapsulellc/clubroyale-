@@ -12,7 +12,7 @@ import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
 import 'package:clubroyale/games/in_between/in_between_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
 import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
@@ -37,8 +37,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
   bool _isChatExpanded = false;
   bool _showVideoGrid = false;
   
-  // Audio player
-  final _audioPlayer = AudioPlayer();
+  // Audio player removed - using global SoundService
   
   // Card lookup cache
   final Map<String, Card> _cardCache = {};
@@ -51,7 +50,6 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
     super.dispose();
   }
   
@@ -119,7 +117,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
         return Scaffold(
           backgroundColor: CasinoColors.feltGreenDark,
           appBar: AppBar(
-            backgroundColor: Colors.black.withOpacity(0.7),
+            backgroundColor: Colors.black.withValues(alpha: 0.7),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () => context.go('/lobby'),
@@ -218,7 +216,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.amber.withOpacity(0.2),
+        color: Colors.amber.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -240,7 +238,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       decoration: BoxDecoration(
-        color: CasinoColors.gold.withOpacity(0.3),
+        color: CasinoColors.gold.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: CasinoColors.gold),
       ),
@@ -276,7 +274,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         border: Border(bottom: BorderSide(color: color)),
       ),
       child: Text(
@@ -315,7 +313,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
             margin: const EdgeInsets.only(bottom: 16),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: _probabilityColor(probability).withOpacity(0.2),
+              color: _probabilityColor(probability).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -372,8 +370,8 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
             boxShadow: [
               BoxShadow(
                 color: isMiddle 
-                    ? CasinoColors.gold.withOpacity(0.5) 
-                    : Colors.black.withOpacity(0.3),
+                    ? CasinoColors.gold.withValues(alpha: 0.5) 
+                    : Colors.black.withValues(alpha: 0.3),
                 blurRadius: isMiddle ? 16 : 8,
                 spreadRadius: isMiddle ? 2 : 0,
               ),
@@ -404,7 +402,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
@@ -426,13 +424,13 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: CasinoColors.gold.withOpacity(0.5), width: 2),
+            border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.5), width: 2),
           ),
           child: Center(
             child: Text(
               '?',
               style: TextStyle(
-                color: CasinoColors.gold.withOpacity(0.6),
+                color: CasinoColors.gold.withValues(alpha: 0.6),
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
               ),
@@ -444,7 +442,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
         Text(
           'MIDDLE',
           style: TextStyle(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
@@ -482,7 +480,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       margin: const EdgeInsets.symmetric(vertical: 16),
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.3),
+        color: color.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color, width: 2),
       ),
@@ -555,8 +553,8 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
-        border: Border(top: BorderSide(color: CasinoColors.gold.withOpacity(0.3))),
+        color: Colors.black.withValues(alpha: 0.7),
+        border: Border(top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3))),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -612,7 +610,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
           else ...[
             Text(
               'Waiting...',
-              style: TextStyle(color: Colors.white.withOpacity(0.5)),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
             ),
           ],
         ],
@@ -626,7 +624,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     
     try {
       // Play pass sound
-      await _playSound('card_slide.mp3');
+      await SoundService.playCardSlide();
 
       final service = ref.read(inBetweenServiceProvider);
       await service.pass(widget.roomId);
@@ -651,7 +649,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     
     try {
       // Play bet sound
-      await _playSound('ding.mp3');
+      await SoundService.playChipSound();
 
       final service = ref.read(inBetweenServiceProvider);
       final userId = ref.read(authServiceProvider).currentUser?.uid;
@@ -675,7 +673,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     
     try {
       // Play reveal sound
-      await _playSound('card_slide.mp3');
+      await SoundService.playCardSlide();
 
       final service = ref.read(inBetweenServiceProvider);
       final userId = ref.read(authServiceProvider).currentUser?.uid;
@@ -685,10 +683,10 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
         
         // Play result sound
         if (result == 'win') {
-          await _playSound('tada.mp3');
+          await SoundService.playRoundEnd();
         } else if (result == 'post') {
           // TODO: Add specific sound for hitting post if available
-          await _playSound('ding.mp3');
+          await SoundService.playTrickWon();
         }
       }
     } catch (e) {
@@ -724,12 +722,5 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     }
   }
 
-  Future<void> _playSound(String assetName) async {
-    try {
-      await _audioPlayer.stop(); // Stop any previous sound
-      await _audioPlayer.play(AssetSource('sounds/$assetName'));
-    } catch (e) {
-      debugPrint('Error playing sound: $e');
-    }
-  }
+  // Helper method removed - using SoundService directly
 }

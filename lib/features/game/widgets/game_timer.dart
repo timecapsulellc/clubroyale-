@@ -151,7 +151,7 @@ class GameTimerWidget extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: timerState.color.withOpacity(0.2),
+            color: timerState.color.withValues(alpha: 0.2),
             border: Border.all(
               color: timerState.color,
               width: 3,
@@ -159,7 +159,7 @@ class GameTimerWidget extends StatelessWidget {
             boxShadow: timerState.phase == TimerPhase.danger
                 ? [
                     BoxShadow(
-                      color: Colors.red.withOpacity(0.5),
+                      color: Colors.red.withValues(alpha: 0.5),
                       blurRadius: 10,
                       spreadRadius: 2,
                     ),
@@ -176,7 +176,7 @@ class GameTimerWidget extends StatelessWidget {
                 child: CircularProgressIndicator(
                   value: timerState.progress,
                   strokeWidth: 4,
-                  backgroundColor: Colors.grey.withOpacity(0.3),
+                  backgroundColor: Colors.grey.withValues(alpha: 0.3),
                   valueColor: AlwaysStoppedAnimation<Color>(timerState.color),
                 ),
               ),
@@ -221,7 +221,7 @@ class GameTimerBar extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(height / 2),
-            color: Colors.grey.withOpacity(0.3),
+            color: Colors.grey.withValues(alpha: 0.3),
           ),
           child: FractionallySizedBox(
             alignment: Alignment.centerLeft,
@@ -232,7 +232,7 @@ class GameTimerBar extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     timerState.color,
-                    timerState.color.withOpacity(0.7),
+                    timerState.color.withValues(alpha: 0.7),
                   ],
                 ),
               ),

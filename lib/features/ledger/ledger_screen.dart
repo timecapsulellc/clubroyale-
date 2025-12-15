@@ -235,7 +235,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -268,7 +268,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
                                 Text(
                                   game.name,
                                   style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: Colors.white.withOpacity(0.8),
+                                    color: Colors.white.withValues(alpha: 0.8),
                                   ),
                                 ),
                               ],
@@ -325,9 +325,9 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
                                         CircleAvatar(
                                           radius: 16,
                                           backgroundColor: isWinner 
-                                              ? Colors.green.withOpacity(0.2)
+                                              ? Colors.green.withValues(alpha: 0.2)
                                               : isLoser 
-                                                  ? Colors.red.withOpacity(0.2)
+                                                  ? Colors.red.withValues(alpha: 0.2)
                                                   : colorScheme.surfaceContainerHighest,
                                           child: Text(
                                             player.name[0].toUpperCase(),
@@ -395,7 +395,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
                                   Container(
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: Colors.green.withOpacity(0.1),
+                                      color: Colors.green.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: const Row(
@@ -551,16 +551,16 @@ class _TransactionTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: colorScheme.primaryContainer.withOpacity(0.3),
+        color: colorScheme.primaryContainer.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.2)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
           // From avatar
           CircleAvatar(
             radius: 16,
-            backgroundColor: Colors.red.withOpacity(0.2),
+            backgroundColor: Colors.red.withValues(alpha: 0.2),
             child: Text(
               fromName[0].toUpperCase(),
               style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),
@@ -602,7 +602,7 @@ class _TransactionTile extends StatelessWidget {
           // To avatar
           CircleAvatar(
             radius: 16,
-            backgroundColor: Colors.green.withOpacity(0.2),
+            backgroundColor: Colors.green.withValues(alpha: 0.2),
             child: Text(
               toName[0].toUpperCase(),
               style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12),

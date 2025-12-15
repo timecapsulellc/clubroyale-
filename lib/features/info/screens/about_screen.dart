@@ -89,15 +89,15 @@ class AboutScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [themeColors.surface, themeColors.surfaceLight.withOpacity(0.5)],
+          colors: [themeColors.surface, themeColors.surfaceLight.withValues(alpha: 0.5)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: themeColors.gold.withOpacity(0.5)),
+        border: Border.all(color: themeColors.gold.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
-            color: themeColors.gold.withOpacity(0.2),
+            color: themeColors.gold.withValues(alpha: 0.2),
             blurRadius: 20,
             spreadRadius: 2,
           ),
@@ -114,7 +114,7 @@ class AboutScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: themeColors.gold.withOpacity(0.4),
+                  color: themeColors.gold.withValues(alpha: 0.4),
                   blurRadius: 20,
                   spreadRadius: 2,
                 ),
@@ -154,7 +154,7 @@ class AboutScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: themeColors.gold.withOpacity(0.2),
+              color: themeColors.gold.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -182,7 +182,7 @@ class AboutScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.3),
+        color: themeColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -211,7 +211,7 @@ class AboutScreen extends ConsumerWidget {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: themeColors.gold.withOpacity(0.2),
+                    color: themeColors.gold.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(stat['icon'] as IconData, color: themeColors.gold),
@@ -250,7 +250,7 @@ class AboutScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.3),
+        color: themeColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -297,7 +297,7 @@ class AboutScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.3),
+        color: themeColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -324,9 +324,9 @@ class AboutScreen extends ConsumerWidget {
             children: techs.map((tech) => Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: themeColors.gold.withOpacity(0.15),
+                color: themeColors.gold.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: themeColors.gold.withOpacity(0.3)),
+                border: Border.all(color: themeColors.gold.withValues(alpha: 0.3)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -360,7 +360,7 @@ class AboutScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.3),
+        color: themeColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -394,9 +394,9 @@ class AboutScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: themeColors.gold.withOpacity(0.1),
+        color: themeColors.gold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: themeColors.gold.withOpacity(0.3)),
+        border: Border.all(color: themeColors.gold.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -431,7 +431,7 @@ class AboutScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.3),
+        color: themeColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -473,9 +473,9 @@ class AboutScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.3),
+        color: themeColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: themeColors.gold.withOpacity(0.3)),
+        border: Border.all(color: themeColors.gold.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [

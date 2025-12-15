@@ -298,7 +298,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                             child: Chip(
                               avatar: const Icon(Icons.star, size: 14, color: Colors.amber),
                               label: const Text('Host'),
-                              backgroundColor: Colors.amber.withOpacity(0.2),
+                              backgroundColor: Colors.amber.withValues(alpha: 0.2),
                               labelStyle: theme.textTheme.labelSmall?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -316,7 +316,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                           decoration: BoxDecoration(
                             color: colorScheme.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: colorScheme.outline.withOpacity(0.3)),
+                            border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -377,7 +377,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.2),
+                            color: Colors.orange.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(
@@ -634,7 +634,7 @@ class _PlayerScoreCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       elevation: isLeader ? 4 : 1,
       color: isCurrentUser
-          ? colorScheme.primaryContainer.withOpacity(0.3)
+          ? colorScheme.primaryContainer.withValues(alpha: 0.3)
           : null,
       child: Padding(
         padding: const EdgeInsets.all(12),

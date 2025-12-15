@@ -271,7 +271,7 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           color: (isMe ? Colors.white : theme.colorScheme.primary)
-                              .withOpacity(0.1),
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -279,8 +279,8 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontStyle: FontStyle.italic,
                             color: isMe
-                                ? theme.colorScheme.onPrimary.withOpacity(0.7)
-                                : theme.colorScheme.onSurface.withOpacity(0.7),
+                                ? theme.colorScheme.onPrimary.withValues(alpha: 0.7)
+                                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                         ),
                       ),
@@ -331,7 +331,7 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: isMyReaction
-                    ? theme.colorScheme.primary.withOpacity(0.3)
+                    ? theme.colorScheme.primary.withValues(alpha: 0.3)
                     : theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(10),
               ),

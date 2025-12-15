@@ -1,9 +1,10 @@
-/// Activity Feed Screen
-/// 
-/// Displays the main activity feed with friends' activities
+// Activity Feed Screen
+//
+// Displays the main activity feed with friends' activities
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/social/activity_feed.dart';
 import 'package:clubroyale/features/social/widgets/feed_item_card.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
@@ -106,7 +107,7 @@ class _EmptyFeedState extends StatelessWidget {
             Icon(
               Icons.dynamic_feed_outlined,
               size: 80,
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 24),
             Text(
@@ -124,10 +125,10 @@ class _EmptyFeedState extends StatelessWidget {
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: () {
-                // Navigate to find friends
+                context.go('/clubs');
               },
-              icon: const Icon(Icons.person_add),
-              label: const Text('Find Friends'),
+              icon: const Icon(Icons.groups),
+              label: const Text('Join a Club'),
             ),
           ],
         ),

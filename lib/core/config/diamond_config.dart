@@ -1,6 +1,7 @@
 /// Diamond Configuration for Economy System
 /// 
 /// All diamond amounts, limits, and costs in one place.
+library;
 
 class DiamondConfig {
   // ============ EARNING (FREE TIER) ============

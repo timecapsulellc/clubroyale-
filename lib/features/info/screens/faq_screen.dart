@@ -133,9 +133,9 @@ class FAQScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.5),
+        color: themeColors.surface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: themeColors.gold.withOpacity(0.3)),
+        border: Border.all(color: themeColors.gold.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -188,9 +188,9 @@ class FAQScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.5),
+        color: themeColors.surface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: themeColors.gold.withOpacity(0.3)),
+        border: Border.all(color: themeColors.gold.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -241,11 +241,11 @@ class _FAQTileState extends State<_FAQTile> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: widget.themeColors.surface.withOpacity(0.3),
+        color: widget.themeColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: _isExpanded 
-              ? widget.themeColors.gold.withOpacity(0.5) 
+              ? widget.themeColors.gold.withValues(alpha: 0.5) 
               : Colors.transparent,
         ),
       ),

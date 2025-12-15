@@ -106,7 +106,7 @@ class _MatchCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -191,7 +191,7 @@ class _PlayerRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       color: isWinner && isComplete
-          ? Colors.green.withOpacity(0.1)
+          ? Colors.green.withValues(alpha: 0.1)
           : null,
       child: Row(
         children: [

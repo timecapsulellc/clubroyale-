@@ -171,7 +171,7 @@ class _ParticlePainter extends CustomPainter {
       final pulseOpacity = particle.opacity * (0.7 + 0.3 * math.sin(glowAnimation * math.pi * 2));
       
       final paint = Paint()
-        ..color = (particle.isGold ? primaryColor : Colors.white).withOpacity(pulseOpacity)
+        ..color = (particle.isGold ? primaryColor : Colors.white).withValues(alpha: pulseOpacity)
         ..style = PaintingStyle.fill;
       
       canvas.drawCircle(Offset(actualX, actualY), particle.size, paint);
@@ -179,7 +179,7 @@ class _ParticlePainter extends CustomPainter {
       // Optional glow for larger particles
       if (particle.size > 2) {
         final glowPaint = Paint()
-          ..color = (particle.isGold ? primaryColor : Colors.white).withOpacity(pulseOpacity * 0.3)
+          ..color = (particle.isGold ? primaryColor : Colors.white).withValues(alpha: pulseOpacity * 0.3)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
         canvas.drawCircle(Offset(actualX, actualY), particle.size * 2, glowPaint);
       }
@@ -213,8 +213,8 @@ class _GlowOrbPainter extends CustomPainter {
       
       final gradient = RadialGradient(
         colors: [
-          color.withOpacity(0.15 * animation),
-          color.withOpacity(0.0),
+          color.withValues(alpha: 0.15 * animation),
+          color.withValues(alpha: 0.0),
         ],
       );
       
@@ -557,7 +557,7 @@ class _ConfettiPainter extends CustomPainter {
       canvas.rotate(rotation);
       
       final paint = Paint()
-        ..color = particle.color.withOpacity(1.0 - animation * 0.5)
+        ..color = particle.color.withValues(alpha: 1.0 - animation * 0.5)
         ..style = PaintingStyle.fill;
       
       canvas.drawRect(

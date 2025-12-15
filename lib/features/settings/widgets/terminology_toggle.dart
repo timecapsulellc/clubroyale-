@@ -46,9 +46,9 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ClubRoyaleTheme.deepPurple.withOpacity(0.5),
+        color: ClubRoyaleTheme.deepPurple.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ClubRoyaleTheme.gold.withOpacity(0.3)),
+        border: Border.all(color: ClubRoyaleTheme.gold.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,7 +152,7 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
             Text(
               subtitle,
               style: TextStyle(
-                color: isSelected ? ClubRoyaleTheme.deepPurple.withOpacity(0.7) : Colors.white38,
+                color: isSelected ? ClubRoyaleTheme.deepPurple.withValues(alpha: 0.7) : Colors.white38,
                 fontSize: 10,
               ),
             ),

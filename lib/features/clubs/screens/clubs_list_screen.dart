@@ -211,7 +211,7 @@ class _EmptyMyClubs extends StatelessWidget {
           Icon(
             Icons.groups_outlined,
             size: 80,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 24),
           Text('No Clubs Yet', style: Theme.of(context).textTheme.headlineSmall),

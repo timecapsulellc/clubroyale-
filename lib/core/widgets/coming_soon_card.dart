@@ -32,15 +32,15 @@ class ComingSoonCard extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              accent.withOpacity(0.15),
-              accent.withOpacity(0.05),
+              accent.withValues(alpha: 0.15),
+              accent.withValues(alpha: 0.05),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: accent.withOpacity(0.3),
+            color: accent.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -53,7 +53,7 @@ class ComingSoonCard extends StatelessWidget {
               child: Icon(
                 icon,
                 size: 100,
-                color: accent.withOpacity(0.1),
+                color: accent.withValues(alpha: 0.1),
               ),
             ),
             // Content
@@ -66,7 +66,7 @@ class ComingSoonCard extends StatelessWidget {
                     width: 56,
                     height: 56,
                     decoration: BoxDecoration(
-                      color: accent.withOpacity(0.2),
+                      color: accent.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -101,7 +101,7 @@ class ComingSoonCard extends StatelessWidget {
                           Text(
                             subtitle!,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.7),
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                           ),
                         ],
@@ -116,12 +116,12 @@ class ComingSoonCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [accent, accent.withOpacity(0.8)],
+                        colors: [accent, accent.withValues(alpha: 0.8)],
                       ),
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: accent.withOpacity(0.4),
+                          color: accent.withValues(alpha: 0.4),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -152,7 +152,7 @@ class ComingSoonCard extends StatelessWidget {
                       )
                       .shimmer(
                         duration: 2000.ms,
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withValues(alpha: 0.3),
                       ),
                 ],
               ),
@@ -195,7 +195,7 @@ class ComingSoonCard extends StatelessWidget {
               height: 80,
               decoration: BoxDecoration(
                 color: (accentColor ?? theme.colorScheme.primary)
-                    .withOpacity(0.1),
+                    .withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -216,7 +216,7 @@ class ComingSoonCard extends StatelessWidget {
               'We\'re working hard to bring you this exciting feature. Stay tuned for updates!',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -272,14 +272,14 @@ void showComingSoonBottomSheet(
                 height: 100,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [accent, accent.withOpacity(0.7)],
+                    colors: [accent, accent.withValues(alpha: 0.7)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: accent.withOpacity(0.4),
+                      color: accent.withValues(alpha: 0.4),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
@@ -314,7 +314,7 @@ void showComingSoonBottomSheet(
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: accent.withOpacity(0.1),
+                  color: accent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Row(
@@ -334,7 +334,7 @@ void showComingSoonBottomSheet(
                 description ??
                     'This feature is currently under development. We\'re working hard to bring you an amazing experience. Stay tuned!',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
                 textAlign: TextAlign.center,
               ),

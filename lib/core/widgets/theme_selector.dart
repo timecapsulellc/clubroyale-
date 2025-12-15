@@ -59,7 +59,7 @@ class ThemeSelectorWidget extends ConsumerWidget {
                         height: isSelected ? 52 : 48,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [previewColor, previewColor.withOpacity(0.7)],
+                            colors: [previewColor, previewColor.withValues(alpha: 0.7)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
@@ -71,7 +71,7 @@ class ThemeSelectorWidget extends ConsumerWidget {
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: previewColor.withOpacity(0.5),
+                                    color: previewColor.withValues(alpha: 0.5),
                                     blurRadius: 12,
                                     spreadRadius: 2,
                                   ),
@@ -122,7 +122,7 @@ class ThemeSelectorWidget extends ConsumerWidget {
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               ),
             ),
             child: Row(

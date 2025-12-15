@@ -1,6 +1,7 @@
 /// Pile - Base class for a collection of cards (from gin_rummy pattern)
 /// 
 /// This is the foundation for Deck, Hand, and DiscardPile
+library;
 
 import 'dart:math' as math;
 

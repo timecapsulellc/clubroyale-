@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 /// Modern bottom navigation bar for the Super App
 class ClubRoyaleBottomNav extends StatelessWidget {
@@ -22,7 +21,7 @@ class ClubRoyaleBottomNav extends StatelessWidget {
         color: colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -108,7 +107,7 @@ class _NavItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: isActive
-              ? colorScheme.primaryContainer.withOpacity(0.4)
+              ? colorScheme.primaryContainer.withValues(alpha: 0.4)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
@@ -125,7 +124,7 @@ class _NavItem extends StatelessWidget {
                     key: ValueKey(isActive),
                     color: isActive
                         ? colorScheme.primary
-                        : colorScheme.onSurface.withOpacity(0.6),
+                        : colorScheme.onSurface.withValues(alpha: 0.6),
                     size: 24,
                   ),
                 ),
@@ -160,7 +159,7 @@ class _NavItem extends StatelessWidget {
               style: theme.textTheme.labelSmall!.copyWith(
                 color: isActive
                     ? colorScheme.primary
-                    : colorScheme.onSurface.withOpacity(0.6),
+                    : colorScheme.onSurface.withValues(alpha: 0.6),
                 fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
               ),
               child: Text(label),

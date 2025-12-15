@@ -120,12 +120,12 @@ class _BadgeItem extends StatelessWidget {
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: rarityColor.withOpacity(0.5),
+            color: rarityColor.withValues(alpha: 0.5),
             width: 2,
           ),
           boxShadow: [
             BoxShadow(
-              color: rarityColor.withOpacity(0.2),
+              color: rarityColor.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -139,7 +139,7 @@ class _BadgeItem extends StatelessWidget {
               height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: rarityColor.withOpacity(0.2),
+                color: rarityColor.withValues(alpha: 0.2),
               ),
               child: Icon(
                 _getIconForAchievement(achievement.id),
@@ -204,7 +204,7 @@ class _EmptyBadgesCard extends StatelessWidget {
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -212,7 +212,7 @@ class _EmptyBadgesCard extends StatelessWidget {
           Icon(
             Icons.emoji_events_outlined,
             size: 48,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 8),
           Text(
@@ -263,7 +263,7 @@ class AchievementDetailSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -274,11 +274,11 @@ class AchievementDetailSheet extends StatelessWidget {
             height: 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: rarityColor.withOpacity(0.2),
+              color: rarityColor.withValues(alpha: 0.2),
               border: Border.all(color: rarityColor, width: 3),
               boxShadow: [
                 BoxShadow(
-                  color: rarityColor.withOpacity(0.4),
+                  color: rarityColor.withValues(alpha: 0.4),
                   blurRadius: 16,
                   spreadRadius: 2,
                 ),
@@ -303,7 +303,7 @@ class AchievementDetailSheet extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: rarityColor.withOpacity(0.2),
+              color: rarityColor.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -506,8 +506,8 @@ class _AchievementListTile extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: achievement.isUnlocked 
-                ? rarityColor.withOpacity(0.2)
-                : Colors.grey.withOpacity(0.2),
+                ? rarityColor.withValues(alpha: 0.2)
+                : Colors.grey.withValues(alpha: 0.2),
             border: Border.all(
               color: achievement.isUnlocked ? rarityColor : Colors.grey,
               width: 2,
@@ -539,7 +539,7 @@ class _AchievementListTile extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 4),
                 child: LinearProgressIndicator(
                   value: (achievement.progress ?? 0) / achievement.maxProgress!,
-                  backgroundColor: Colors.grey.withOpacity(0.2),
+                  backgroundColor: Colors.grey.withValues(alpha: 0.2),
                   valueColor: AlwaysStoppedAnimation(
                     achievement.isUnlocked ? rarityColor : Colors.grey,
                   ),
@@ -550,7 +550,7 @@ class _AchievementListTile extends StatelessWidget {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: rarityColor.withOpacity(0.2),
+            color: rarityColor.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(

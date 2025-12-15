@@ -37,7 +37,7 @@ class PlayerAvatar extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.4),
+                    color: Colors.black.withValues(alpha: 0.4),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -87,7 +87,7 @@ class PlayerAvatar extends StatelessWidget {
         Container(
            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(4),
             ),
           child: Text(

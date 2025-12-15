@@ -1,5 +1,4 @@
 // Conditional import for web compatibility
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'ad_service_stub.dart'
     if (dart.library.io) 'ad_service_mobile.dart'
     if (dart.library.html) 'ad_service_web.dart';

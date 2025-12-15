@@ -209,7 +209,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       suits[index % 4],
       style: TextStyle(
         fontSize: 60 + (index * 10).toDouble(),
-        color: colors[index % 4].withOpacity(0.3),
+        color: colors[index % 4].withValues(alpha: 0.3),
         fontWeight: FontWeight.bold,
       ),
     );
@@ -239,12 +239,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           ),
           boxShadow: [
             BoxShadow(
-              color: CasinoColors.gold.withOpacity(0.4),
+              color: CasinoColors.gold.withValues(alpha: 0.4),
               blurRadius: 30,
               spreadRadius: 5,
             ),
             BoxShadow(
-              color: CasinoColors.gold.withOpacity(0.2),
+              color: CasinoColors.gold.withValues(alpha: 0.2),
               blurRadius: 60,
               spreadRadius: 10,
             ),
@@ -296,7 +296,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       '🎴 The Ultimate Call Break Experience',
       style: TextStyle(
         fontSize: 16,
-        color: Colors.white.withOpacity(0.8),
+        color: Colors.white.withValues(alpha: 0.8),
         fontWeight: FontWeight.w500,
         letterSpacing: 1,
       ),
@@ -309,9 +309,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: Colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red.withOpacity(0.5)),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
@@ -339,7 +339,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: CasinoColors.gold.withOpacity(0.4),
+            color: CasinoColors.gold.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -393,10 +393,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.green.withOpacity(0.5),
+          color: Colors.green.withValues(alpha: 0.5),
           width: 1.5,
         ),
-        color: Colors.green.withOpacity(0.1),
+        color: Colors.green.withValues(alpha: 0.1),
       ),
       child: Material(
         color: Colors.transparent,
@@ -436,10 +436,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -512,9 +512,9 @@ class _FeatureCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -532,7 +532,7 @@ class _FeatureCard extends StatelessWidget {
           Text(
             subtitle,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               fontSize: 11,
             ),
           ),
@@ -559,7 +559,7 @@ class _ParticlePainter extends CustomPainter {
       final opacity = 0.1 + (animation * 0.2) + (random.nextDouble() * 0.3);
       
       final paint = Paint()
-        ..color = CasinoColors.gold.withOpacity(opacity * 0.5)
+        ..color = CasinoColors.gold.withValues(alpha: opacity * 0.5)
         ..style = PaintingStyle.fill;
       
       canvas.drawCircle(
@@ -576,8 +576,8 @@ class _ParticlePainter extends CustomPainter {
       
       final gradient = RadialGradient(
         colors: [
-          CasinoColors.richPurple.withOpacity(0.15),
-          CasinoColors.richPurple.withOpacity(0.0),
+          CasinoColors.richPurple.withValues(alpha: 0.15),
+          CasinoColors.richPurple.withValues(alpha: 0.0),
         ],
       );
       

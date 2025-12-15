@@ -140,7 +140,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.deepPurple.withOpacity(0.4),
+            color: Colors.deepPurple.withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -188,7 +188,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -222,7 +222,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.amber.withOpacity(0.4),
+            color: Colors.amber.withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -240,7 +240,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: _isCreatingRoom
@@ -281,7 +281,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -326,7 +326,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple.withOpacity(0.3),
+                    color: Colors.deepPurple.withValues(alpha: 0.3),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.vpn_key, color: Colors.deepPurple, size: 24),
@@ -370,7 +370,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
     return Container(
       height: 60,
       decoration: BoxDecoration(
-        color: Colors.grey.shade800.withOpacity(0.5),
+        color: Colors.grey.shade800.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Colors.grey.shade600,
@@ -401,7 +401,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.3),
+                    color: Colors.green.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Text(

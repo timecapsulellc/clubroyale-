@@ -175,7 +175,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withOpacity(0.7),
+                      Colors.black.withValues(alpha: 0.7),
                       Colors.transparent,
                     ],
                   ),
@@ -195,7 +195,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                       margin: const EdgeInsets.symmetric(horizontal: 2),
                       height: 3,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(2),
                       ),
                       child: ClipRRect(
@@ -254,7 +254,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                         Text(
                           _formatTime(_currentStory.createdAt),
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withValues(alpha: 0.7),
                             fontSize: 12,
                           ),
                         ),

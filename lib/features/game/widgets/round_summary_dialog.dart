@@ -82,7 +82,7 @@ class RoundSummaryDialog extends StatelessWidget {
             // Player scores table
             Container(
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -146,7 +146,7 @@ class RoundSummaryDialog extends StatelessWidget {
 
                     return Container(
                       color: index == 0 && isFinalRound
-                          ? Colors.amber.withOpacity(0.2)
+                          ? Colors.amber.withValues(alpha: 0.2)
                           : null,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 12),

@@ -35,10 +35,10 @@ class CardWidget extends StatelessWidget {
         height: h,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: Colors.white.withOpacity(0.2)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 4,
               offset: const Offset(1, 2),
             ),
@@ -50,7 +50,7 @@ class CardWidget extends StatelessWidget {
           ),
         ),
         child: Center(
-          child: Icon(Icons.style, color: AppTheme.gold.withOpacity(0.5), size: isLarge ? 32 : 24),
+          child: Icon(Icons.style, color: AppTheme.gold.withValues(alpha: 0.5), size: isLarge ? 32 : 24),
         ),
       );
     }
@@ -68,8 +68,8 @@ class CardWidget extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: isSelected 
-                ? AppTheme.gold.withOpacity(0.5) 
-                : Colors.black.withOpacity(0.2),
+                ? AppTheme.gold.withValues(alpha: 0.5) 
+                : Colors.black.withValues(alpha: 0.2),
             blurRadius: isSelected ? 8 : 3,
             offset: const Offset(1, 1),
           ),

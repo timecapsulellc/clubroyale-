@@ -68,12 +68,13 @@ service cloud.firestore {
       allow delete: if false;
     }
     
-    // Wallets collection for diamond balances
-    match /wallets/{userId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated() && isOwner(userId);
-    }
+    // Wallets collection for diamond balances (legacy - see /wallets below)
+    // REMOVED DUPLICATE: Wallet access is controlled in lines 237-240
+    // match /wallets/{userId} {
+    //   allow read: if isAuthenticated();
+    //   allow create: if isAuthenticated();
+    //   allow update: if isAuthenticated() && isOwner(userId);
+    // }
     
     // ============ GAMES (ROOMS) ============
     // Main collection for game rooms - used by lobby_service
@@ -81,8 +82,26 @@ service cloud.firestore {
     match /games/{gameId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      // SECURITY: Only host or participants can update/delete
+      allow update: if isAuthenticated() && 
+        (resource.data.hostId == request.auth.uid || 
+         request.auth.uid in resource.data.playerIds);
+      allow delete: if isAuthenticated() && 
+        resource.data.hostId == request.auth.uid;
+      
+      // Chat subcollection
+      match /chat/{messageId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated();
+        allow update: if isAuthenticated();
+        allow delete: if false;
+      }
+      
+      // Typing indicators
+      match /typing/{userId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated();
+      }
     }
     
     // ============ MATCHES ============
@@ -91,8 +110,12 @@ service cloud.firestore {
     match /matches/{matchId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      // SECURITY: Only host or participants can update/delete
+      allow update: if isAuthenticated() && 
+        (resource.data.hostId == request.auth.uid || 
+         request.auth.uid in resource.data.playerIds);
+      allow delete: if isAuthenticated() && 
+        resource.data.hostId == request.auth.uid;
     }
     
     // ============ INVITES ============
@@ -106,12 +129,7 @@ service cloud.firestore {
     
     // ============ DIAMONDS ============
     
-    match /diamond_rewards/{rewardId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if false;
-      allow delete: if false;
-    }
+
     
     match /diamond_spending/{spendId} {
       allow read: if isAuthenticated();
@@ -163,6 +181,15 @@ service cloud.firestore {
       allow delete: if isAuthenticated();
     }
     
+    // ============ GAME INVITES ============
+    
+    match /game_invites/{inviteId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+    }
+    
     // ============ SIGNALING (WebRTC) ============
     
     match /signaling/{roomId} {
@@ -175,6 +202,43 @@ service cloud.firestore {
         allow read: if isAuthenticated();
         allow write: if isAuthenticated();
       }
+    }
+    
+    // ============ GAME ROOMS (Signaling) ============
+    // Used by SignalingService for WebRTC
+    
+    match /game_rooms/{roomId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+      
+      match /webrtc/signaling {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated();
+        
+        match /offers/{offerId} {
+          allow read: if isAuthenticated();
+          allow write: if isAuthenticated();
+        }
+        
+        match /answers/{answerId} {
+          allow read: if isAuthenticated();
+          allow write: if isAuthenticated();
+        }
+        
+        match /candidates/{candidateId} {
+          allow read: if isAuthenticated();
+          allow write: if isAuthenticated();
+        }
+      }
+    }
+
+    match /voice_rooms/{roomId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
     }
     
     // ============ WALLETS ============
@@ -298,6 +362,13 @@ service cloud.firestore {
        allow create: if isAuthenticated();
        allow update: if isAuthenticated();
     }
+
+    match /activity_feed/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated(); // For likes
+      allow delete: if false;
+    }
     
     // ============ DIAMOND ECONOMY ============
     
@@ -376,6 +447,18 @@ service cloud.firestore {
     match /profiles/{userId}/followers/{followerId} {
         allow read: if isAuthenticated();
         allow write: if isAuthenticated(); // Others write to this when they follow
+    }
+    
+    // ============ MISC SERVICES ============
+    
+    match /feedback/{feedbackId} {
+        allow create: if isAuthenticated();
+        allow read: if isAdmin();
+    }
+    
+    match /presence/{userId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && isOwner(userId);
     }
   }
 }

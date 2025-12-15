@@ -97,7 +97,7 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                 leading: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.1),
+                    color: Colors.purple.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.photo_library, color: Colors.purple),
@@ -111,7 +111,7 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                 leading: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.camera_alt, color: Colors.blue),
@@ -128,7 +128,7 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                   leading: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(Icons.videocam, color: Colors.red),
@@ -426,7 +426,7 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                         maxLines: null,
                         decoration: InputDecoration(
                           hintText: 'Type your text...',
-                          hintStyle: TextStyle(color: _textColor.withOpacity(0.5), fontSize: 24),
+                          hintStyle: TextStyle(color: _textColor.withValues(alpha: 0.5), fontSize: 24),
                           border: InputBorder.none,
                         ),
                         autofocus: true,
@@ -448,7 +448,7 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+                        colors: [Colors.black.withValues(alpha: 0.6), Colors.transparent],
                       ),
                     ),
                     child: Row(
@@ -518,7 +518,7 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                       gradient: LinearGradient(
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
-                        colors: [Colors.black.withOpacity(0.8), Colors.transparent],
+                        colors: [Colors.black.withValues(alpha: 0.8), Colors.transparent],
                       ),
                     ),
                     child: Row(
@@ -527,7 +527,7 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(24),
                             ),
                             child: TextField(

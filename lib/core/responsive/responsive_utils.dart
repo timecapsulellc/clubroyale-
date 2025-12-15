@@ -1,6 +1,7 @@
 /// Responsive Design Utilities
 /// 
 /// Provides breakpoints, sizing, and layout utilities for all device sizes
+library;
 
 import 'package:flutter/material.dart';
 

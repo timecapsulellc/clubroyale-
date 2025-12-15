@@ -143,7 +143,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
                           border: Border.all(color: ClubRoyaleTheme.gold, width: 2),
                           boxShadow: [
                             BoxShadow(
-                              color: ClubRoyaleTheme.gold.withOpacity(0.3),
+                              color: ClubRoyaleTheme.gold.withValues(alpha: 0.3),
                               blurRadius: 16,
                               spreadRadius: 2,
                             ),
@@ -238,7 +238,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.white10),
                 ),
@@ -337,10 +337,10 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       decoration: BoxDecoration(
-        color: isHighlight ? ClubRoyaleTheme.gold.withOpacity(0.15) : Colors.white.withOpacity(0.05),
+        color: isHighlight ? ClubRoyaleTheme.gold.withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isHighlight ? ClubRoyaleTheme.gold.withOpacity(0.5) : Colors.white10,
+          color: isHighlight ? ClubRoyaleTheme.gold.withValues(alpha: 0.5) : Colors.white10,
         ),
       ),
       child: Column(
@@ -378,7 +378,7 @@ class _CustomizationTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white10),
       ),

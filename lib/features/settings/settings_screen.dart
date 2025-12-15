@@ -184,22 +184,22 @@ class SettingsScreen extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ClubRoyaleTheme.gold.withOpacity(0.2)),
+        border: Border.all(color: ClubRoyaleTheme.gold.withValues(alpha: 0.2)),
       ),
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: ClubRoyaleTheme.gold.withOpacity(0.1),
+            color: ClubRoyaleTheme.gold.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: ClubRoyaleTheme.gold, size: 20),
         ),
         title: Text(title, style: TextStyle(color: ClubRoyaleTheme.champagne, fontWeight: FontWeight.w500)),
-        subtitle: Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
-        trailing: Icon(Icons.chevron_right, color: ClubRoyaleTheme.gold.withOpacity(0.7)),
+        subtitle: Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12)),
+        trailing: Icon(Icons.chevron_right, color: ClubRoyaleTheme.gold.withValues(alpha: 0.7)),
         onTap: onTap,
       ),
     );

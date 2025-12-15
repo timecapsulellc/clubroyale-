@@ -20,14 +20,10 @@ class GameException implements Exception {
 /// Exception for network-related errors
 class NetworkException extends GameException {
   NetworkException(
-    String message, {
-    String? code,
-    dynamic originalError,
-  }) : super(
-          message,
-          code: code,
-          originalError: originalError,
-        );
+    super.message, {
+    super.code,
+    super.originalError,
+  });
 
   @override
   String toString() => 'NetworkException: $message';
@@ -36,9 +32,9 @@ class NetworkException extends GameException {
 /// Exception for invalid game state or moves
 class InvalidMoveException extends GameException {
   InvalidMoveException(
-    String message, {
-    String? code,
-  }) : super(message, code: code);
+    super.message, {
+    super.code,
+  });
 
   @override
   String toString() => 'InvalidMoveException: $message';
@@ -47,14 +43,10 @@ class InvalidMoveException extends GameException {
 /// Exception for Firebase-related errors
 class FirebaseGameException extends GameException {
   FirebaseGameException(
-    String message, {
-    String? code,
-    dynamic originalError,
-  }) : super(
-          message,
-          code: code,
-          originalError: originalError,
-        );
+    super.message, {
+    super.code,
+    super.originalError,
+  });
 
   @override
   String toString() => 'FirebaseGameException: $message';
@@ -63,14 +55,10 @@ class FirebaseGameException extends GameException {
 /// Exception for authentication errors
 class AuthenticationException extends GameException {
   AuthenticationException(
-    String message, {
-    String? code,
-    dynamic originalError,
-  }) : super(
-          message,
-          code: code,
-          originalError: originalError,
-        );
+    super.message, {
+    super.code,
+    super.originalError,
+  });
 
   @override
   String toString() => 'AuthenticationException: $message';

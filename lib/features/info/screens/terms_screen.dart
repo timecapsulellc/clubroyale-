@@ -39,7 +39,7 @@ class TermsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: themeColors.gold.withOpacity(0.1),
+                color: themeColors.gold.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -185,9 +185,9 @@ class TermsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: themeColors.surface.withOpacity(0.5),
+                color: themeColors.surface.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: themeColors.gold.withOpacity(0.3)),
+                border: Border.all(color: themeColors.gold.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -214,9 +214,9 @@ class TermsScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.5),
+        color: themeColors.surface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: themeColors.gold.withOpacity(0.3)),
+        border: Border.all(color: themeColors.gold.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -249,7 +249,7 @@ class TermsScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: themeColors.surface.withOpacity(0.2),
+        color: themeColors.surface.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(

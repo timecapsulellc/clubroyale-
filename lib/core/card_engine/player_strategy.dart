@@ -2,6 +2,7 @@
 /// 
 /// Based on gin_rummy PlayerStrategy pattern
 /// Allows different difficulty levels and play styles
+library;
 
 import 'pile.dart';
 

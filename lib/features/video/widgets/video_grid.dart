@@ -205,7 +205,7 @@ class VideoGridWidget extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.8),
+                      color: Colors.red.withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.mic_off, size: 14, color: Colors.white),
@@ -215,7 +215,7 @@ class VideoGridWidget extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.8),
+                      color: Colors.red.withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.videocam_off, size: 14, color: Colors.white),
@@ -247,7 +247,7 @@ class VideoGridWidget extends ConsumerWidget {
         color: theme.colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),

@@ -117,6 +117,49 @@ class AuthService {
     }
   }
 
+  /// Ensure user document exists in Firestore (triggers Cloud Functions)
+  Future<void> _ensureUserDocExists(User user) async {
+    final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    final doc = await userRef.get();
+    
+    if (!doc.exists) {
+      debugPrint('Creating new user document for ${user.uid}...');
+      await userRef.set({
+        'displayName': user.displayName ?? 'Player',
+        'email': user.email,
+        'photoURL': user.photoURL,
+        'createdAt': FieldValue.serverTimestamp(),
+        'lastLoginAt': FieldValue.serverTimestamp(),
+        'isAnonymous': user.isAnonymous,
+      });
+      
+      // Initialize empty profile if needed (separate from auth user doc, depending on architecture)
+      // Based on ProfileService, it reads from 'profiles' collection, not 'users'.
+      // Let's create 'profiles' doc too to be safe, as existing code might expect it.
+      // Wait, diamondRewards listens to 'users/{userId}'. 
+      // But ProfileService reads 'profiles/{userId}'.
+      
+      // Let's ensure 'profiles' doc exists too for the UI
+      final profileRef = FirebaseFirestore.instance.collection('profiles').doc(user.uid);
+      final profileDoc = await profileRef.get();
+      if (!profileDoc.exists) {
+         await profileRef.set({
+          'displayName': user.displayName ?? 'Player',
+          'avatarUrl': user.photoURL,
+          'createdAt': FieldValue.serverTimestamp(),
+          'achievements': [],
+          'badges': [],
+        });
+      }
+
+    } else {
+      // access update
+      await userRef.update({
+        'lastLoginAt': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
   /// Sign in with Google
   Future<User?> signInWithGoogle() async {
     try {
@@ -142,8 +185,9 @@ class AuthService {
         TestUser.clear();
       }
       
-      // Setup FCM after successful login
+      // Setup FCM and Firestore Doc after successful login
       if (userCredential.user != null) {
+        await _ensureUserDocExists(userCredential.user!);
         await _setupFCM(userCredential.user!.uid);
       }
       
@@ -159,8 +203,9 @@ class AuthService {
     try {
       final userCredential = await _auth.signInAnonymously();
       
-      // Setup FCM after successful login
+      // Setup FCM and Firestore Doc after successful login
       if (userCredential.user != null) {
+        await _ensureUserDocExists(userCredential.user!);
         await _setupFCM(userCredential.user!.uid);
       }
       

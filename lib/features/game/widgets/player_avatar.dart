@@ -35,12 +35,12 @@ class PlayerAvatar extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: isCurrentTurn ? CasinoColors.gold : Colors.white.withOpacity(0.3),
+              color: isCurrentTurn ? CasinoColors.gold : Colors.white.withValues(alpha: 0.3),
               width: isCurrentTurn ? 3 : 2,
             ),
             boxShadow: isCurrentTurn ? [
               BoxShadow(
-                color: CasinoColors.gold.withOpacity(0.6),
+                color: CasinoColors.gold.withValues(alpha: 0.6),
                 blurRadius: 12,
                 spreadRadius: 2,
               ),
@@ -61,7 +61,7 @@ class PlayerAvatar extends StatelessWidget {
           decoration: BoxDecoration(
             color: isCurrentTurn 
                 ? CasinoColors.gold
-                : Colors.black.withOpacity(0.6),
+                : Colors.black.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -91,9 +91,9 @@ class PlayerAvatar extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: CasinoColors.feltGreenDark.withOpacity(0.8),
+              color: CasinoColors.feltGreenDark.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: CasinoColors.gold.withOpacity(0.3)),
+              border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.3)),
             ),
             child: Text(
               '${tricksWon ?? 0}/${bid ?? 0}',
@@ -278,9 +278,9 @@ class GameBottomNav extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         border: Border(
-          top: BorderSide(color: CasinoColors.gold.withOpacity(0.3)),
+          top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3)),
         ),
       ),
       child: SafeArea(
@@ -352,7 +352,7 @@ class _NavItem extends StatelessWidget {
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: CasinoColors.gold.withOpacity(0.5)),
+                border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.5)),
               ),
               child: Icon(icon, color: CasinoColors.gold, size: 18),
             ),
@@ -360,7 +360,7 @@ class _NavItem extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: CasinoColors.gold.withOpacity(0.9),
+                color: CasinoColors.gold.withValues(alpha: 0.9),
                 fontSize: 9,
                 fontWeight: FontWeight.w500,
               ),

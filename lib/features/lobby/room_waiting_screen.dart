@@ -284,7 +284,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                               height: 300,
                               decoration: BoxDecoration(
                                 color: Colors.black87,
-                                border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.2))),
+                                border: Border(top: BorderSide(color: Colors.grey.withValues(alpha: 0.2))),
                               ),
                               child: VideoGridWidget(
                                 roomId: widget.roomId,
@@ -311,7 +311,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.deepPurple.withOpacity(0.4),
+                          color: Colors.deepPurple.withValues(alpha: 0.4),
                           blurRadius: 16,
                           offset: const Offset(0, 6),
                         ),
@@ -345,10 +345,10 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Colors.amber.withOpacity(0.3),
+                                color: Colors.amber.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Row(
@@ -391,14 +391,14 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                             children: [
                               Icon(
                                 Icons.info_outline,
-                                color: Colors.white.withOpacity(0.6),
+                                color: Colors.white.withValues(alpha: 0.6),
                                 size: 14,
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 'Share this code with friends to join',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.7),
+                                  color: Colors.white.withValues(alpha: 0.7),
                                   fontSize: 12,
                                 ),
                               ),
@@ -468,8 +468,8 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: room.gameType == 'marriage' 
-                                    ? Colors.pink.withOpacity(0.2)
-                                    : Colors.deepPurple.withOpacity(0.2),
+                                    ? Colors.pink.withValues(alpha: 0.2)
+                                    : Colors.deepPurple.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
                                   color: room.gameType == 'marriage' 
@@ -555,8 +555,8 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                       gradient: player.isReady
                           ? LinearGradient(
                               colors: [
-                                Colors.green.withOpacity(0.15),
-                                Colors.teal.withOpacity(0.05),
+                                Colors.green.withValues(alpha: 0.15),
+                                Colors.teal.withValues(alpha: 0.05),
                               ],
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
@@ -565,13 +565,13 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: player.isReady 
-                            ? Colors.green.withOpacity(0.5)
-                            : colorScheme.outline.withOpacity(0.2),
+                            ? Colors.green.withValues(alpha: 0.5)
+                            : colorScheme.outline.withValues(alpha: 0.2),
                         width: player.isReady ? 2 : 1,
                       ),
                       boxShadow: player.isReady ? [
                         BoxShadow(
-                          color: Colors.green.withOpacity(0.2),
+                          color: Colors.green.withValues(alpha: 0.2),
                           blurRadius: 8,
                           spreadRadius: 1,
                         ),
@@ -587,7 +587,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                               shape: BoxShape.circle,
                               boxShadow: player.isReady ? [
                                 BoxShadow(
-                                  color: Colors.green.withOpacity(0.4),
+                                  color: Colors.green.withValues(alpha: 0.4),
                                   blurRadius: 12,
                                   spreadRadius: 2,
                                 ),
@@ -654,7 +654,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                                           borderRadius: BorderRadius.circular(10),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.amber.withOpacity(0.3),
+                                              color: Colors.amber.withValues(alpha: 0.3),
                                               blurRadius: 4,
                                             ),
                                           ],
@@ -702,7 +702,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: player.isReady ? [
                                 BoxShadow(
-                                  color: Colors.green.withOpacity(0.3),
+                                  color: Colors.green.withValues(alpha: 0.3),
                                   blurRadius: 6,
                                 ),
                               ] : null,
@@ -740,10 +740,10 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: colorScheme.secondaryContainer.withOpacity(0.3),
+                      color: colorScheme.secondaryContainer.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: colorScheme.secondary.withOpacity(0.3),
+                        color: colorScheme.secondary.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
@@ -768,10 +768,10 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer.withOpacity(0.3),
+                      color: colorScheme.primaryContainer.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: colorScheme.primary.withOpacity(0.3),
+                        color: colorScheme.primary.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
@@ -1180,9 +1180,9 @@ class _ShareButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.5)),
+          border: Border.all(color: color.withValues(alpha: 0.5)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

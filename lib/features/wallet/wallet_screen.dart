@@ -162,18 +162,18 @@ class WalletScreen extends ConsumerWidget {
                           return Container(
                             padding: const EdgeInsets.all(32),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.05),
+                              color: Colors.white.withValues(alpha: 0.05),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: Colors.white10),
                             ),
                             child: Column(
                               children: [
-                                Icon(Icons.receipt_long, size: 48, color: Colors.white.withOpacity(0.3)),
+                                Icon(Icons.receipt_long, size: 48, color: Colors.white.withValues(alpha: 0.3)),
                                 const SizedBox(height: 16),
                                 Text(
                                   'The ledger is empty.',
                                   style: TextStyle(
-                                    color: Colors.white.withOpacity(0.5),
+                                    color: Colors.white.withValues(alpha: 0.5),
                                   ),
                                 ),
                               ],
@@ -221,7 +221,7 @@ class WalletScreen extends ConsumerWidget {
         border: Border.all(color: ClubRoyaleTheme.gold, width: 2),
         boxShadow: [
           BoxShadow(
-            color: ClubRoyaleTheme.gold.withOpacity(0.3),
+            color: ClubRoyaleTheme.gold.withValues(alpha: 0.3),
             blurRadius: 20,
             spreadRadius: 2,
             offset: const Offset(0, 4),
@@ -234,7 +234,7 @@ class WalletScreen extends ConsumerWidget {
           Positioned(
             right: -20,
             top: -20,
-            child: Icon(Icons.diamond_outlined, size: 150, color: Colors.white.withOpacity(0.05)),
+            child: Icon(Icons.diamond_outlined, size: 150, color: Colors.white.withValues(alpha: 0.05)),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +246,7 @@ class WalletScreen extends ConsumerWidget {
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(colors: [ClubRoyaleTheme.gold, Colors.orange]),
                       shape: BoxShape.circle,
-                      boxShadow: [BoxShadow(color: Colors.orange.withOpacity(0.5), blurRadius: 10)],
+                      boxShadow: [BoxShadow(color: Colors.orange.withValues(alpha: 0.5), blurRadius: 10)],
                     ),
                     child: const Icon(Icons.account_balance_wallet, color: Colors.black, size: 20),
                   ),
@@ -324,7 +324,7 @@ class _PremiumActionButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: gradient.colors.last.withOpacity(0.4),
+              color: gradient.colors.last.withValues(alpha: 0.4),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -362,7 +362,7 @@ class _TransactionTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white10),
       ),
@@ -372,8 +372,8 @@ class _TransactionTile extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: isCredit 
-                ? Colors.green.withOpacity(0.2)
-                : Colors.red.withOpacity(0.2),
+                ? Colors.green.withValues(alpha: 0.2)
+                : Colors.red.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -399,7 +399,7 @@ class _TransactionTile extends StatelessWidget {
                 Text(
                   DateFormat.yMMMd().add_jm().format(tx.createdAt),
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                     fontSize: 12,
                   ),
                 ),

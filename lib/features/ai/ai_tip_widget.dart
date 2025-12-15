@@ -165,7 +165,7 @@ class _AiTipWidgetState extends ConsumerState<AiTipWidget> {
                         ),
                         decoration: BoxDecoration(
                           color: _getConfidenceColor(_tip!.confidence)
-                              .withOpacity(0.2),
+                              .withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -359,7 +359,7 @@ class _AiBidSuggestionWidgetState extends ConsumerState<AiBidSuggestionWidget> {
                         ),
                         decoration: BoxDecoration(
                           color: _getStrengthColor(_suggestion!.handStrength)
-                              .withOpacity(0.2),
+                              .withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(

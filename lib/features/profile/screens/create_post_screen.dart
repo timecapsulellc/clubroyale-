@@ -193,7 +193,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
               ),
             ),
             const SizedBox(height: 16),
@@ -259,9 +259,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withOpacity(0.3),
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: colorScheme.primary.withOpacity(0.5)),
+                  border: Border.all(color: colorScheme.primary.withValues(alpha: 0.5)),
                 ),
                 child: Row(
                   children: [

@@ -172,7 +172,7 @@ class _TournamentCard extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: _getGameColor(tournament.gameType).withOpacity(0.2),
+                      color: _getGameColor(tournament.gameType).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -305,7 +305,7 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -373,7 +373,7 @@ class _EmptyState extends StatelessWidget {
           Icon(
             Icons.emoji_events_outlined,
             size: 80,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 24),
           Text(
@@ -384,6 +384,17 @@ class _EmptyState extends StatelessWidget {
           Text(
             'Be the first to create one!',
             style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const TournamentCreationScreen()),
+              );
+            },
+            icon: const Icon(Icons.add),
+            label: const Text('Create Tournament'),
           ),
         ],
       ),

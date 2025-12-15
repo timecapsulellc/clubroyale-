@@ -7,6 +7,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/games/call_break/call_break_game.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
+import 'package:clubroyale/core/services/sound_service.dart';
+import 'package:clubroyale/config/casino_theme.dart';
 
 class CallBreakGameScreen extends StatefulWidget {
   final String? gameId;
@@ -94,7 +96,18 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
     );
     
     try {
+      final oldTricks = Map<String, int>.from(_game.tricksWon);
       _game.playCard(_currentUserId, card);
+      SoundService.playCardSlide();
+      
+      // Check for trick win
+      for (final pid in _game.playerIds) {
+        if ((_game.tricksWon[pid] ?? 0) > (oldTricks[pid] ?? 0)) {
+           SoundService.playTrickWon();
+           break;
+        }
+      }
+
       setState(() {
         _selectedCardId = null;
         
@@ -118,7 +131,18 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
         // Simple AI: play highest valid card
         final card = validCards.reduce((a, b) => 
           a.rank.value > b.rank.value ? a : b);
+        
+        final oldTricks = Map<String, int>.from(_game.tricksWon);
         _game.playCard(aiPid, card);
+        SoundService.playCardSlide();
+        
+        // Check for trick win
+        for (final pid in _game.playerIds) {
+          if ((_game.tricksWon[pid] ?? 0) > (oldTricks[pid] ?? 0)) {
+             SoundService.playTrickWon();
+             break;
+          }
+        }
       }
       
       // Check if round ended
@@ -145,6 +169,8 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('${GameTerminology.callBreakGame} - Round ${_game.currentRound}'),
+        backgroundColor: CasinoColors.deepPurple,
+        foregroundColor: CasinoColors.gold,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -154,17 +180,23 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
         ],
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.green.shade900,
-              Colors.green.shade700,
-            ],
-          ),
+        decoration: const BoxDecoration(
+          color: CasinoColors.deepPurple,
         ),
-        child: SafeArea(
+        child: Stack(
+          children: [
+            // Background Image
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.3,
+                child: Image.asset(
+                  'assets/images/casino_bg_dark.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+
+            SafeArea(
           child: Column(
             children: [
               // Score board
@@ -182,6 +214,8 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
               _buildActionBar(),
             ],
           ),
+          ),
+          ],
         ),
       ),
     );
@@ -203,10 +237,10 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: isCurrent 
-                ? Colors.amber.withValues(alpha: 0.3)
+                ? CasinoColors.gold.withValues(alpha: 0.3)
                 : Colors.black.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(8),
-              border: isMe ? Border.all(color: Colors.white, width: 2) : null,
+              border: isMe ? Border.all(color: CasinoColors.gold, width: 2) : null,
             ),
             child: Column(
               children: [
@@ -225,7 +259,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
                 if (bid != null)
                   Text(
                     'Bid: $bid | Won: $won',
-                    style: const TextStyle(color: Colors.amber, fontSize: 11),
+                    style: const TextStyle(color: CasinoColors.gold, fontSize: 11),
                   ),
               ],
             ),
@@ -273,7 +307,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
             if (myBid != null)
               Text(
                 'Your bid: $myBid',
-                style: const TextStyle(color: Colors.amber, fontSize: 18),
+                style: const TextStyle(color: CasinoColors.gold, fontSize: 18),
               )
             else if (isMyTurn) ...[
               const Text(
@@ -293,7 +327,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     decoration: BoxDecoration(
-                      color: Colors.amber,
+                      color: CasinoColors.gold,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -316,7 +350,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
               ElevatedButton(
                 onPressed: _submitMyBid,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber,
+                  backgroundColor: CasinoColors.gold,
                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 ),
                 child: const Text(

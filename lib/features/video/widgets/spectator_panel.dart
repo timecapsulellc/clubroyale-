@@ -194,7 +194,7 @@ class VideoMiniWidget extends ConsumerWidget {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -222,7 +222,7 @@ class VideoMiniWidget extends ConsumerWidget {
               child: Icon(
                 Icons.open_in_full,
                 size: 16,
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             // Controls
@@ -263,7 +263,7 @@ class VideoMiniWidget extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: isActive ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
+          color: isActive ? Colors.green.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.2),
           shape: BoxShape.circle,
         ),
         child: Icon(

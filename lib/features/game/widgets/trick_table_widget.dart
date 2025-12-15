@@ -45,14 +45,14 @@ class TrickTableWidget extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: Colors.green.shade800,
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       width: 2,
                     ),
                   ),
                    child: Center(
                     child: Icon(
                       Icons.casino_outlined,
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       size: 40,
                     ),
                   ),

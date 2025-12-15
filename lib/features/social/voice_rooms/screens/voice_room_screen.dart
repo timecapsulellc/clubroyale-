@@ -79,7 +79,7 @@ class VoiceRoomScreen extends ConsumerWidget {
               // Room info
               Container(
                 padding: const EdgeInsets.all(16),
-                color: colorScheme.primaryContainer.withOpacity(0.3),
+                color: colorScheme.primaryContainer.withValues(alpha: 0.3),
                 child: Row(
                   children: [
                     Icon(Icons.mic, color: colorScheme.primary),
@@ -108,7 +108,7 @@ class VoiceRoomScreen extends ConsumerWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withOpacity(0.2),
+                        color: colorScheme.primary.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
@@ -158,7 +158,7 @@ class VoiceRoomScreen extends ConsumerWidget {
                   color: colorScheme.surface,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, -2),
                     ),
@@ -500,7 +500,7 @@ class VoiceRoomCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: colorScheme.primary.withOpacity(0.1),
+                            color: colorScheme.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(

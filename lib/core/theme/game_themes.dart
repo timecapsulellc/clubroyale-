@@ -2,6 +2,7 @@
 /// 
 /// Defines available table themes and card customization options
 /// for the ClubRoyale Game Store feature.
+library;
 
 import 'package:flutter/material.dart';
 
