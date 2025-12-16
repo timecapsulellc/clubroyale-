@@ -2,47 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
-/// Activity model for social feed
-class SocialActivity {
-  final String id;
-  final String type; // 'game_won', 'game_lost', 'club_joined', 'friend_added', 'message'
-  final String userId;
-  final String userName;
-  final String? userAvatar;
-  final String content;
-  final DateTime timestamp;
-  final Map<String, dynamic>? metadata;
-
-  SocialActivity({
-    required this.id,
-    required this.type,
-    required this.userId,
-    required this.userName,
-    this.userAvatar,
-    required this.content,
-    required this.timestamp,
-    this.metadata,
-  });
-
-  factory SocialActivity.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return SocialActivity(
-      id: doc.id,
-      type: data['type'] ?? 'unknown',
-      userId: data['userId'] ?? '',
-      userName: data['userName'] ?? 'Unknown',
-      userAvatar: data['userAvatar'],
-      content: data['content'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      metadata: data['metadata'],
-    );
-  }
-}
+import 'package:clubroyale/features/social/models/social_activity.dart';
+import 'package:clubroyale/features/social/providers/dashboard_providers.dart';
+import 'dart:ui';
 
 /// Compact activity feed widget for the social dashboard
 class SocialFeedWidget extends ConsumerWidget {
@@ -62,99 +27,96 @@ class SocialFeedWidget extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('activity_feed')
-          .where('targetUserId', isEqualTo: userId)
-          .orderBy('timestamp', descending: true)
-          .limit(maxItems)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return _LoadingState();
-        }
+    // Watch activity feed provider
+    final activitiesAsync = ref.watch(activityFeedProvider(maxItems));
 
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+    return activitiesAsync.when(
+      loading: () => _LoadingState(),
+      error: (err, stack) => _EmptyFeedState(), // Treat error as empty for now or show error
+      data: (activities) {
+        if (activities.isEmpty) {
           return _EmptyFeedState();
         }
 
-        final activities = snapshot.data!.docs
-            .map((doc) => SocialActivity.fromFirestore(doc))
-            .toList();
-
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: CasinoColors.gold.withValues(alpha: 0.15),
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.4), // Slightly darker for legibility
+                borderRadius: BorderRadius.circular(20), // Kept for border alignment
+                border: Border.all(
+                  color: CasinoColors.gold.withValues(alpha: 0.15),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.dynamic_feed_rounded,
+                          color: CasinoColors.gold,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Activity',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () => context.go('/activity'),
+                          child: Row(
+                            children: [
+                              Text(
+                                'View All',
+                                style: TextStyle(
+                                  color: CasinoColors.gold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                color: CasinoColors.gold,
+                                size: 12,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Activity List
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: activities.length,
+                    separatorBuilder: (context, index) => Divider(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      height: 1,
+                    ),
+                    itemBuilder: (context, index) {
+                      final activity = activities[index];
+                      return _ActivityTile(
+                        activity: activity,
+                      ).animate(delay: (50 * index).ms)
+                          .fadeIn()
+                          .slideX(begin: -0.1);
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.dynamic_feed_rounded,
-                      color: CasinoColors.gold,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Activity',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () => context.go('/activity'),
-                      child: Row(
-                        children: [
-                          Text(
-                            'View All',
-                            style: TextStyle(
-                              color: CasinoColors.gold,
-                              fontSize: 12,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            color: CasinoColors.gold,
-                            size: 12,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Activity List
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: activities.length,
-                separatorBuilder: (_, __) => Divider(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  height: 1,
-                ),
-                itemBuilder: (context, index) {
-                  final activity = activities[index];
-                  return _ActivityTile(
-                    activity: activity,
-                  ).animate(delay: (50 * index).ms)
-                      .fadeIn()
-                      .slideX(begin: -0.1);
-                },
-              ),
-            ],
           ),
         );
       },

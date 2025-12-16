@@ -1,6 +1,9 @@
 import 'dart:math' as dart;
 import 'package:flutter/material.dart';
 import 'package:clubroyale/config/casino_theme.dart';
+import 'dart:ui';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:clubroyale/features/social/providers/dashboard_providers.dart';
 
 /// Player avatar widget positioned around the game table
 class PlayerAvatar extends StatelessWidget {
@@ -254,7 +257,7 @@ class GameTableLayout extends StatelessWidget {
 
 /// Bottom navigation bar for game screens
 /// Social-first bottom navigation bar with prominent Play button
-class SocialBottomNav extends StatelessWidget {
+class SocialBottomNav extends ConsumerWidget {
   final VoidCallback? onHomeTap;
   final VoidCallback? onChatsTap;
   final VoidCallback? onPlayTap;
@@ -280,59 +283,79 @@ class SocialBottomNav extends StatelessWidget {
     this.onBackTap,
     this.onActivityTap,
     this.onTournamentTap,
+    this.isFloating = false,
   });
 
+  final bool isFloating;
+
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.85),
-        border: Border(
-          top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3)),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch live data
+    final unreadChatsCount = ref.watch(unreadChatsCountProvider).value ?? 0;
+    final pendingRequestsCount = ref.watch(pendingFriendRequestsProvider).value ?? 0;
+    
+    return ClipRRect(
+      borderRadius: isFloating ? BorderRadius.circular(30) : BorderRadius.zero,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.6), // More transparent for glass effect
+            borderRadius: isFloating ? BorderRadius.circular(30) : null,
+            border: isFloating
+                ? Border.all(
+                    color: CasinoColors.gold.withValues(alpha: 0.3),
+                    width: 1.5,
+                  )
+                : Border(
+                    top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3)),
+                  ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.5),
+                blurRadius: 10,
+                offset: const Offset(0, -2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // Home / Feed
-            _NavItem(
-              icon: Icons.home_rounded,
-              label: 'Home',
-              onTap: onHomeTap ?? onActivityTap,
+          child: SafeArea(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Home / Feed
+                _NavItem(
+                  icon: Icons.home_rounded,
+                  label: 'Home',
+                  onTap: onHomeTap ?? onActivityTap,
+                ),
+                // Chats
+                _NavItem(
+                  icon: Icons.chat_bubble_rounded,
+                  label: 'Chats',
+                  onTap: onChatsTap,
+                  badgeCount: unreadChatsCount,
+                ),
+                // Play Button - Center & Prominent
+                _PlayButton(
+                  onTap: onPlayTap,
+                ),
+                // Clubs
+                _NavItem(
+                  icon: Icons.groups_rounded,
+                  label: 'Clubs',
+                  onTap: onClubsTap,
+                  badgeCount: pendingRequestsCount,
+                ),
+                // Profile
+                _NavItem(
+                  icon: Icons.person_rounded,
+                  label: 'Profile',
+                  onTap: onAccountTap,
+                ),
+              ],
             ),
-            // Chats
-            _NavItem(
-              icon: Icons.chat_bubble_rounded,
-              label: 'Chats',
-              onTap: onChatsTap,
-              hasBadge: true, // Could show unread count
-            ),
-            // Play Button - Center & Prominent
-            _PlayButton(
-              onTap: onPlayTap,
-            ),
-            // Clubs
-            _NavItem(
-              icon: Icons.groups_rounded,
-              label: 'Clubs',
-              onTap: onClubsTap,
-            ),
-            // Profile
-            _NavItem(
-              icon: Icons.person_rounded,
-              label: 'Profile',
-              onTap: onAccountTap,
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -350,28 +373,32 @@ class _PlayButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 56,
-        height: 56,
+        width: 64, // Larger high-fidelity size
+        height: 64,
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [CasinoColors.gold, CasinoColors.bronzeGold],
+          gradient: LinearGradient(
+            colors: [Colors.amber.shade300, Colors.amber.shade600], // Brighter Gold
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: CasinoColors.gold.withValues(alpha: 0.5),
-              blurRadius: 12,
-              spreadRadius: 2,
+              color: Colors.amber.shade600.withValues(alpha: 0.6), // Glowing shadow
+              blurRadius: 16,
+              spreadRadius: 4,
             ),
           ],
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.4),
+            width: 1.5,
+          ),
         ),
         child: const Center(
           child: Icon(
-            Icons.sports_esports_rounded,
-            color: Colors.black,
-            size: 28,
+            Icons.play_arrow_rounded,
+            color: Colors.black, // High contrast
+            size: 38,
           ),
         ),
       ),
@@ -383,13 +410,13 @@ class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
-  final bool hasBadge;
+  final int badgeCount;
   
   const _NavItem({
     required this.icon,
     required this.label,
     this.onTap,
-    this.hasBadge = false,
+    this.badgeCount = 0,
   });
 
   @override
@@ -405,18 +432,38 @@ class _NavItem extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                Icon(icon, color: CasinoColors.gold.withValues(alpha: 0.9), size: 22),
-                if (hasBadge)
+                Icon(icon, color: CasinoColors.gold.withValues(alpha: 0.9), size: 24),
+                if (badgeCount > 0)
                   Positioned(
-                    right: -4,
-                    top: -2,
+                    right: -6,
+                    top: -4,
                     child: Container(
-                      width: 8,
-                      height: 8,
+                      padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         color: Colors.red,
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.black, width: 1.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 2,
+                          )
+                        ],
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Center(
+                        child: Text(
+                          badgeCount > 9 ? '9+' : '$badgeCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            height: 1,
+                          ),
+                        ),
                       ),
                     ),
                   ),

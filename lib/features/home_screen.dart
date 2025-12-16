@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -18,6 +18,10 @@ import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:clubroyale/features/social/widgets/online_friends_bar.dart';
 import 'package:clubroyale/features/social/widgets/quick_social_actions.dart';
 import 'package:clubroyale/features/social/widgets/social_feed_widget.dart';
+import 'package:clubroyale/features/social/widgets/live_activity_section.dart';
+import 'package:clubroyale/features/social/providers/dashboard_providers.dart';
+import 'package:clubroyale/features/stories/services/story_service.dart';
+
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -28,399 +32,452 @@ class HomeScreen extends ConsumerWidget {
     final authService = ref.watch(authServiceProvider);
     final user = authService.currentUser;
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    
+    // Watch unread chats for badge
+    final unreadChatsCount = ref.watch(unreadChatsCountProvider).value ?? 0;
 
-    return Scaffold(
-      backgroundColor: CasinoColors.darkPurple,
-      bottomNavigationBar: SocialBottomNav(
-        onHomeTap: () {}, // Already on home
-        onChatsTap: () => context.go('/chats'),
-        onPlayTap: () => context.go('/lobby'), // Prominent center button
-        onClubsTap: () => context.go('/clubs'),
-        onAccountTap: () => context.go('/profile'),
-        // Legacy callbacks for backward compatibility
-        onActivityTap: () => context.go('/activity'),
-      ),
-      body: ParticleBackground(
-        primaryColor: ClubRoyaleTheme.gold,
-        secondaryColor: ClubRoyaleTheme.royalPurple,
-        particleCount: 40,
-        child: SafeArea(
-          child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            // Premium App Bar
-            SliverAppBar(
-              expandedHeight: 240,
-              floating: false,
-              pinned: true,
-              stretch: true,
-              backgroundColor: CasinoColors.deepPurple,
-              flexibleSpace: FlexibleSpaceBar(
-                stretchModes: const [
-                  StretchMode.zoomBackground,
-                  StretchMode.blurBackground,
-                ],
-                title: ShaderMask(
-                  shaderCallback: (bounds) => const LinearGradient(
-                    colors: [ClubRoyaleTheme.gold, ClubRoyaleTheme.champagne, ClubRoyaleTheme.gold],
-                  ).createShader(bounds),
-                  child: const Text(
-                    'ClubRoyale',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 24,
-                      letterSpacing: 2.0,
-                      shadows: [
-                        Shadow(
-                          color: Color(0x66D4AF37),
-                          offset: Offset(0, 2),
-                          blurRadius: 8,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                centerTitle: true,
-                background: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset(
-                      'assets/images/casino_bg_dark.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        // Fallback gradient when image fails to load
-                        return Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                CasinoColors.deepPurple,
-                                CasinoColors.richPurple,
-                                CasinoColors.darkPurple,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth > 600;
+        final contentMaxWidth = 800.0;
+        
+        return Scaffold(
+          backgroundColor: CasinoColors.darkPurple,
+          body: Stack(
+            children: [
+              // 1. Centered Content Area
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: contentMaxWidth),
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      // Refresh all dashboard data
+                      ref.invalidate(unreadChatsCountProvider);
+                      ref.invalidate(onlineFriendsCountProvider);
+                      ref.invalidate(activeVoiceRoomsProvider);
+                      ref.invalidate(spectatorGamesProvider);
+                      ref.invalidate(pendingFriendRequestsProvider);
+                      ref.invalidate(friendsStoriesProvider);
+                      ref.invalidate(myStoriesProvider);
+                      ref.invalidate(activityFeedProvider(5));
+                      ref.invalidate(activityFeedProvider(4));
+                    },
+                    color: CasinoColors.gold,
+                    backgroundColor: CasinoColors.deepPurple,
+                    child: ParticleBackground(
+                      primaryColor: ClubRoyaleTheme.gold,
+                      secondaryColor: ClubRoyaleTheme.royalPurple,
+                      particleCount: 40,
+                      child: SafeArea(
+                        bottom: false, // Handle bottom padding manually in list
+                        child: CustomScrollView(
+                          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                          slivers: [
+                            // Premium App Bar (Compact)
+                            SliverAppBar(
+                              expandedHeight: 140,
+                              floating: false,
+                              pinned: true,
+                              stretch: true,
+                              backgroundColor: CasinoColors.deepPurple,
+                              flexibleSpace: FlexibleSpaceBar(
+                                stretchModes: const [
+                                  StretchMode.zoomBackground,
+                                  StretchMode.blurBackground,
+                                ],
+                                title: ShaderMask(
+                                  shaderCallback: (bounds) => const LinearGradient(
+                                    colors: [ClubRoyaleTheme.gold, ClubRoyaleTheme.champagne, ClubRoyaleTheme.gold],
+                                  ).createShader(bounds),
+                                  child: const Text(
+                                    'ClubRoyale',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 24,
+                                      letterSpacing: 2.0,
+                                      shadows: [
+                                        Shadow(
+                                          color: Color(0x66D4AF37),
+                                          offset: Offset(0, 2),
+                                          blurRadius: 8,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                centerTitle: true,
+                                background: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/casino_bg_dark.png',
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                CasinoColors.deepPurple,
+                                                CasinoColors.richPurple,
+                                                CasinoColors.darkPurple,
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Colors.black.withValues(alpha: 0.3),
+                                            Colors.transparent,
+                                            Colors.black.withValues(alpha: 0.6),
+                                          ],
+                                          stops: const [0.0, 0.5, 1.0],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              actions: [
+                                Container(
+                                  margin: const EdgeInsets.only(right: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.1),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.person, color: Colors.white),
+                                    onPressed: () => context.go('/profile'),
+                                    tooltip: 'Profile',
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(right: 16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.1),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.logout, color: Colors.white),
+                                    onPressed: () async {
+                                      await authService.signOut();
+                                      if (context.mounted) context.go('/auth');
+                                    },
+                                    tooltip: 'Sign Out',
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                    // Gradient Overlay for text contrast
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withValues(alpha: 0.3),
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.6),
+
+                            // Content
+                            SliverPadding(
+                              // Add extra bottom padding for the floating dock
+                              padding: EdgeInsets.fromLTRB(16, 24, 16, isDesktop ? 120 : 100),
+                              sliver: SliverList(
+                                delegate: SliverChildListDelegate([
+                                  // Welcome Message
+                                  Container(
+                                    padding: const EdgeInsets.all(24),
+                                    decoration: CasinoDecorations.goldAccentCard(),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: CasinoColors.gold.withValues(alpha: 0.2),
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                          child: Icon(
+                                            Icons.waving_hand_rounded,
+                                            color: CasinoColors.gold,
+                                            size: 32,
+                                          ).animate().shake(delay: 500.ms),
+                                        ),
+                                        const SizedBox(width: 20),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Welcome back,',
+                                                style: theme.textTheme.titleSmall?.copyWith(
+                                                  color: CasinoColors.gold,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                user?.displayName ?? user?.email?.split('@').first ?? 'Player',
+                                                style: theme.textTheme.headlineMedium?.copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w800,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ).animate().fadeIn().slideX(),
+
+                                  const SizedBox(height: 16),
+
+                                  // Stories Bar
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.2),
+                                      border: Border(
+                                        top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.2)),
+                                        bottom: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.2)),
+                                      ),
+                                    ),
+                                    child: const StoryBar(),
+                                  ).animate().fadeIn(delay: 150.ms),
+
+                                  const SizedBox(height: 16),
+
+                                  // Live Activity Section
+                                  const LiveActivitySection().animate().fadeIn(delay: 200.ms),
+                                  
+                                  const SizedBox(height: 16),
+
+                                  // Quick Actions
+                                  QuickSocialActions(
+                                    unreadMessagesCount: unreadChatsCount,
+                                  ),
+
+                                  const SizedBox(height: 24),
+
+                                  // Online Friends
+                                  const OnlineFriendsBar().animate().fadeIn(delay: 200.ms),
+
+                                  const SizedBox(height: 24),
+
+                                  // Activity Feed
+                                  const SocialFeedWidget(maxItems: 4).animate().fadeIn(delay: 250.ms),
+
+                                  const SizedBox(height: 32),
+
+                                  // Play Section
+                                  Text(
+                                    '🎮 Play Games',
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ).animate().fadeIn(delay: 300.ms),
+
+                                  const SizedBox(height: 16),
+
+                                  // Main Play Card
+                                  _PrimaryActionCard(
+                                    icon: Icons.play_arrow_rounded,
+                                    title: 'Enter Lobby',
+                                    subtitle: 'Join or create a new game session',
+                                    gradientColors: [CasinoColors.gold, CasinoColors.bronzeGold],
+                                    onTap: () => context.go('/lobby'),
+                                  ).animate().fadeIn(delay: 350.ms).slideY(begin: 0.2),
+
+                                  // Quick Test Game (Test Mode Only)
+                                  if (TestMode.isEnabled) ...[
+                                    const SizedBox(height: 12),
+                                    _PrimaryActionCard(
+                                      icon: Icons.science_rounded,
+                                      title: '🧪 Quick Test Game',
+                                      subtitle: 'Start instantly with 3 bots',
+                                      gradientColors: [CasinoColors.feltGreen, const Color(0xFF1a4f2e)],
+                                      onTap: () => _startQuickTestGame(context, ref, user?.uid ?? 'test_user', user?.displayName ?? 'Test Player'),
+                                    ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
+                                  ],
+
+                                  const SizedBox(height: 24),
+
+                                  // Game Selector
+                                  Text(
+                                    'Select Game',
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ).animate().fadeIn(delay: 350.ms),
+                                  
+                                  const SizedBox(height: 12),
+
+                                  // Game Type Cards Row 1
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _GameTypeCard(
+                                          icon: Icons.layers_rounded,
+                                          title: 'Marriage',
+                                          subtitle: 'Rummy-style',
+                                          color: Colors.pink,
+                                          isFeatured: true,
+                                          onTap: () => context.go('/marriage'),
+                                        ).animate().fadeIn(delay: 400.ms).slideX(begin: -0.1),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: _GameTypeCard(
+                                          icon: Icons.style_rounded,
+                                          title: 'Call Break',
+                                          subtitle: 'Trick-taking',
+                                          color: CasinoColors.gold,
+                                          onTap: () => context.go('/lobby'),
+                                        ).animate().fadeIn(delay: 450.ms).slideX(begin: 0.1),
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 12),
+
+                                  // Game Type Cards Row 2
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _GameTypeCard(
+                                          icon: Icons.casino_rounded,
+                                          title: 'Teen Patti',
+                                          subtitle: '3 Card Poker',
+                                          color: Colors.orange,
+                                          isNew: true,
+                                          onTap: () => context.go('/lobby'),
+                                        ).animate().fadeIn(delay: 500.ms).slideX(begin: -0.1),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: _GameTypeCard(
+                                          icon: Icons.unfold_more_rounded,
+                                          title: GameTerminology.inBetweenGame,
+                                          subtitle: GameTerminology.inBetweenDescription,
+                                          color: Colors.green,
+                                          isNew: true,
+                                          onTap: () => context.go('/lobby'),
+                                        ).animate().fadeIn(delay: 550.ms).slideX(begin: 0.1),
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 32),
+
+                                  // Card Demo
+                                  Text(
+                                    'Featured Cards',
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ).animate().fadeIn(delay: 350.ms),
+                                  
+                                  const SizedBox(height: 12),
+
+                                  _CardDemoCarousel().animate().fadeIn(delay: 400.ms).slideX(begin: -0.1),
+
+                                  const SizedBox(height: 32),
+
+                                  // How To Play
+                                  _HowToPlayCard(
+                                    onTap: () => _showHowToPlayDialog(context),
+                                  ).animate().fadeIn(delay: 450.ms).slideY(begin: 0.1),
+
+                                  Text(
+                                    'Activities',
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ).animate().fadeIn(delay: 400.ms),
+                                  
+                                  const SizedBox(height: 16),
+
+                                  // Activity Grid
+                                  GridView.count(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    crossAxisCount: context.responsive(mobile: 2, tablet: 3, desktop: 4),
+                                    mainAxisSpacing: context.scaledSpacing(12),
+                                    crossAxisSpacing: context.scaledSpacing(12),
+                                    childAspectRatio: context.isMobile ? 0.72 : 0.85,
+                                    children: [
+                                      _EnhancedActivityCard(
+                                        icon: Icons.history_rounded,
+                                        title: 'History',
+                                        subtitle: 'View past games',
+                                        gradientColors: [CasinoColors.richPurple, CasinoColors.deepPurple],
+                                        previewWidget: _HistoryPreview(),
+                                        onTap: () => context.go('/history'),
+                                      ).animate().fadeIn(delay: 500.ms).scale(begin: const Offset(0.9, 0.9)),
+                                      
+                                      _EnhancedActivityCard(
+                                        icon: Icons.leaderboard_rounded,
+                                        title: 'Leaderboard',
+                                        subtitle: 'Top players',
+                                        gradientColors: [CasinoColors.gold, CasinoColors.bronzeGold],
+                                        previewWidget: _LeaderboardPreview(),
+                                        onTap: () => context.go('/leaderboard'),
+                                      ).animate().fadeIn(delay: 600.ms).scale(begin: const Offset(0.9, 0.9)),
+                                      
+                                      _EnhancedActivityCard(
+                                        icon: Icons.settings_rounded,
+                                        title: 'Settings',
+                                        subtitle: 'Preferences',
+                                        gradientColors: [CasinoColors.cardBackgroundLight, CasinoColors.cardBackground],
+                                        previewWidget: _SettingsPreview(),
+                                        onTap: () => context.go('/profile'),
+                                      ).animate().fadeIn(delay: 700.ms).scale(begin: const Offset(0.9, 0.9)),
+
+                                      _WalletCard(
+                                        onTap: () => context.go('/wallet'),
+                                      ).animate().fadeIn(delay: 800.ms).scale(begin: const Offset(0.9, 0.9)),
+                                    ],
+                                  ),
+                                ]),
+                              ),
+                            ),
                           ],
-                          stops: const [0.0, 0.5, 1.0],
                         ),
                       ),
                     ),
-                    // Hero Icon (Optional - keeping small if banner is busy, or removing)
-                    // Removing Hero Icon to let the banner art shine.
-                  ],
+                  ),
                 ),
               ),
-              actions: [
-                Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.person, color: Colors.white),
-                    onPressed: () => context.go('/profile'),
-                    tooltip: 'Profile',
+              
+              // 2. Responsive Floating Navigation Dock
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: isDesktop ? 24.0 : 0),
+                  child: SizedBox(
+                    width: isDesktop ? 450 : double.infinity, // Constrained width for capsule look on desktop
+                    child: SocialBottomNav(
+                      isFloating: isDesktop,
+                      onHomeTap: () {}, // Already on home
+                      onChatsTap: () => context.go('/chats'),
+                      onPlayTap: () => context.go('/lobby'),
+                      onClubsTap: () => context.go('/clubs'),
+                      onAccountTap: () => context.go('/profile'),
+                      // Legacy
+                      onActivityTap: () => context.go('/activity'),
+                    ),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(right: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.logout, color: Colors.white),
-                    onPressed: () async {
-                      await authService.signOut();
-                      if (context.mounted) context.go('/auth');
-                    },
-                    tooltip: 'Sign Out',
-                  ),
-                ),
-              ],
-            ),
-
-            // Content
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  // Welcome Message
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: CasinoDecorations.goldAccentCard(),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: CasinoColors.gold.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Icon(
-                            Icons.waving_hand_rounded,
-                            color: CasinoColors.gold,
-                            size: 32,
-                          ).animate().shake(delay: 500.ms),
-                        ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Welcome back,',
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  color: CasinoColors.gold,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                user?.displayName ?? user?.email?.split('@').first ?? 'Player',
-                                style: theme.textTheme.headlineMedium?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ).animate().fadeIn().slideX(),
-
-                  const SizedBox(height: 16),
-
-                  // 📖 Stories Bar (Super App Feature)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      border: Border(
-                        top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.2)),
-                        bottom: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.2)),
-                      ),
-                    ),
-                    child: const StoryBar(),
-                  ).animate().fadeIn(delay: 150.ms),
-
-                  const SizedBox(height: 16),
-
-                  // ===== QUICK SOCIAL ACTIONS =====
-                  const QuickSocialActions(),
-
-                  const SizedBox(height: 24),
-
-                  // ===== ONLINE FRIENDS BAR =====
-                  const OnlineFriendsBar().animate().fadeIn(delay: 200.ms),
-
-                  const SizedBox(height: 24),
-
-                  // ===== ACTIVITY FEED =====
-                  const SocialFeedWidget(maxItems: 4).animate().fadeIn(delay: 250.ms),
-
-                  const SizedBox(height: 32),
-
-                  // ===== PLAY SECTION =====
-                  Text(
-                    '🎮 Play Games',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                  ).animate().fadeIn(delay: 300.ms),
-
-                  const SizedBox(height: 16),
-
-                  // Main Play Card
-                  _PrimaryActionCard(
-                    icon: Icons.play_arrow_rounded,
-                    title: 'Enter Lobby',
-                    subtitle: 'Join or create a new game session',
-                    gradientColors: [CasinoColors.gold, CasinoColors.bronzeGold],
-                    onTap: () => context.go('/lobby'),
-                  ).animate().fadeIn(delay: 350.ms).slideY(begin: 0.2),
-
-                  // Quick Test Game Button (Test Mode Only)
-                  if (TestMode.isEnabled) ...[
-                    const SizedBox(height: 12),
-                    _PrimaryActionCard(
-                      icon: Icons.science_rounded,
-                      title: '🧪 Quick Test Game',
-                      subtitle: 'Start instantly with 3 bots',
-                      gradientColors: [CasinoColors.feltGreen, const Color(0xFF1a4f2e)],
-                      onTap: () => _startQuickTestGame(context, ref, user?.uid ?? 'test_user', user?.displayName ?? 'Test Player'),
-                    ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
-                  ],
-
-                  const SizedBox(height: 24),
-
-                  // ===== GAME SELECTOR SECTION =====
-                  Text(
-                    'Select Game',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                  ).animate().fadeIn(delay: 350.ms),
-                  
-                  const SizedBox(height: 12),
-
-                  // Game Type Cards - Row 1 (Featured Games)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _GameTypeCard(
-                          icon: Icons.layers_rounded,
-                          title: 'Marriage',
-                          subtitle: 'Rummy-style',
-                          color: Colors.pink,
-                          isFeatured: true,
-                          onTap: () => context.go('/marriage'),
-                        ).animate().fadeIn(delay: 400.ms).slideX(begin: -0.1),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _GameTypeCard(
-                          icon: Icons.style_rounded,
-                          title: 'Call Break',
-                          subtitle: 'Trick-taking',
-                          color: CasinoColors.gold,
-                          onTap: () => context.go('/lobby'),
-                        ).animate().fadeIn(delay: 450.ms).slideX(begin: 0.1),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Game Type Cards - Row 2
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _GameTypeCard(
-                          icon: Icons.casino_rounded,
-                          title: 'Teen Patti',
-                          subtitle: '3 Card Poker',
-                          color: Colors.orange,
-                          isNew: true,
-                          onTap: () => context.go('/lobby'),
-                        ).animate().fadeIn(delay: 500.ms).slideX(begin: -0.1),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _GameTypeCard(
-                          icon: Icons.unfold_more_rounded,
-                          title: GameTerminology.inBetweenGame,
-                          subtitle: GameTerminology.inBetweenDescription,
-                          color: Colors.green,
-                          isNew: true,
-                          onTap: () => context.go('/lobby'),
-                        ).animate().fadeIn(delay: 550.ms).slideX(begin: 0.1),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // ===== CARD DEMO SECTION =====
-                  Text(
-                    'Featured Cards',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                  ).animate().fadeIn(delay: 350.ms),
-                  
-                  const SizedBox(height: 12),
-
-                  _CardDemoCarousel().animate().fadeIn(delay: 400.ms).slideX(begin: -0.1),
-
-                  const SizedBox(height: 32),
-
-                  // ===== HOW TO PLAY SECTION =====
-                  _HowToPlayCard(
-                    onTap: () => _showHowToPlayDialog(context),
-                  ).animate().fadeIn(delay: 450.ms).slideY(begin: 0.1),
-
-                  Text(
-                    'Activities',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                  ).animate().fadeIn(delay: 400.ms),
-                  
-                  const SizedBox(height: 16),
-
-                  // Enhanced Activity Cards Grid
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: context.responsive(mobile: 2, tablet: 3, desktop: 4),
-                    mainAxisSpacing: context.scaledSpacing(12),
-                    crossAxisSpacing: context.scaledSpacing(12),
-                    childAspectRatio: context.isMobile ? 0.72 : 0.85,
-                    children: [
-                      _EnhancedActivityCard(
-                        icon: Icons.history_rounded,
-                        title: 'History',
-                        subtitle: 'View past games',
-                        gradientColors: [CasinoColors.richPurple, CasinoColors.deepPurple],
-                        previewWidget: _HistoryPreview(),
-                        onTap: () => context.go('/history'),
-                      ).animate().fadeIn(delay: 500.ms).scale(begin: const Offset(0.9, 0.9)),
-                      
-                      _EnhancedActivityCard(
-                        icon: Icons.leaderboard_rounded,
-                        title: 'Leaderboard',
-                        subtitle: 'Top players',
-                        gradientColors: [CasinoColors.gold, CasinoColors.bronzeGold],
-                        previewWidget: _LeaderboardPreview(),
-                        onTap: () => context.go('/leaderboard'),
-                      ).animate().fadeIn(delay: 600.ms).scale(begin: const Offset(0.9, 0.9)),
-                      
-                      _EnhancedActivityCard(
-                        icon: Icons.settings_rounded,
-                        title: 'Settings',
-                        subtitle: 'Preferences',
-                        gradientColors: [CasinoColors.cardBackgroundLight, CasinoColors.cardBackground],
-                        previewWidget: _SettingsPreview(),
-                        onTap: () => context.go('/profile'),
-                      ).animate().fadeIn(delay: 700.ms).scale(begin: const Offset(0.9, 0.9)),
-
-                      _WalletCard(
-                        onTap: () => context.go('/wallet'),
-                      ).animate().fadeIn(delay: 800.ms).scale(begin: const Offset(0.9, 0.9)),
-                    ],
-                  ),
-                ]),
               ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
+            ],
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -723,20 +780,7 @@ class _LeaderboardPreview extends StatelessWidget {
   }
 }
 
-class _RankBadge extends StatelessWidget {
-  final int rank;
-  final Color color;
-  const _RankBadge({required this.rank, required this.color});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 18, height: 18,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      child: Center(child: Text('$rank', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))),
-    );
-  }
-}
 
 // Settings preview widget (Enhanced with colors and badges)
 class _SettingsPreview extends StatelessWidget {
@@ -1092,32 +1136,7 @@ class _MiniTransaction extends StatelessWidget {
 
 
 // ============ FLOATING CARD DECORATION ============
-class _FloatingCardDecor extends StatelessWidget {
-  final String suit;
-  final int delay;
 
-  const _FloatingCardDecor({required this.suit, required this.delay});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = (suit == '♥' || suit == '♦') ? Colors.red.shade200 : Colors.white;
-    return Text(
-      suit,
-      style: TextStyle(
-        fontSize: 40,
-        color: color,
-        fontWeight: FontWeight.bold,
-        shadows: [
-          Shadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-    ).animate(onPlay: (c) => c.repeat(reverse: true))
-     .moveY(begin: -10, end: 10, duration: 2000.ms, delay: delay.ms, curve: Curves.easeInOut);
-  }
-}
 
 // ============ CARD DEMO CAROUSEL ============
 class _CardDemoCarousel extends StatelessWidget {
@@ -1212,102 +1231,7 @@ class _FallbackCard extends StatelessWidget {
 }
 
 
-class _DemoPlayingCard extends StatelessWidget {
-  final String rank;
-  final String suit;
-  final Color color;
 
-  const _DemoPlayingCard({
-    required this.rank,
-    required this.suit,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 90,
-      height: 130,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: Stack(
-        children: [
-          // Top left
-          Positioned(
-            top: 8,
-            left: 8,
-            child: Column(
-              children: [
-                Text(
-                  rank,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-                Text(
-                  suit,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: color,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Center suit
-          Center(
-            child: Text(
-              suit,
-              style: TextStyle(
-                fontSize: 36,
-                color: color.withValues(alpha: 0.3),
-              ),
-            ),
-          ),
-          // Bottom right (rotated)
-          Positioned(
-            bottom: 8,
-            right: 8,
-            child: Transform.rotate(
-              angle: 3.14159,
-              child: Column(
-                children: [
-                  Text(
-                    rank,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                  Text(
-                    suit,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: color,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // ============ HOW TO PLAY CARD ============
 class _HowToPlayCard extends StatelessWidget {

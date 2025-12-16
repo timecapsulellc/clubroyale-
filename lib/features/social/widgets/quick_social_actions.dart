@@ -5,7 +5,12 @@ import 'package:clubroyale/config/casino_theme.dart';
 
 /// Row of quick social action buttons for the dashboard
 class QuickSocialActions extends StatelessWidget {
-  const QuickSocialActions({super.key});
+  final int unreadMessagesCount;
+  
+  const QuickSocialActions({
+    super.key,
+    this.unreadMessagesCount = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +32,7 @@ class QuickSocialActions extends StatelessWidget {
               icon: Icons.chat_bubble_outline_rounded,
               label: 'Message',
               color: Colors.blue,
+              badgeCount: unreadMessagesCount,
               onTap: () => context.go('/chats'),
             ).animate(delay: 150.ms).fadeIn().slideY(begin: 0.2),
           ),
@@ -165,12 +171,14 @@ class _QuickActionChip extends StatelessWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
+  final int badgeCount;
   
   const _QuickActionChip({
     required this.icon,
     required this.label,
     required this.color,
     required this.onTap,
+    this.badgeCount = 0,
   });
 
   @override
@@ -192,13 +200,46 @@ class _QuickActionChip extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: color, size: 20),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: color, size: 20),
+                  ),
+                  if (badgeCount > 0)
+                    Positioned(
+                      right: -4,
+                      top: -4,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.black, width: 1.5),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Center(
+                          child: Text(
+                            badgeCount > 99 ? '99+' : '$badgeCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              height: 1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: 6),
               Text(

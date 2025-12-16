@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/config/admin_config.dart';
+import 'package:clubroyale/features/social/models/social_user_model.dart';
 
 /// Provider for admin diamond service
 final adminDiamondServiceProvider = Provider<AdminDiamondService>(
@@ -202,6 +203,49 @@ class AdminDiamondService {
     for (final doc in snapshot.docs) {
       await _executeGrant(doc.id);
     }
+  }
+  /// Watch full grant history (executed or rejected)
+  Stream<List<DiamondRequest>> watchGrantHistory() {
+    return _db
+        .collection('diamond_requests')
+        .where('status', whereIn: ['executed', 'rejected'])
+        .orderBy('createdAt', descending: true)
+        .limit(50)
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => DiamondRequest.fromFirestore(doc)).toList());
+  }
+
+  /// Lookup user by Email, ID or Name
+  Future<List<SocialUser>> lookupUser(String query) async {
+    if (query.isEmpty) return [];
+    
+    // Check if query is an email
+    if (query.contains('@')) {
+      final emailSnapshot = await _db.collection('users')
+          .where('email', isEqualTo: query.trim())
+          .limit(1)
+          .get();
+      if (emailSnapshot.docs.isNotEmpty) {
+        return emailSnapshot.docs.map((doc) => SocialUser.fromJson({...doc.data(), 'id': doc.id})).toList();
+      }
+    }
+    
+    // Check if query is an Exact ID (len > 20)
+    if (query.length > 20) {
+      final doc = await _db.collection('users').doc(query.trim()).get();
+      if (doc.exists) {
+        return [SocialUser.fromJson({...doc.data()!, 'id': doc.id})];
+      }
+    }
+    
+    // Fallback: Name Search (Prefix)
+    return _db.collection('users')
+        .where('displayName', isGreaterThanOrEqualTo: query)
+        .where('displayName', isLessThan: '${query}z')
+        .limit(10)
+        .get()
+        .then((s) => s.docs.map((doc) => SocialUser.fromJson({...doc.data(), 'id': doc.id})).toList());
   }
 }
 

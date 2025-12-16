@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:clubroyale/features/stories/models/story.dart';
 import 'package:clubroyale/features/stories/services/story_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
@@ -86,7 +87,13 @@ class StoryCircle extends ConsumerWidget {
                         : null,
                   ),
                 ),
-              ),
+              )
+              .animate(onPlay: (controller) => controller.repeat())
+              .shimmer(
+                 duration: 2000.ms, 
+                 color: hasUnviewed ? Colors.white.withValues(alpha: 0.5) : Colors.transparent
+              )
+              .then(delay: 3000.ms), // Pause between shimmers
               // Add button for current user
               if (isCurrentUser)
                 Positioned(
@@ -181,7 +188,7 @@ class StoryBar extends ConsumerWidget {
           // Friends' stories
           friendsStoriesAsync.when(
             loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (err, stack) => const SizedBox.shrink(),
             data: (userStoriesList) => Row(
               children: userStoriesList.map((userStories) {
                 return Padding(

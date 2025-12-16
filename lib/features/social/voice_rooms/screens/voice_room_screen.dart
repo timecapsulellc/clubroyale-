@@ -3,6 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/social/voice_rooms/models/voice_room.dart';
 import 'package:clubroyale/features/social/voice_rooms/services/voice_room_service.dart';
+import 'package:clubroyale/features/social/voice_rooms/services/voice_room_service.dart';
+import 'package:clubroyale/features/social/services/social_service.dart';
+import 'package:clubroyale/features/social/invite_service.dart';
+import 'package:clubroyale/features/social/services/friend_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 /// Voice room screen displaying participants and controls
@@ -30,9 +35,15 @@ class VoiceRoomScreen extends ConsumerWidget {
           error: (_, __) => const Text('Voice Room'),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => _showRoomSettings(context, ref),
+          roomAsync.when(
+            data: (room) => room != null 
+              ? IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: () => _showRoomSettings(context, ref, room),
+                )
+              : const SizedBox(),
+            loading: () => const SizedBox(),
+            error: (_, __) => const SizedBox(),
           ),
         ],
       ),
@@ -168,24 +179,40 @@ class VoiceRoomScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     // Mute button
-                    _ControlButton(
-                      icon: Icons.mic_off,
-                      activeIcon: Icons.mic,
-                      label: 'Mute',
-                      isActive: false, // TODO: Get from participant state
-                      onTap: () {
-                        ref.read(voiceRoomServiceProvider).toggleMute(roomId);
-                      },
+                    Builder(
+                      builder: (context) {
+                        final userId = ref.watch(authServiceProvider).currentUser?.uid;
+                        final me = userId != null ? room.participants[userId] : null;
+                        final isMuted = me?.isMuted ?? false;
+                        
+                        return _ControlButton(
+                          icon: Icons.mic_off,
+                          activeIcon: Icons.mic,
+                          label: 'Mute',
+                          isActive: !isMuted, 
+                          onTap: () {
+                            ref.read(voiceRoomServiceProvider).toggleMute(roomId);
+                          },
+                        );
+                      }
                     ),
                     // Deafen button
-                    _ControlButton(
-                      icon: Icons.headset_off,
-                      activeIcon: Icons.headset,
-                      label: 'Deafen',
-                      isActive: false, // TODO: Get from participant state
-                      onTap: () {
-                        ref.read(voiceRoomServiceProvider).toggleDeafen(roomId);
-                      },
+                    Builder(
+                      builder: (context) {
+                        final userId = ref.watch(authServiceProvider).currentUser?.uid;
+                        final me = userId != null ? room.participants[userId] : null;
+                        final isDeafened = me?.isDeafened ?? false;
+                        
+                        return _ControlButton(
+                          icon: Icons.headset_off,
+                          activeIcon: Icons.headset,
+                          label: 'Deafen',
+                          isActive: !isDeafened,
+                          onTap: () {
+                            ref.read(voiceRoomServiceProvider).toggleDeafen(roomId);
+                          },
+                        );
+                      }
                     ),
                     // Leave button
                     _ControlButton(
@@ -209,7 +236,7 @@ class VoiceRoomScreen extends ConsumerWidget {
     );
   }
 
-  void _showRoomSettings(BuildContext context, WidgetRef ref) {
+  void _showRoomSettings(BuildContext context, WidgetRef ref, VoiceRoom room) {
     showModalBottomSheet(
       context: context,
       builder: (context) => SafeArea(
@@ -221,7 +248,7 @@ class VoiceRoomScreen extends ConsumerWidget {
               title: const Text('Invite Friends'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Implement friend invite
+                _showInviteSheet(context, ref, room);
               },
             ),
             ListTile(
@@ -229,21 +256,159 @@ class VoiceRoomScreen extends ConsumerWidget {
               title: const Text('Share Room Link'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Implement share
+                _shareRoom(context, ref, room);
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Room Settings'),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Implement settings
-              },
-            ),
+            if (ref.read(authServiceProvider).currentUser?.uid == room.hostId)
+              ListTile(
+                leading: const Icon(Icons.settings),
+                title: const Text('Room Settings'),
+                onTap: () {
+                  Navigator.pop(context);
+                  // Settings implementation would go here (e.g., change name, privacy)
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Room settings coming soon')),
+                  );
+                },
+              ),
           ],
         ),
       ),
     );
+  }
+
+  void _showInviteSheet(BuildContext context, WidgetRef ref, VoiceRoom room) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          minChildSize: 0.5,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (context, scrollController) {
+            final friendIdsStream = ref.watch(friendServiceProvider).watchMyFriendIds();
+            
+            return Column(
+              children: [
+                AppBar(
+                  title: const Text('Invite Friends'),
+                  leading: const SizedBox(),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: StreamBuilder<List<String>>(
+                    stream: friendIdsStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      
+                      final friendIds = snapshot.data ?? [];
+                      if (friendIds.isEmpty) {
+                        return const Center(child: Text('No friends found to invite.'));
+                      }
+                      
+                      return ListView.builder(
+                        controller: scrollController,
+                        itemCount: friendIds.length,
+                        itemBuilder: (context, index) {
+                          final friendId = friendIds[index];
+                          
+                          // Check if already in room
+                          final isInRoom = room.participants.containsKey(friendId);
+                          
+                          return Consumer(
+                            builder: (context, ref, child) {
+                              final userFuture = ref.watch(socialServiceProvider).getUserProfile(friendId);
+                              
+                              return FutureBuilder(
+                                future: userFuture,
+                                builder: (context, userSnapshot) {
+                                  final user = userSnapshot.data;
+                                  if (user == null) return const SizedBox();
+                                  
+                                  return ListTile(
+                                    leading: CircleAvatar(
+                                      backgroundImage: user.avatarUrl != null
+                                          ? NetworkImage(user.avatarUrl!)
+                                          : null,
+                                      child: user.avatarUrl == null
+                                          ? Text(user.displayName.isNotEmpty ? user.displayName[0].toUpperCase() : '?')
+                                          : null,
+                                    ),
+                                    title: Text(user.displayName),
+                                    subtitle: Text(isInRoom ? 'Already in room' : 'Tap to invite'),
+                                    trailing: isInRoom 
+                                      ? const Icon(Icons.check, color: Colors.green)
+                                      : IconButton(
+                                          icon: const Icon(Icons.send),
+                                          onPressed: () async {
+                                            // Send invite
+                                            final success = await ref.read(inviteServiceProvider).sendInvite(
+                                              toUserId: friendId,
+                                              roomId: room.id,
+                                              roomCode: null, // Voice rooms might not have codes
+                                              gameType: 'voice_room',
+                                            );
+                                            
+                                            if (context.mounted) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(success 
+                                                    ? 'Invite sent to ${user.displayName}' 
+                                                    : 'Invite already sent'
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                  );
+                                }
+                              );
+                            }
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _shareRoom(BuildContext context, WidgetRef ref, VoiceRoom room) async {
+    try {
+      final user = ref.read(authServiceProvider).currentUser;
+      if (user == null) return;
+
+      final inviteLink = await ref.read(inviteServiceProvider).generateInviteLink(
+        roomId: room.id,
+        roomCode: '', // Voice rooms don't use codes primarily
+        hostId: user.uid,
+        hostName: user.displayName ?? 'Host',
+        gameType: 'voice_room',
+      );
+      
+      await ref.read(inviteServiceProvider).shareInviteLink(inviteLink);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to share room: $e')),
+        );
+      }
+    }
   }
 }
 

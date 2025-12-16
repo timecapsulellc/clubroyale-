@@ -1,5 +1,3 @@
-
-// import 'dart:io'; // Removed for web compatibility
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +10,7 @@ import 'package:clubroyale/features/ledger/ledger_service.dart';
 import 'package:clubroyale/features/ledger/settlement_service.dart';
 import 'package:clubroyale/features/ledger/transaction_model.dart';
 import 'package:share_plus/share_plus.dart';
-// import 'package:path_provider/path_provider.dart'; // Removed for web compatibility
+import 'package:clubroyale/core/services/receipt_service.dart';
 
 final ledgerProvider = FutureProvider.family<GameRoom?, String>((ref, gameId) {
   final ledgerService = ref.watch(ledgerServiceProvider);
@@ -85,19 +83,9 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
 
   /// Generate and share receipt as image
   Future<void> _shareAsImage(GameRoom game) async {
-    if (kIsWeb) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Image sharing not supported on web yet')),
-      );
-      return;
-    }
-
     setState(() => _isGeneratingImage = true);
 
     try {
-      /* 
-      // TODO: Restore mobile implementation with conditional import to fix build
-      
       // Wait for the widget to be rendered
       await Future.delayed(const Duration(milliseconds: 100));
 
@@ -110,22 +98,13 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       final bytes = byteData!.buffer.asUint8List();
 
-      // Save to temp file
-      // final tempDir = await getTemporaryDirectory();
-      // final fileName = 'settlement_${game.id ?? 'receipt'}_${DateTime.now().millisecondsSinceEpoch}.png';
-      // final file = File('${tempDir.path}/$fileName');
-      // await file.writeAsBytes(bytes);
-
-      // Share the image
-      // await Share.shareXFiles(
-      //   [XFile(file.path)],
-      //   text: 'Settlement Receipt for ${game.name}',
-      //   subject: 'ClubRoyale Settlement',
-      // );
-      */
+      final fileName = 'settlement_${game.id ?? 'receipt'}_${DateTime.now().millisecondsSinceEpoch}.png';
       
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Image generation temporarily disabled for web build')),
+      // Use the platform-specific ReceiptService
+      await ReceiptService().shareReceiptImage(
+        bytes,
+        fileName,
+        'Settlement Receipt for ${game.name}'
       );
 
     } catch (e) {
