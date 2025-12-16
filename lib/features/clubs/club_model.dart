@@ -34,6 +34,7 @@ abstract class Club with _$Club {
     required String ownerName,
     String? avatarUrl,
     String? bannerUrl,
+    String? chatId, // Link to Social Chat
     @Default(ClubPrivacy.public) ClubPrivacy privacy,
     @Default([]) List<String> memberIds,
     @Default(0) int memberCount,

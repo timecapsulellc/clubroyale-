@@ -8,7 +8,8 @@ import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore';
 
-const db = getFirestore();
+// Lazy initialization
+const db = () => getFirestore();
 
 // Approval thresholds
 const SINGLE_APPROVAL_LIMIT = 999;
@@ -39,7 +40,7 @@ export const onGrantApproved = onDocumentUpdated('diamond_requests/{requestId}',
 export const executeCooledGrants = onSchedule('every 1 hours', async () => {
     const now = Timestamp.now();
 
-    const cooledGrants = await db
+    const cooledGrants = await db()
         .collection('diamond_requests')
         .where('status', '==', 'cooling_period')
         .where('coolingPeriodEnds', '<', now)
@@ -63,10 +64,10 @@ async function executeGrant(requestId: string, requestData: FirebaseFirestore.Do
     const targetUserId = requestData.targetUserId;
     const amount = requestData.amount;
 
-    const batch = db.batch();
+    const batch = db().batch();
 
     // Update wallet balance
-    const walletRef = db.collection('wallets').doc(targetUserId);
+    const walletRef = db().collection('wallets').doc(targetUserId);
     batch.update(walletRef, {
         balance: FieldValue.increment(amount),
         totalPurchased: FieldValue.increment(amount),
@@ -74,7 +75,7 @@ async function executeGrant(requestId: string, requestData: FirebaseFirestore.Do
     });
 
     // Record transaction
-    const txRef = db.collection('transactions').doc();
+    const txRef = db().collection('transactions').doc();
     batch.set(txRef, {
         userId: targetUserId,
         amount: amount,
@@ -85,7 +86,7 @@ async function executeGrant(requestId: string, requestData: FirebaseFirestore.Do
     });
 
     // Update request status
-    const requestRef = db.collection('diamond_requests').doc(requestId);
+    const requestRef = db().collection('diamond_requests').doc(requestId);
     batch.update(requestRef, {
         status: 'executed',
         executedAt: FieldValue.serverTimestamp(),

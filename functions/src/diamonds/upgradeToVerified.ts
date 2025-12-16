@@ -12,7 +12,8 @@ import * as admin from 'firebase-admin';
 import { VERIFICATION_FEE, TIER_LIMITS } from './config';
 import { getUser } from './utils';
 
-const firestore = admin.firestore();
+// Lazy initialization
+const getDb = () => admin.firestore();
 
 export const upgradeToVerified = onCall(async (request) => {
     const userId = request.auth?.uid;
@@ -50,8 +51,8 @@ export const upgradeToVerified = onCall(async (request) => {
     }
 
     // Deduct fee and upgrade
-    await firestore.runTransaction(async (transaction) => {
-        const userRef = firestore.collection('users').doc(userId);
+    await getDb().runTransaction(async (transaction) => {
+        const userRef = getDb().collection('users').doc(userId);
 
         // 1. Burn fee
         // We update balance and origin tracking.
@@ -64,7 +65,7 @@ export const upgradeToVerified = onCall(async (request) => {
         });
 
         // 2. Record burn in ledger
-        const burnRef = firestore.collection('diamond_ledger').doc();
+        const burnRef = getDb().collection('diamond_ledger').doc();
         transaction.set(burnRef, {
             type: 'burn',
             fromUserId: userId,

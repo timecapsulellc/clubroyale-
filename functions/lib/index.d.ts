@@ -7,6 +7,7 @@
  * - Push notifications (FCM)
  */
 export { auditGameUpdate } from './triggers/auditTriggers';
+export { onSocialMessageSent, onStoryCreated, onFriendRequestCreated, onFriendshipUpdated, onVoiceRoomCreated } from './triggers/social';
 export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenService';
 export { validateTransfer } from './diamonds/validateTransfer';
 export { grantGameplayReward } from './diamonds/grantGameplayReward';

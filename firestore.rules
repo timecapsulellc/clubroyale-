@@ -156,6 +156,23 @@ service cloud.firestore {
       allow delete: if false;
     }
     
+    // ============ CHATS (Social DMs) ============
+    // Main chats collection for social messaging
+    
+    match /chats/{chatId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if false;
+      
+      match /messages/{messageId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated();
+        allow update: if false;
+        allow delete: if false;
+      }
+    }
+    
     // ============ CONVERSATIONS (DMs) ============
     
     match /conversations/{conversationId} {

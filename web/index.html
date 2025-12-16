@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <!-- SEO Meta Tags -->
-  <title>ClubRoyale - Play Marriage & Call Break with Friends</title>
+  <title>ClubRoyale - Play Marriage &amp; Call Break with Friends</title>
   <meta name="description"
     content="Play Marriage, Call Break, and more card games online with friends. Create private rooms, invite friends, and track scores. Free to play!">
   <meta name="keywords"
@@ -18,7 +18,7 @@
   <meta name="author" content="ClubRoyale">
   <meta name="robots" content="index, follow">
 
-  <!-- Theme & PWA -->
+  <!-- Theme & PWA - Premium Purple Theme -->
   <meta name="theme-color" content="#6b21a8">
   <meta name="background-color" content="#1a0a2e">
   <meta name="mobile-web-app-capable" content="yes">
@@ -47,7 +47,7 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://clubroyale-app.web.app/">
-  <meta property="og:title" content="ClubRoyale - Play Marriage & Call Break with Friends">
+  <meta property="og:title" content="ClubRoyale - Play Marriage &amp; Call Break with Friends">
   <meta property="og:description"
     content="Play classic South Asian card games online with friends. Create rooms, invite friends, track scores!">
   <meta property="og:image" content="https://clubroyale-app.web.app/icons/Icon-512.png">
@@ -56,7 +56,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://clubroyale-app.web.app/">
-  <meta name="twitter:title" content="ClubRoyale - Play Marriage & Call Break">
+  <meta name="twitter:title" content="ClubRoyale - Play Marriage &amp; Call Break">
   <meta name="twitter:description" content="Play classic card games online with friends. Free to play!">
   <meta name="twitter:image" content="https://clubroyale-app.web.app/icons/Icon-512.png">
 
@@ -101,7 +101,7 @@
     body {
       margin: 0;
       padding: 0;
-      background-color: #1a0a2e;
+      background-color: #051A12;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
@@ -115,31 +115,34 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 100%);
+      background: linear-gradient(to bottom, #2d1052, #1a0a2e);
       z-index: 9999;
     }
 
     #loading-logo {
-      width: 80px;
-      height: 80px;
+      width: 120px;
+      height: 120px;
       animation: pulse 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
     }
 
     #loading-text {
-      color: #a78bfa;
-      font-size: 24px;
-      font-weight: 600;
-      margin-top: 20px;
-      letter-spacing: 2px;
+      color: #ffd700;
+      font-size: 28px;
+      font-weight: 700;
+      margin-top: 24px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     #loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(167, 139, 250, 0.3);
-      border-top-color: #a78bfa;
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(255, 215, 0, 0.3);
+      border-top-color: #ffd700;
       border-radius: 50%;
-      margin-top: 30px;
+      margin-top: 40px;
       animation: spin 1s linear infinite;
     }
 
@@ -163,10 +166,78 @@
       }
     }
   </style>
+  <style id="splash-screen-style">
+    html {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      background-color: #051A12;
+      background-size: 100% 100%;
+    }
+
+    .center {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+
+    .contain {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .stretch {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .cover {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .bottom {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      -ms-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+    }
+
+    .bottomLeft {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
+    .bottomRight {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+  <script id="splash-screen-script">
+    function removeSplashFromWeb() {
+      document.getElementById("splash")?.remove();
+      document.getElementById("splash-branding")?.remove();
+      document.body.style.background = "transparent";
+    }
+  </script>
 </head>
 
 <body>
-  <!-- Loading Screen -->
+  <!-- Loading Screen - Single clean splash -->
   <div id="loading">
     <img id="loading-logo" src="icons/Icon-192.png" alt="ClubRoyale">
     <div id="loading-text">ClubRoyale</div>
@@ -216,7 +287,7 @@
   </script>
 
   <!-- Flutter Bootstrap -->
-  <script src="flutter_bootstrap.js" async></script>
+  <script src="flutter_bootstrap.js" async=""></script>
 
   <!-- Noscript Fallback -->
   <noscript>
@@ -226,6 +297,9 @@
       <p>Please enable JavaScript in your browser settings.</p>
     </div>
   </noscript>
+  <!-- Cache-busting v1.3.0 Build: 20251216-1405 | Auto-invalidates on deploy -->
+
+
 </body>
 
 </html>

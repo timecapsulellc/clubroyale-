@@ -13,7 +13,8 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore';
 
-const db = getFirestore();
+// Lazy initialization
+const db = () => getFirestore();
 
 // Configuration
 const DIAMOND_CONFIG = {
@@ -38,14 +39,14 @@ export const grantSignupBonus = onDocumentCreated('users/{userId}', async (event
     if (!userData) return;
 
     // Check if wallet already exists (shouldn't happen for new user)
-    const walletDoc = await db.collection('wallets').doc(userId).get();
+    const walletDoc = await db().collection('wallets').doc(userId).get();
     if (walletDoc.exists) {
         console.log(`Wallet already exists for user ${userId}`);
         return;
     }
 
     // Create wallet with signup bonus
-    await db.collection('wallets').doc(userId).set({
+    await db().collection('wallets').doc(userId).set({
         userId: userId,
         balance: DIAMOND_CONFIG.signupBonus,
         totalEarned: DIAMOND_CONFIG.signupBonus,
@@ -57,7 +58,7 @@ export const grantSignupBonus = onDocumentCreated('users/{userId}', async (event
     });
 
     // Record the reward
-    await db.collection('diamond_rewards').add({
+    await db().collection('diamond_rewards').add({
         userId: userId,
         type: 'signup',
         amount: DIAMOND_CONFIG.signupBonus,
@@ -66,7 +67,7 @@ export const grantSignupBonus = onDocumentCreated('users/{userId}', async (event
     });
 
     // Record transaction
-    await db.collection('transactions').add({
+    await db().collection('transactions').add({
         userId: userId,
         amount: DIAMOND_CONFIG.signupBonus,
         type: 'reward',
@@ -90,7 +91,7 @@ export const claimDailyLogin = onCall(async (request) => {
     const today = getTodayKey();
 
     // Check if already claimed today
-    const existing = await db
+    const existing = await db()
         .collection('diamond_rewards')
         .where('userId', '==', userId)
         .where('type', '==', 'daily_login')
@@ -103,9 +104,9 @@ export const claimDailyLogin = onCall(async (request) => {
     }
 
     // Grant the reward
-    const batch = db.batch();
+    const batch = db().batch();
 
-    const rewardRef = db.collection('diamond_rewards').doc();
+    const rewardRef = db().collection('diamond_rewards').doc();
     batch.set(rewardRef, {
         userId: userId,
         type: 'daily_login',
@@ -115,14 +116,14 @@ export const claimDailyLogin = onCall(async (request) => {
         claimedAt: FieldValue.serverTimestamp(),
     });
 
-    const walletRef = db.collection('wallets').doc(userId);
+    const walletRef = db().collection('wallets').doc(userId);
     batch.update(walletRef, {
         balance: FieldValue.increment(DIAMOND_CONFIG.dailyLogin),
         totalEarned: FieldValue.increment(DIAMOND_CONFIG.dailyLogin),
         lastUpdated: FieldValue.serverTimestamp(),
     });
 
-    const txRef = db.collection('transactions').doc();
+    const txRef = db().collection('transactions').doc();
     batch.set(txRef, {
         userId: userId,
         amount: DIAMOND_CONFIG.dailyLogin,
@@ -154,7 +155,7 @@ export const claimAdReward = onCall(async (request) => {
     const today = getTodayKey();
 
     // Check daily limit
-    const todayAds = await db
+    const todayAds = await db()
         .collection('diamond_rewards')
         .where('userId', '==', userId)
         .where('type', '==', 'ad_watch')
@@ -169,9 +170,9 @@ export const claimAdReward = onCall(async (request) => {
     }
 
     // Grant the reward
-    const batch = db.batch();
+    const batch = db().batch();
 
-    const rewardRef = db.collection('diamond_rewards').doc();
+    const rewardRef = db().collection('diamond_rewards').doc();
     batch.set(rewardRef, {
         userId: userId,
         type: 'ad_watch',
@@ -182,7 +183,7 @@ export const claimAdReward = onCall(async (request) => {
         claimedAt: FieldValue.serverTimestamp(),
     });
 
-    const walletRef = db.collection('wallets').doc(userId);
+    const walletRef = db().collection('wallets').doc(userId);
     batch.update(walletRef, {
         balance: FieldValue.increment(DIAMOND_CONFIG.perAdWatch),
         totalEarned: FieldValue.increment(DIAMOND_CONFIG.perAdWatch),
@@ -220,7 +221,7 @@ export const grantGameReward = onDocumentUpdated('games/{gameId}', async (event)
         if (!playerId || player.isBot) continue;
 
         // Check daily limit
-        const todayGames = await db
+        const todayGames = await db()
             .collection('diamond_rewards')
             .where('userId', '==', playerId)
             .where('type', '==', 'game_complete')
@@ -233,9 +234,9 @@ export const grantGameReward = onDocumentUpdated('games/{gameId}', async (event)
         }
 
         // Grant reward
-        const batch = db.batch();
+        const batch = db().batch();
 
-        const rewardRef = db.collection('diamond_rewards').doc();
+        const rewardRef = db().collection('diamond_rewards').doc();
         batch.set(rewardRef, {
             userId: playerId,
             type: 'game_complete',
@@ -246,7 +247,7 @@ export const grantGameReward = onDocumentUpdated('games/{gameId}', async (event)
             claimedAt: FieldValue.serverTimestamp(),
         });
 
-        const walletRef = db.collection('wallets').doc(playerId);
+        const walletRef = db().collection('wallets').doc(playerId);
         batch.update(walletRef, {
             balance: FieldValue.increment(DIAMOND_CONFIG.perGameComplete),
             totalEarned: FieldValue.increment(DIAMOND_CONFIG.perGameComplete),
@@ -270,7 +271,7 @@ export const processReferral = onDocumentCreated('referrals/{referralId}', async
     const monthKey = getMonthKey();
 
     // Check monthly limit
-    const monthlyReferrals = await db
+    const monthlyReferrals = await db()
         .collection('diamond_rewards')
         .where('userId', '==', referrerId)
         .where('type', '==', 'referral')
@@ -283,9 +284,9 @@ export const processReferral = onDocumentCreated('referrals/{referralId}', async
     }
 
     // Grant reward
-    const batch = db.batch();
+    const batch = db().batch();
 
-    const rewardRef = db.collection('diamond_rewards').doc();
+    const rewardRef = db().collection('diamond_rewards').doc();
     batch.set(rewardRef, {
         userId: referrerId,
         type: 'referral',
@@ -296,7 +297,7 @@ export const processReferral = onDocumentCreated('referrals/{referralId}', async
         claimedAt: FieldValue.serverTimestamp(),
     });
 
-    const walletRef = db.collection('wallets').doc(referrerId);
+    const walletRef = db().collection('wallets').doc(referrerId);
     batch.update(walletRef, {
         balance: FieldValue.increment(DIAMOND_CONFIG.referralBonus),
         totalEarned: FieldValue.increment(DIAMOND_CONFIG.referralBonus),

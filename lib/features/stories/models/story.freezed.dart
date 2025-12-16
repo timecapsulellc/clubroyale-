@@ -15,7 +15,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Story {
 
- String get id; String get userId; String get userName; String? get userPhotoUrl; String get mediaUrl; StoryMediaType get mediaType; DateTime get createdAt; DateTime get expiresAt; List<String> get viewedBy; int get viewCount; String? get caption; String? get textOverlay; String? get textColor;
+ String get id; String get userId; String get userName; String? get userPhotoUrl; String? get mediaUrl;// Optional - not needed for gameResult type
+ StoryMediaType get mediaType; DateTime get createdAt; DateTime get expiresAt; List<String> get viewedBy; int get viewCount; String? get caption; String? get textOverlay; String? get textColor;// Game result fields (for gameResult type)
+ String? get gameType; String? get winnerId; String? get winnerName; Map<String, int>? get scores;
 /// Create a copy of Story
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +30,16 @@ $StoryCopyWith<Story> get copyWith => _$StoryCopyWithImpl<Story>(this as Story, 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Story&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.userPhotoUrl, userPhotoUrl) || other.userPhotoUrl == userPhotoUrl)&&(identical(other.mediaUrl, mediaUrl) || other.mediaUrl == mediaUrl)&&(identical(other.mediaType, mediaType) || other.mediaType == mediaType)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&const DeepCollectionEquality().equals(other.viewedBy, viewedBy)&&(identical(other.viewCount, viewCount) || other.viewCount == viewCount)&&(identical(other.caption, caption) || other.caption == caption)&&(identical(other.textOverlay, textOverlay) || other.textOverlay == textOverlay)&&(identical(other.textColor, textColor) || other.textColor == textColor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Story&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.userPhotoUrl, userPhotoUrl) || other.userPhotoUrl == userPhotoUrl)&&(identical(other.mediaUrl, mediaUrl) || other.mediaUrl == mediaUrl)&&(identical(other.mediaType, mediaType) || other.mediaType == mediaType)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&const DeepCollectionEquality().equals(other.viewedBy, viewedBy)&&(identical(other.viewCount, viewCount) || other.viewCount == viewCount)&&(identical(other.caption, caption) || other.caption == caption)&&(identical(other.textOverlay, textOverlay) || other.textOverlay == textOverlay)&&(identical(other.textColor, textColor) || other.textColor == textColor)&&(identical(other.gameType, gameType) || other.gameType == gameType)&&(identical(other.winnerId, winnerId) || other.winnerId == winnerId)&&(identical(other.winnerName, winnerName) || other.winnerName == winnerName)&&const DeepCollectionEquality().equals(other.scores, scores));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userId,userName,userPhotoUrl,mediaUrl,mediaType,createdAt,expiresAt,const DeepCollectionEquality().hash(viewedBy),viewCount,caption,textOverlay,textColor);
+int get hashCode => Object.hash(runtimeType,id,userId,userName,userPhotoUrl,mediaUrl,mediaType,createdAt,expiresAt,const DeepCollectionEquality().hash(viewedBy),viewCount,caption,textOverlay,textColor,gameType,winnerId,winnerName,const DeepCollectionEquality().hash(scores));
 
 @override
 String toString() {
-  return 'Story(id: $id, userId: $userId, userName: $userName, userPhotoUrl: $userPhotoUrl, mediaUrl: $mediaUrl, mediaType: $mediaType, createdAt: $createdAt, expiresAt: $expiresAt, viewedBy: $viewedBy, viewCount: $viewCount, caption: $caption, textOverlay: $textOverlay, textColor: $textColor)';
+  return 'Story(id: $id, userId: $userId, userName: $userName, userPhotoUrl: $userPhotoUrl, mediaUrl: $mediaUrl, mediaType: $mediaType, createdAt: $createdAt, expiresAt: $expiresAt, viewedBy: $viewedBy, viewCount: $viewCount, caption: $caption, textOverlay: $textOverlay, textColor: $textColor, gameType: $gameType, winnerId: $winnerId, winnerName: $winnerName, scores: $scores)';
 }
 
 
@@ -48,7 +50,7 @@ abstract mixin class $StoryCopyWith<$Res>  {
   factory $StoryCopyWith(Story value, $Res Function(Story) _then) = _$StoryCopyWithImpl;
 @useResult
 $Res call({
- String id, String userId, String userName, String? userPhotoUrl, String mediaUrl, StoryMediaType mediaType, DateTime createdAt, DateTime expiresAt, List<String> viewedBy, int viewCount, String? caption, String? textOverlay, String? textColor
+ String id, String userId, String userName, String? userPhotoUrl, String? mediaUrl, StoryMediaType mediaType, DateTime createdAt, DateTime expiresAt, List<String> viewedBy, int viewCount, String? caption, String? textOverlay, String? textColor, String? gameType, String? winnerId, String? winnerName, Map<String, int>? scores
 });
 
 
@@ -65,14 +67,14 @@ class _$StoryCopyWithImpl<$Res>
 
 /// Create a copy of Story
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? userName = null,Object? userPhotoUrl = freezed,Object? mediaUrl = null,Object? mediaType = null,Object? createdAt = null,Object? expiresAt = null,Object? viewedBy = null,Object? viewCount = null,Object? caption = freezed,Object? textOverlay = freezed,Object? textColor = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? userName = null,Object? userPhotoUrl = freezed,Object? mediaUrl = freezed,Object? mediaType = null,Object? createdAt = null,Object? expiresAt = null,Object? viewedBy = null,Object? viewCount = null,Object? caption = freezed,Object? textOverlay = freezed,Object? textColor = freezed,Object? gameType = freezed,Object? winnerId = freezed,Object? winnerName = freezed,Object? scores = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
 as String,userPhotoUrl: freezed == userPhotoUrl ? _self.userPhotoUrl : userPhotoUrl // ignore: cast_nullable_to_non_nullable
-as String?,mediaUrl: null == mediaUrl ? _self.mediaUrl : mediaUrl // ignore: cast_nullable_to_non_nullable
-as String,mediaType: null == mediaType ? _self.mediaType : mediaType // ignore: cast_nullable_to_non_nullable
+as String?,mediaUrl: freezed == mediaUrl ? _self.mediaUrl : mediaUrl // ignore: cast_nullable_to_non_nullable
+as String?,mediaType: null == mediaType ? _self.mediaType : mediaType // ignore: cast_nullable_to_non_nullable
 as StoryMediaType,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
 as DateTime,viewedBy: null == viewedBy ? _self.viewedBy : viewedBy // ignore: cast_nullable_to_non_nullable
@@ -80,7 +82,11 @@ as List<String>,viewCount: null == viewCount ? _self.viewCount : viewCount // ig
 as int,caption: freezed == caption ? _self.caption : caption // ignore: cast_nullable_to_non_nullable
 as String?,textOverlay: freezed == textOverlay ? _self.textOverlay : textOverlay // ignore: cast_nullable_to_non_nullable
 as String?,textColor: freezed == textColor ? _self.textColor : textColor // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,gameType: freezed == gameType ? _self.gameType : gameType // ignore: cast_nullable_to_non_nullable
+as String?,winnerId: freezed == winnerId ? _self.winnerId : winnerId // ignore: cast_nullable_to_non_nullable
+as String?,winnerName: freezed == winnerName ? _self.winnerName : winnerName // ignore: cast_nullable_to_non_nullable
+as String?,scores: freezed == scores ? _self.scores : scores // ignore: cast_nullable_to_non_nullable
+as Map<String, int>?,
   ));
 }
 
@@ -165,10 +171,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  String userName,  String? userPhotoUrl,  String mediaUrl,  StoryMediaType mediaType,  DateTime createdAt,  DateTime expiresAt,  List<String> viewedBy,  int viewCount,  String? caption,  String? textOverlay,  String? textColor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  String userName,  String? userPhotoUrl,  String? mediaUrl,  StoryMediaType mediaType,  DateTime createdAt,  DateTime expiresAt,  List<String> viewedBy,  int viewCount,  String? caption,  String? textOverlay,  String? textColor,  String? gameType,  String? winnerId,  String? winnerName,  Map<String, int>? scores)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Story() when $default != null:
-return $default(_that.id,_that.userId,_that.userName,_that.userPhotoUrl,_that.mediaUrl,_that.mediaType,_that.createdAt,_that.expiresAt,_that.viewedBy,_that.viewCount,_that.caption,_that.textOverlay,_that.textColor);case _:
+return $default(_that.id,_that.userId,_that.userName,_that.userPhotoUrl,_that.mediaUrl,_that.mediaType,_that.createdAt,_that.expiresAt,_that.viewedBy,_that.viewCount,_that.caption,_that.textOverlay,_that.textColor,_that.gameType,_that.winnerId,_that.winnerName,_that.scores);case _:
   return orElse();
 
 }
@@ -186,10 +192,10 @@ return $default(_that.id,_that.userId,_that.userName,_that.userPhotoUrl,_that.me
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  String userName,  String? userPhotoUrl,  String mediaUrl,  StoryMediaType mediaType,  DateTime createdAt,  DateTime expiresAt,  List<String> viewedBy,  int viewCount,  String? caption,  String? textOverlay,  String? textColor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  String userName,  String? userPhotoUrl,  String? mediaUrl,  StoryMediaType mediaType,  DateTime createdAt,  DateTime expiresAt,  List<String> viewedBy,  int viewCount,  String? caption,  String? textOverlay,  String? textColor,  String? gameType,  String? winnerId,  String? winnerName,  Map<String, int>? scores)  $default,) {final _that = this;
 switch (_that) {
 case _Story():
-return $default(_that.id,_that.userId,_that.userName,_that.userPhotoUrl,_that.mediaUrl,_that.mediaType,_that.createdAt,_that.expiresAt,_that.viewedBy,_that.viewCount,_that.caption,_that.textOverlay,_that.textColor);case _:
+return $default(_that.id,_that.userId,_that.userName,_that.userPhotoUrl,_that.mediaUrl,_that.mediaType,_that.createdAt,_that.expiresAt,_that.viewedBy,_that.viewCount,_that.caption,_that.textOverlay,_that.textColor,_that.gameType,_that.winnerId,_that.winnerName,_that.scores);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -206,10 +212,10 @@ return $default(_that.id,_that.userId,_that.userName,_that.userPhotoUrl,_that.me
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  String userName,  String? userPhotoUrl,  String mediaUrl,  StoryMediaType mediaType,  DateTime createdAt,  DateTime expiresAt,  List<String> viewedBy,  int viewCount,  String? caption,  String? textOverlay,  String? textColor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  String userName,  String? userPhotoUrl,  String? mediaUrl,  StoryMediaType mediaType,  DateTime createdAt,  DateTime expiresAt,  List<String> viewedBy,  int viewCount,  String? caption,  String? textOverlay,  String? textColor,  String? gameType,  String? winnerId,  String? winnerName,  Map<String, int>? scores)?  $default,) {final _that = this;
 switch (_that) {
 case _Story() when $default != null:
-return $default(_that.id,_that.userId,_that.userName,_that.userPhotoUrl,_that.mediaUrl,_that.mediaType,_that.createdAt,_that.expiresAt,_that.viewedBy,_that.viewCount,_that.caption,_that.textOverlay,_that.textColor);case _:
+return $default(_that.id,_that.userId,_that.userName,_that.userPhotoUrl,_that.mediaUrl,_that.mediaType,_that.createdAt,_that.expiresAt,_that.viewedBy,_that.viewCount,_that.caption,_that.textOverlay,_that.textColor,_that.gameType,_that.winnerId,_that.winnerName,_that.scores);case _:
   return null;
 
 }
@@ -221,14 +227,15 @@ return $default(_that.id,_that.userId,_that.userName,_that.userPhotoUrl,_that.me
 @JsonSerializable()
 
 class _Story extends Story {
-  const _Story({required this.id, required this.userId, required this.userName, this.userPhotoUrl, required this.mediaUrl, this.mediaType = StoryMediaType.photo, required this.createdAt, required this.expiresAt, final  List<String> viewedBy = const [], this.viewCount = 0, this.caption, this.textOverlay, this.textColor}): _viewedBy = viewedBy,super._();
+  const _Story({required this.id, required this.userId, required this.userName, this.userPhotoUrl, this.mediaUrl, this.mediaType = StoryMediaType.photo, required this.createdAt, required this.expiresAt, final  List<String> viewedBy = const [], this.viewCount = 0, this.caption, this.textOverlay, this.textColor, this.gameType, this.winnerId, this.winnerName, final  Map<String, int>? scores}): _viewedBy = viewedBy,_scores = scores,super._();
   factory _Story.fromJson(Map<String, dynamic> json) => _$StoryFromJson(json);
 
 @override final  String id;
 @override final  String userId;
 @override final  String userName;
 @override final  String? userPhotoUrl;
-@override final  String mediaUrl;
+@override final  String? mediaUrl;
+// Optional - not needed for gameResult type
 @override@JsonKey() final  StoryMediaType mediaType;
 @override final  DateTime createdAt;
 @override final  DateTime expiresAt;
@@ -243,6 +250,19 @@ class _Story extends Story {
 @override final  String? caption;
 @override final  String? textOverlay;
 @override final  String? textColor;
+// Game result fields (for gameResult type)
+@override final  String? gameType;
+@override final  String? winnerId;
+@override final  String? winnerName;
+ final  Map<String, int>? _scores;
+@override Map<String, int>? get scores {
+  final value = _scores;
+  if (value == null) return null;
+  if (_scores is EqualUnmodifiableMapView) return _scores;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
 
 /// Create a copy of Story
 /// with the given fields replaced by the non-null parameter values.
@@ -257,16 +277,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Story&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.userPhotoUrl, userPhotoUrl) || other.userPhotoUrl == userPhotoUrl)&&(identical(other.mediaUrl, mediaUrl) || other.mediaUrl == mediaUrl)&&(identical(other.mediaType, mediaType) || other.mediaType == mediaType)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&const DeepCollectionEquality().equals(other._viewedBy, _viewedBy)&&(identical(other.viewCount, viewCount) || other.viewCount == viewCount)&&(identical(other.caption, caption) || other.caption == caption)&&(identical(other.textOverlay, textOverlay) || other.textOverlay == textOverlay)&&(identical(other.textColor, textColor) || other.textColor == textColor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Story&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.userPhotoUrl, userPhotoUrl) || other.userPhotoUrl == userPhotoUrl)&&(identical(other.mediaUrl, mediaUrl) || other.mediaUrl == mediaUrl)&&(identical(other.mediaType, mediaType) || other.mediaType == mediaType)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&const DeepCollectionEquality().equals(other._viewedBy, _viewedBy)&&(identical(other.viewCount, viewCount) || other.viewCount == viewCount)&&(identical(other.caption, caption) || other.caption == caption)&&(identical(other.textOverlay, textOverlay) || other.textOverlay == textOverlay)&&(identical(other.textColor, textColor) || other.textColor == textColor)&&(identical(other.gameType, gameType) || other.gameType == gameType)&&(identical(other.winnerId, winnerId) || other.winnerId == winnerId)&&(identical(other.winnerName, winnerName) || other.winnerName == winnerName)&&const DeepCollectionEquality().equals(other._scores, _scores));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userId,userName,userPhotoUrl,mediaUrl,mediaType,createdAt,expiresAt,const DeepCollectionEquality().hash(_viewedBy),viewCount,caption,textOverlay,textColor);
+int get hashCode => Object.hash(runtimeType,id,userId,userName,userPhotoUrl,mediaUrl,mediaType,createdAt,expiresAt,const DeepCollectionEquality().hash(_viewedBy),viewCount,caption,textOverlay,textColor,gameType,winnerId,winnerName,const DeepCollectionEquality().hash(_scores));
 
 @override
 String toString() {
-  return 'Story(id: $id, userId: $userId, userName: $userName, userPhotoUrl: $userPhotoUrl, mediaUrl: $mediaUrl, mediaType: $mediaType, createdAt: $createdAt, expiresAt: $expiresAt, viewedBy: $viewedBy, viewCount: $viewCount, caption: $caption, textOverlay: $textOverlay, textColor: $textColor)';
+  return 'Story(id: $id, userId: $userId, userName: $userName, userPhotoUrl: $userPhotoUrl, mediaUrl: $mediaUrl, mediaType: $mediaType, createdAt: $createdAt, expiresAt: $expiresAt, viewedBy: $viewedBy, viewCount: $viewCount, caption: $caption, textOverlay: $textOverlay, textColor: $textColor, gameType: $gameType, winnerId: $winnerId, winnerName: $winnerName, scores: $scores)';
 }
 
 
@@ -277,7 +297,7 @@ abstract mixin class _$StoryCopyWith<$Res> implements $StoryCopyWith<$Res> {
   factory _$StoryCopyWith(_Story value, $Res Function(_Story) _then) = __$StoryCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String userId, String userName, String? userPhotoUrl, String mediaUrl, StoryMediaType mediaType, DateTime createdAt, DateTime expiresAt, List<String> viewedBy, int viewCount, String? caption, String? textOverlay, String? textColor
+ String id, String userId, String userName, String? userPhotoUrl, String? mediaUrl, StoryMediaType mediaType, DateTime createdAt, DateTime expiresAt, List<String> viewedBy, int viewCount, String? caption, String? textOverlay, String? textColor, String? gameType, String? winnerId, String? winnerName, Map<String, int>? scores
 });
 
 
@@ -294,14 +314,14 @@ class __$StoryCopyWithImpl<$Res>
 
 /// Create a copy of Story
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? userName = null,Object? userPhotoUrl = freezed,Object? mediaUrl = null,Object? mediaType = null,Object? createdAt = null,Object? expiresAt = null,Object? viewedBy = null,Object? viewCount = null,Object? caption = freezed,Object? textOverlay = freezed,Object? textColor = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? userName = null,Object? userPhotoUrl = freezed,Object? mediaUrl = freezed,Object? mediaType = null,Object? createdAt = null,Object? expiresAt = null,Object? viewedBy = null,Object? viewCount = null,Object? caption = freezed,Object? textOverlay = freezed,Object? textColor = freezed,Object? gameType = freezed,Object? winnerId = freezed,Object? winnerName = freezed,Object? scores = freezed,}) {
   return _then(_Story(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
 as String,userPhotoUrl: freezed == userPhotoUrl ? _self.userPhotoUrl : userPhotoUrl // ignore: cast_nullable_to_non_nullable
-as String?,mediaUrl: null == mediaUrl ? _self.mediaUrl : mediaUrl // ignore: cast_nullable_to_non_nullable
-as String,mediaType: null == mediaType ? _self.mediaType : mediaType // ignore: cast_nullable_to_non_nullable
+as String?,mediaUrl: freezed == mediaUrl ? _self.mediaUrl : mediaUrl // ignore: cast_nullable_to_non_nullable
+as String?,mediaType: null == mediaType ? _self.mediaType : mediaType // ignore: cast_nullable_to_non_nullable
 as StoryMediaType,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
 as DateTime,viewedBy: null == viewedBy ? _self._viewedBy : viewedBy // ignore: cast_nullable_to_non_nullable
@@ -309,7 +329,11 @@ as List<String>,viewCount: null == viewCount ? _self.viewCount : viewCount // ig
 as int,caption: freezed == caption ? _self.caption : caption // ignore: cast_nullable_to_non_nullable
 as String?,textOverlay: freezed == textOverlay ? _self.textOverlay : textOverlay // ignore: cast_nullable_to_non_nullable
 as String?,textColor: freezed == textColor ? _self.textColor : textColor // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,gameType: freezed == gameType ? _self.gameType : gameType // ignore: cast_nullable_to_non_nullable
+as String?,winnerId: freezed == winnerId ? _self.winnerId : winnerId // ignore: cast_nullable_to_non_nullable
+as String?,winnerName: freezed == winnerName ? _self.winnerName : winnerName // ignore: cast_nullable_to_non_nullable
+as String?,scores: freezed == scores ? _self._scores : scores // ignore: cast_nullable_to_non_nullable
+as Map<String, int>?,
   ));
 }
 

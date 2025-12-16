@@ -46,7 +46,8 @@ const https_1 = require("firebase-functions/v2/https");
 const admin = __importStar(require("firebase-admin"));
 const config_1 = require("./config");
 const utils_1 = require("./utils");
-const firestore = admin.firestore();
+// Lazy initialization
+const getDb = () => admin.firestore();
 exports.upgradeToVerified = (0, https_1.onCall)(async (request) => {
     const userId = request.auth?.uid;
     if (!userId) {
@@ -69,8 +70,8 @@ exports.upgradeToVerified = (0, https_1.onCall)(async (request) => {
         throw new https_1.HttpsError('failed-precondition', 'Phone verification required before upgrading.');
     }
     // Deduct fee and upgrade
-    await firestore.runTransaction(async (transaction) => {
-        const userRef = firestore.collection('users').doc(userId);
+    await getDb().runTransaction(async (transaction) => {
+        const userRef = getDb().collection('users').doc(userId);
         // 1. Burn fee
         // We update balance and origin tracking.
         // Spec says fee is burned. We treat it as spending, but we also record a specific burn ledger entry.
@@ -81,7 +82,7 @@ exports.upgradeToVerified = (0, https_1.onCall)(async (request) => {
             verifiedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
         // 2. Record burn in ledger
-        const burnRef = firestore.collection('diamond_ledger').doc();
+        const burnRef = getDb().collection('diamond_ledger').doc();
         transaction.set(burnRef, {
             type: 'burn',
             fromUserId: userId,

@@ -9,7 +9,8 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import * as admin from 'firebase-admin';
 import { daysSince, sendAdminAlert, resetDailyLimits } from './utils';
 
-const firestore = admin.firestore();
+// Lazy initialization
+const getDb = () => admin.firestore();
 
 // ============ AUTOMATIC TIER UPGRADE CHECK ============
 // Runs every hour to promote eligible users
@@ -18,12 +19,12 @@ export const checkTierUpgrade = onSchedule({
     timeZone: 'Asia/Kolkata',
 }, async (event) => {
     // Check 'verified' users for promotion to 'trusted'
-    const verifiedUsersSnapshot = await firestore
+    const verifiedUsersSnapshot = await getDb()
         .collection('users')
         .where('tier', '==', 'verified')
         .get();
 
-    const batch = firestore.batch();
+    const batch = getDb().batch();
     let upgradeCount = 0;
 
     for (const doc of verifiedUsersSnapshot.docs) {
@@ -64,17 +65,17 @@ export const monitorDiamondSupply = onSchedule({
     try {
         // 1. Calculate Circulating Supply
         // NOTE: In a massive app, scanning all users is expensive. 
-        const aggregateSnapshot = await firestore.collection('users').count().get();
+        const aggregateSnapshot = await getDb().collection('users').count().get();
         const userCount = aggregateSnapshot.data().count;
 
-        const sumSnapshot = await firestore.collection('users').aggregate({
+        const sumSnapshot = await getDb().collection('users').aggregate({
             totalBalance: admin.firestore.AggregateField.sum('diamondBalance')
         }).get();
 
         const totalSupply = sumSnapshot.data().totalBalance || 0;
 
         // 2. Get yesterday's supply to calc inflation
-        const metricsRef = firestore.collection('supply_metrics');
+        const metricsRef = getDb().collection('supply_metrics');
         const lastMetricQuery = await metricsRef.orderBy('timestamp', 'desc').limit(1).get();
         let yesterdaySupply = 0;
         if (!lastMetricQuery.empty) {

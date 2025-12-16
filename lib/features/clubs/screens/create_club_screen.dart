@@ -2,8 +2,10 @@
 /// 
 /// Form to create a new gaming club
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:clubroyale/features/clubs/club_model.dart';
 import 'package:clubroyale/features/clubs/club_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
@@ -23,6 +25,15 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
   ClubPrivacy _privacy = ClubPrivacy.public;
   final Set<String> _gameTypes = {'marriage'};
   bool _isLoading = false;
+  File? _imageFile;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+    if (picked != null) {
+      setState(() => _imageFile = File(picked.path));
+    }
+  }
 
   @override
   void dispose() {
@@ -44,27 +55,33 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Club avatar placeholder
+              // Club avatar picker
               Center(
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                      child: const Icon(Icons.groups, size: 48),
-                    ),
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: CircleAvatar(
-                        radius: 18,
-                        child: IconButton(
-                          icon: const Icon(Icons.camera_alt, size: 18),
-                          onPressed: () {},
+                child: GestureDetector(
+                  onTap: _pickImage,
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                        backgroundImage: _imageFile != null ? FileImage(_imageFile!) : null,
+                        child: _imageFile == null 
+                          ? const Icon(Icons.groups, size: 48) 
+                          : null,
+                      ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: CircleAvatar(
+                          radius: 18,
+                          child: IconButton(
+                            icon: const Icon(Icons.camera_alt, size: 18),
+                            onPressed: _pickImage,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -97,7 +114,7 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Privacy
+              // Privacy (Keep existing)
               Text('Privacy', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
               SegmentedButton<ClubPrivacy>(
@@ -117,15 +134,10 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
                 onSelectionChanged: (s) => setState(() => _privacy = s.first),
               ),
               const SizedBox(height: 8),
-              Text(
-                _privacy == ClubPrivacy.public
-                    ? 'Anyone can join this club'
-                    : 'Members must be invited',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              
               const SizedBox(height: 24),
 
-              // Game Types
+              // Game Types (Keep existing)
               Text('Games Played', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
               Wrap(
@@ -138,14 +150,7 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
                       s ? _gameTypes.add('marriage') : _gameTypes.remove('marriage');
                     }),
                   ),
-                  FilterChip(
-                    label: const Text('Call Break'),
-                    selected: _gameTypes.contains('call_break'),
-                    onSelected: (s) => setState(() {
-                      s ? _gameTypes.add('call_break') : _gameTypes.remove('call_break');
-                    }),
-                  ),
-                  FilterChip(
+                   FilterChip(
                     label: const Text('Teen Patti'),
                     selected: _gameTypes.contains('teen_patti'),
                     onSelected: (s) => setState(() {
@@ -184,6 +189,11 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
       final user = auth.currentUser;
       if (user == null) throw Exception('Not logged in');
 
+      String? avatarUrl;
+      if (_imageFile != null) {
+        avatarUrl = await ref.read(clubServiceProvider).uploadClubAvatar(_imageFile!);
+      }
+
       final clubId = await ref.read(clubServiceProvider).createClub(
         ownerId: user.uid,
         ownerName: user.displayName ?? 'Host',
@@ -191,6 +201,7 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
         description: _descriptionController.text,
         privacy: _privacy,
         gameTypes: _gameTypes.toList(),
+        avatarUrl: avatarUrl,
       );
 
       if (mounted) {

@@ -12,7 +12,8 @@ import * as admin from 'firebase-admin';
 import { DAILY_LOGIN_REWARD, LOGIN_STREAK_BONUSES, getNextMilestone, isSameDay, isYesterday } from './config';
 import { grantDiamondsToUser, getUser } from './utils';
 
-const firestore = admin.firestore();
+// Lazy initialization
+const getDb = () => admin.firestore();
 
 interface DailyLoginResponse {
     success: boolean;
@@ -69,7 +70,7 @@ export const claimDailyLogin = onCall(async (request): Promise<DailyLoginRespons
     await grantDiamondsToUser(userId, reward, 'dailyLogin', reason);
 
     // Update user streak data
-    await firestore.collection('users').doc(userId).update({
+    await getDb().collection('users').doc(userId).update({
         loginStreak: streakDays,
         lastDailyLoginClaim: admin.firestore.FieldValue.serverTimestamp(),
         lastActive: admin.firestore.FieldValue.serverTimestamp(),

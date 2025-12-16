@@ -56,6 +56,8 @@ dependencies:
   firebase_messaging: ^16.0.4
   timeago: ^3.7.1
   url_launcher: ^6.3.2
+  firebase_database: ^12.1.1
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +71,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.3
   integration_test:
     sdk: flutter
+  flutter_native_splash: ^2.4.7
 
 flutter:
   uses-material-design: true
@@ -78,3 +81,21 @@ flutter:
     - assets/images/
     - assets/images/chips/
     - assets/store/
+
+flutter_native_splash:
+  color: "#1a0a2e"
+  image: assets/images/logo.png
+  android_12:
+    image: assets/images/logo.png
+    color: "#1a0a2e"
+  fullscreen: true
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
+  web:
+    generate: true
+    image_path: "assets/images/logo.png"
+    background_color: "#1a0a2e"
+    theme_color: "#6b21a8"

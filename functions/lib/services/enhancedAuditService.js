@@ -9,7 +9,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EnhancedAuditService = void 0;
 const firestore_1 = require("firebase-admin/firestore");
-const db = (0, firestore_1.getFirestore)();
+// Lazy initialization to avoid calling getFirestore() before initializeApp()
+let _db = null;
+const db = () => {
+    if (!_db) {
+        _db = (0, firestore_1.getFirestore)();
+    }
+    return _db;
+};
 // ============ Collections ============
 const COLLECTIONS = {
     GAME_EVENTS: 'audit_game_events',
@@ -23,19 +30,19 @@ const COLLECTIONS = {
 exports.EnhancedAuditService = {
     // ============ Event Logging ============
     async logGameEvent(event) {
-        await db.collection(COLLECTIONS.GAME_EVENTS).add({
+        await db().collection(COLLECTIONS.GAME_EVENTS).add({
             ...event,
             timestamp: firestore_1.FieldValue.serverTimestamp(),
         });
     },
     async logDeal(audit) {
-        await db.collection(COLLECTIONS.DEAL_AUDITS).add({
+        await db().collection(COLLECTIONS.DEAL_AUDITS).add({
             ...audit,
             timestamp: firestore_1.FieldValue.serverTimestamp(),
         });
     },
     async logMove(audit) {
-        await db.collection(COLLECTIONS.MOVE_AUDITS).add({
+        await db().collection(COLLECTIONS.MOVE_AUDITS).add({
             ...audit,
             timestamp: firestore_1.FieldValue.serverTimestamp(),
         });
@@ -43,7 +50,7 @@ exports.EnhancedAuditService = {
         await this.checkMoveAnomalies(audit);
     },
     async flagSuspicious(activity) {
-        await db.collection(COLLECTIONS.SUSPICIOUS).add({
+        await db().collection(COLLECTIONS.SUSPICIOUS).add({
             ...activity,
             timestamp: firestore_1.FieldValue.serverTimestamp(),
         });
@@ -91,7 +98,7 @@ exports.EnhancedAuditService = {
     },
     async getRecentInvalidMoves(playerId, minutes) {
         const cutoff = new Date(Date.now() - minutes * 60 * 1000);
-        const snapshot = await db.collection(COLLECTIONS.MOVE_AUDITS)
+        const snapshot = await db().collection(COLLECTIONS.MOVE_AUDITS)
             .where('playerId', '==', playerId)
             .where('isValid', '==', false)
             .where('timestamp', '>=', firestore_1.Timestamp.fromDate(cutoff))
@@ -163,7 +170,7 @@ exports.EnhancedAuditService = {
         return { score: Math.min(score, 1.0), indicators };
     },
     async getRoomMoves(roomId) {
-        const snapshot = await db.collection(COLLECTIONS.MOVE_AUDITS)
+        const snapshot = await db().collection(COLLECTIONS.MOVE_AUDITS)
             .where('roomId', '==', roomId)
             .orderBy('timestamp')
             .get();
@@ -171,8 +178,8 @@ exports.EnhancedAuditService = {
     },
     // ============ Player Stats ============
     async incrementPlayerFlag(playerId, type, severity) {
-        const ref = db.collection(COLLECTIONS.PLAYER_STATS).doc(playerId);
-        await db.runTransaction(async (txn) => {
+        const ref = db().collection(COLLECTIONS.PLAYER_STATS).doc(playerId);
+        await db().runTransaction(async (txn) => {
             const doc = await txn.get(ref);
             const data = doc.exists ? doc.data() : { flags: {}, totalFlags: 0, weightedScore: 0 };
             const flags = data.flags || {};
@@ -189,7 +196,7 @@ exports.EnhancedAuditService = {
         });
     },
     async flagUserForReview(playerId, reason, details) {
-        const ref = db.collection(COLLECTIONS.FLAGGED_USERS).doc(playerId);
+        const ref = db().collection(COLLECTIONS.FLAGGED_USERS).doc(playerId);
         const doc = await ref.get();
         if (doc.exists) {
             await ref.update({
@@ -220,12 +227,12 @@ exports.EnhancedAuditService = {
         }
     },
     async getPlayerStats(playerId) {
-        const doc = await db.collection(COLLECTIONS.PLAYER_STATS).doc(playerId).get();
+        const doc = await db().collection(COLLECTIONS.PLAYER_STATS).doc(playerId).get();
         return doc.exists ? doc.data() : null;
     },
     // ============ Fairness Verification ============
     async verifyDealFairness(roomId, roundNumber) {
-        const dealDoc = await db.collection(COLLECTIONS.DEAL_AUDITS)
+        const dealDoc = await db().collection(COLLECTIONS.DEAL_AUDITS)
             .where('roomId', '==', roomId)
             .where('roundNumber', '==', roundNumber)
             .limit(1)
@@ -245,9 +252,9 @@ exports.EnhancedAuditService = {
     // ============ Reporting ============
     async getAuditSummary(roomId) {
         const [moves, suspicious, events] = await Promise.all([
-            db.collection(COLLECTIONS.MOVE_AUDITS).where('roomId', '==', roomId).count().get(),
-            db.collection(COLLECTIONS.SUSPICIOUS).where('roomId', '==', roomId).count().get(),
-            db.collection(COLLECTIONS.GAME_EVENTS).where('roomId', '==', roomId).count().get(),
+            db().collection(COLLECTIONS.MOVE_AUDITS).where('roomId', '==', roomId).count().get(),
+            db().collection(COLLECTIONS.SUSPICIOUS).where('roomId', '==', roomId).count().get(),
+            db().collection(COLLECTIONS.GAME_EVENTS).where('roomId', '==', roomId).count().get(),
         ]);
         return {
             roomId,

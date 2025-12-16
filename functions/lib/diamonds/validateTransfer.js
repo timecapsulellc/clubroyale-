@@ -46,7 +46,8 @@ const https_1 = require("firebase-functions/v2/https");
 const admin = __importStar(require("firebase-admin"));
 const config_1 = require("./config");
 const utils_1 = require("./utils");
-const firestore = admin.firestore();
+// Lazy initialization
+const getDb = () => admin.firestore();
 /**
  * Validate and execute P2P diamond transfer
  */
@@ -87,9 +88,9 @@ exports.validateTransfer = (0, https_1.onCall)(async (request) => {
     const transferFee = Math.floor(amount * config_1.TRANSFER_FEE_PERCENT);
     const netAmount = amount - transferFee;
     // 6. Execute transfer atomically
-    await firestore.runTransaction(async (transaction) => {
-        const senderRef = firestore.collection('users').doc(senderId);
-        const receiverRef = firestore.collection('users').doc(receiverId);
+    await getDb().runTransaction(async (transaction) => {
+        const senderRef = getDb().collection('users').doc(senderId);
+        const receiverRef = getDb().collection('users').doc(receiverId);
         // Verify receiver exists
         const receiverDoc = await transaction.get(receiverRef);
         if (!receiverDoc.exists) {
@@ -127,7 +128,7 @@ exports.validateTransfer = (0, https_1.onCall)(async (request) => {
             previousHash: previousEntry?.auditHash || 'GENESIS',
             timestamp: Date.now(),
         });
-        const ledgerRef = firestore.collection('diamond_ledger').doc();
+        const ledgerRef = getDb().collection('diamond_ledger').doc();
         transaction.set(ledgerRef, {
             type: 'transfer',
             fromUserId: senderId,
@@ -142,7 +143,7 @@ exports.validateTransfer = (0, https_1.onCall)(async (request) => {
             sequenceNumber: (previousEntry?.sequenceNumber || 0) + 1,
         });
         // Record fee burn separately
-        const burnRef = firestore.collection('diamond_ledger').doc();
+        const burnRef = getDb().collection('diamond_ledger').doc();
         transaction.set(burnRef, {
             type: 'burn',
             fromUserId: senderId,

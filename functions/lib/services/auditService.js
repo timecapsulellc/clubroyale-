@@ -7,7 +7,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkReactionTime = exports.logSuspiciousActivity = exports.logMove = exports.AuditService = void 0;
 const firestore_1 = require("firebase-admin/firestore");
-const db = (0, firestore_1.getFirestore)();
 // Audit service class
 class AuditService {
     /**
@@ -18,7 +17,7 @@ class AuditService {
             ...entry,
             serverTimestamp: firestore_1.FieldValue.serverTimestamp(),
         };
-        await db.collection('matches').doc(matchId).update({
+        await (0, firestore_1.getFirestore)().collection('matches').doc(matchId).update({
             auditLog: firestore_1.FieldValue.arrayUnion(auditEntry),
         });
     }
@@ -32,12 +31,12 @@ class AuditService {
             timestamp: firestore_1.FieldValue.serverTimestamp(),
         };
         // Add to match document
-        await db.collection('matches').doc(matchId).update({
+        await (0, firestore_1.getFirestore)().collection('matches').doc(matchId).update({
             suspiciousActivity: firestore_1.FieldValue.arrayUnion(entry),
         });
         // If high severity, also add to flagged users collection
         if (activity.severity === 'high') {
-            await db.collection('flaggedUsers').doc(activity.userId).set({
+            await (0, firestore_1.getFirestore)().collection('flaggedUsers').doc(activity.userId).set({
                 matchId,
                 reason: activity.reason,
                 severity: activity.severity,
@@ -47,7 +46,8 @@ class AuditService {
             }, { merge: true });
         }
         // Track violation count for user
-        await db
+        // Track violation count for user
+        await (0, firestore_1.getFirestore)()
             .collection('userStats')
             .doc(activity.userId)
             .set({
@@ -73,7 +73,7 @@ class AuditService {
      * Check for repeated violations
      */
     static async checkRepeatedViolations(userId, threshold = 5) {
-        const userStats = await db.collection('userStats').doc(userId).get();
+        const userStats = await (0, firestore_1.getFirestore)().collection('userStats').doc(userId).get();
         if (!userStats.exists)
             return false;
         const data = userStats.data();
@@ -84,14 +84,14 @@ class AuditService {
      * Get all suspicious activity for a match
      */
     static async getMatchSuspiciousActivity(matchId) {
-        const match = await db.collection('matches').doc(matchId).get();
+        const match = await (0, firestore_1.getFirestore)().collection('matches').doc(matchId).get();
         return match.data()?.suspiciousActivity || [];
     }
     /**
      * Get flagged users for review
      */
     static async getFlaggedUsers(limit = 50) {
-        const snapshot = await db
+        const snapshot = await (0, firestore_1.getFirestore)()
             .collection('flaggedUsers')
             .where('reviewed', '==', false)
             .orderBy('timestamp', 'desc')
@@ -106,13 +106,13 @@ class AuditService {
      * Mark a flagged user as reviewed
      */
     static async markReviewed(userId, action) {
-        await db.collection('flaggedUsers').doc(userId).update({
+        await (0, firestore_1.getFirestore)().collection('flaggedUsers').doc(userId).update({
             reviewed: true,
             reviewAction: action,
             reviewedAt: firestore_1.FieldValue.serverTimestamp(),
         });
         if (action === 'banned') {
-            await db.collection('users').doc(userId).update({
+            await (0, firestore_1.getFirestore)().collection('users').doc(userId).update({
                 isBanned: true,
                 bannedAt: firestore_1.FieldValue.serverTimestamp(),
             });

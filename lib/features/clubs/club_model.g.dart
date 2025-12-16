@@ -14,6 +14,7 @@ _Club _$ClubFromJson(Map<String, dynamic> json) => _Club(
   ownerName: json['ownerName'] as String,
   avatarUrl: json['avatarUrl'] as String?,
   bannerUrl: json['bannerUrl'] as String?,
+  chatId: json['chatId'] as String?,
   privacy:
       $enumDecodeNullable(_$ClubPrivacyEnumMap, json['privacy']) ??
       ClubPrivacy.public,
@@ -42,6 +43,7 @@ Map<String, dynamic> _$ClubToJson(_Club instance) => <String, dynamic>{
   'ownerName': instance.ownerName,
   'avatarUrl': instance.avatarUrl,
   'bannerUrl': instance.bannerUrl,
+  'chatId': instance.chatId,
   'privacy': _$ClubPrivacyEnumMap[instance.privacy]!,
   'memberIds': instance.memberIds,
   'memberCount': instance.memberCount,

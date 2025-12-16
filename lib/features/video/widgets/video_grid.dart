@@ -106,16 +106,39 @@ class VideoGridWidget extends ConsumerWidget {
       return const Center(child: Text('Waiting for participants...'));
     }
 
-    // Calculate grid layout based on participant count
-    final int columns = participants.length <= 2 ? participants.length : 2;
-    final int rows = (participants.length / columns).ceil();
+    // Calculate optimal grid layout for 1-8 participants
+    // 1: 1x1
+    // 2: 2x1 (side by side)
+    // 3-4: 2x2
+    // 5-6: 2x3
+    // 7-8: 2x4 or 3x3
+    final int count = participants.length;
+    int columns;
+    double aspectRatio;
+    
+    if (count == 1) {
+      columns = 1;
+      aspectRatio = 4 / 3;
+    } else if (count == 2) {
+      columns = 2;
+      aspectRatio = 4 / 3;
+    } else if (count <= 4) {
+      columns = 2;
+      aspectRatio = 4 / 3;
+    } else if (count <= 6) {
+      columns = 2;
+      aspectRatio = 3 / 4; // Taller tiles for more rows
+    } else {
+      columns = 3; // 3x3 for 7-8 participants
+      aspectRatio = 1.0; // Square tiles
+    }
 
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: columns,
-        childAspectRatio: 4 / 3,
+        childAspectRatio: aspectRatio,
         crossAxisSpacing: 4,
         mainAxisSpacing: 4,
       ),

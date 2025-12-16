@@ -8,13 +8,14 @@ import * as admin from 'firebase-admin';
 import * as crypto from 'crypto';
 import { DiamondOrigin } from './config';
 
-const firestore = admin.firestore();
+// Lazy initialization
+const getDb = (): admin.firestore.Firestore => admin.firestore();
 
 /**
  * Get user data from Firestore
  */
 export async function getUser(userId: string): Promise<admin.firestore.DocumentData> {
-    const doc = await firestore.collection('users').doc(userId).get();
+    const doc = await getDb().collection('users').doc(userId).get();
     if (!doc.exists) {
         throw new Error(`User ${userId} not found`);
     }
@@ -30,9 +31,9 @@ export async function grantDiamondsToUser(
     origin: DiamondOrigin,
     reason: string
 ): Promise<void> {
-    const userRef = firestore.collection('users').doc(userId);
+    const userRef = getDb().collection('users').doc(userId);
 
-    await firestore.runTransaction(async (transaction) => {
+    await getDb().runTransaction(async (transaction) => {
         // Update user balance and origin tracking
         transaction.update(userRef, {
             diamondBalance: admin.firestore.FieldValue.increment(amount),
@@ -52,7 +53,7 @@ export async function grantDiamondsToUser(
             timestamp: Date.now(),
         });
 
-        const ledgerRef = firestore.collection('diamond_ledger').doc();
+        const ledgerRef = getDb().collection('diamond_ledger').doc();
         transaction.set(ledgerRef, {
             type: 'earn',
             fromUserId: null,
@@ -75,7 +76,7 @@ export async function getLastLedgerEntry(): Promise<{
     auditHash: string;
     sequenceNumber: number;
 } | null> {
-    const snapshot = await firestore
+    const snapshot = await getDb()
         .collection('diamond_ledger')
         .orderBy('sequenceNumber', 'desc')
         .limit(1)
@@ -114,11 +115,11 @@ export function generateAuditHash(data: Record<string, unknown>): string {
  * Reset daily limits (called by scheduled function at midnight)
  */
 export async function resetDailyLimits(): Promise<number> {
-    const usersRef = firestore.collection('users');
+    const usersRef = getDb().collection('users');
     const snapshot = await usersRef.get();
 
     let resetCount = 0;
-    const batch = firestore.batch();
+    const batch = getDb().batch();
 
     snapshot.docs.forEach((doc) => {
         batch.update(doc.ref, {
@@ -141,7 +142,7 @@ export async function sendAdminAlert(alert: {
     message: string;
     data?: Record<string, unknown>;
 }): Promise<void> {
-    await firestore.collection('admin_alerts').add({
+    await getDb().collection('admin_alerts').add({
         ...alert,
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
         acknowledged: false,
@@ -160,7 +161,7 @@ export async function verifyGameResult(
     result: string
 ): Promise<{ verified: boolean }> {
     try {
-        const gameDoc = await firestore.collection('games').doc(gameId).get();
+        const gameDoc = await getDb().collection('games').doc(gameId).get();
         if (!gameDoc.exists) {
             return { verified: false };
         }
@@ -185,7 +186,7 @@ export async function verifyGameResult(
         }
 
         // Mark reward as claimed
-        await firestore.collection('games').doc(gameId).update({
+        await getDb().collection('games').doc(gameId).update({
             claimedRewards: admin.firestore.FieldValue.arrayUnion(userId),
         });
 

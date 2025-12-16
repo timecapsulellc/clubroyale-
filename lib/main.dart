@@ -5,17 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:clubroyale/firebase_options.dart';
 import 'core/services/analytics_service.dart';
 
 import 'features/lobby/lobby_screen.dart';
 import 'features/lobby/room_waiting_screen.dart';
-import 'features/splash/splash_screen.dart';
 import 'features/game/game_screen.dart';
-import 'core/theme/app_theme.dart';
 import 'core/theme/multi_theme.dart';
-import 'core/config/club_royale_theme.dart';
 import 'features/game/game_history_screen.dart';
 import 'games/call_break/call_break_screen.dart';
 import 'features/leaderboard/leaderboard_screen.dart';
@@ -40,14 +36,12 @@ import 'package:clubroyale/features/admin/screens/admin_panel_screen.dart';
 import 'package:clubroyale/features/admin/screens/grant_request_screen.dart';
 import 'package:clubroyale/features/admin/screens/pending_approvals_screen.dart';
 import 'package:clubroyale/features/settings/settings_screen.dart';
-import 'package:clubroyale/core/config/game_settings.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 // Stories imports
 import 'package:clubroyale/features/stories/screens/story_viewer_screen.dart';
 import 'package:clubroyale/features/stories/screens/story_creator_screen.dart';
 import 'package:clubroyale/features/stories/models/story.dart';
 // Voice Room imports
-import 'package:clubroyale/features/social/voice_rooms/screens/voice_room_screen.dart';
+import 'package:clubroyale/features/social/screens/voice_room_screen.dart';
 // Enhanced Profile imports
 import 'package:clubroyale/features/profile/screens/profile_view_screen.dart';
 import 'package:clubroyale/features/profile/screens/followers_list_screen.dart';
@@ -67,6 +61,9 @@ import 'package:clubroyale/features/info/screens/landing_page.dart';
 import 'package:clubroyale/features/info/screens/privacy_screen.dart';
 
 // Social & Gaming Features imports
+import 'package:clubroyale/features/social/screens/chat_list_screen.dart';
+import 'package:clubroyale/features/social/screens/chat_room_screen.dart';
+import 'package:clubroyale/features/social/screens/friends_screen.dart';
 import 'package:clubroyale/features/social/screens/activity_feed_screen.dart';
 import 'package:clubroyale/features/tournament/screens/tournament_lobby_screen.dart';
 import 'package:clubroyale/features/clubs/screens/clubs_list_screen.dart';
@@ -81,15 +78,9 @@ final _analyticsService = AnalyticsService();
 
 // 1. Define your routes
 final GoRouter _router = GoRouter(
-  initialLocation: '/splash', // Start with splash screen
+  initialLocation: '/', // Start directly at home/auth gate
   observers: [_analyticsService.observer],
   routes: <RouteBase>[
-    GoRoute(
-      path: '/splash',
-      builder: (BuildContext context, GoRouterState state) {
-        return const ClubRoyaleSplashScreen();
-      },
-    ),
     GoRoute(
       path: '/onboarding',
       builder: (BuildContext context, GoRouterState state) {
@@ -284,10 +275,10 @@ final GoRouter _router = GoRouter(
         ),
         // Voice Room route
         GoRoute(
-          path: 'voice-room/:roomId',
+          path: 'voice-room/:chatId',
           builder: (BuildContext context, GoRouterState state) {
-            final String roomId = state.pathParameters['roomId']!;
-            return VoiceRoomScreen(roomId: roomId);
+            final String chatId = state.pathParameters['chatId']!;
+            return VoiceRoomScreen(chatId: chatId);
           },
         ),
         // Enhanced Profile routes
@@ -392,6 +383,27 @@ final GoRouter _router = GoRouter(
           path: 'replays',
           builder: (BuildContext context, GoRouterState state) {
             return const ReplayListScreen();
+          },
+        ),
+        // Social-First Features
+        GoRoute(
+          path: 'chats',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ChatListScreen();
+          },
+        ),
+        GoRoute(
+          path: 'social/chat/:chatId',
+          builder: (BuildContext context, GoRouterState state) {
+            final String chatId = state.pathParameters['chatId']!;
+            return ChatRoomScreen(chatId: chatId);
+          },
+        ),
+        GoRoute(
+          path: 'friends',
+          builder: (BuildContext context, GoRouterState state) {
+             // Import needed at top
+             return const FriendsScreen();
           },
         ),
       ],

@@ -13,6 +13,10 @@ import 'package:clubroyale/core/responsive/responsive_utils.dart';
 // Stories import
 import 'package:clubroyale/features/stories/widgets/story_bar.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
+// Social-First Widgets
+import 'package:clubroyale/features/social/widgets/online_friends_bar.dart';
+import 'package:clubroyale/features/social/widgets/quick_social_actions.dart';
+import 'package:clubroyale/features/social/widgets/social_feed_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -26,13 +30,14 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: CasinoColors.darkPurple,
-      bottomNavigationBar: GameBottomNav(
-        onAccountTap: () => context.go('/profile'),
-        onSettingsTap: () => context.go('/settings'),
-        onStoreTap: () => context.go('/wallet'),
-        onActivityTap: () => context.go('/activity'),
-        onTournamentTap: () => context.go('/tournaments'),
+      bottomNavigationBar: SocialBottomNav(
+        onHomeTap: () {}, // Already on home
+        onChatsTap: () => context.go('/chats'),
+        onPlayTap: () => context.go('/lobby'), // Prominent center button
         onClubsTap: () => context.go('/clubs'),
+        onAccountTap: () => context.go('/profile'),
+        // Legacy callbacks for backward compatibility
+        onActivityTap: () => context.go('/activity'),
       ),
       body: ParticleBackground(
         primaryColor: ClubRoyaleTheme.gold,
@@ -216,16 +221,31 @@ class HomeScreen extends ConsumerWidget {
                     child: const StoryBar(),
                   ).animate().fadeIn(delay: 150.ms),
 
+                  const SizedBox(height: 16),
+
+                  // ===== QUICK SOCIAL ACTIONS =====
+                  const QuickSocialActions(),
+
+                  const SizedBox(height: 24),
+
+                  // ===== ONLINE FRIENDS BAR =====
+                  const OnlineFriendsBar().animate().fadeIn(delay: 200.ms),
+
+                  const SizedBox(height: 24),
+
+                  // ===== ACTIVITY FEED =====
+                  const SocialFeedWidget(maxItems: 4).animate().fadeIn(delay: 250.ms),
+
                   const SizedBox(height: 32),
 
-                  // Quick Actions Title
+                  // ===== PLAY SECTION =====
                   Text(
-                    'Start Playing',
+                    '🎮 Play Games',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
                     ),
-                  ).animate().fadeIn(delay: 200.ms),
+                  ).animate().fadeIn(delay: 300.ms),
 
                   const SizedBox(height: 16),
 
@@ -236,7 +256,7 @@ class HomeScreen extends ConsumerWidget {
                     subtitle: 'Join or create a new game session',
                     gradientColors: [CasinoColors.gold, CasinoColors.bronzeGold],
                     onTap: () => context.go('/lobby'),
-                  ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2),
+                  ).animate().fadeIn(delay: 350.ms).slideY(begin: 0.2),
 
                   // Quick Test Game Button (Test Mode Only)
                   if (TestMode.isEnabled) ...[
@@ -247,10 +267,10 @@ class HomeScreen extends ConsumerWidget {
                       subtitle: 'Start instantly with 3 bots',
                       gradientColors: [CasinoColors.feltGreen, const Color(0xFF1a4f2e)],
                       onTap: () => _startQuickTestGame(context, ref, user?.uid ?? 'test_user', user?.displayName ?? 'Test Player'),
-                    ).animate().fadeIn(delay: 350.ms).slideY(begin: 0.2),
+                    ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
                   ],
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
 
                   // ===== GAME SELECTOR SECTION =====
                   Text(

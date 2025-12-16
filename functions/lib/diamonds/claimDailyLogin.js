@@ -46,7 +46,8 @@ const https_1 = require("firebase-functions/v2/https");
 const admin = __importStar(require("firebase-admin"));
 const config_1 = require("./config");
 const utils_1 = require("./utils");
-const firestore = admin.firestore();
+// Lazy initialization
+const getDb = () => admin.firestore();
 exports.claimDailyLogin = (0, https_1.onCall)(async (request) => {
     const userId = request.auth?.uid;
     if (!userId) {
@@ -81,7 +82,7 @@ exports.claimDailyLogin = (0, https_1.onCall)(async (request) => {
         : `Day ${streakDays} login`;
     await (0, utils_1.grantDiamondsToUser)(userId, reward, 'dailyLogin', reason);
     // Update user streak data
-    await firestore.collection('users').doc(userId).update({
+    await getDb().collection('users').doc(userId).update({
         loginStreak: streakDays,
         lastDailyLoginClaim: admin.firestore.FieldValue.serverTimestamp(),
         lastActive: admin.firestore.FieldValue.serverTimestamp(),

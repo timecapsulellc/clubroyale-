@@ -4,7 +4,6 @@
 // - ClubRoyale brand and games
 // - Diamond economy
 // - Social features
-// - Permissions setup
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,7 +29,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     OnboardingPage(
       icon: Icons.casino,
       title: 'Welcome to ClubRoyale',
-      subtitle: 'Your Premium Card Gaming Experience',
+      subtitle: 'Your Premium Card Gaming Club',
       description: 'Play classic card games with friends in a stunning casino atmosphere.',
       color: CasinoColors.gold,
     ),
@@ -38,21 +37,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       icon: Icons.style,
       title: 'World-Class Games',
       subtitle: 'Marriage • Call Break • Teen Patti • In-Between',
-      description: 'Enjoy authentic gameplay with beautiful animations and haptic feedback.',
+      description: 'Enjoy authentic gameplay with beautiful animations and real-time multiplayer.',
       color: Colors.purpleAccent,
     ),
     OnboardingPage(
       icon: Icons.diamond,
       title: 'Free Diamond Economy',
       subtitle: 'Earn 100+ Diamonds Daily',
-      description: 'No real money required! Earn diamonds by playing, logging in, and referring friends.',
-      color: Colors.cyan,
+      description: 'No real money required! Earn diamonds by playing, logging in daily, and referring friends.',
+      color: Colors.cyanAccent,
     ),
     OnboardingPage(
       icon: Icons.people,
       title: 'Social Gaming',
       subtitle: 'Connect • Compete • Celebrate',
-      description: 'Voice chat, tournaments, clubs, and more. Gaming is better with friends!',
+      description: 'Voice chat, tournaments, clubs, and leaderboards. Gaming is better with friends!',
       color: Colors.pinkAccent,
     ),
   ];

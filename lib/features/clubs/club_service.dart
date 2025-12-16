@@ -2,20 +2,31 @@
 /// 
 /// Manages gaming clubs/groups
 
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/clubs/club_model.dart';
+import 'package:clubroyale/features/social/models/social_chat_model.dart';
 
 /// Club Service
 class ClubService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   CollectionReference<Map<String, dynamic>> get _clubsRef =>
       _firestore.collection('clubs');
 
   DocumentReference<Map<String, dynamic>> _clubDoc(String id) =>
       _clubsRef.doc(id);
+
+  /// Upload Club Avatar
+  Future<String> uploadClubAvatar(File file) async {
+    final ref = _storage.ref().child('clubs/${DateTime.now().millisecondsSinceEpoch}.jpg');
+    await ref.putFile(file);
+    return await ref.getDownloadURL();
+  }
 
   /// Create a new club
   Future<String> createClub({
@@ -29,6 +40,23 @@ class ClubService {
   }) async {
     final doc = _clubsRef.doc();
     
+    // 1. Create Linked Chat
+    final chatRef = _firestore.collection('chats').doc();
+    await chatRef.set({
+      'id': chatRef.id,
+      'type': 'club',
+      'participants': [ownerId],
+      'admins': [ownerId],
+      'name': name,
+      'description': description,
+      'avatarUrl': avatarUrl,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+      'unreadCounts': {},
+      'metadata': {'clubId': doc.id},
+    });
+
+    // 2. Create Club
     await doc.set({
       'id': doc.id,
       'name': name,
@@ -36,6 +64,7 @@ class ClubService {
       'ownerId': ownerId,
       'ownerName': ownerName,
       'avatarUrl': avatarUrl,
+      'chatId': chatRef.id, // Save Chat ID
       'privacy': privacy.name,
       'memberIds': [ownerId],
       'memberCount': 1,
@@ -87,6 +116,8 @@ class ClubService {
         return false;
       }
 
+      final chatId = doc.data()!['chatId'] as String?;
+
       await _clubDoc(clubId).update({
         'memberIds': FieldValue.arrayUnion([oderId]),
         'memberCount': FieldValue.increment(1),
@@ -102,6 +133,13 @@ class ClubService {
         'winsInClub': 0,
         'totalPoints': 0,
       });
+      
+      // Add to Chat
+      if (chatId != null) {
+        await _firestore.collection('chats').doc(chatId).update({
+          'participants': FieldValue.arrayUnion([oderId])
+        });
+      }
 
       // Post activity
       await _postActivity(
@@ -134,6 +172,8 @@ class ClubService {
         debugPrint('Owner cannot leave. Transfer ownership first.');
         return false;
       }
+      
+      final chatId = doc.data()!['chatId'] as String?;
 
       await _clubDoc(clubId).update({
         'memberIds': FieldValue.arrayRemove([oderId]),
@@ -141,6 +181,13 @@ class ClubService {
       });
 
       await _clubDoc(clubId).collection('members').doc(oderId).delete();
+      
+      // Remove from Chat
+      if (chatId != null) {
+        await _firestore.collection('chats').doc(chatId).update({
+          'participants': FieldValue.arrayRemove([oderId])
+        });
+      }
 
       return true;
     } catch (e) {

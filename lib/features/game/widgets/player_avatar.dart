@@ -253,24 +253,33 @@ class GameTableLayout extends StatelessWidget {
 }
 
 /// Bottom navigation bar for game screens
-class GameBottomNav extends StatelessWidget {
+/// Social-first bottom navigation bar with prominent Play button
+class SocialBottomNav extends StatelessWidget {
+  final VoidCallback? onHomeTap;
+  final VoidCallback? onChatsTap;
+  final VoidCallback? onPlayTap;
+  final VoidCallback? onClubsTap;
   final VoidCallback? onAccountTap;
+  
+  // Legacy callbacks (for backward compatibility)
   final VoidCallback? onSettingsTap;
   final VoidCallback? onStoreTap;
   final VoidCallback? onBackTap;
   final VoidCallback? onActivityTap;
   final VoidCallback? onTournamentTap;
-  final VoidCallback? onClubsTap;
   
-  const GameBottomNav({
+  const SocialBottomNav({
     super.key,
+    this.onHomeTap,
+    this.onChatsTap,
+    this.onPlayTap,
+    this.onClubsTap,
     this.onAccountTap,
     this.onSettingsTap,
     this.onStoreTap,
     this.onBackTap,
     this.onActivityTap,
     this.onTournamentTap,
-    this.onClubsTap,
   });
 
   @override
@@ -278,49 +287,92 @@ class GameBottomNav extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.7),
+        color: Colors.black.withValues(alpha: 0.85),
         border: Border(
           top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3)),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: SafeArea(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            // Home / Feed
             _NavItem(
-              icon: Icons.person,
-              label: 'Account',
+              icon: Icons.home_rounded,
+              label: 'Home',
+              onTap: onHomeTap ?? onActivityTap,
+            ),
+            // Chats
+            _NavItem(
+              icon: Icons.chat_bubble_rounded,
+              label: 'Chats',
+              onTap: onChatsTap,
+              hasBadge: true, // Could show unread count
+            ),
+            // Play Button - Center & Prominent
+            _PlayButton(
+              onTap: onPlayTap,
+            ),
+            // Clubs
+            _NavItem(
+              icon: Icons.groups_rounded,
+              label: 'Clubs',
+              onTap: onClubsTap,
+            ),
+            // Profile
+            _NavItem(
+              icon: Icons.person_rounded,
+              label: 'Profile',
               onTap: onAccountTap,
             ),
-            if (onActivityTap != null)
-              _NavItem(
-                icon: Icons.dynamic_feed,
-                label: 'Activity',
-                onTap: onActivityTap,
-              ),
-            if (onTournamentTap != null)
-              _NavItem(
-                icon: Icons.emoji_events,
-                label: 'Tourneys',
-                onTap: onTournamentTap,
-              ),
-            if (onClubsTap != null)
-              _NavItem(
-                icon: Icons.groups,
-                label: 'Clubs',
-                onTap: onClubsTap,
-              ),
-            _NavItem(
-              icon: Icons.diamond,
-              label: 'Store',
-              onTap: onStoreTap,
-            ),
-            _NavItem(
-              icon: Icons.settings,
-              label: 'Settings',
-              onTap: onSettingsTap,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Special prominent Play button for center of nav
+class _PlayButton extends StatelessWidget {
+  final VoidCallback? onTap;
+  
+  const _PlayButton({this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [CasinoColors.gold, CasinoColors.bronzeGold],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: CasinoColors.gold.withValues(alpha: 0.5),
+              blurRadius: 12,
+              spreadRadius: 2,
             ),
           ],
+        ),
+        child: const Center(
+          child: Icon(
+            Icons.sports_esports_rounded,
+            color: Colors.black,
+            size: 28,
+          ),
         ),
       ),
     );
@@ -331,11 +383,13 @@ class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
+  final bool hasBadge;
   
   const _NavItem({
     required this.icon,
     required this.label,
     this.onTap,
+    this.hasBadge = false,
   });
 
   @override
@@ -344,24 +398,36 @@ class _NavItem extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.5)),
-              ),
-              child: Icon(icon, color: CasinoColors.gold, size: 18),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(icon, color: CasinoColors.gold.withValues(alpha: 0.9), size: 22),
+                if (hasBadge)
+                  Positioned(
+                    right: -4,
+                    top: -2,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.black, width: 1.5),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: CasinoColors.gold.withValues(alpha: 0.9),
-                fontSize: 9,
+                color: CasinoColors.gold.withValues(alpha: 0.8),
+                fontSize: 10,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -371,4 +437,3 @@ class _NavItem extends StatelessWidget {
     );
   }
 }
-

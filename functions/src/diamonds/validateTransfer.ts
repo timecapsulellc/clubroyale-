@@ -12,7 +12,8 @@ import * as admin from 'firebase-admin';
 import { TIER_LIMITS, TRANSFER_FEE_PERCENT, UserTier, DiamondOrigin } from './config';
 import { getUser, generateAuditHash, getLastLedgerEntry } from './utils';
 
-const firestore = admin.firestore();
+// Lazy initialization
+const getDb = () => admin.firestore();
 
 interface TransferRequest {
     receiverId: string;
@@ -86,9 +87,9 @@ export const validateTransfer = onCall(async (request): Promise<TransferResult> 
     const netAmount = amount - transferFee;
 
     // 6. Execute transfer atomically
-    await firestore.runTransaction(async (transaction) => {
-        const senderRef = firestore.collection('users').doc(senderId);
-        const receiverRef = firestore.collection('users').doc(receiverId);
+    await getDb().runTransaction(async (transaction) => {
+        const senderRef = getDb().collection('users').doc(senderId);
+        const receiverRef = getDb().collection('users').doc(receiverId);
 
         // Verify receiver exists
         const receiverDoc = await transaction.get(receiverRef);
@@ -136,7 +137,7 @@ export const validateTransfer = onCall(async (request): Promise<TransferResult> 
             timestamp: Date.now(),
         });
 
-        const ledgerRef = firestore.collection('diamond_ledger').doc();
+        const ledgerRef = getDb().collection('diamond_ledger').doc();
         transaction.set(ledgerRef, {
             type: 'transfer',
             fromUserId: senderId,
@@ -152,7 +153,7 @@ export const validateTransfer = onCall(async (request): Promise<TransferResult> 
         });
 
         // Record fee burn separately
-        const burnRef = firestore.collection('diamond_ledger').doc();
+        const burnRef = getDb().collection('diamond_ledger').doc();
         transaction.set(burnRef, {
             type: 'burn',
             fromUserId: senderId,

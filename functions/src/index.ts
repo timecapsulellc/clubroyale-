@@ -29,6 +29,13 @@ import { AuditService, logMove, logSuspiciousActivity } from './services/auditSe
 
 // Import Triggers
 export { auditGameUpdate } from './triggers/auditTriggers';
+export {
+    onSocialMessageSent,
+    onStoryCreated,
+    onFriendRequestCreated,
+    onFriendshipUpdated,
+    onVoiceRoomCreated
+} from './triggers/social';
 
 // Export LiveKit token functions
 export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenService';

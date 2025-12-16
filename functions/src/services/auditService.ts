@@ -6,7 +6,7 @@
 
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
-const db = getFirestore();
+// No module-level initialization
 
 // Severity levels for suspicious activity
 export type SuspiciousSeverity = 'low' | 'medium' | 'high';
@@ -57,7 +57,7 @@ export class AuditService {
             serverTimestamp: FieldValue.serverTimestamp(),
         };
 
-        await db.collection('matches').doc(matchId).update({
+        await getFirestore().collection('matches').doc(matchId).update({
             auditLog: FieldValue.arrayUnion(auditEntry),
         });
     }
@@ -76,13 +76,13 @@ export class AuditService {
         };
 
         // Add to match document
-        await db.collection('matches').doc(matchId).update({
+        await getFirestore().collection('matches').doc(matchId).update({
             suspiciousActivity: FieldValue.arrayUnion(entry),
         });
 
         // If high severity, also add to flagged users collection
         if (activity.severity === 'high') {
-            await db.collection('flaggedUsers').doc(activity.userId).set(
+            await getFirestore().collection('flaggedUsers').doc(activity.userId).set(
                 {
                     matchId,
                     reason: activity.reason,
@@ -96,7 +96,8 @@ export class AuditService {
         }
 
         // Track violation count for user
-        await db
+        // Track violation count for user
+        await getFirestore()
             .collection('userStats')
             .doc(activity.userId)
             .set(
@@ -135,7 +136,7 @@ export class AuditService {
         userId: string,
         threshold: number = 5
     ): Promise<boolean> {
-        const userStats = await db.collection('userStats').doc(userId).get();
+        const userStats = await getFirestore().collection('userStats').doc(userId).get();
 
         if (!userStats.exists) return false;
 
@@ -151,7 +152,7 @@ export class AuditService {
     static async getMatchSuspiciousActivity(
         matchId: string
     ): Promise<SuspiciousActivity[]> {
-        const match = await db.collection('matches').doc(matchId).get();
+        const match = await getFirestore().collection('matches').doc(matchId).get();
         return match.data()?.suspiciousActivity || [];
     }
 
@@ -161,7 +162,7 @@ export class AuditService {
     static async getFlaggedUsers(
         limit: number = 50
     ): Promise<Array<{ id: string; data: Record<string, unknown> }>> {
-        const snapshot = await db
+        const snapshot = await getFirestore()
             .collection('flaggedUsers')
             .where('reviewed', '==', false)
             .orderBy('timestamp', 'desc')
@@ -181,14 +182,14 @@ export class AuditService {
         userId: string,
         action: 'cleared' | 'warned' | 'banned'
     ): Promise<void> {
-        await db.collection('flaggedUsers').doc(userId).update({
+        await getFirestore().collection('flaggedUsers').doc(userId).update({
             reviewed: true,
             reviewAction: action,
             reviewedAt: FieldValue.serverTimestamp(),
         });
 
         if (action === 'banned') {
-            await db.collection('users').doc(userId).update({
+            await getFirestore().collection('users').doc(userId).update({
                 isBanned: true,
                 bannedAt: FieldValue.serverTimestamp(),
             });

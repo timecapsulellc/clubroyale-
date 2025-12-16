@@ -9,7 +9,8 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
-const db = getFirestore();
+// Lazy initialization
+const db = () => getFirestore();
 
 /**
  * Weekly Bonus Distribution (Runs every Sunday at 00:00 UTC)
@@ -39,14 +40,14 @@ export const dailyCleanup = onSchedule({
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const oldTransfers = await db.collection('diamond_transfers')
+    const oldTransfers = await db().collection('diamond_transfers')
         .where('status', 'in', ['completed', 'cancelled', 'expired'])
         .where('createdAt', '<', Timestamp.fromDate(thirtyDaysAgo))
         .limit(500)
         .get();
 
     if (!oldTransfers.empty) {
-        const batch = db.batch();
+        const batch = db().batch();
         oldTransfers.docs.forEach(doc => batch.delete(doc.ref));
         await batch.commit();
         console.log(`Cleaned up ${oldTransfers.size} old transfer records`);
@@ -56,13 +57,13 @@ export const dailyCleanup = onSchedule({
     const sixtyDaysAgo = new Date();
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
 
-    const oldRewards = await db.collection('diamond_rewards')
+    const oldRewards = await db().collection('diamond_rewards')
         .where('claimedAt', '<', Timestamp.fromDate(sixtyDaysAgo))
         .limit(500)
         .get();
 
     if (!oldRewards.empty) {
-        const batch = db.batch();
+        const batch = db().batch();
         oldRewards.docs.forEach(doc => batch.delete(doc.ref));
         await batch.commit();
         console.log(`Cleaned up ${oldRewards.size} old reward logs`);

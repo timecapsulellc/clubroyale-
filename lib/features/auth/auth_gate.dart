@@ -9,11 +9,25 @@ import 'auth_service.dart';
 
 // TestMode is imported from auth_service.dart
 
-class AuthGate extends ConsumerWidget {
+import '../social/services/presence_service.dart';
+
+class AuthGate extends ConsumerStatefulWidget {
   const AuthGate({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends ConsumerState<AuthGate> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize presence system (idempotent listener)
+    ref.read(presenceServiceProvider).initialize();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authService = ref.watch(authServiceProvider);
 
     return ValueListenableBuilder<bool>(
@@ -28,7 +42,7 @@ class AuthGate extends ConsumerWidget {
           stream: authService.authStateChanges,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return const Scaffold(body: Center(child: CircularProgressIndicator()));
             }
 
             if (snapshot.hasData) {

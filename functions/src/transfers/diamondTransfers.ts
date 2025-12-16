@@ -8,7 +8,8 @@ import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore';
 
-const db = getFirestore();
+// Lazy initialization
+const db = () => getFirestore();
 
 /**
  * Complete transfer when both parties confirm
@@ -29,10 +30,10 @@ export const onTransferConfirmed = onDocumentUpdated('diamond_transfers/{transfe
     const toUserId = after.toUserId;
     const amount = after.amount;
 
-    const batch = db.batch();
+    const batch = db().batch();
 
     // Remove from sender's escrow
-    const senderWalletRef = db.collection('wallets').doc(fromUserId);
+    const senderWalletRef = db().collection('wallets').doc(fromUserId);
     batch.update(senderWalletRef, {
         escrowedBalance: FieldValue.increment(-amount),
         totalTransferredOut: FieldValue.increment(amount),
@@ -40,7 +41,7 @@ export const onTransferConfirmed = onDocumentUpdated('diamond_transfers/{transfe
     });
 
     // Credit to receiver
-    const receiverWalletRef = db.collection('wallets').doc(toUserId);
+    const receiverWalletRef = db().collection('wallets').doc(toUserId);
     batch.update(receiverWalletRef, {
         balance: FieldValue.increment(amount),
         totalTransferredIn: FieldValue.increment(amount),
@@ -48,14 +49,14 @@ export const onTransferConfirmed = onDocumentUpdated('diamond_transfers/{transfe
     });
 
     // Update transfer status
-    const transferRef = db.collection('diamond_transfers').doc(event.params.transferId);
+    const transferRef = db().collection('diamond_transfers').doc(event.params.transferId);
     batch.update(transferRef, {
         status: 'completed',
         completedAt: FieldValue.serverTimestamp(),
     });
 
     // Record transactions
-    const senderTxRef = db.collection('transactions').doc();
+    const senderTxRef = db().collection('transactions').doc();
     batch.set(senderTxRef, {
         userId: fromUserId,
         amount: -amount,
@@ -65,7 +66,7 @@ export const onTransferConfirmed = onDocumentUpdated('diamond_transfers/{transfe
         createdAt: FieldValue.serverTimestamp(),
     });
 
-    const receiverTxRef = db.collection('transactions').doc();
+    const receiverTxRef = db().collection('transactions').doc();
     batch.set(receiverTxRef, {
         userId: toUserId,
         amount: amount,
@@ -85,7 +86,7 @@ export const onTransferConfirmed = onDocumentUpdated('diamond_transfers/{transfe
 export const expireStaleTransfers = onSchedule('every 1 hours', async () => {
     const now = Timestamp.now();
 
-    const staleTransfers = await db
+    const staleTransfers = await db()
         .collection('diamond_transfers')
         .where('status', '==', 'pending')
         .where('expiresAt', '<', now)
@@ -98,10 +99,10 @@ export const expireStaleTransfers = onSchedule('every 1 hours', async () => {
         const fromUserId = data.fromUserId;
         const amount = data.amount;
 
-        const batch = db.batch();
+        const batch = db().batch();
 
         // Return from escrow to balance
-        const walletRef = db.collection('wallets').doc(fromUserId);
+        const walletRef = db().collection('wallets').doc(fromUserId);
         batch.update(walletRef, {
             balance: FieldValue.increment(amount),
             escrowedBalance: FieldValue.increment(-amount),

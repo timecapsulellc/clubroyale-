@@ -43,7 +43,8 @@ exports.monitorDiamondSupply = exports.checkTierUpgrade = void 0;
 const scheduler_1 = require("firebase-functions/v2/scheduler");
 const admin = __importStar(require("firebase-admin"));
 const utils_1 = require("./utils");
-const firestore = admin.firestore();
+// Lazy initialization
+const getDb = () => admin.firestore();
 // ============ AUTOMATIC TIER UPGRADE CHECK ============
 // Runs every hour to promote eligible users
 exports.checkTierUpgrade = (0, scheduler_1.onSchedule)({
@@ -51,11 +52,11 @@ exports.checkTierUpgrade = (0, scheduler_1.onSchedule)({
     timeZone: 'Asia/Kolkata',
 }, async (event) => {
     // Check 'verified' users for promotion to 'trusted'
-    const verifiedUsersSnapshot = await firestore
+    const verifiedUsersSnapshot = await getDb()
         .collection('users')
         .where('tier', '==', 'verified')
         .get();
-    const batch = firestore.batch();
+    const batch = getDb().batch();
     let upgradeCount = 0;
     for (const doc of verifiedUsersSnapshot.docs) {
         const user = doc.data();
@@ -88,14 +89,14 @@ exports.monitorDiamondSupply = (0, scheduler_1.onSchedule)({
     try {
         // 1. Calculate Circulating Supply
         // NOTE: In a massive app, scanning all users is expensive. 
-        const aggregateSnapshot = await firestore.collection('users').count().get();
+        const aggregateSnapshot = await getDb().collection('users').count().get();
         const userCount = aggregateSnapshot.data().count;
-        const sumSnapshot = await firestore.collection('users').aggregate({
+        const sumSnapshot = await getDb().collection('users').aggregate({
             totalBalance: admin.firestore.AggregateField.sum('diamondBalance')
         }).get();
         const totalSupply = sumSnapshot.data().totalBalance || 0;
         // 2. Get yesterday's supply to calc inflation
-        const metricsRef = firestore.collection('supply_metrics');
+        const metricsRef = getDb().collection('supply_metrics');
         const lastMetricQuery = await metricsRef.orderBy('timestamp', 'desc').limit(1).get();
         let yesterdaySupply = 0;
         if (!lastMetricQuery.empty) {

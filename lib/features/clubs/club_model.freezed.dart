@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Club {
 
- String get id; String get name; String get description; String get ownerId; String get ownerName; String? get avatarUrl; String? get bannerUrl; ClubPrivacy get privacy; List<String> get memberIds; int get memberCount; List<String> get gameTypes; String? get discordLink; String? get rules; DateTime? get createdAt; bool get isVerified; int get totalGamesPlayed; int get weeklyActiveMembers;
+ String get id; String get name; String get description; String get ownerId; String get ownerName; String? get avatarUrl; String? get bannerUrl; String? get chatId;// Link to Social Chat
+ ClubPrivacy get privacy; List<String> get memberIds; int get memberCount; List<String> get gameTypes; String? get discordLink; String? get rules; DateTime? get createdAt; bool get isVerified; int get totalGamesPlayed; int get weeklyActiveMembers;
 /// Create a copy of Club
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +29,16 @@ $ClubCopyWith<Club> get copyWith => _$ClubCopyWithImpl<Club>(this as Club, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Club&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.ownerId, ownerId) || other.ownerId == ownerId)&&(identical(other.ownerName, ownerName) || other.ownerName == ownerName)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.privacy, privacy) || other.privacy == privacy)&&const DeepCollectionEquality().equals(other.memberIds, memberIds)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&const DeepCollectionEquality().equals(other.gameTypes, gameTypes)&&(identical(other.discordLink, discordLink) || other.discordLink == discordLink)&&(identical(other.rules, rules) || other.rules == rules)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.isVerified, isVerified) || other.isVerified == isVerified)&&(identical(other.totalGamesPlayed, totalGamesPlayed) || other.totalGamesPlayed == totalGamesPlayed)&&(identical(other.weeklyActiveMembers, weeklyActiveMembers) || other.weeklyActiveMembers == weeklyActiveMembers));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Club&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.ownerId, ownerId) || other.ownerId == ownerId)&&(identical(other.ownerName, ownerName) || other.ownerName == ownerName)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.chatId, chatId) || other.chatId == chatId)&&(identical(other.privacy, privacy) || other.privacy == privacy)&&const DeepCollectionEquality().equals(other.memberIds, memberIds)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&const DeepCollectionEquality().equals(other.gameTypes, gameTypes)&&(identical(other.discordLink, discordLink) || other.discordLink == discordLink)&&(identical(other.rules, rules) || other.rules == rules)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.isVerified, isVerified) || other.isVerified == isVerified)&&(identical(other.totalGamesPlayed, totalGamesPlayed) || other.totalGamesPlayed == totalGamesPlayed)&&(identical(other.weeklyActiveMembers, weeklyActiveMembers) || other.weeklyActiveMembers == weeklyActiveMembers));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,ownerId,ownerName,avatarUrl,bannerUrl,privacy,const DeepCollectionEquality().hash(memberIds),memberCount,const DeepCollectionEquality().hash(gameTypes),discordLink,rules,createdAt,isVerified,totalGamesPlayed,weeklyActiveMembers);
+int get hashCode => Object.hash(runtimeType,id,name,description,ownerId,ownerName,avatarUrl,bannerUrl,chatId,privacy,const DeepCollectionEquality().hash(memberIds),memberCount,const DeepCollectionEquality().hash(gameTypes),discordLink,rules,createdAt,isVerified,totalGamesPlayed,weeklyActiveMembers);
 
 @override
 String toString() {
-  return 'Club(id: $id, name: $name, description: $description, ownerId: $ownerId, ownerName: $ownerName, avatarUrl: $avatarUrl, bannerUrl: $bannerUrl, privacy: $privacy, memberIds: $memberIds, memberCount: $memberCount, gameTypes: $gameTypes, discordLink: $discordLink, rules: $rules, createdAt: $createdAt, isVerified: $isVerified, totalGamesPlayed: $totalGamesPlayed, weeklyActiveMembers: $weeklyActiveMembers)';
+  return 'Club(id: $id, name: $name, description: $description, ownerId: $ownerId, ownerName: $ownerName, avatarUrl: $avatarUrl, bannerUrl: $bannerUrl, chatId: $chatId, privacy: $privacy, memberIds: $memberIds, memberCount: $memberCount, gameTypes: $gameTypes, discordLink: $discordLink, rules: $rules, createdAt: $createdAt, isVerified: $isVerified, totalGamesPlayed: $totalGamesPlayed, weeklyActiveMembers: $weeklyActiveMembers)';
 }
 
 
@@ -48,7 +49,7 @@ abstract mixin class $ClubCopyWith<$Res>  {
   factory $ClubCopyWith(Club value, $Res Function(Club) _then) = _$ClubCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String description, String ownerId, String ownerName, String? avatarUrl, String? bannerUrl, ClubPrivacy privacy, List<String> memberIds, int memberCount, List<String> gameTypes, String? discordLink, String? rules, DateTime? createdAt, bool isVerified, int totalGamesPlayed, int weeklyActiveMembers
+ String id, String name, String description, String ownerId, String ownerName, String? avatarUrl, String? bannerUrl, String? chatId, ClubPrivacy privacy, List<String> memberIds, int memberCount, List<String> gameTypes, String? discordLink, String? rules, DateTime? createdAt, bool isVerified, int totalGamesPlayed, int weeklyActiveMembers
 });
 
 
@@ -65,7 +66,7 @@ class _$ClubCopyWithImpl<$Res>
 
 /// Create a copy of Club
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? ownerId = null,Object? ownerName = null,Object? avatarUrl = freezed,Object? bannerUrl = freezed,Object? privacy = null,Object? memberIds = null,Object? memberCount = null,Object? gameTypes = null,Object? discordLink = freezed,Object? rules = freezed,Object? createdAt = freezed,Object? isVerified = null,Object? totalGamesPlayed = null,Object? weeklyActiveMembers = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? ownerId = null,Object? ownerName = null,Object? avatarUrl = freezed,Object? bannerUrl = freezed,Object? chatId = freezed,Object? privacy = null,Object? memberIds = null,Object? memberCount = null,Object? gameTypes = null,Object? discordLink = freezed,Object? rules = freezed,Object? createdAt = freezed,Object? isVerified = null,Object? totalGamesPlayed = null,Object? weeklyActiveMembers = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -74,6 +75,7 @@ as String,ownerId: null == ownerId ? _self.ownerId : ownerId // ignore: cast_nul
 as String,ownerName: null == ownerName ? _self.ownerName : ownerName // ignore: cast_nullable_to_non_nullable
 as String,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
 as String?,bannerUrl: freezed == bannerUrl ? _self.bannerUrl : bannerUrl // ignore: cast_nullable_to_non_nullable
+as String?,chatId: freezed == chatId ? _self.chatId : chatId // ignore: cast_nullable_to_non_nullable
 as String?,privacy: null == privacy ? _self.privacy : privacy // ignore: cast_nullable_to_non_nullable
 as ClubPrivacy,memberIds: null == memberIds ? _self.memberIds : memberIds // ignore: cast_nullable_to_non_nullable
 as List<String>,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
@@ -169,10 +171,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String description,  String ownerId,  String ownerName,  String? avatarUrl,  String? bannerUrl,  ClubPrivacy privacy,  List<String> memberIds,  int memberCount,  List<String> gameTypes,  String? discordLink,  String? rules,  DateTime? createdAt,  bool isVerified,  int totalGamesPlayed,  int weeklyActiveMembers)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String description,  String ownerId,  String ownerName,  String? avatarUrl,  String? bannerUrl,  String? chatId,  ClubPrivacy privacy,  List<String> memberIds,  int memberCount,  List<String> gameTypes,  String? discordLink,  String? rules,  DateTime? createdAt,  bool isVerified,  int totalGamesPlayed,  int weeklyActiveMembers)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Club() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.ownerId,_that.ownerName,_that.avatarUrl,_that.bannerUrl,_that.privacy,_that.memberIds,_that.memberCount,_that.gameTypes,_that.discordLink,_that.rules,_that.createdAt,_that.isVerified,_that.totalGamesPlayed,_that.weeklyActiveMembers);case _:
+return $default(_that.id,_that.name,_that.description,_that.ownerId,_that.ownerName,_that.avatarUrl,_that.bannerUrl,_that.chatId,_that.privacy,_that.memberIds,_that.memberCount,_that.gameTypes,_that.discordLink,_that.rules,_that.createdAt,_that.isVerified,_that.totalGamesPlayed,_that.weeklyActiveMembers);case _:
   return orElse();
 
 }
@@ -190,10 +192,10 @@ return $default(_that.id,_that.name,_that.description,_that.ownerId,_that.ownerN
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String description,  String ownerId,  String ownerName,  String? avatarUrl,  String? bannerUrl,  ClubPrivacy privacy,  List<String> memberIds,  int memberCount,  List<String> gameTypes,  String? discordLink,  String? rules,  DateTime? createdAt,  bool isVerified,  int totalGamesPlayed,  int weeklyActiveMembers)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String description,  String ownerId,  String ownerName,  String? avatarUrl,  String? bannerUrl,  String? chatId,  ClubPrivacy privacy,  List<String> memberIds,  int memberCount,  List<String> gameTypes,  String? discordLink,  String? rules,  DateTime? createdAt,  bool isVerified,  int totalGamesPlayed,  int weeklyActiveMembers)  $default,) {final _that = this;
 switch (_that) {
 case _Club():
-return $default(_that.id,_that.name,_that.description,_that.ownerId,_that.ownerName,_that.avatarUrl,_that.bannerUrl,_that.privacy,_that.memberIds,_that.memberCount,_that.gameTypes,_that.discordLink,_that.rules,_that.createdAt,_that.isVerified,_that.totalGamesPlayed,_that.weeklyActiveMembers);case _:
+return $default(_that.id,_that.name,_that.description,_that.ownerId,_that.ownerName,_that.avatarUrl,_that.bannerUrl,_that.chatId,_that.privacy,_that.memberIds,_that.memberCount,_that.gameTypes,_that.discordLink,_that.rules,_that.createdAt,_that.isVerified,_that.totalGamesPlayed,_that.weeklyActiveMembers);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -210,10 +212,10 @@ return $default(_that.id,_that.name,_that.description,_that.ownerId,_that.ownerN
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String description,  String ownerId,  String ownerName,  String? avatarUrl,  String? bannerUrl,  ClubPrivacy privacy,  List<String> memberIds,  int memberCount,  List<String> gameTypes,  String? discordLink,  String? rules,  DateTime? createdAt,  bool isVerified,  int totalGamesPlayed,  int weeklyActiveMembers)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String description,  String ownerId,  String ownerName,  String? avatarUrl,  String? bannerUrl,  String? chatId,  ClubPrivacy privacy,  List<String> memberIds,  int memberCount,  List<String> gameTypes,  String? discordLink,  String? rules,  DateTime? createdAt,  bool isVerified,  int totalGamesPlayed,  int weeklyActiveMembers)?  $default,) {final _that = this;
 switch (_that) {
 case _Club() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.ownerId,_that.ownerName,_that.avatarUrl,_that.bannerUrl,_that.privacy,_that.memberIds,_that.memberCount,_that.gameTypes,_that.discordLink,_that.rules,_that.createdAt,_that.isVerified,_that.totalGamesPlayed,_that.weeklyActiveMembers);case _:
+return $default(_that.id,_that.name,_that.description,_that.ownerId,_that.ownerName,_that.avatarUrl,_that.bannerUrl,_that.chatId,_that.privacy,_that.memberIds,_that.memberCount,_that.gameTypes,_that.discordLink,_that.rules,_that.createdAt,_that.isVerified,_that.totalGamesPlayed,_that.weeklyActiveMembers);case _:
   return null;
 
 }
@@ -225,7 +227,7 @@ return $default(_that.id,_that.name,_that.description,_that.ownerId,_that.ownerN
 @JsonSerializable()
 
 class _Club extends Club {
-  const _Club({required this.id, required this.name, required this.description, required this.ownerId, required this.ownerName, this.avatarUrl, this.bannerUrl, this.privacy = ClubPrivacy.public, final  List<String> memberIds = const [], this.memberCount = 0, final  List<String> gameTypes = const [], this.discordLink, this.rules, this.createdAt, this.isVerified = false, this.totalGamesPlayed = 0, this.weeklyActiveMembers = 0}): _memberIds = memberIds,_gameTypes = gameTypes,super._();
+  const _Club({required this.id, required this.name, required this.description, required this.ownerId, required this.ownerName, this.avatarUrl, this.bannerUrl, this.chatId, this.privacy = ClubPrivacy.public, final  List<String> memberIds = const [], this.memberCount = 0, final  List<String> gameTypes = const [], this.discordLink, this.rules, this.createdAt, this.isVerified = false, this.totalGamesPlayed = 0, this.weeklyActiveMembers = 0}): _memberIds = memberIds,_gameTypes = gameTypes,super._();
   factory _Club.fromJson(Map<String, dynamic> json) => _$ClubFromJson(json);
 
 @override final  String id;
@@ -235,6 +237,8 @@ class _Club extends Club {
 @override final  String ownerName;
 @override final  String? avatarUrl;
 @override final  String? bannerUrl;
+@override final  String? chatId;
+// Link to Social Chat
 @override@JsonKey() final  ClubPrivacy privacy;
  final  List<String> _memberIds;
 @override@JsonKey() List<String> get memberIds {
@@ -271,16 +275,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Club&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.ownerId, ownerId) || other.ownerId == ownerId)&&(identical(other.ownerName, ownerName) || other.ownerName == ownerName)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.privacy, privacy) || other.privacy == privacy)&&const DeepCollectionEquality().equals(other._memberIds, _memberIds)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&const DeepCollectionEquality().equals(other._gameTypes, _gameTypes)&&(identical(other.discordLink, discordLink) || other.discordLink == discordLink)&&(identical(other.rules, rules) || other.rules == rules)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.isVerified, isVerified) || other.isVerified == isVerified)&&(identical(other.totalGamesPlayed, totalGamesPlayed) || other.totalGamesPlayed == totalGamesPlayed)&&(identical(other.weeklyActiveMembers, weeklyActiveMembers) || other.weeklyActiveMembers == weeklyActiveMembers));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Club&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.ownerId, ownerId) || other.ownerId == ownerId)&&(identical(other.ownerName, ownerName) || other.ownerName == ownerName)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.chatId, chatId) || other.chatId == chatId)&&(identical(other.privacy, privacy) || other.privacy == privacy)&&const DeepCollectionEquality().equals(other._memberIds, _memberIds)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&const DeepCollectionEquality().equals(other._gameTypes, _gameTypes)&&(identical(other.discordLink, discordLink) || other.discordLink == discordLink)&&(identical(other.rules, rules) || other.rules == rules)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.isVerified, isVerified) || other.isVerified == isVerified)&&(identical(other.totalGamesPlayed, totalGamesPlayed) || other.totalGamesPlayed == totalGamesPlayed)&&(identical(other.weeklyActiveMembers, weeklyActiveMembers) || other.weeklyActiveMembers == weeklyActiveMembers));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,ownerId,ownerName,avatarUrl,bannerUrl,privacy,const DeepCollectionEquality().hash(_memberIds),memberCount,const DeepCollectionEquality().hash(_gameTypes),discordLink,rules,createdAt,isVerified,totalGamesPlayed,weeklyActiveMembers);
+int get hashCode => Object.hash(runtimeType,id,name,description,ownerId,ownerName,avatarUrl,bannerUrl,chatId,privacy,const DeepCollectionEquality().hash(_memberIds),memberCount,const DeepCollectionEquality().hash(_gameTypes),discordLink,rules,createdAt,isVerified,totalGamesPlayed,weeklyActiveMembers);
 
 @override
 String toString() {
-  return 'Club(id: $id, name: $name, description: $description, ownerId: $ownerId, ownerName: $ownerName, avatarUrl: $avatarUrl, bannerUrl: $bannerUrl, privacy: $privacy, memberIds: $memberIds, memberCount: $memberCount, gameTypes: $gameTypes, discordLink: $discordLink, rules: $rules, createdAt: $createdAt, isVerified: $isVerified, totalGamesPlayed: $totalGamesPlayed, weeklyActiveMembers: $weeklyActiveMembers)';
+  return 'Club(id: $id, name: $name, description: $description, ownerId: $ownerId, ownerName: $ownerName, avatarUrl: $avatarUrl, bannerUrl: $bannerUrl, chatId: $chatId, privacy: $privacy, memberIds: $memberIds, memberCount: $memberCount, gameTypes: $gameTypes, discordLink: $discordLink, rules: $rules, createdAt: $createdAt, isVerified: $isVerified, totalGamesPlayed: $totalGamesPlayed, weeklyActiveMembers: $weeklyActiveMembers)';
 }
 
 
@@ -291,7 +295,7 @@ abstract mixin class _$ClubCopyWith<$Res> implements $ClubCopyWith<$Res> {
   factory _$ClubCopyWith(_Club value, $Res Function(_Club) _then) = __$ClubCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String description, String ownerId, String ownerName, String? avatarUrl, String? bannerUrl, ClubPrivacy privacy, List<String> memberIds, int memberCount, List<String> gameTypes, String? discordLink, String? rules, DateTime? createdAt, bool isVerified, int totalGamesPlayed, int weeklyActiveMembers
+ String id, String name, String description, String ownerId, String ownerName, String? avatarUrl, String? bannerUrl, String? chatId, ClubPrivacy privacy, List<String> memberIds, int memberCount, List<String> gameTypes, String? discordLink, String? rules, DateTime? createdAt, bool isVerified, int totalGamesPlayed, int weeklyActiveMembers
 });
 
 
@@ -308,7 +312,7 @@ class __$ClubCopyWithImpl<$Res>
 
 /// Create a copy of Club
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? ownerId = null,Object? ownerName = null,Object? avatarUrl = freezed,Object? bannerUrl = freezed,Object? privacy = null,Object? memberIds = null,Object? memberCount = null,Object? gameTypes = null,Object? discordLink = freezed,Object? rules = freezed,Object? createdAt = freezed,Object? isVerified = null,Object? totalGamesPlayed = null,Object? weeklyActiveMembers = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? ownerId = null,Object? ownerName = null,Object? avatarUrl = freezed,Object? bannerUrl = freezed,Object? chatId = freezed,Object? privacy = null,Object? memberIds = null,Object? memberCount = null,Object? gameTypes = null,Object? discordLink = freezed,Object? rules = freezed,Object? createdAt = freezed,Object? isVerified = null,Object? totalGamesPlayed = null,Object? weeklyActiveMembers = null,}) {
   return _then(_Club(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -317,6 +321,7 @@ as String,ownerId: null == ownerId ? _self.ownerId : ownerId // ignore: cast_nul
 as String,ownerName: null == ownerName ? _self.ownerName : ownerName // ignore: cast_nullable_to_non_nullable
 as String,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
 as String?,bannerUrl: freezed == bannerUrl ? _self.bannerUrl : bannerUrl // ignore: cast_nullable_to_non_nullable
+as String?,chatId: freezed == chatId ? _self.chatId : chatId // ignore: cast_nullable_to_non_nullable
 as String?,privacy: null == privacy ? _self.privacy : privacy // ignore: cast_nullable_to_non_nullable
 as ClubPrivacy,memberIds: null == memberIds ? _self._memberIds : memberIds // ignore: cast_nullable_to_non_nullable
 as List<String>,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable

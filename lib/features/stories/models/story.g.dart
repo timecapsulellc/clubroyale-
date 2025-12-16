@@ -11,7 +11,7 @@ _Story _$StoryFromJson(Map<String, dynamic> json) => _Story(
   userId: json['userId'] as String,
   userName: json['userName'] as String,
   userPhotoUrl: json['userPhotoUrl'] as String?,
-  mediaUrl: json['mediaUrl'] as String,
+  mediaUrl: json['mediaUrl'] as String?,
   mediaType:
       $enumDecodeNullable(_$StoryMediaTypeEnumMap, json['mediaType']) ??
       StoryMediaType.photo,
@@ -24,6 +24,12 @@ _Story _$StoryFromJson(Map<String, dynamic> json) => _Story(
   caption: json['caption'] as String?,
   textOverlay: json['textOverlay'] as String?,
   textColor: json['textColor'] as String?,
+  gameType: json['gameType'] as String?,
+  winnerId: json['winnerId'] as String?,
+  winnerName: json['winnerName'] as String?,
+  scores: (json['scores'] as Map<String, dynamic>?)?.map(
+    (k, e) => MapEntry(k, (e as num).toInt()),
+  ),
 );
 
 Map<String, dynamic> _$StoryToJson(_Story instance) => <String, dynamic>{
@@ -40,11 +46,16 @@ Map<String, dynamic> _$StoryToJson(_Story instance) => <String, dynamic>{
   'caption': instance.caption,
   'textOverlay': instance.textOverlay,
   'textColor': instance.textColor,
+  'gameType': instance.gameType,
+  'winnerId': instance.winnerId,
+  'winnerName': instance.winnerName,
+  'scores': instance.scores,
 };
 
 const _$StoryMediaTypeEnumMap = {
   StoryMediaType.photo: 'photo',
   StoryMediaType.video: 'video',
+  StoryMediaType.gameResult: 'gameResult',
 };
 
 _StoryViewer _$StoryViewerFromJson(Map<String, dynamic> json) => _StoryViewer(

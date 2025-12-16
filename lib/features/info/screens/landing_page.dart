@@ -95,27 +95,26 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
         child: Column(
           children: [
             // Logo
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                gradient: themeColors.accentGradient,
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: themeColors.gold.withValues(alpha: 0.4),
-                    blurRadius: 30,
-                    spreadRadius: 5,
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  '♠',
-                  style: TextStyle(fontSize: 64, color: themeColors.background),
+              Container(
+                width: 140,
+                height: 140,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: themeColors.accentGradient,
+                  borderRadius: BorderRadius.circular(40),
+                  boxShadow: [
+                    BoxShadow(
+                      color: themeColors.gold.withValues(alpha: 0.4),
+                      blurRadius: 30,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  fit: BoxFit.contain,
                 ),
               ),
-            ),
             const SizedBox(height: 32),
             
             // Title

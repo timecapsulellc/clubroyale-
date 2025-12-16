@@ -9,6 +9,8 @@ enum StoryMediaType {
   photo,
   @JsonValue('video')
   video,
+  @JsonValue('gameResult')
+  gameResult,
 }
 
 /// Story model for 24-hour ephemeral content
@@ -21,7 +23,7 @@ abstract class Story with _$Story {
     required String userId,
     required String userName,
     String? userPhotoUrl,
-    required String mediaUrl,
+    String? mediaUrl, // Optional - not needed for gameResult type
     @Default(StoryMediaType.photo) StoryMediaType mediaType,
     required DateTime createdAt,
     required DateTime expiresAt,
@@ -30,6 +32,11 @@ abstract class Story with _$Story {
     String? caption,
     String? textOverlay,
     String? textColor,
+    // Game result fields (for gameResult type)
+    String? gameType,
+    String? winnerId,
+    String? winnerName,
+    Map<String, int>? scores, // playerId -> score
   }) = _Story;
 
   factory Story.fromJson(Map<String, dynamic> json) => _$StoryFromJson(json);

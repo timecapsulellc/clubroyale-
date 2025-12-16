@@ -8,7 +8,7 @@
  * - Push notifications (FCM)
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processSettlement = exports.dailyCleanup = exports.weeklyTasks = exports.notifyAdminNewChat = exports.executeCooledGrants = exports.onGrantApproved = exports.monitorDiamondSupply = exports.checkTierUpgrade = exports.upgradeToVerified = exports.claimDailyLogin = exports.grantGameplayReward = exports.validateTransfer = exports.validateSpectatorAccess = exports.generateLiveKitToken = exports.auditGameUpdate = void 0;
+exports.processSettlement = exports.dailyCleanup = exports.weeklyTasks = exports.notifyAdminNewChat = exports.executeCooledGrants = exports.onGrantApproved = exports.monitorDiamondSupply = exports.checkTierUpgrade = exports.upgradeToVerified = exports.claimDailyLogin = exports.grantGameplayReward = exports.validateTransfer = exports.validateSpectatorAccess = exports.generateLiveKitToken = exports.onVoiceRoomCreated = exports.onFriendshipUpdated = exports.onFriendRequestCreated = exports.onStoryCreated = exports.onSocialMessageSent = exports.auditGameUpdate = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const app_1 = require("firebase-admin/app");
 const firestore_1 = require("firebase-admin/firestore");
@@ -16,6 +16,12 @@ const messaging_1 = require("firebase-admin/messaging");
 // Import Triggers
 var auditTriggers_1 = require("./triggers/auditTriggers");
 Object.defineProperty(exports, "auditGameUpdate", { enumerable: true, get: function () { return auditTriggers_1.auditGameUpdate; } });
+var social_1 = require("./triggers/social");
+Object.defineProperty(exports, "onSocialMessageSent", { enumerable: true, get: function () { return social_1.onSocialMessageSent; } });
+Object.defineProperty(exports, "onStoryCreated", { enumerable: true, get: function () { return social_1.onStoryCreated; } });
+Object.defineProperty(exports, "onFriendRequestCreated", { enumerable: true, get: function () { return social_1.onFriendRequestCreated; } });
+Object.defineProperty(exports, "onFriendshipUpdated", { enumerable: true, get: function () { return social_1.onFriendshipUpdated; } });
+Object.defineProperty(exports, "onVoiceRoomCreated", { enumerable: true, get: function () { return social_1.onVoiceRoomCreated; } });
 // Export LiveKit token functions
 var tokenService_1 = require("./livekit/tokenService");
 Object.defineProperty(exports, "generateLiveKitToken", { enumerable: true, get: function () { return tokenService_1.generateLiveKitToken; } });

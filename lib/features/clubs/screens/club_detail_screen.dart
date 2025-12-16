@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/clubs/club_model.dart';
 import 'package:clubroyale/features/clubs/club_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:go_router/go_router.dart';
 
 class ClubDetailScreen extends ConsumerWidget {
   final String clubId;
@@ -41,6 +42,21 @@ class ClubDetailScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            floatingActionButton: club.memberIds.contains(ref.read(authServiceProvider).currentUser?.uid)
+              ? FloatingActionButton.extended(
+                  onPressed: () {
+                    if (club.chatId != null) {
+                      context.push('/social/chat/${club.chatId}');
+                    } else {
+                       ScaffoldMessenger.of(context).showSnackBar(
+                         const SnackBar(content: Text('Chat not available for this club'))
+                       );
+                    }
+                  },
+                  label: const Text('Club Chat'),
+                  icon: const Icon(Icons.forum),
+                )
+              : null,
           ),
         );
       },

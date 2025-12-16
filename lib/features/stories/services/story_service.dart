@@ -98,6 +98,49 @@ class StoryService {
     return story;
   }
 
+  /// Create a game result story (auto-generated after game completion)
+  Future<Story> createGameResultStory({
+    required String gameType,
+    required String winnerId,
+    required String winnerName,
+    required Map<String, int> scores,
+    String? caption,
+  }) async {
+    final userId = ref.read(currentUserIdProvider);
+    final userProfile = ref.read(authStateProvider).value;
+    
+    if (userId == null) {
+      throw Exception('User not authenticated');
+    }
+
+    final now = DateTime.now();
+    final expiresAt = now.add(storyDuration);
+    
+    final storyDoc = _storiesRef.doc();
+    final story = Story(
+      id: storyDoc.id,
+      userId: userId,
+      userName: userProfile?.displayName ?? 'Player',
+      userPhotoUrl: userProfile?.photoURL,
+      mediaType: StoryMediaType.gameResult,
+      createdAt: now,
+      expiresAt: expiresAt,
+      caption: caption ?? 'Game completed!',
+      gameType: gameType,
+      winnerId: winnerId,
+      winnerName: winnerName,
+      scores: scores,
+    );
+
+    await storyDoc.set({
+      ...story.toJson(),
+      'createdAt': FieldValue.serverTimestamp(),
+      'expiresAt': Timestamp.fromDate(expiresAt),
+    });
+
+    return story;
+  }
+
   /// Get stories by a specific user
   Stream<List<Story>> getUserStories(String userId) {
     final now = DateTime.now();
@@ -237,7 +280,7 @@ class StoryService {
       userId: data['userId'] as String,
       userName: data['userName'] as String,
       userPhotoUrl: data['userPhotoUrl'] as String?,
-      mediaUrl: data['mediaUrl'] as String,
+      mediaUrl: data['mediaUrl'] as String?,
       mediaType: StoryMediaType.values.firstWhere(
         (e) => e.name == data['mediaType'],
         orElse: () => StoryMediaType.photo,
@@ -250,6 +293,13 @@ class StoryService {
       caption: data['caption'] as String?,
       textOverlay: data['textOverlay'] as String?,
       textColor: data['textColor'] as String?,
+      // Game result fields
+      gameType: data['gameType'] as String?,
+      winnerId: data['winnerId'] as String?,
+      winnerName: data['winnerName'] as String?,
+      scores: data['scores'] != null 
+          ? Map<String, int>.from(data['scores']) 
+          : null,
     );
   }
 

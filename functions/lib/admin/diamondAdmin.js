@@ -9,7 +9,8 @@ exports.notifyAdminNewChat = exports.executeCooledGrants = exports.onGrantApprov
 const firestore_1 = require("firebase-functions/v2/firestore");
 const scheduler_1 = require("firebase-functions/v2/scheduler");
 const firestore_2 = require("firebase-admin/firestore");
-const db = (0, firestore_2.getFirestore)();
+// Lazy initialization
+const db = () => (0, firestore_2.getFirestore)();
 // Approval thresholds
 const SINGLE_APPROVAL_LIMIT = 999;
 const DUAL_APPROVAL_LIMIT = 9999;
@@ -34,7 +35,7 @@ exports.onGrantApproved = (0, firestore_1.onDocumentUpdated)('diamond_requests/{
  */
 exports.executeCooledGrants = (0, scheduler_1.onSchedule)('every 1 hours', async () => {
     const now = firestore_2.Timestamp.now();
-    const cooledGrants = await db
+    const cooledGrants = await db()
         .collection('diamond_requests')
         .where('status', '==', 'cooling_period')
         .where('coolingPeriodEnds', '<', now)
@@ -53,16 +54,16 @@ exports.executeCooledGrants = (0, scheduler_1.onSchedule)('every 1 hours', async
 async function executeGrant(requestId, requestData) {
     const targetUserId = requestData.targetUserId;
     const amount = requestData.amount;
-    const batch = db.batch();
+    const batch = db().batch();
     // Update wallet balance
-    const walletRef = db.collection('wallets').doc(targetUserId);
+    const walletRef = db().collection('wallets').doc(targetUserId);
     batch.update(walletRef, {
         balance: firestore_2.FieldValue.increment(amount),
         totalPurchased: firestore_2.FieldValue.increment(amount),
         lastUpdated: firestore_2.FieldValue.serverTimestamp(),
     });
     // Record transaction
-    const txRef = db.collection('transactions').doc();
+    const txRef = db().collection('transactions').doc();
     batch.set(txRef, {
         userId: targetUserId,
         amount: amount,
@@ -72,7 +73,7 @@ async function executeGrant(requestId, requestData) {
         createdAt: firestore_2.FieldValue.serverTimestamp(),
     });
     // Update request status
-    const requestRef = db.collection('diamond_requests').doc(requestId);
+    const requestRef = db().collection('diamond_requests').doc(requestId);
     batch.update(requestRef, {
         status: 'executed',
         executedAt: firestore_2.FieldValue.serverTimestamp(),
