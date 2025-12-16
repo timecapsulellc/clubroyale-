@@ -139,29 +139,37 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                       ),
                     ),
                   )
-                : Image.network(
-                    _currentStory.mediaUrl,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                          color: colorScheme.primary,
+                : _currentStory.mediaUrl != null 
+                    ? Image.network(
+                        _currentStory.mediaUrl!,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                              color: colorScheme.primary,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) => const Center(
+                          child: Icon(
+                            Icons.error_outline,
+                            size: 64,
+                            color: Colors.white54,
+                          ),
                         ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) => const Center(
-                      child: Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: Colors.white54,
+                      )
+                    : const Center(
+                        child: Icon(
+                          Icons.image_not_supported,
+                          size: 64,
+                          color: Colors.white54,
+                        ),
                       ),
-                    ),
-                  ),
 
             // Gradient overlay at top
             Positioned(

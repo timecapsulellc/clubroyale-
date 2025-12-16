@@ -1,32 +1,33 @@
 # ClubRoyale 🃏
 
-> **Your Private Card Club** - A premium multiplayer card game platform with AI-powered gameplay
+> **Play & Connect** - A premium social gaming platform with classic card games, voice rooms, stories, and community features
 
-[![Live](https://img.shields.io/badge/Live-taasclub--app.web.app-brightgreen)](https://taasclub-app.web.app)
+[![Live](https://img.shields.io/badge/Live-clubroyale--app.web.app-brightgreen)](https://clubroyale-app.web.app)
 [![Android](https://img.shields.io/badge/Android-APK%20Ready-green)](./build/app/outputs/flutter-apk/app-release.apk)
-[![Tests](https://img.shields.io/badge/Tests-162%20Passing-brightgreen)](./test)
-[![Score](https://img.shields.io/badge/Quality%20Score-99%2F100-blue)]()
+[![Tests](https://img.shields.io/badge/Tests-168%20Passing-brightgreen)](./test)
+[![Score](https://img.shields.io/badge/Quality%20Score-100%2F100-blue)]()
 
 ---
 
 ## 🎮 What is ClubRoyale?
 
-ClubRoyale is a **premium multiplayer card game platform** that digitizes the "Home Game" experience. Host private rooms, play popular card games with friends, and settle scores seamlessly.
+ClubRoyale is a **Play & Connect** social gaming platform that combines classic card games with modern social features. It's not just about playing games—it's about connecting with friends, sharing moments, and being part of a gaming community.
 
 ### For Players
-- 🃏 **Play 4 Games**: Royal Meld (Marriage), Call Break, Teen Patti, In-Between
-- 👥 **Multiplayer**: 2-8 players per room
-- 🤖 **AI Opponents**: Smart bots fill empty seats (GenKit AI)
-- 💬 **Social**: Chat, voice, video during games
-- 📱 **Anywhere**: Web PWA, Android (iOS coming soon)
-- 🎨 **5 Themes**: Royal Green, Purple, Blue, Crimson, Emerald
-- 🌙 **Day/Night Mode**: Light and dark themes
+- 🃏 **4 Premium Games**: Royal Meld (Marriage), Call Break, Teen Patti, In-Between
+- � **Social Hub**: Chat, Stories, Activity Feed, Online Friends Bar
+- 🎙️ **Voice Rooms**: Live audio chat during games and hangouts
+- 👥 **Clubs & Communities**: Join gaming clubs with leaderboards
+- 👀 **Spectator Mode**: Watch live games with friends
+- 🏆 **Tournaments**: Compete in bracket-style tournaments
+- 📱 **Cross-Platform**: Web PWA, Android (iOS coming soon)
+- 🎨 **5 Beautiful Themes**: Royal Green, Purple, Blue, Crimson, Emerald
 
 ### For Hosts
-- 🏠 **Private Rooms**: Share 6-digit code with friends
-- 💎 **Diamond Economy**: Earn free diamonds daily
-- 📊 **Settlement**: Auto-calculate "who owes whom"
-- 📤 **Share**: Export settlement to WhatsApp
+- 🏠 **Private Rooms**: Share 6-digit codes with friends
+- 💎 **Diamond Economy**: Earn free diamonds through social activities
+- 📊 **Auto Settlement**: Calculate "who owes whom" instantly
+- 📤 **Share Results**: Export to WhatsApp or post to Story
 
 ---
 
@@ -41,12 +42,12 @@ cd ClubRoyale
 flutter pub get
 
 # Run on Chrome (Web)
-flutter run -d chrome
+flutter run -d chrome --web-port 8081
 
 # Build Android APK
 flutter build apk --release
 
-# Build Web
+# Build Web (Production)
 flutter build web
 ```
 
@@ -58,47 +59,81 @@ flutter build web
 |--------|-------|
 | **Status** | 🟢 Production Ready |
 | **Quality Score** | 100/100 |
-| **Dart Files** | 232 |
-| **Lines of Code** | 65,264 |
+| **Dart Files** | 240+ |
+| **Lines of Code** | 68,000+ |
 | **Tests Passing** | 168/169 (99.4%) |
-| **Cloud Functions** | 12 Deployed |
+| **Cloud Functions** | 25+ Deployed |
 | **AI Flows** | 6 GenKit Flows |
-| **Feature Modules** | 27 |
-| **Theme Presets** | 5 |
+| **Feature Modules** | 30+ |
+| **Development Phases** | 19 Complete |
 
 ### Platform Availability
 
 | Platform | Status | Access |
 |----------|--------|--------|
-| **Web PWA** | 🟢 Live | [taasclub-app.web.app](https://taasclub-app.web.app) |
+| **Web PWA** | 🟢 Live | [clubroyale-app.web.app](https://clubroyale-app.web.app) |
 | **Android** | ✅ Ready | APK in `build/` folder |
 | **iOS** | ⏳ Coming Soon | Firebase configured |
 
 ---
 
-## 🎨 Theme System (NEW!)
+## ✅ Completed Development Phases
 
-Switch between 5 beautiful color themes:
-
-| Theme | Primary | Accent |
+### Phase 1-7: Core Foundation
+| Phase | Feature | Status |
 |-------|---------|--------|
-| 🟢 **Royal Green** (Default) | Forest Green | Gold |
-| 🟣 Royal Purple | Deep Purple | Gold |
-| 🔵 Midnight Blue | Navy | Silver |
-| 🔴 Crimson | Dark Red | Gold |
-| 🌿 Emerald | Teal | Champagne |
+| 1 | Read Receipts (Blue Ticks) | ✅ Complete |
+| 2 | Diamond Gift Messages | ✅ Complete |
+| 3 | Auto Game Result Stories | ✅ Complete |
+| 4 | In-Game Social Overlay | ✅ Complete |
+| 5 | Spectator Mode | ✅ Complete |
+| 6 | Group Video Calls (1-8 players) | ✅ Complete |
+| 7 | Cloud Function Triggers | ✅ Complete |
 
-**Features:**
-- Day/Night mode toggle
-- Persisted to device storage
-- Beautiful theme picker in Settings
+### Phase 15-17: Verification & Polish
+| Phase | Feature | Status |
+|-------|---------|--------|
+| 15 | Firebase Cloud Functions Deployment | ✅ Complete |
+| 16 | Admin Chat, Voice Room Token, Sound Effects | ✅ Complete |
+| 17 | Final Audit, Analytics Integration | ✅ Complete |
+
+### Phase 18: Diamond Revenue Model V5
+| Component | Description | Status |
+|-----------|-------------|--------|
+| Core Config | `SocialDiamondRewards`, `VoiceRoomDiamondConfig`, `StoryDiamondConfig` | ✅ |
+| Social Diamond Service | Voice room hosting, story views, game invites, tipping | ✅ |
+| Cloud Functions | `grantSocialRewardFunction`, `processVoiceRoomTip`, scheduled rewards | ✅ |
+| Earn Diamonds UI | Social tab with daily progress and activity cards | ✅ |
+
+### Phase 19: In-Game Social Features
+| Component | Description | Status |
+|-----------|-------------|--------|
+| Social Overlay | Chat/Voice/Spectator tabs during gameplay | ✅ |
+| Voice Control Panel | Mic toggle, join/leave, participant display | ✅ |
+| Spectator List Panel | Real-time count, viewer list, share link | ✅ |
+| Game Result Story Sheet | Victory UI, "Post to Story" with captions | ✅ |
 
 ---
 
-## 🎯 Features
+## 🎯 Complete Feature List
 
-### Games (4 Complete)
+### 📱 Social-First Features (NEW!)
+| Feature | Description |
+|---------|-------------|
+| **Onboarding ("Play & Connect")** | Social-first welcome flow highlighting community |
+| **Activity Feed** | Social feed with game results, friend activities |
+| **Stories** | Share game highlights, 24-hour expiring stories |
+| **Online Friends Bar** | See who's online, quick invite to games |
+| **Quick Social Actions** | One-tap access to Chat, Friends, Activity |
+| **Voice Rooms** | Live audio during games and hangouts |
+| **Clubs** | Gaming communities with leaderboards |
+| **Spectator Mode** | Watch live games, spectator count badge |
+| **Game Invites** | In-chat game invitations |
+| **Diamond Gifts** | Send diamonds with animated messages |
+| **Reply to Messages** | Quote and reply to chat messages |
+| **Read Receipts** | Blue tick indicators (sent/delivered/read) |
 
+### 🃏 Card Games (4 Complete)
 | Game | Players | AI Bots | Status |
 |------|---------|---------|--------|
 | **Royal Meld** (Marriage) | 2-8 | ✅ GenKit | 🟢 Complete |
@@ -106,45 +141,42 @@ Switch between 5 beautiful color themes:
 | **Teen Patti** | 2-8 | ✅ GenKit | 🟢 Complete |
 | **In-Between** | 2-6 | ✅ GenKit | 🟢 Complete |
 
-### Multi-Region Terminology
+### 💎 Diamond Economy V5
+| Earn Method | Diamonds | Daily Cap |
+|-------------|----------|-----------|
+| Welcome Bonus | 100 💎 | Once |
+| Daily Login | 10 💎 | 1x/day |
+| Watch Ad | 20 💎 | 6x/day |
+| Complete Game | 5 💎 | Unlimited |
+| Voice Room Host (15 min) | 5 💎 | 30 💎/day |
+| Story Views (10 views) | 2 💎 | 20 💎/day |
+| Game Invite Accepted | 3 💎 | 15 💎/day |
+| Weekly Engagement Tier | 10-100 💎 | Weekly |
+| Monthly Milestone | 50-500 💎 | Monthly |
 
-| Global (ClubRoyale) | South Asia (Traditional) |
-|---------------------|--------------------------|
-| Royal Meld | Marriage |
-| Wild Card | Tiplu |
-| High Wild | Poplu |
-| Low Wild | Jhiplu |
-| Royal Sequence | Marriage (meld) |
-| Go Royale | Declare |
+### 🎙️ Voice & Video
+| Feature | Status |
+|---------|--------|
+| WebRTC Voice Chat | ✅ |
+| LiveKit Video Calls | ✅ |
+| 1-8 Player Video Grid | ✅ |
+| Speaking Indicators | ✅ |
+| Mute/Unmute Controls | ✅ |
 
-### Core Features
-- ✅ **Theme System** - 5 presets + day/night mode
-- ✅ **Lobby System** - Create/join rooms with 6-digit codes
-- ✅ **ELO Matchmaking** - Skill-based player pairing
-- ✅ **Real-time Chat** - In-game, lobby, and direct messages
-- ✅ **Voice/Video** - WebRTC audio + LiveKit video
-- ✅ **Stories** - Share moments with friends
-- ✅ **Diamond Economy** - Free daily bonuses
-- ✅ **Settlement Calculator** - Auto-calculate and share results
-- ✅ **Anti-Cheat** - Server-side move validation
-- ✅ **AI Moderation** - GenKit-powered chat filtering
-- ✅ **Activity Feed** - Social feed with game results (NEW)
-- ✅ **Tournaments** - Bracket system with lobbies (NEW)
-- ✅ **Clubs/Groups** - Gaming clubs with leaderboards (NEW)
-- ✅ **Replay System** - Record and playback games (NEW)
-- ✅ **Spectator Mode** - Watch live games (NEW)
-- ✅ **Achievement Badges** - 21 achievements to unlock (NEW)
-
-### AI Integration (GenKit + Gemini)
-
-| Flow | Purpose |
-|------|---------|
-| `gameTipFlow` | Suggest optimal card to play |
-| `botPlayFlow` | AI opponent card selection |
-| `moderationFlow` | Chat content filtering |
-| `bidSuggestionFlow` | Bid recommendations |
-| `matchmakingFlow` | ELO-based player matching |
-| `marriageBotPlay` | Marriage-specific AI |
+### 🏗️ Core Infrastructure
+| Feature | Status |
+|---------|--------|
+| Lobby System (6-digit codes) | ✅ |
+| ELO Matchmaking | ✅ |
+| Real-time Chat | ✅ |
+| Settlement Calculator | ✅ |
+| Anti-Cheat (Server-side) | ✅ |
+| AI Moderation (GenKit) | ✅ |
+| Tournaments (Bracket System) | ✅ |
+| Replay System | ✅ |
+| 21 Achievement Badges | ✅ |
+| Push Notifications (FCM) | ✅ |
+| PWA (Installable) | ✅ |
 
 ---
 
@@ -153,43 +185,77 @@ Switch between 5 beautiful color themes:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    FLUTTER FRONTEND                             │
-│  • 4 Game Engines  • 20 Feature Modules  • 5 Theme Presets     │
+│  • 4 Game Engines  • 30+ Feature Modules  • 5 Theme Presets     │
 ├─────────────────────────────────────────────────────────────────┤
 │                    STATE (Riverpod 3.x)                         │
 ├─────────────────────────────────────────────────────────────────┤
-│                    SERVICE LAYER (22 Services)                  │
+│                    SERVICE LAYER (25+ Services)                 │
+│  • AuthService  • SocialService  • DiamondService  • VoiceRoom  │
+│  • StoryService • SpectatorService • PresenceService • Chat     │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    FIREBASE BACKEND                             │
-│  • Firestore DB  • Auth  • 12 Cloud Functions  • Storage       │
+│  • Firestore DB  • Auth  • 25+ Cloud Functions  • Storage      │
 ├─────────────────────────────────────────────────────────────────┤
 │                    AI LAYER (GenKit + Gemini Pro)               │
-│  • 6 AI Flows  • Real-time Processing  • Chat Moderation       │
+│  • 6 AI Flows  • Real-time Bot Play  • Chat Moderation          │
+├─────────────────────────────────────────────────────────────────┤
+│                    CLOUD FUNCTIONS                              │
+│  • Social Triggers  • Diamond Rewards  • Scheduled Jobs         │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+### Key Service Files
+
+| Service | Purpose | Location |
+|---------|---------|----------|
+| `social_service.dart` | Chat, messages, social operations | `lib/features/social/services/` |
+| `presence_service.dart` | Online status tracking | `lib/features/social/services/` |
+| `social_diamond_service.dart` | Social diamond rewards | `lib/features/wallet/` |
+| `story_service.dart` | Stories CRUD | `lib/features/stories/services/` |
+| `spectator_service.dart` | Spectator mode | `lib/features/game/services/` |
+| `voice_room_service.dart` | Voice chat rooms | `lib/features/social/services/` |
+
+### Key Widget Files
+
+| Widget | Purpose | Location |
+|--------|---------|----------|
+| `social_overlay.dart` | In-game social panel | `lib/features/game/widgets/` |
+| `game_result_story_sheet.dart` | Post-game story creator | `lib/features/game/widgets/` |
+| `spectator_badge.dart` | Spectator count display | `lib/features/game/widgets/` |
+| `online_friends_bar.dart` | Friends online indicator | `lib/features/social/widgets/` |
+| `quick_social_actions.dart` | Quick action buttons | `lib/features/social/widgets/` |
+| `social_feed_widget.dart` | Activity feed | `lib/features/social/widgets/` |
+
 ---
 
-## 💎 Revenue Model (Safe Harbor)
+## 🔮 Roadmap: What's Next
 
-> **The app is a CALCULATOR, not a BANK.**
+### Immediate (Q1 2025)
+- [ ] iOS App Store Release
+- [ ] Performance optimization for low-end devices
+- [ ] Advanced club management features
+- [ ] Tournament prizes and rewards
 
-| Earn Diamonds | Amount |
-|---------------|--------|
-| Welcome Bonus | 100 💎 |
-| Daily Login | 10 💎 |
-| Watch Ad | 20 💎 (6x/day) |
-| Complete Game | 5 💎 |
-| Referral | 50 💎 |
+### Short-Term (Q2 2025)
+- [ ] Seasonal events and limited-time games
+- [ ] Profile customization (avatars, frames)
+- [ ] Enhanced achievement system
+- [ ] Community moderation tools
 
-| Spend Diamonds | Cost |
-|----------------|------|
-| Create Room | 10 💎 |
-| Ad-Free Game | 5 💎 |
+### Medium-Term (Q3-Q4 2025)
+- [ ] Regional game variants (Nepali, Indian versions)
+- [ ] Team tournaments
+- [ ] Creator program for content creators
+- [ ] API for third-party integrations
 
-**No real money transactions.** Settlement is for offline use only.
+### Long-Term Vision
+- [ ] More card games (Rummy, Poker variants)
+- [ ] Cross-promotional features with other apps
+- [ ] White-label solution for private clubs
+- [ ] AI-powered game coaching
 
 ---
 
@@ -197,33 +263,42 @@ Switch between 5 beautiful color themes:
 
 ```
 ClubRoyale/
-├── lib/                      # Flutter app (222 files, 64K LOC)
-│   ├── core/                 # Shared utilities (15 modules)
-│   │   ├── theme/            # Multi-theme system
-│   │   ├── widgets/          # Common widgets
-│   │   └── services/         # Core services
-│   ├── features/             # Feature modules (20 modules)
-│   │   ├── auth/             # Authentication
-│   │   ├── lobby/            # Room management
-│   │   ├── chat/             # Messaging
-│   │   ├── social/           # Friends, presence, stories
-│   │   ├── wallet/           # Diamond economy
-│   │   ├── settings/         # Theme selector here
-│   │   └── ...
-│   └── games/                # Game engines (4 games)
-│       ├── marriage/         # 52 tests
-│       ├── call_break/       # 20 tests
-│       ├── teen_patti/
-│       └── in_between/
-├── functions/                # Cloud Functions (12 functions)
+├── lib/                          # Flutter app (240+ files, 68K+ LOC)
+│   ├── core/                     # Shared utilities
+│   │   ├── theme/                # Multi-theme system
+│   │   ├── config/               # Diamond config, game terminology
+│   │   ├── widgets/              # Common widgets
+│   │   ├── audio/                # Sound service
+│   │   └── services/             # Analytics, share, deferred
+│   ├── features/                 # Feature modules (30+ modules)
+│   │   ├── auth/                 # Authentication
+│   │   ├── lobby/                # Room management
+│   │   ├── social/               # Chat, friends, presence, voice
+│   │   ├── stories/              # Stories feature
+│   │   ├── wallet/               # Diamond economy
+│   │   ├── game/                 # Game screens, overlays, spectator
+│   │   ├── clubs/                # Club system
+│   │   ├── tournament/           # Tournament system
+│   │   ├── replay/               # Game replay
+│   │   ├── profile/              # User profiles
+│   │   ├── onboarding/           # First-run experience
+│   │   ├── settings/             # Settings & themes
+│   │   └── admin/                # Admin panel
+│   └── games/                    # Game engines (4 games)
+│       ├── marriage/             # Royal Meld
+│       ├── call_break/           # Call Break
+│       ├── teen_patti/           # Teen Patti
+│       └── in_between/           # In-Between
+├── functions/                    # Cloud Functions (25+ functions)
 │   └── src/
-│       ├── genkit/           # 6 AI flows
-│       └── triggers/         # Firestore triggers
-├── web/                      # PWA assets
-├── android/                  # Android platform
-├── ios/                      # iOS platform
-├── test/                     # 19 test files
-└── docs/                     # 50 documentation files
+│       ├── genkit/               # 6 AI flows
+│       ├── triggers/             # Firestore triggers
+│       └── rewards/              # Social diamond rewards
+├── web/                          # PWA assets
+├── android/                      # Android platform
+├── ios/                          # iOS platform
+├── test/                         # Test files
+└── docs/                         # 40+ documentation files
 ```
 
 ---
@@ -233,11 +308,11 @@ ClubRoyale/
 | Category | Documents |
 |----------|-----------|
 | **Strategy** | [PRD](./docs/PRD_TAASCLUB.md), [Roadmap](./docs/ULTIMATE_ROADMAP.md), [Audit](./docs/ULTIMATE_AUDIT_REPORT.md) |
+| **Architecture** | [Architecture Audit](./docs/ARCHITECTURE_AUDIT.md), [Tech Summary](./docs/PROJECT_TECHNICAL_SUMMARY.md) |
 | **Games** | [Marriage Rules](./docs/MARRIAGE_GAME_SPEC.md), [Game SDK](./docs/GAME_ENGINE_SDK.md) |
 | **Legal** | [Privacy Policy](./docs/PRIVACY_POLICY.md), [Terms](./docs/TERMS_OF_SERVICE.md), [Data Safety](./docs/DATA_SAFETY_DECLARATION.md) |
 | **Setup** | [FCM](./docs/FCM_SETUP.md), [LiveKit](./docs/LIVEKIT_SETUP.md), [Deep Links](./docs/DEEP_LINKS_SETUP.md) |
-| **Store** | [Listing](./docs/STORE_LISTING.md), [Assets](./docs/STORE_ASSETS.md), [Icons](./docs/ICON_DESIGN_SPECS.md) |
-| **Status** | [Remaining Tasks](./docs/REMAINING_TASKS.md), [Project Status](./docs/REMAINING_TASKS.md) |
+| **Store** | [Listing](./docs/STORE_LISTING.md), [Assets](./docs/STORE_ASSETS.md), [Brand](./docs/BRAND_STYLE_GUIDE.md) |
 
 ---
 
@@ -249,23 +324,45 @@ ClubRoyale/
 | **Language** | Dart 3.10 (null-safe) |
 | **State** | Riverpod 3.x |
 | **Routing** | GoRouter |
-| **Backend** | Firebase (Firestore, Auth, Functions, Storage) |
+| **Backend** | Firebase (Firestore, Auth, Functions, Storage, FCM) |
 | **AI/ML** | GenKit + Gemini Pro (Google AI) |
 | **Video** | LiveKit |
-| **Audio** | WebRTC |
+| **Audio** | WebRTC + audioplayers |
 | **Ads** | Google AdMob (Ready) |
-| **IAP** | RevenueCat (Ready) |
+| **Analytics** | Firebase Analytics |
 
 ---
 
-## 🔗 Links
+## 🏆 Quality Metrics
 
-| Resource | URL |
-|----------|-----|
-| **Live App** | https://taasclub-app.web.app |
-| **Firebase Console** | https://console.firebase.google.com/project/taasclub-app |
-| **GitHub** | https://github.com/timecapsulellc/TaasClub |
-| **Documentation** | [./docs/README.md](./docs/README.md) |
+- ✅ **168/169 tests passing** (99.4%)
+- ✅ **Zero critical bugs**
+- ✅ **Type-safe codebase** (null-safety enabled)
+- ✅ **Enterprise-grade security** (server-side validation)
+- ✅ **Legal compliance** (Safe Harbor model)
+- ✅ **PWA optimized** (installable, offline-ready)
+- ✅ **19 development phases complete**
+- ✅ **25+ Cloud Functions deployed**
+- ✅ **Social-first architecture**
+
+---
+
+## 🆕 Recent Updates (December 2025)
+
+| Update | Description |
+|--------|-------------|
+| **Play & Connect Onboarding** | Social-first welcome flow |
+| **Diamond Revenue V5** | Social earning methods (voice, stories, invites) |
+| **In-Game Social Overlay** | Chat/Voice/Spectator during gameplay |
+| **Game Result Stories** | Post wins directly to Story |
+| **Spectator Mode** | Watch live games with badge |
+| **Voice Room Integration** | Mic controls, participant display |
+| **Reply to Messages** | Quote and reply in chat |
+| **Diamond Gifts** | Send animated diamond messages |
+| **Read Receipts** | Blue tick indicators |
+| **Firebase Config Fix** | Web platform RTDB handling |
+
+**Last Updated:** December 16, 2025
 
 ---
 
@@ -275,27 +372,11 @@ Proprietary - Metaweb Technologies
 
 ---
 
-## 🏆 Quality Metrics
+## 🔗 Links
 
-- ✅ **162/169 tests passing** (96%)
-- ✅ **Zero critical bugs**
-- ✅ **Type-safe codebase** (null-safety enabled)
-- ✅ **Enterprise-grade security** (server-side validation)
-- ✅ **Legal compliance** (Safe Harbor model)
-- ✅ **PWA optimized** (installable, offline-ready)
-- ✅ **Multi-theme** (5 presets + day/night)
-
----
-
-## 🆕 Recent Updates (December 2025)
-
-| Update | Description |
-|--------|-------------|
-| **Social Features** | Activity Feed, Tournaments, Clubs (NEW) |
-| **Replay System** | Record and playback games (NEW) |
-| **Spectator Mode** | Watch live games (NEW) |
-| **Achievement Badges** | 21 achievements to unlock (NEW) |
-| **Multi-Theme** | 5 color presets with day/night mode |
-| **Branding** | TaasClub → ClubRoyale |
-
-**Last Updated:** December 12, 2025
+| Resource | URL |
+|----------|-----|
+| **Live App** | https://clubroyale-app.web.app |
+| **Firebase Console** | https://console.firebase.google.com/project/taasclub-app |
+| **GitHub** | https://github.com/timecapsulellc/TaasClub |
+| **Documentation** | [./docs/README.md](./docs/README.md) |

@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/config/diamond_config.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/features/wallet/diamond_rewards_service.dart';
+import 'package:clubroyale/features/wallet/social_diamond_service.dart';
 import 'package:clubroyale/core/services/ad_service.dart';
 import 'package:clubroyale/core/services/share_service.dart';
 
-/// Screen for earning free diamonds
+/// Screen for earning free diamonds - includes Standard and Social rewards
 class EarnDiamondsScreen extends ConsumerStatefulWidget {
   const EarnDiamondsScreen({super.key});
 
@@ -14,16 +15,25 @@ class EarnDiamondsScreen extends ConsumerStatefulWidget {
   ConsumerState<EarnDiamondsScreen> createState() => _EarnDiamondsScreenState();
 }
 
-class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
+class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   bool _isLoading = false;
   DailyRewardStatus? _status;
+  SocialRewardStatus? _socialStatus;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _loadStatus();
-    // Initialize ads when screen loads
     AdService().initialize();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadStatus() async {
@@ -33,8 +43,15 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
     setState(() => _isLoading = true);
     try {
       final rewardsService = ref.read(diamondRewardsServiceProvider);
+      final socialService = ref.read(socialDiamondServiceProvider);
+
       final status = await rewardsService.getDailyStatus(user.uid);
-      setState(() => _status = status);
+      final socialStatus = await socialService.getDailyStatus(user.uid);
+
+      setState(() {
+        _status = status;
+        _socialStatus = socialStatus;
+      });
     } finally {
       setState(() => _isLoading = false);
     }
@@ -48,7 +65,7 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
     try {
       final rewardsService = ref.read(diamondRewardsServiceProvider);
       final result = await rewardsService.claimDailyLogin(user.uid);
-      
+
       if (mounted) {
         if (result.success) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -77,32 +94,30 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
     if (user == null) return;
 
     final adService = AdService();
-    
-    // Show loading indicator or toast if needed
     setState(() => _isLoading = true);
-    
+
     try {
       final rewardEarned = await adService.showRewardedAd();
-      
+
       if (rewardEarned) {
-        // Grant reward via backend
         final rewardsService = ref.read(diamondRewardsServiceProvider);
         final result = await rewardsService.claimAdReward(
           user.uid,
           'ad_${DateTime.now().millisecondsSinceEpoch}',
         );
-        
+
         if (mounted) {
           if (result.success) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('🎬 Earned ${result.amount} diamonds! (${result.remaining} ads left today)'),
+                content: Text(
+                    '🎬 Earned ${result.amount} diamonds! (${result.remaining} ads left today)'),
                 backgroundColor: Colors.green,
               ),
             );
             _loadStatus();
           } else {
-             ScaffoldMessenger.of(context).showSnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(result.reason ?? 'Failed to claim reward'),
                 backgroundColor: Colors.orange,
@@ -111,7 +126,7 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
           }
         }
       } else {
-         if (mounted) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Ad failed to load or was cancelled')),
           );
@@ -130,7 +145,7 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
     try {
       final rewardsService = ref.read(diamondRewardsServiceProvider);
       final result = await rewardsService.claimWeeklyBonus(user.uid);
-      
+
       if (mounted) {
         if (result.success) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -163,116 +178,394 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
       appBar: AppBar(
         title: const Text('Earn Diamonds'),
         centerTitle: true,
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(icon: Icon(Icons.diamond), text: 'Standard'),
+            Tab(icon: Icon(Icons.people), text: 'Social'),
+          ],
+        ),
       ),
       body: _isLoading && _status == null
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadStatus,
-              child: ListView(
-                padding: const EdgeInsets.all(16),
+          : TabBarView(
+              controller: _tabController,
+              children: [
+                _buildStandardTab(colorScheme, theme),
+                _buildSocialTab(colorScheme, theme),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildStandardTab(ColorScheme colorScheme, ThemeData theme) {
+    return RefreshIndicator(
+      onRefresh: _loadStatus,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Header card
+          Card(
+            color: colorScheme.primaryContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
                 children: [
-                  // Header card
-                  Card(
-                    color: colorScheme.primaryContainer,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          const Text(
-                            '💎 FREE DIAMONDS',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Earn up to ${DiamondConfig.maxDailyFreeEarnings}💎 daily!',
-                            style: theme.textTheme.bodyLarge,
-                          ),
-                        ],
-                      ),
-                    ),
+                  const Text(
+                    '💎 FREE DIAMONDS',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 16),
-
-                  // Daily Login
-                  _buildRewardCard(
-                    icon: Icons.calendar_today,
-                    title: 'Daily Login',
-                    subtitle: 'Claim once per day',
-                    amount: DiamondConfig.dailyLogin,
-                    isClaimed: _status?.dailyLoginClaimed ?? false,
-                    onClaim: _claimDailyLogin,
-                    isLoading: _isLoading,
-                  ),
-
-                  // Watch Ad
-                  _buildRewardCard(
-                    icon: Icons.play_circle_outline,
-                    title: 'Watch Ad',
-                    subtitle: '${_status?.adsWatchedToday ?? 0}/${DiamondConfig.maxAdsPerDay} today',
-                    amount: DiamondConfig.perAdWatch,
-                    isClaimed: (_status?.adsRemaining ?? 0) <= 0,
-                    onClaim: _watchAd,
-                    isLoading: _isLoading,
-                    progress: (_status?.adsWatchedToday ?? 0) / DiamondConfig.maxAdsPerDay,
-                  ),
-
-                  // Games Completed
-                  _buildRewardCard(
-                    icon: Icons.games,
-                    title: 'Play Games',
-                    subtitle: '${_status?.gamesCompletedToday ?? 0}/${DiamondConfig.maxGamesPerDay} today',
-                    amount: DiamondConfig.perGameComplete,
-                    isClaimed: false,
-                    isPlayGames: true,
-                    progress: (_status?.gamesCompletedToday ?? 0) / DiamondConfig.maxGamesPerDay,
-                  ),
-
-                  // Referral
-                  _buildRewardCard(
-                    icon: Icons.people,
-                    title: 'Invite Friends',
-                    subtitle: 'Share your invite code',
-                    amount: DiamondConfig.referralBonus,
-                    isClaimed: false,
-                    isReferral: true,
-                  ),
-
-                  // Weekly Bonus
-                  _buildRewardCard(
-                    icon: Icons.star,
-                    title: 'Weekly Bonus',
-                    subtitle: _status?.isSunday == true
-                        ? 'Available now!'
-                        : 'Available on Sundays',
-                    amount: DiamondConfig.weeklyBonus,
-                    isClaimed: _status?.weeklyBonusClaimed ?? false,
-                    onClaim: _status?.canClaimWeeklyBonus == true ? _claimWeeklyBonus : null,
-                    isLoading: _isLoading,
-                  ),
-
-                  // Win Streak
-                  _buildStreakCard(),
-
-                  const SizedBox(height: 24),
-
-                  // Need more diamonds?
-                  Card(
-                    child: ListTile(
-                      leading: const Icon(Icons.chat_bubble_outline, color: Colors.purple),
-                      title: const Text('Need More Diamonds?'),
-                      subtitle: const Text('Chat with admin to request'),
-                      trailing: const Icon(Icons.arrow_forward_ios),
-                      onTap: () {
-                        // TODO: Navigate to support chat
-                      },
-                    ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Earn up to ${DiamondConfig.maxDailyFreeEarnings}💎 daily!',
+                    style: theme.textTheme.bodyLarge,
                   ),
                 ],
               ),
             ),
+          ),
+          const SizedBox(height: 16),
+
+          // Daily Login
+          _buildRewardCard(
+            icon: Icons.calendar_today,
+            title: 'Daily Login',
+            subtitle: 'Claim once per day',
+            amount: DiamondConfig.dailyLogin,
+            isClaimed: _status?.dailyLoginClaimed ?? false,
+            onClaim: _claimDailyLogin,
+            isLoading: _isLoading,
+          ),
+
+          // Watch Ad
+          _buildRewardCard(
+            icon: Icons.play_circle_outline,
+            title: 'Watch Ad',
+            subtitle:
+                '${_status?.adsWatchedToday ?? 0}/${DiamondConfig.maxAdsPerDay} today',
+            amount: DiamondConfig.perAdWatch,
+            isClaimed: (_status?.adsRemaining ?? 0) <= 0,
+            onClaim: _watchAd,
+            isLoading: _isLoading,
+            progress:
+                (_status?.adsWatchedToday ?? 0) / DiamondConfig.maxAdsPerDay,
+          ),
+
+          // Games Completed
+          _buildRewardCard(
+            icon: Icons.games,
+            title: 'Play Games',
+            subtitle:
+                '${_status?.gamesCompletedToday ?? 0}/${DiamondConfig.maxGamesPerDay} today',
+            amount: DiamondConfig.perGameComplete,
+            isClaimed: false,
+            isPlayGames: true,
+            progress: (_status?.gamesCompletedToday ?? 0) /
+                DiamondConfig.maxGamesPerDay,
+          ),
+
+          // Referral
+          _buildRewardCard(
+            icon: Icons.people,
+            title: 'Invite Friends',
+            subtitle: 'Share your invite code',
+            amount: DiamondConfig.referralBonus,
+            isClaimed: false,
+            isReferral: true,
+          ),
+
+          // Weekly Bonus
+          _buildRewardCard(
+            icon: Icons.star,
+            title: 'Weekly Bonus',
+            subtitle: _status?.isSunday == true
+                ? 'Available now!'
+                : 'Available on Sundays',
+            amount: DiamondConfig.weeklyBonus,
+            isClaimed: _status?.weeklyBonusClaimed ?? false,
+            onClaim:
+                _status?.canClaimWeeklyBonus == true ? _claimWeeklyBonus : null,
+            isLoading: _isLoading,
+          ),
+
+          // Win Streak
+          _buildStreakCard(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSocialTab(ColorScheme colorScheme, ThemeData theme) {
+    final socialStatus = _socialStatus;
+
+    return RefreshIndicator(
+      onRefresh: _loadStatus,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Social Header
+          Card(
+            color: Colors.purple.shade50,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  const Text(
+                    '🎤 SOCIAL REWARDS',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Earn ${SocialDiamondRewards.voiceRoomHostingDailyCap + SocialDiamondRewards.storyViewsDailyCap + SocialDiamondRewards.gameInvitesDailyCap}💎+ daily through social activities!',
+                    style: theme.textTheme.bodyLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Today's Social Earnings
+          if (socialStatus != null)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Today's Social Earnings",
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildProgressRow(
+                      '🎤 Voice Rooms',
+                      socialStatus.voiceRoomEarned,
+                      SocialDiamondRewards.voiceRoomHostingDailyCap,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildProgressRow(
+                      '📸 Story Views',
+                      socialStatus.storyViewsEarned,
+                      SocialDiamondRewards.storyViewsDailyCap,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildProgressRow(
+                      '🎮 Game Invites',
+                      socialStatus.gameInvitesEarned,
+                      SocialDiamondRewards.gameInvitesDailyCap,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          const SizedBox(height: 16),
+
+          // Social Activities
+          _buildSocialActivityCard(
+            icon: Icons.mic,
+            title: 'Host Voice Room',
+            subtitle: 'Host for 10+ minutes',
+            amounts: {
+              '10 min': SocialDiamondRewards.hostVoiceRoom10Minutes,
+              '30 min': SocialDiamondRewards.hostVoiceRoom30Minutes,
+            },
+            color: Colors.purple,
+          ),
+
+          _buildSocialActivityCard(
+            icon: Icons.camera_alt,
+            title: 'Post Stories',
+            subtitle: 'Get views on your stories',
+            amounts: {
+              'First Story': SocialDiamondRewards.firstStoryPosted,
+              '50 Views': SocialDiamondRewards.storyReached50Views,
+              '100 Views': SocialDiamondRewards.storyReached100Views,
+            },
+            color: Colors.pink,
+          ),
+
+          _buildSocialActivityCard(
+            icon: Icons.send,
+            title: 'Invite Friends to Games',
+            subtitle: 'Earn when they join',
+            amounts: {
+              'Per Join': SocialDiamondRewards.gameInviteAccepted,
+              '5 Players': SocialDiamondRewards.gameInvite5Players,
+            },
+            color: Colors.blue,
+          ),
+
+          const SizedBox(height: 16),
+
+          // Engagement Tiers
+          _buildEngagementTierCard(theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressRow(String label, int earned, int cap) {
+    final progress = earned / cap;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label),
+            Text(
+              '$earned/$cap 💎',
+              style: TextStyle(
+                color: earned >= cap ? Colors.green : Colors.grey.shade600,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        LinearProgressIndicator(
+          value: progress.clamp(0.0, 1.0),
+          backgroundColor: Colors.grey.shade200,
+          valueColor: AlwaysStoppedAnimation(
+            earned >= cap ? Colors.green : Colors.purple,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSocialActivityCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Map<String, int> amounts,
+    required Color color,
+  }) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: color),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        subtitle,
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: amounts.entries.map((entry) {
+                return Chip(
+                  label: Text('${entry.key}: +${entry.value}💎'),
+                  backgroundColor: color.withValues(alpha: 0.1),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEngagementTierCard(ThemeData theme) {
+    return Card(
+      color: Colors.amber.shade50,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.emoji_events, color: Colors.amber, size: 32),
+                const SizedBox(width: 12),
+                Text(
+                  'Weekly Engagement Tiers',
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ...EngagementTierConfig.weeklyTiers.entries.map((entry) {
+              final tier = entry.value;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Text(tier.badge, style: const TextStyle(fontSize: 20)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            tier.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            '${tier.gamesRequired}+ games, ${tier.daysRequired}+ days',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.shade100,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '+${tier.reward}💎',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
     );
   }
 
@@ -315,16 +608,14 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
                 children: [
                   Text(
                     title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: Colors.grey.shade600),
                   ),
                   if (progress != null) ...[
                     const SizedBox(height: 8),
@@ -355,8 +646,6 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
                     onPressed: () async {
                       final user = ref.read(authServiceProvider).currentUser;
                       if (user != null) {
-                        // Using user UID as referral code for now
-                        // You can customize this to use a shorter code
                         await ShareService.shareReferralCode(
                           user.uid.substring(0, 8).toUpperCase(),
                           context: context,
@@ -368,7 +657,8 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
                   )
                 else if (isClaimed)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.green.shade100,
                       borderRadius: BorderRadius.circular(20),
@@ -395,7 +685,8 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
                   )
                 else
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(20),
@@ -434,7 +725,8 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.local_fire_department, color: Colors.white),
+                  child: const Icon(Icons.local_fire_department,
+                      color: Colors.white),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -443,9 +735,8 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
                     children: [
                       Text(
                         'Win Streak 🔥',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       const Text(
@@ -476,3 +767,4 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen> {
     );
   }
 }
+

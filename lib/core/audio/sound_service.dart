@@ -2,11 +2,12 @@
 /// 
 /// Manages audio playback for game sounds and effects
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Sound service provider
-final soundServiceProvider = Provider((ref) => SoundService());
+/// Sound service provider - using Provider since SoundService is a ChangeNotifier
+final soundServiceProvider = ChangeNotifierProvider<SoundService>((ref) => SoundService());
 
 /// Sound types available in the game
 enum GameSound {
@@ -54,21 +55,39 @@ class SoundSettings {
 }
 
 /// Sound service for game audio
-class SoundService {
+class SoundService extends ChangeNotifier {
   SoundSettings _settings = const SoundSettings();
+  final AudioPlayer _player = AudioPlayer();
   
+  // Cache players for overlapping sounds if needed, 
+  // but for simple UI SFX single player with 'lowLatency' might suffice for now.
+  // Actually, for overlapping sounds (rapid card play), we might need a pool.
+  // AudioPlayers 'lowLatency' mode handles this reasonably well.
+  
+  SoundService() {
+    // Initialize audio player
+    try {
+        _player.setReleaseMode(ReleaseMode.stop);
+    } catch (e) {
+        debugPrint('Audio Init Error: $e');
+    }
+  }
+
   SoundSettings get settings => _settings;
   
   void updateSettings(SoundSettings settings) {
     _settings = settings;
+    notifyListeners();
   }
   
   void toggleSound() {
     _settings = _settings.copyWith(soundEnabled: !_settings.soundEnabled);
+    notifyListeners();
   }
   
   void toggleMusic() {
     _settings = _settings.copyWith(musicEnabled: !_settings.musicEnabled);
+    notifyListeners();
   }
   
   Future<void> play(GameSound sound) async {
@@ -78,10 +97,22 @@ class SoundService {
     if (soundFile == null) return;
     
     try {
+      // Create a *new* player for SFX to allow overlapping sounds (important for card games)
+      // Or use the shared one? Shared one cuts off previous sound.
+      // For card games, overlap is better.
+      // However, creating too many players is heavy.
+      // 'AudioPlayer' is relatively light.
+      final player = AudioPlayer();
+      await player.setVolume(_settings.soundVolume);
+      await player.play(AssetSource('sounds/$soundFile'), mode: PlayerMode.lowLatency);
+      // Auto dispose player after completion?
+      // AudioPlayers usually handles this if we don't keep reference, but we should be careful.
+      // Ideally we use a pool, but for now simple 'fire & forget' with new player is common in Flutter for SFX.
+      player.onPlayerComplete.listen((_) => player.dispose());
+      
       if (kDebugMode) {
-        print('🔊 Playing sound: $sound');
+        print('🔊 Playing sound: $soundFile');
       }
-      // TODO: Implement actual audio playback
     } catch (e) {
       if (kDebugMode) {
         print('Sound error: $e');
@@ -127,6 +158,12 @@ class SoundService {
       case GameSound.diamond:
         return 'ding.mp3';
     }
+  }
+  
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
   }
 }
 

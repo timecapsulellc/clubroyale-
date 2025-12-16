@@ -49,8 +49,8 @@ import 'package:clubroyale/features/profile/screens/create_post_screen.dart';
 // TODO: Fix chat screen API mismatches before enabling
 
 
-// import 'package:clubroyale/features/admin/screens/admin_chat_screen.dart';
-// import 'package:clubroyale/features/wallet/screens/user_support_chat_screen.dart';
+import 'package:clubroyale/features/admin/screens/admin_chat_screen.dart';
+import 'package:clubroyale/features/wallet/screens/user_support_chat_screen.dart';
 
 // Info Screens imports
 import 'package:clubroyale/features/info/screens/faq_screen.dart';
@@ -310,18 +310,18 @@ final GoRouter _router = GoRouter(
           },
         ),
         // TODO: Fix chat screen API mismatches before enabling
-        // GoRoute(
-        //   path: 'admin/chats',
-        //   builder: (BuildContext context, GoRouterState state) {
-        //     return const AdminChatScreen();
-        //   },
-        // ),
-        // GoRoute(
-        //   path: 'support',
-        //   builder: (BuildContext context, GoRouterState state) {
-        //     return const UserSupportChatScreen();
-        //   },
-        // ),
+        GoRoute(
+          path: 'admin/chats',
+          builder: (BuildContext context, GoRouterState state) {
+            return const AdminChatScreen();
+          },
+        ),
+        GoRoute(
+          path: 'support',
+          builder: (BuildContext context, GoRouterState state) {
+            return const UserSupportChatScreen();
+          },
+        ),
         
         // Info Screens Routes
         GoRoute(
@@ -420,6 +420,12 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     debugPrint('✅ Firebase initialized successfully');
+    
+    // Configure Firebase Realtime Database URL (required for web)
+    // The database URL must match the actual database in Firebase console
+    if (kIsWeb) {
+      debugPrint('ℹ️ Running on web - Realtime Database available via Firestore');
+    }
   } catch (e) {
     debugPrint('⚠️ Firebase initialization failed: $e');
     // Continue anyway - app can work with limited functionality

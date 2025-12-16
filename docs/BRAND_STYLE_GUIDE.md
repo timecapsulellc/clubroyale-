@@ -1,15 +1,19 @@
 # 👑 ClubRoyale Brand & Style Guide
 
-**Version 1.0.0** | December 2025
+**Version 2.0.0** | December 16, 2025
 
-This document defines the visual identity, color palettes, and design standards for the ClubRoyale application. All UI/UX decisions should adhere to these guidelines to ensure a consistent, premium "Private Club" aesthetic.
+This document defines the visual identity, color palettes, and design standards for the ClubRoyale application. All UI/UX decisions should adhere to these guidelines to ensure a consistent, premium "Play & Connect" aesthetic.
 
 ---
 
 ## 1. Brand Identity
-**ClubRoyale** is a premium, invite-only digital card club. The aesthetic is **High-End Casino**, **Exclusive Lounge**, and **Modern Digital**.
-*   **Keywords**: Luxury, Immersive, Gold, Depth, Professional.
+
+**ClubRoyale** is a **Play & Connect** social gaming platform. The aesthetic combines **Premium Casino**, **Social Hub**, and **Modern Digital Community**.
+
+*   **Tagline**: "Play & Connect"
+*   **Keywords**: Social, Luxury, Immersive, Gold, Depth, Community, Fun.
 *   **Mood**: Dark mode by default, rich gradients, metallic accents.
+*   **Core Value**: Games + Social = Community
 
 ---
 

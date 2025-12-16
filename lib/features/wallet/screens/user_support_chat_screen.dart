@@ -38,9 +38,12 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
         .get();
 
     if (snapshot.docs.isNotEmpty && mounted) {
+      final chatId = snapshot.docs.first.id;
       setState(() {
-        _activeChatId = snapshot.docs.first.id;
+        _activeChatId = chatId;
       });
+      // Mark as read by user
+      ref.read(adminChatServiceProvider).markAsRead(chatId, isAdmin: false);
     }
   }
 
@@ -53,8 +56,8 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
       final chatService = ref.read(adminChatServiceProvider);
       final chatId = await chatService.startChat(
         userId: user.uid,
-        userName: user.displayName ?? 'User', // Fixed: was userEmail
-        subject: 'Diamond Support Request',
+        userName: user.displayName ?? 'User',
+        subject: 'Support Request',
       );
       
       if (mounted) {
@@ -84,7 +87,7 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
       await chatService.sendMessage(
         chatId: _activeChatId!,
         senderId: user.uid,
-        senderName: user.displayName ?? 'User', // Fixed: added senderName
+        senderName: user.displayName ?? 'User',
         content: content,
         isAdmin: false,
       );
@@ -104,6 +107,7 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Loading State (Initial check)
     if (_activeChatId == null && _isLoading) {
       return Scaffold(
         appBar: AppBar(title: const Text('Support Chat')),
@@ -111,6 +115,7 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
       );
     }
 
+    // Empty State (No Active Chat)
     if (_activeChatId == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Support Chat')),
@@ -118,19 +123,32 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.support_agent, size: 64, color: Colors.blue),
-              const SizedBox(height: 16),
-              const Text(
-                'Need help with diamonds?',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.support_agent, size: 64, color: Theme.of(context).primaryColor),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'How can we help?',
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
-              const Text('Start a chat with our support team.'),
-              const SizedBox(height: 24),
+              const Text(
+                'Talk to our support team directly.',
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 32),
               FilledButton.icon(
                 onPressed: _startNewChat,
-                icon: const Icon(Icons.chat),
-                label: const Text('Start Chat'),
+                icon: const Icon(Icons.chat_bubble),
+                label: const Text('Start Conversation'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                ),
               ),
             ],
           ),
@@ -143,7 +161,16 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Support Chat'),
+        title: const Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: Colors.white24,
+              child: Icon(Icons.support_agent, color: Colors.white, size: 20),
+            ),
+            SizedBox(width: 12),
+            Text('ClubRoyale Support'),
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -164,7 +191,7 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
 
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final msg = messages[index];
@@ -198,11 +225,16 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
                   Expanded(
                     child: TextField(
                       controller: _messageController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Type a message...',
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
                           vertical: 10,
                         ),
                       ),
@@ -241,6 +273,17 @@ class _MessageBubble extends StatelessWidget {
       ? DateFormat('HH:mm').format(message.createdAt!) 
       : '';
 
+    // User messages (Me) -> Blue/Primary
+    // Admin messages (Other) -> Grey/Surface
+    
+    final bubbleColor = isMe 
+        ? theme.primaryColor 
+        : theme.colorScheme.surfaceContainerHighest;
+    
+    final textColor = isMe 
+        ? Colors.white 
+        : theme.colorScheme.onSurface;
+
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -250,28 +293,40 @@ class _MessageBubble extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: isMe ? Colors.blue : Colors.grey.shade200,
+          color: bubbleColor,
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: isMe ? const Radius.circular(16) : Radius.zero,
-            bottomRight: isMe ? Radius.zero : const Radius.circular(16),
+            topLeft: const Radius.circular(20),
+            topRight: const Radius.circular(20),
+            bottomLeft: isMe ? const Radius.circular(20) : Radius.zero,
+            bottomRight: isMe ? Radius.zero : const Radius.circular(20),
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (!isMe)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  'Support Team',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: textColor.withValues(alpha: 0.7),
+                  ),
+                ),
+              ),
             Text(
               message.content,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: isMe ? Colors.white : Colors.black87,
+                color: textColor,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               timeStr,
               style: theme.textTheme.labelSmall?.copyWith(
-                color: isMe ? Colors.white70 : Colors.black54,
+                color: textColor.withValues(alpha: 0.7),
                 fontSize: 10,
               ),
             ),

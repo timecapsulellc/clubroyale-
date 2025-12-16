@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/chat/chat_service.dart';
 import 'package:clubroyale/features/chat/chat_message.dart';
+import 'package:clubroyale/features/game/services/spectator_service.dart';
+import 'package:clubroyale/features/social/services/voice_room_service.dart';
+import 'package:clubroyale/core/services/share_service.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:intl/intl.dart';
 
 /// In-game social overlay panel
@@ -240,15 +244,31 @@ class _GameChatPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Get current user for chat params
+    final userId = ref.watch(currentUserIdProvider);
+    final userProfile = ref.watch(authStateProvider).value;
+    final userName = userProfile?.displayName ?? 'Player';
+
+    if (userId == null) {
+      return const Center(
+        child: Text('Sign in to chat', style: TextStyle(color: Colors.white38)),
+      );
+    }
+
+    final params = ChatServiceParams(
+      roomId: gameId,
+      userId: userId,
+      userName: userName,
+    );
+
+    final messagesAsync = ref.watch(chatMessagesProvider(params));
+
     return Column(
       children: [
         // Message list
         Expanded(
-          child: StreamBuilder<List<ChatMessage>>(
-            stream: ref.watch(chatServiceProvider).watchMessages(gameId),
-            builder: (context, snapshot) {
-              final messages = snapshot.data ?? [];
-              
+          child: messagesAsync.when(
+            data: (messages) {
               if (messages.isEmpty) {
                 return const Center(
                   child: Text(
@@ -269,15 +289,21 @@ class _GameChatPanel extends ConsumerWidget {
                 },
               );
             },
+            loading: () => const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            error: (e, _) => Center(
+              child: Text('Error: $e', style: const TextStyle(color: Colors.red, fontSize: 12)),
+            ),
           ),
         ),
         // Input area
-        _buildInputArea(ref),
+        _buildInputArea(ref, params),
       ],
     );
   }
 
-  Widget _buildInputArea(WidgetRef ref) {
+  Widget _buildInputArea(WidgetRef ref, ChatServiceParams params) {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -306,13 +332,13 @@ class _GameChatPanel extends ConsumerWidget {
                 ),
                 isDense: true,
               ),
-              onSubmitted: (_) => _sendMessage(ref),
+              onSubmitted: (_) => _sendMessage(ref, params),
             ),
           ),
           const SizedBox(width: 4),
           IconButton(
             icon: const Icon(Icons.send, color: Colors.purple, size: 20),
-            onPressed: () => _sendMessage(ref),
+            onPressed: () => _sendMessage(ref, params),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           ),
@@ -321,16 +347,13 @@ class _GameChatPanel extends ConsumerWidget {
     );
   }
 
-  void _sendMessage(WidgetRef ref) {
+  void _sendMessage(WidgetRef ref, ChatServiceParams params) {
     if (messageController.text.trim().isEmpty) return;
     
     final text = messageController.text.trim();
     messageController.clear();
     
-    ref.read(chatServiceProvider).sendMessage(
-      roomId: gameId,
-      content: text,
-    );
+    ref.read(chatServiceProvider(params)).sendMessage(text);
   }
 }
 
@@ -388,68 +411,122 @@ class _VoiceControlPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Mic toggle button
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.purple.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.mic,
-              color: Colors.white,
-              size: 32,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Tap to Mute',
-            style: TextStyle(color: Colors.white54, fontSize: 12),
-          ),
-          const SizedBox(height: 24),
-          // Speaker toggle
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildVoiceOption(Icons.volume_up, 'Speaker', true),
-              const SizedBox(width: 16),
-              _buildVoiceOption(Icons.headphones, 'Earpiece', false),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+    final voiceService = ref.watch(voiceRoomServiceProvider(gameId));
+    final isMuted = !voiceService.isMicEnabled;
+    final isConnected = voiceService.isConnected;
+    final participants = voiceService.allParticipants;
 
-  Widget _buildVoiceOption(IconData icon, String label, bool isSelected) {
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: isSelected 
-                ? Colors.purple.withValues(alpha: 0.3) 
-                : Colors.white.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+      // Connected participants
+        if (participants.isNotEmpty)
+          Container(
+            padding: const EdgeInsets.all(8),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: participants.map((p) {
+                final isSpeaking = p.isSpeaking;
+                final participantName = p.name ?? p.identity;
+                return Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isSpeaking 
+                        ? Colors.green.withValues(alpha: 0.3) 
+                        : Colors.white.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: isSpeaking 
+                        ? Border.all(color: Colors.green, width: 2) 
+                        : null,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundColor: isSpeaking ? Colors.green : Colors.purple,
+                        child: Text(
+                          participantName.isNotEmpty 
+                              ? participantName[0].toUpperCase() 
+                              : '?',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        participantName,
+                        style: const TextStyle(color: Colors.white70, fontSize: 10),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
           ),
-          child: Icon(
-            icon,
-            color: isSelected ? Colors.purple.shade200 : Colors.white54,
-            size: 20,
+        
+        const Spacer(),
+        
+        // Main controls
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Mic toggle button
+              GestureDetector(
+                onTap: () => voiceService.toggleMicrophone(),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: isMuted 
+                        ? Colors.red.withValues(alpha: 0.3) 
+                        : Colors.purple.withValues(alpha: 0.3),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isMuted ? Colors.red : Colors.purple,
+                      width: 2,
+                    ),
+                  ),
+                  child: Icon(
+                    isMuted ? Icons.mic_off : Icons.mic,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                isMuted ? 'Tap to Unmute' : 'Tap to Mute',
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
+              ),
+              const SizedBox(height: 16),
+              // Join/Leave button
+              if (!isConnected)
+                ElevatedButton.icon(
+                  onPressed: () => voiceService.joinRoom(asListener: false),
+                  icon: const Icon(Icons.call, size: 16),
+                  label: const Text('Join Voice'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                  ),
+                )
+              else
+                ElevatedButton.icon(
+                  onPressed: () => voiceService.leaveRoom(),
+                  icon: const Icon(Icons.call_end, size: 16),
+                  label: const Text('Leave'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+            ],
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.white54,
-            fontSize: 10,
-          ),
-        ),
+        
+        const Spacer(),
       ],
     );
   }
@@ -463,7 +540,9 @@ class _SpectatorListPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO: Connect to actual spectator list from Firestore
+    final spectatorCount = ref.watch(spectatorCountProvider(gameId));
+    final spectatorList = ref.watch(spectatorListProvider(gameId));
+
     return Column(
       children: [
         // Header with count
@@ -471,38 +550,91 @@ class _SpectatorListPanel extends ConsumerWidget {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              Icon(Icons.visibility, color: Colors.white54, size: 16),
+              const Icon(Icons.visibility, color: Colors.white54, size: 16),
               const SizedBox(width: 8),
-              const Text(
-                '0 watching',
-                style: TextStyle(color: Colors.white70, fontSize: 12),
+              spectatorCount.when(
+                data: (count) => Text(
+                  '$count watching',
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+                loading: () => const Text(
+                  '... watching',
+                  style: TextStyle(color: Colors.white54, fontSize: 12),
+                ),
+                error: (_, __) => const Text(
+                  '0 watching',
+                  style: TextStyle(color: Colors.white54, fontSize: 12),
+                ),
               ),
             ],
           ),
         ),
         // Spectator list
         Expanded(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.visibility_off,
-                  color: Colors.white24,
-                  size: 40,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'No spectators yet',
-                  style: TextStyle(color: Colors.white38, fontSize: 12),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Share the game to\ninvite friends to watch',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white24, fontSize: 10),
-                ),
-              ],
+          child: spectatorList.when(
+            data: (list) {
+              if (list.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.visibility_off,
+                        color: Colors.white24,
+                        size: 40,
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'No spectators yet',
+                        style: TextStyle(color: Colors.white38, fontSize: 12),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Share the game to\ninvite friends to watch',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white24, fontSize: 10),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                itemCount: list.length,
+                itemBuilder: (context, index) {
+                  final spectator = list[index];
+                  return ListTile(
+                    dense: true,
+                    leading: CircleAvatar(
+                      radius: 14,
+                      backgroundImage: spectator.photoUrl != null
+                          ? NetworkImage(spectator.photoUrl!)
+                          : null,
+                      child: spectator.photoUrl == null
+                          ? Text(
+                              spectator.name[0].toUpperCase(),
+                              style: const TextStyle(fontSize: 12),
+                            )
+                          : null,
+                    ),
+                    title: Text(
+                      spectator.name,
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                    subtitle: Text(
+                      _formatTime(spectator.joinedAt),
+                      style: const TextStyle(color: Colors.white38, fontSize: 10),
+                    ),
+                  );
+                },
+              );
+            },
+            loading: () => const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            error: (_, __) => const Center(
+              child: Text('Error loading', style: TextStyle(color: Colors.red)),
             ),
           ),
         ),
@@ -512,9 +644,7 @@ class _SpectatorListPanel extends ConsumerWidget {
           child: SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () {
-                // TODO: Share game link
-              },
+              onPressed: () => _shareGame(context, ref),
               icon: const Icon(Icons.share, size: 16),
               label: const Text('Invite to Watch', style: TextStyle(fontSize: 12)),
               style: ElevatedButton.styleFrom(
@@ -526,6 +656,21 @@ class _SpectatorListPanel extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  String _formatTime(DateTime time) {
+    final diff = DateTime.now().difference(time);
+    if (diff.inMinutes < 1) return 'just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    return '${diff.inHours}h ago';
+  }
+
+  void _shareGame(BuildContext context, WidgetRef ref) {
+    final link = ref.read(spectatorServiceProvider).getSpectatorLink(gameId);
+    ShareService.shareText(
+      text: '🎴 Watch my game live on ClubRoyale!\n\n$link',
+      context: context,
     );
   }
 }

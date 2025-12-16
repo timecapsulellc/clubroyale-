@@ -27,32 +27,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   
   final List<OnboardingPage> _pages = [
     OnboardingPage(
-      icon: Icons.casino,
+      icon: Icons.favorite,
       title: 'Welcome to ClubRoyale',
-      subtitle: 'Your Premium Card Gaming Club',
-      description: 'Play classic card games with friends in a stunning casino atmosphere.',
+      subtitle: 'Play & Connect',
+      description: 'Your social club for classic card games, live chats, voice rooms, and making friends who share your passion.',
       color: CasinoColors.gold,
     ),
     OnboardingPage(
-      icon: Icons.style,
-      title: 'World-Class Games',
-      subtitle: 'Marriage • Call Break • Teen Patti • In-Between',
-      description: 'Enjoy authentic gameplay with beautiful animations and real-time multiplayer.',
+      icon: Icons.people_alt,
+      title: 'Connect with Friends',
+      subtitle: 'Chat • Stories • Activity Feed',
+      description: 'See who\'s online, share game highlights to your story, react to friends\' wins, and stay connected 24/7.',
+      color: Colors.pinkAccent,
+    ),
+    OnboardingPage(
+      icon: Icons.mic,
+      title: 'Live Voice Rooms & Clubs',
+      subtitle: 'Talk • Play Together • Join Communities',
+      description: 'Drop into voice rooms, join exclusive clubs, and find your tribe of card game lovers.',
       color: Colors.purpleAccent,
     ),
     OnboardingPage(
-      icon: Icons.diamond,
-      title: 'Free Diamond Economy',
-      subtitle: 'Earn 100+ Diamonds Daily',
-      description: 'No real money required! Earn diamonds by playing, logging in daily, and referring friends.',
+      icon: Icons.style,
+      title: 'Premium Card Games',
+      subtitle: 'Marriage • Call Break • Teen Patti • In-Between',
+      description: 'Play world-class games with stunning animations. No real money needed – earn free diamonds daily!',
       color: Colors.cyanAccent,
-    ),
-    OnboardingPage(
-      icon: Icons.people,
-      title: 'Social Gaming',
-      subtitle: 'Connect • Compete • Celebrate',
-      description: 'Voice chat, tournaments, clubs, and leaderboards. Gaming is better with friends!',
-      color: Colors.pinkAccent,
     ),
   ];
 

@@ -1,24 +1,57 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/social_user_model.dart';
 
 final presenceServiceProvider = Provider<PresenceService>((ref) {
-  return PresenceService(FirebaseAuth.instance, FirebaseDatabase.instance);
+  return PresenceService(FirebaseAuth.instance);
 });
 
 class PresenceService {
   final FirebaseAuth _auth;
-  final FirebaseDatabase _db;
+  FirebaseDatabase? _db;
+  bool _isInitialized = false;
+  bool _isAvailable = false;
   
   StreamSubscription? _connectionSubscription;
   DatabaseReference? _userStatusRef;
 
-  PresenceService(this._auth, this._db);
+  PresenceService(this._auth);
+  
+  /// Initialize the database lazily to catch errors
+  void _initDatabase() {
+    if (_isInitialized) return;
+    _isInitialized = true;
+    
+    // Skip Realtime Database on web - it requires databaseURL in firebase_options.dart
+    // which is not configured for this project
+    if (kIsWeb) {
+      debugPrint('ℹ️ Realtime Database skipped on web - using Firestore for presence');
+      _isAvailable = false;
+      return;
+    }
+    
+    try {
+      _db = FirebaseDatabase.instance;
+      _isAvailable = true;
+      debugPrint('✅ Realtime Database initialized');
+    } catch (e) {
+      debugPrint('⚠️ Realtime Database not available: $e');
+      _isAvailable = false;
+    }
+  }
 
   /// Initialize presence system (call on app start)
   void initialize() {
+    _initDatabase();
+    
+    if (!_isAvailable || _db == null) {
+      debugPrint('ℹ️ Presence system disabled - Realtime Database not available');
+      return;
+    }
+    
     _auth.authStateChanges().listen((user) {
       if (user != null) {
         _connectUser(user.uid);
@@ -29,11 +62,13 @@ class PresenceService {
   }
 
   void _connectUser(String uid) {
+    if (_db == null) return;
+    
     // Reference to this user's status in RTDB
-    _userStatusRef = _db.ref('/status/$uid');
+    _userStatusRef = _db!.ref('/status/$uid');
 
     // Monitor connection state
-    final infoConnected = _db.ref('.info/connected');
+    final infoConnected = _db!.ref('.info/connected');
     
     _connectionSubscription?.cancel();
     _connectionSubscription = infoConnected.onValue.listen((event) {
@@ -79,7 +114,12 @@ class PresenceService {
 
   /// Stream of a specific user/friend's status
   Stream<SocialUserStatus> watchUserStatus(String uid) {
-    return _db.ref('/status/$uid').onValue.map((event) {
+    if (_db == null) {
+      // Return a stream that immediately emits offline status
+      return Stream.value(SocialUserStatus.offline());
+    }
+    
+    return _db!.ref('/status/$uid').onValue.map((event) {
       if (event.snapshot.value == null) return SocialUserStatus.offline();
       
       final data = Map<String, dynamic>.from(event.snapshot.value as Map);

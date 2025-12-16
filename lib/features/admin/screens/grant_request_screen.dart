@@ -6,7 +6,9 @@ import 'package:clubroyale/features/admin/admin_diamond_service.dart';
 
 /// Screen for creating a new diamond grant request
 class GrantRequestScreen extends ConsumerStatefulWidget {
-  const GrantRequestScreen({super.key});
+  final String? prefillUserId;
+  
+  const GrantRequestScreen({super.key, this.prefillUserId});
 
   @override
   ConsumerState<GrantRequestScreen> createState() => _GrantRequestScreenState();
@@ -14,12 +16,18 @@ class GrantRequestScreen extends ConsumerStatefulWidget {
 
 class _GrantRequestScreenState extends ConsumerState<GrantRequestScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _userIdController = TextEditingController();
+  late final TextEditingController _userIdController;
   final _userEmailController = TextEditingController();
   final _amountController = TextEditingController();
   final _reasonController = TextEditingController();
 
   bool _isLoading = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    _userIdController = TextEditingController(text: widget.prefillUserId ?? '');
+  }
 
   Future<void> _createGrantRequest() async {
     if (!_formKey.currentState!.validate()) return;

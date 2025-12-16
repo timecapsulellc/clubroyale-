@@ -102,12 +102,16 @@ class SocialService {
   Future<void> sendTextMessage({
     required String chatId,
     required String text,
+    String? replyToMessageId,
+    SocialMessagePreviewData? replyToPreview,
   }) async {
     await _sendMessage(
       chatId: chatId,
       type: SocialMessageType.text,
       content: SocialMessageContent(text: text),
       previewText: text,
+      replyToMessageId: replyToMessageId,
+      replyToPreview: replyToPreview,
     );
   }
   
@@ -132,6 +136,8 @@ class SocialService {
   Future<void> sendImageMessage({
     required String chatId,
     required File imageFile,
+    String? replyToMessageId,
+    SocialMessagePreviewData? replyToPreview,
   }) async {
     final uid = currentUserId;
     if (uid == null) throw Exception("Not logged in");
@@ -152,6 +158,8 @@ class SocialService {
         mediaUrl: downloadUrl,
       ),
       previewText: '📷 Image',
+      replyToMessageId: replyToMessageId,
+      replyToPreview: replyToPreview,
     );
   }
 
@@ -161,6 +169,8 @@ class SocialService {
     required SocialMessageType type,
     required SocialMessageContent content,
     required String previewText,
+    String? replyToMessageId,
+    SocialMessagePreviewData? replyToPreview,
   }) async {
     final user = _auth.currentUser;
     if (user == null) throw Exception("Not logged in");
@@ -178,6 +188,8 @@ class SocialService {
       'timestamp': FieldValue.serverTimestamp(),
       'readBy': [user.uid],
       'reactions': {},
+      if (replyToMessageId != null) 'replyToMessageId': replyToMessageId,
+      if (replyToPreview != null) 'replyToPreview': replyToPreview.toJson(),
     };
 
     await messageRef.set(messageData);

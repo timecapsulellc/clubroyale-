@@ -51,6 +51,31 @@ See you at the tables! 🃏
     }
   }
 
+  /// Share plain text (generic share)
+  static Future<void> shareText({
+    required String text,
+    required BuildContext context,
+    String? subject,
+  }) async {
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          text: text,
+          subject: subject ?? 'ClubRoyale',
+        ),
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to share: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   /// Share game room invite
   static Future<void> shareGameRoomCode(
     String roomCode,

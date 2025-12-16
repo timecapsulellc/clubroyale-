@@ -262,8 +262,10 @@ class StoryService {
     
     // Delete media from storage
     try {
-      final ref = storage.refFromURL(story.mediaUrl);
-      await ref.delete();
+      if (story.mediaUrl != null) {
+        final ref = storage.refFromURL(story.mediaUrl!);
+        await ref.delete();
+      }
     } catch (_) {
       // Media might already be deleted
     }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../video_service.dart';
+import '../services/pip_service.dart';
 
 /// 2x2 Video grid for displaying player videos
 class VideoGridWidget extends ConsumerWidget {
@@ -47,7 +48,7 @@ class VideoGridWidget extends ConsumerWidget {
         Expanded(
           child: _buildVideoGrid(context, allParticipants),
         ),
-        _buildControlBar(context, videoService),
+        _buildControlBar(context, videoService, ref),
       ],
     );
   }
@@ -261,7 +262,7 @@ class VideoGridWidget extends ConsumerWidget {
         participant.videoTrackPublications.first.muted == false;
   }
 
-  Widget _buildControlBar(BuildContext context, VideoService service) {
+  Widget _buildControlBar(BuildContext context, VideoService service, WidgetRef ref) {
     final theme = Theme.of(context);
 
     return Container(
@@ -279,6 +280,21 @@ class VideoGridWidget extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Minimize to PiP
+          _buildControlButton(
+            context,
+            icon: Icons.picture_in_picture_alt,
+            isActive: true,
+            onPressed: service.room != null
+                ? () {
+                    ref.read(pipServiceProvider.notifier).enablePip(service.room!);
+                    // Optionally navigate back or to game screen
+                  }
+                : null,
+            tooltip: 'Picture-in-Picture',
+          ),
+          const SizedBox(width: 16),
+
           // Mic toggle
           _buildControlButton(
             context,

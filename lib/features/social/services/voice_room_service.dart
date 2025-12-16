@@ -149,8 +149,6 @@ class VoiceRoomService extends ChangeNotifier {
   // Hand raising logic would go here (metadata update)
 
   Future<String> _getToken({required bool isListener}) async {
-    // TODO: Use real cloud function
-    // Stub for Development if Function doesn't exist
     try {
       final callable = _functions.httpsCallable('generateLiveKitToken');
       final result = await callable.call<Map<String, dynamic>>({
@@ -159,12 +157,18 @@ class VoiceRoomService extends ChangeNotifier {
         'participantId': userId,
         'isSpectator': isListener, 
       });
-      return result.data['token'] as String;
+      
+      final data = result.data;
+      if (data.containsKey('token')) {
+        return data['token'] as String;
+      } else {
+        throw Exception('Token not found in response');
+      }
     } catch (e) {
-      // Fallback for Development ONLY - return a dummy token or rethrow
-      debugPrint("Cloud Function Error: $e");
-      // throw e; 
-      return "dummy-token"; // This will fail connection but allow UI testing if handled
+      debugPrint("VoiceRoom Token Error: $e");
+      // In development, we might still want a fallback if the function fails
+      // But for production, this should rethrow or handle the error gracefully
+      rethrow; 
     }
   }
 

@@ -53,6 +53,14 @@ export { checkTierUpgrade, monitorDiamondSupply } from './diamonds/scheduled';
 export { onGrantApproved, executeCooledGrants, notifyAdminNewChat } from './admin/diamondAdmin';
 export { weeklyTasks, dailyCleanup } from './scheduled/dailyTasks';
 
+// Export Social Diamond Rewards (V5 Enhancements)
+export {
+    grantSocialRewardFunction,
+    processVoiceRoomTip,
+    calculateWeeklyEngagement,
+    calculateMonthlyMilestones
+} from './rewards/social';
+
 // Initialize Firebase Admin
 initializeApp();
 const db = getFirestore();
