@@ -21,6 +21,8 @@ import 'package:clubroyale/features/social/widgets/social_feed_widget.dart';
 import 'package:clubroyale/features/social/widgets/live_activity_section.dart';
 import 'package:clubroyale/features/social/providers/dashboard_providers.dart';
 import 'package:clubroyale/features/stories/services/story_service.dart';
+import 'package:clubroyale/features/home/widgets/compact_header.dart';
+import 'package:clubroyale/core/widgets/social_bottom_nav.dart' as social_nav;
 
 
 class HomeScreen extends ConsumerWidget {
@@ -253,9 +255,7 @@ class HomeScreen extends ConsumerWidget {
                                   const SizedBox(height: 16),
 
                                   // Quick Actions
-                                  QuickSocialActions(
-                                    unreadMessagesCount: unreadChatsCount,
-                                  ),
+                                  const QuickSocialActions(),
 
                                   const SizedBox(height: 24),
 
@@ -460,15 +460,9 @@ class HomeScreen extends ConsumerWidget {
                   padding: EdgeInsets.only(bottom: isDesktop ? 24.0 : 0),
                   child: SizedBox(
                     width: isDesktop ? 450 : double.infinity, // Constrained width for capsule look on desktop
-                    child: SocialBottomNav(
+                    child: social_nav.SocialBottomNav(
+                      currentIndex: 0, // Home is selected
                       isFloating: isDesktop,
-                      onHomeTap: () {}, // Already on home
-                      onChatsTap: () => context.go('/chats'),
-                      onPlayTap: () => context.go('/lobby'),
-                      onClubsTap: () => context.go('/clubs'),
-                      onAccountTap: () => context.go('/profile'),
-                      // Legacy
-                      onActivityTap: () => context.go('/activity'),
                     ),
                   ),
                 ),
