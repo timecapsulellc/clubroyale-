@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/stories/services/story_service.dart';
 import 'package:clubroyale/core/services/share_service.dart';
-import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Widget shown after game completion to share result as a story
 class GameResultStorySheet extends ConsumerStatefulWidget {
@@ -312,7 +311,7 @@ class _GameResultStorySheetState extends ConsumerState<GameResultStorySheet> {
       buffer.writeln('🏆 I WON! 🏆');
     }
     buffer.writeln('🎴 ${_getGameDisplayName(widget.gameType)} Results');
-    buffer.writeln('${'─' * 20}');
+    buffer.writeln('─' * 20);
     
     // Sort and display scores
     final sortedScores = widget.scores.entries.toList()
@@ -323,7 +322,7 @@ class _GameResultStorySheetState extends ConsumerState<GameResultStorySheet> {
       buffer.writeln('$medal ${sortedScores[i].key}: ${sortedScores[i].value} pts');
     }
     
-    buffer.writeln('${'─' * 20}');
+    buffer.writeln('─' * 20);
     if (_caption != null && _caption!.isNotEmpty) {
       buffer.writeln('💬 $_caption');
       buffer.writeln();

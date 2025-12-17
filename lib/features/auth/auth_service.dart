@@ -336,13 +336,16 @@ class _TestModeUser implements User {
 
   Future<void> updateEmail(String newEmail) async {}
 
+  @override
   Future<void> updatePassword(String newPassword) async {}
 
+  @override
   Future<void> updatePhoneNumber(PhoneAuthCredential phoneCredential) async {}
 
   @override
   Future<void> updatePhotoURL(String? photoURL) async {}
 
+  @override
   Future<void> updateProfile({String? displayName, String? photoURL}) async {}
 
   @override
@@ -363,10 +366,12 @@ class _TestModeUser implements User {
     throw UnimplementedError();
   }
 
+  @override
   Future<UserCredential> reauthenticateWithPopup(AuthProvider provider) {
     throw UnimplementedError();
   }
 
+  @override
   Future<void> reauthenticateWithRedirect(AuthProvider provider) {
     throw UnimplementedError();
   }

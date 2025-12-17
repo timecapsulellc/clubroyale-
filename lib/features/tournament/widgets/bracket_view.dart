@@ -1,6 +1,7 @@
 /// Bracket View Widget
 /// 
 /// Displays tournament brackets visually
+library;
 
 import 'package:flutter/material.dart';
 import 'package:clubroyale/features/tournament/tournament_model.dart';

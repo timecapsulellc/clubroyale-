@@ -89,7 +89,7 @@ Or open ClubRoyale and enter the room code!
     
     final buffer = StringBuffer();
     buffer.writeln('🎴 $gameDisplayName Game Results');
-    buffer.writeln('${'─' * 20}');
+    buffer.writeln('─' * 20);
     
     // Sort by score
     final sortedScores = scores.entries.toList()
@@ -101,7 +101,7 @@ Or open ClubRoyale and enter the room code!
       buffer.writeln('$medal ${entry.key}: ${entry.value} pts');
     }
     
-    buffer.writeln('${'─' * 20}');
+    buffer.writeln('─' * 20);
     buffer.writeln(summary);
     buffer.writeln();
     buffer.writeln('Play at: clubroyale.app');
@@ -130,7 +130,7 @@ Or open ClubRoyale and enter the room code!
       buffer.writeln('🏆 I WON! 🏆');
     }
     buffer.writeln('$gameEmoji $gameDisplayName on ClubRoyale');
-    buffer.writeln('${'─' * 25}');
+    buffer.writeln('─' * 25);
     
     // Sort by score
     final sortedScores = allScores.entries.toList()
@@ -143,7 +143,7 @@ Or open ClubRoyale and enter the room code!
       buffer.writeln('$medal ${entry.key}: ${entry.value} pts$isMe');
     }
     
-    buffer.writeln('${'─' * 25}');
+    buffer.writeln('─' * 25);
     buffer.writeln();
     buffer.writeln('📱 Play with me: clubroyale.app');
     if (roomCode != null) {

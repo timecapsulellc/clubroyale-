@@ -3,6 +3,7 @@
 /// Implementation of In Between (Acey Deucey) card game
 /// Simple betting game - guess if card falls between two dealt cards
 /// Based on open source implementations from ranjeetabh/Card-Games
+library;
 
 import 'package:clubroyale/games/base_game.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';

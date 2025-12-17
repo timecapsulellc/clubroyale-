@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../chat/chat_message.dart'; // Reuse MessageType if possible, or redefine? We'll redefine for rich types.
+// Reuse MessageType if possible, or redefine? We'll redefine for rich types.
 
 part 'social_chat_model.freezed.dart';
 part 'social_chat_model.g.dart';
@@ -19,10 +19,10 @@ abstract class SocialChat with _$SocialChat {
   
   const factory SocialChat({
     required String id,
-    required ChatType type,
+    @Default(ChatType.direct) ChatType type,
     
     // Participants
-    required List<String> participants,
+    @Default([]) List<String> participants,
     @Default([]) List<String> admins,
     
     // Group Metadata
@@ -59,11 +59,11 @@ abstract class SocialMessagePreview with _$SocialMessagePreview {
   const SocialMessagePreview._();
   
   const factory SocialMessagePreview({
-    required String messageId,
-    required String senderId,
-    required String senderName,
-    required String content,
-    required String type, // 'text', 'image', etc.
+    @Default('') String messageId,
+    @Default('') String senderId,
+    @Default('Unknown') String senderName,
+    @Default('') String content,
+    @Default('text') String type, // 'text', 'image', etc.
     @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
     required DateTime timestamp,
   }) = _SocialMessagePreview;

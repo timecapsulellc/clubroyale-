@@ -1,6 +1,7 @@
 /// BaseGame - Abstract interface for all card games
 /// 
 /// This defines the contract that all games must implement
+library;
 
 import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';

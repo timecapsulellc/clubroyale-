@@ -7,8 +7,8 @@ part of 'social_user_model.dart';
 // **************************************************************************
 
 _SocialUser _$SocialUserFromJson(Map<String, dynamic> json) => _SocialUser(
-  id: json['id'] as String,
-  displayName: json['displayName'] as String,
+  id: json['id'] as String? ?? '',
+  displayName: json['displayName'] as String? ?? 'Player',
   avatarUrl: json['avatarUrl'] as String?,
   status:
       $enumDecodeNullable(_$UserStatusEnumMap, json['status']) ??

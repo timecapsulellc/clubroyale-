@@ -1,6 +1,7 @@
 /// Replay Service
 /// 
 /// Manages saving, loading, and playing back game replays
+library;
 
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';

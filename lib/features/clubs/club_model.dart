@@ -1,6 +1,7 @@
 /// Club Models
 /// 
 /// Models for gaming clubs/groups feature
+library;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 

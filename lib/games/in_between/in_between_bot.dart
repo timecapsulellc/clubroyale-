@@ -2,9 +2,9 @@
 /// 
 /// AI-powered bot decision making for In Between (Acey Deucey) game
 /// Probability-based betting based on card spread
+library;
 
 import 'dart:math';
-import 'package:clubroyale/games/in_between/in_between_game.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 
 /// Bot difficulty level

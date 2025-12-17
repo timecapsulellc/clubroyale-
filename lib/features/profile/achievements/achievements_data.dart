@@ -1,6 +1,7 @@
 /// Achievement and Badge Definitions
 /// 
 /// Defines all achievements available in ClubRoyale
+library;
 
 import 'package:clubroyale/features/profile/user_profile.dart';
 

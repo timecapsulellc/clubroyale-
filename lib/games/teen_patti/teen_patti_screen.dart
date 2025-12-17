@@ -1,6 +1,7 @@
 /// Teen Patti Game Screen
 /// 
 /// Real-time multiplayer Teen Patti game UI
+library;
 
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_riverpod/flutter_riverpod.dart';

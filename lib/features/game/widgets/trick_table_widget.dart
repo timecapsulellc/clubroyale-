@@ -77,7 +77,7 @@ class TrickTableWidget extends StatelessWidget {
                       ),
                     ),
                   );
-                }).toList(),
+                }),
             ],
           ),
         ),

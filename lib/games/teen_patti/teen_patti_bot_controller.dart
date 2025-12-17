@@ -1,6 +1,7 @@
 /// Teen Patti Bot Controller
 /// 
 /// Manages bot turns and integrates TeenPattiBotStrategy with game state
+library;
 
 import 'dart:async';
 import 'package:flutter/foundation.dart';

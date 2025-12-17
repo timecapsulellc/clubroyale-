@@ -3,6 +3,7 @@
 /// 
 /// These prompts are ensuring consistency between client-side explanations
 /// and server-side behavior.
+library;
 
 class MarriagePrompts {
   static const String strategyEasy = 

@@ -1,6 +1,7 @@
 /// Online Players Panel
 /// 
 /// Shows list of online players in the lobby with invite/friend actions.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:clubroyale/features/social/presence_service.dart';
 import 'package:clubroyale/features/social/friends_service.dart';
 import 'package:clubroyale/features/social/invite_service.dart';
-import 'package:clubroyale/features/auth/auth_service.dart';
 
 class OnlinePlayersPanel extends ConsumerWidget {
   final String? currentRoomId;

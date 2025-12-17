@@ -5,6 +5,7 @@
 /// - Create Room (multiplayer - costs diamonds)
 /// - Join Room (multiplayer - by room code)
 /// Uses GameTerminology for multi-region localization
+library;
 
 import 'dart:math';
 import 'package:flutter/material.dart';

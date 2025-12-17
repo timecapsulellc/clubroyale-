@@ -1,6 +1,7 @@
 /// Replay Player Screen
 /// 
 /// Plays back recorded game replays with controls
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

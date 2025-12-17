@@ -8,7 +8,7 @@
  * - Push notifications (FCM)
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processSettlement = exports.dailyCleanup = exports.weeklyTasks = exports.notifyAdminNewChat = exports.executeCooledGrants = exports.onGrantApproved = exports.monitorDiamondSupply = exports.checkTierUpgrade = exports.upgradeToVerified = exports.claimDailyLogin = exports.grantGameplayReward = exports.validateTransfer = exports.validateSpectatorAccess = exports.generateLiveKitToken = exports.onVoiceRoomCreated = exports.onFriendshipUpdated = exports.onFriendRequestCreated = exports.onStoryCreated = exports.onSocialMessageSent = exports.auditGameUpdate = void 0;
+exports.processSettlement = exports.calculateMonthlyMilestones = exports.calculateWeeklyEngagement = exports.processVoiceRoomTip = exports.grantSocialRewardFunction = exports.analyzeTrends = exports.predictEngagement = exports.analyzeBehavior = exports.moderateContent = exports.detectHighlights = exports.enhanceStream = exports.recommendGames = exports.suggestFriends = exports.rankFeed = exports.generateAchievementCelebration = exports.generateCaption = exports.generateReelScript = exports.generateStory = exports.planFeatureImplementation = exports.analyzeBug = exports.getArchitectureGuidance = exports.generateCode = exports.dailyCleanup = exports.weeklyTasks = exports.notifyAdminNewChat = exports.executeCooledGrants = exports.onGrantApproved = exports.monitorDiamondSupply = exports.checkTierUpgrade = exports.upgradeToVerified = exports.claimDailyLogin = exports.grantGameplayReward = exports.validateTransfer = exports.validateSpectatorAccess = exports.generateLiveKitToken = exports.onVoiceRoomCreated = exports.onFriendshipUpdated = exports.onFriendRequestCreated = exports.onStoryCreated = exports.onSocialMessageSent = exports.auditGameUpdate = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const app_1 = require("firebase-admin/app");
 const firestore_1 = require("firebase-admin/firestore");
@@ -48,6 +48,37 @@ Object.defineProperty(exports, "notifyAdminNewChat", { enumerable: true, get: fu
 var dailyTasks_1 = require("./scheduled/dailyTasks");
 Object.defineProperty(exports, "weeklyTasks", { enumerable: true, get: function () { return dailyTasks_1.weeklyTasks; } });
 Object.defineProperty(exports, "dailyCleanup", { enumerable: true, get: function () { return dailyTasks_1.dailyCleanup; } });
+// Export AI Agents (12 Total)
+var agents_1 = require("./agents");
+// IDE Guide Agent
+Object.defineProperty(exports, "generateCode", { enumerable: true, get: function () { return agents_1.generateCode; } });
+Object.defineProperty(exports, "getArchitectureGuidance", { enumerable: true, get: function () { return agents_1.getArchitectureGuidance; } });
+Object.defineProperty(exports, "analyzeBug", { enumerable: true, get: function () { return agents_1.analyzeBug; } });
+Object.defineProperty(exports, "planFeatureImplementation", { enumerable: true, get: function () { return agents_1.planFeatureImplementation; } });
+// Content Creator Agent
+Object.defineProperty(exports, "generateStory", { enumerable: true, get: function () { return agents_1.generateStory; } });
+Object.defineProperty(exports, "generateReelScript", { enumerable: true, get: function () { return agents_1.generateReelScript; } });
+Object.defineProperty(exports, "generateCaption", { enumerable: true, get: function () { return agents_1.generateCaption; } });
+Object.defineProperty(exports, "generateAchievementCelebration", { enumerable: true, get: function () { return agents_1.generateAchievementCelebration; } });
+// Recommendation Agent
+Object.defineProperty(exports, "rankFeed", { enumerable: true, get: function () { return agents_1.rankFeed; } });
+Object.defineProperty(exports, "suggestFriends", { enumerable: true, get: function () { return agents_1.suggestFriends; } });
+Object.defineProperty(exports, "recommendGames", { enumerable: true, get: function () { return agents_1.recommendGames; } });
+// Streaming Agent
+Object.defineProperty(exports, "enhanceStream", { enumerable: true, get: function () { return agents_1.enhanceStream; } });
+Object.defineProperty(exports, "detectHighlights", { enumerable: true, get: function () { return agents_1.detectHighlights; } });
+// Safety Agent
+Object.defineProperty(exports, "moderateContent", { enumerable: true, get: function () { return agents_1.moderateContent; } });
+Object.defineProperty(exports, "analyzeBehavior", { enumerable: true, get: function () { return agents_1.analyzeBehavior; } });
+// Analytics Agent
+Object.defineProperty(exports, "predictEngagement", { enumerable: true, get: function () { return agents_1.predictEngagement; } });
+Object.defineProperty(exports, "analyzeTrends", { enumerable: true, get: function () { return agents_1.analyzeTrends; } });
+// Export Social Diamond Rewards (V5 Enhancements)
+var social_2 = require("./rewards/social");
+Object.defineProperty(exports, "grantSocialRewardFunction", { enumerable: true, get: function () { return social_2.grantSocialRewardFunction; } });
+Object.defineProperty(exports, "processVoiceRoomTip", { enumerable: true, get: function () { return social_2.processVoiceRoomTip; } });
+Object.defineProperty(exports, "calculateWeeklyEngagement", { enumerable: true, get: function () { return social_2.calculateWeeklyEngagement; } });
+Object.defineProperty(exports, "calculateMonthlyMilestones", { enumerable: true, get: function () { return social_2.calculateMonthlyMilestones; } });
 // Initialize Firebase Admin
 (0, app_1.initializeApp)();
 const db = (0, firestore_1.getFirestore)();

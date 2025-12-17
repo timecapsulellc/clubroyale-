@@ -53,6 +53,33 @@ export { checkTierUpgrade, monitorDiamondSupply } from './diamonds/scheduled';
 export { onGrantApproved, executeCooledGrants, notifyAdminNewChat } from './admin/diamondAdmin';
 export { weeklyTasks, dailyCleanup } from './scheduled/dailyTasks';
 
+// Export AI Agents (12 Total)
+export {
+    // IDE Guide Agent
+    generateCode,
+    getArchitectureGuidance,
+    analyzeBug,
+    planFeatureImplementation,
+    // Content Creator Agent
+    generateStory,
+    generateReelScript,
+    generateCaption,
+    generateAchievementCelebration,
+    // Recommendation Agent
+    rankFeed,
+    suggestFriends,
+    recommendGames,
+    // Streaming Agent
+    enhanceStream,
+    detectHighlights,
+    // Safety Agent
+    moderateContent,
+    analyzeBehavior,
+    // Analytics Agent
+    predictEngagement,
+    analyzeTrends,
+} from './agents';
+
 // Export Social Diamond Rewards (V5 Enhancements)
 export {
     grantSocialRewardFunction,

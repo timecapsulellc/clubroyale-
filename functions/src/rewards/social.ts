@@ -5,10 +5,13 @@
  * Handles server-side validation and scheduled engagement tier calculations.
  */
 
-import * as functions from 'firebase-functions';
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { logger } from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
-const db = admin.firestore();
+// Lazy initialization to avoid "app not initialized" error
+const getDb = () => admin.firestore();
 
 // ============================================================================
 // CONFIGURATION (Mirror of diamond_config.dart)
@@ -73,7 +76,7 @@ function getMonthKey(): string {
 }
 
 async function getDailyRewardTotal(userId: string, category: string, dateKey: string): Promise<number> {
-    const rewards = await db.collection('diamond_rewards')
+    const rewards = await getDb().collection('diamond_rewards')
         .where('userId', '==', userId)
         .where('category', '==', category)
         .where('dateKey', '==', dateKey)
@@ -99,10 +102,10 @@ async function grantSocialReward(params: {
 }): Promise<void> {
     if (params.amount <= 0) return;
 
-    const batch = db.batch();
+    const batch = getDb().batch();
 
     // Create reward record
-    const rewardRef = db.collection('diamond_rewards').doc();
+    const rewardRef = getDb().collection('diamond_rewards').doc();
     batch.set(rewardRef, {
         userId: params.userId,
         type: params.type,
@@ -117,7 +120,7 @@ async function grantSocialReward(params: {
     });
 
     // Update wallet balance
-    const walletRef = db.collection('wallets').doc(params.userId);
+    const walletRef = getDb().collection('wallets').doc(params.userId);
     batch.update(walletRef, {
         balance: admin.firestore.FieldValue.increment(params.amount),
         totalEarned: admin.firestore.FieldValue.increment(params.amount),
@@ -125,7 +128,7 @@ async function grantSocialReward(params: {
     });
 
     // Record transaction
-    const txRef = db.collection('transactions').doc();
+    const txRef = getDb().collection('transactions').doc();
     batch.set(txRef, {
         userId: params.userId,
         amount: params.amount,
@@ -136,7 +139,7 @@ async function grantSocialReward(params: {
     });
 
     await batch.commit();
-    functions.logger.info(`Social reward granted: ${params.amount}💎 (${params.type}) to ${params.userId}`);
+    logger.info(`Social reward granted: ${params.amount}💎 (${params.type}) to ${params.userId}`);
 }
 
 // ============================================================================
@@ -147,20 +150,20 @@ async function grantSocialReward(params: {
  * Generic social reward granting function
  * Called by client after completing a social action
  */
-export const grantSocialRewardFunction = functions.https.onCall(async (data, context) => {
-    if (!context.auth) {
-        throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
+export const grantSocialRewardFunction = onCall(async (request) => {
+    if (!request.auth) {
+        throw new HttpsError('unauthenticated', 'Must be logged in');
     }
 
-    const userId = context.auth.uid;
-    const { rewardType, metadata } = data;
+    const userId = request.auth.uid;
+    const { rewardType, metadata } = request.data;
 
     const today = getTodayKey();
 
     // Validate reward type
     const rewardAmount = SOCIAL_REWARDS[rewardType as keyof typeof SOCIAL_REWARDS];
     if (!rewardAmount) {
-        throw new functions.https.HttpsError('invalid-argument', 'Invalid reward type');
+        throw new HttpsError('invalid-argument', 'Invalid reward type');
     }
 
     // Determine category for capping
@@ -198,21 +201,21 @@ export const grantSocialRewardFunction = functions.https.onCall(async (data, con
 /**
  * Process voice room tip with 5% platform fee
  */
-export const processVoiceRoomTip = functions.https.onCall(async (data, context) => {
-    if (!context.auth) {
-        throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
+export const processVoiceRoomTip = onCall(async (request) => {
+    if (!request.auth) {
+        throw new HttpsError('unauthenticated', 'Must be logged in');
     }
 
-    const senderId = context.auth.uid;
-    const { receiverId, amount, roomId } = data;
+    const senderId = request.auth.uid;
+    const { receiverId, amount, roomId } = request.data;
 
     // Validate
     if (!receiverId || !amount || amount < 5) {
-        throw new functions.https.HttpsError('invalid-argument', 'Invalid tip parameters');
+        throw new HttpsError('invalid-argument', 'Invalid tip parameters');
     }
 
     // Check sender balance
-    const senderWallet = await db.collection('wallets').doc(senderId).get();
+    const senderWallet = await getDb().collection('wallets').doc(senderId).get();
     const senderBalance = (senderWallet.data()?.balance || 0) as number;
 
     if (senderBalance < amount) {
@@ -224,20 +227,20 @@ export const processVoiceRoomTip = functions.https.onCall(async (data, context) 
     const netAmount = amount - fee;
 
     // Execute transaction
-    const batch = db.batch();
+    const batch = getDb().batch();
 
-    batch.update(db.collection('wallets').doc(senderId), {
+    batch.update(getDb().collection('wallets').doc(senderId), {
         balance: admin.firestore.FieldValue.increment(-amount),
         lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    batch.update(db.collection('wallets').doc(receiverId), {
+    batch.update(getDb().collection('wallets').doc(receiverId), {
         balance: admin.firestore.FieldValue.increment(netAmount),
         totalEarned: admin.firestore.FieldValue.increment(netAmount),
         lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    const txRef = db.collection('transactions').doc();
+    const txRef = getDb().collection('transactions').doc();
     batch.set(txRef, {
         type: 'voice_room_tip',
         senderId,
@@ -251,7 +254,7 @@ export const processVoiceRoomTip = functions.https.onCall(async (data, context) 
 
     await batch.commit();
 
-    functions.logger.info(`Voice room tip: ${amount}💎 from ${senderId} to ${receiverId} (fee: ${fee})`);
+    logger.info(`Voice room tip: ${amount}💎 from ${senderId} to ${receiverId} (fee: ${fee})`);
 
     return {
         success: true,
@@ -271,16 +274,15 @@ export const processVoiceRoomTip = functions.https.onCall(async (data, context) 
  * Weekly engagement tier calculation
  * Runs every Sunday at 23:00 UTC
  */
-export const calculateWeeklyEngagement = functions.pubsub
-    .schedule('0 23 * * 0') // Sunday 23:00 UTC
-    .timeZone('UTC')
-    .onRun(async () => {
-        functions.logger.info('Starting weekly engagement calculation');
+export const calculateWeeklyEngagement = onSchedule(
+    { schedule: '0 23 * * 0', timeZone: 'UTC' },
+    async () => {
+        logger.info('Starting weekly engagement calculation');
 
         const weekKey = getWeekKey();
 
         // Get all users with activity this week
-        const usersWithActivity = await db.collection('users')
+        const usersWithActivity = await getDb().collection('users')
             .where('lastActivityWeek', '==', weekKey)
             .get();
 
@@ -307,8 +309,8 @@ export const calculateWeeklyEngagement = functions.pubsub
                 if (weeklyStats.gamesPlayed >= tier.gamesRequired &&
                     weeklyStats.daysActive >= tier.daysRequired) {
                     // Check additional requirements
-                    if (tier.requiresVoiceRoom && !weeklyStats.hostedVoiceRooms) continue;
-                    if (tier.requiresStories && !weeklyStats.postedStories) continue;
+                    if ('requiresVoiceRoom' in tier && tier.requiresVoiceRoom && !weeklyStats.hostedVoiceRooms) continue;
+                    if ('requiresStories' in tier && tier.requiresStories && !weeklyStats.postedStories) continue;
 
                     qualifyingTier = tierKey;
                     tierReward = tier.reward;
@@ -317,7 +319,7 @@ export const calculateWeeklyEngagement = functions.pubsub
 
             if (qualifyingTier && tierReward > 0) {
                 // Check if already claimed
-                const existingClaim = await db.collection('diamond_rewards')
+                const existingClaim = await getDb().collection('diamond_rewards')
                     .where('userId', '==', userId)
                     .where('type', '==', 'weekly_engagement')
                     .where('weekKey', '==', weekKey)
@@ -339,28 +341,27 @@ export const calculateWeeklyEngagement = functions.pubsub
             }
         }
 
-        functions.logger.info(`Weekly engagement complete: ${processedCount} users rewarded`);
-        return null;
-    });
+        logger.info(`Weekly engagement complete: ${processedCount} users rewarded`);
+    }
+);
 
 /**
  * Monthly milestone calculation
  * Runs on the 1st of each month at 00:30 UTC
  */
-export const calculateMonthlyMilestones = functions.pubsub
-    .schedule('30 0 1 * *') // 1st of month, 00:30 UTC
-    .timeZone('UTC')
-    .onRun(async () => {
+export const calculateMonthlyMilestones = onSchedule(
+    { schedule: '30 0 1 * *', timeZone: 'UTC' },
+    async () => {
         // Get previous month key
         const now = new Date();
         const prevMonth = now.getMonth() === 0 ? 12 : now.getMonth();
         const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
         const monthKey = `${prevYear}-${String(prevMonth).padStart(2, '0')}`;
 
-        functions.logger.info(`Starting monthly milestone calculation for ${monthKey}`);
+        logger.info(`Starting monthly milestone calculation for ${monthKey}`);
 
         // Get users with monthly stats
-        const usersWithStats = await db.collection('users')
+        const usersWithStats = await getDb().collection('users')
             .where('lastActiveMonth', '==', monthKey)
             .get();
 
@@ -391,7 +392,7 @@ export const calculateMonthlyMilestones = functions.pubsub
                 if (!reward) continue;
 
                 // Check if already claimed
-                const existingClaim = await db.collection('diamond_rewards')
+                const existingClaim = await getDb().collection('diamond_rewards')
                     .where('userId', '==', userId)
                     .where('type', '==', 'monthly_milestone')
                     .where('monthKey', '==', monthKey)
@@ -414,6 +415,6 @@ export const calculateMonthlyMilestones = functions.pubsub
             }
         }
 
-        functions.logger.info(`Monthly milestones complete: ${processedCount} rewards granted`);
-        return null;
-    });
+        logger.info(`Monthly milestones complete: ${processedCount} rewards granted`);
+    }
+);

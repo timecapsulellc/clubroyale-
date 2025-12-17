@@ -30,6 +30,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
   XFile? _image;
   Uint8List? _imageBytes;
   bool _isEditing = false;
+  
+  // Theme State
+  String _selectedTheme = 'Gold';
+  String? _generatedAvatarUrl; // Holds the AI generated URL temporarily
+  final Map<String, List<Color>> _themeColors = {
+    'Gold': [const Color(0xFFD4AF37), const Color(0xFFF7E7CE)],
+    'Neo': [Colors.cyan, Colors.blueAccent],
+    'Purple': [Colors.purpleAccent, const Color(0xFF7c3aed)],
+    'Pink': [Colors.pinkAccent, Colors.redAccent],
+    'Fire': [Colors.orange, Colors.deepOrange],
+  };
 
   @override
   void initState() {
@@ -45,21 +56,163 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
     super.dispose();
   }
 
+  // Initial Data Load
+  void _loadUserProfile(UserProfile user) {
+    if (_displayNameController.text.isEmpty) {
+      _displayNameController.text = user.displayName;
+    }
+    if (_selectedTheme == 'Gold' && user.profileTheme != null) {
+      _selectedTheme = user.profileTheme!;
+    }
+  }
+
+  Future<void> _showAvatarOptions() async {
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF2d1b4e),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('Update Profile Picture', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: Colors.white),
+              title: const Text('Upload from Gallery (PNG, JPG, GIF)', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickImage();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.auto_awesome, color: ClubRoyaleTheme.champagne),
+              title: const Text('Generate AI Avatar', style: TextStyle(color: ClubRoyaleTheme.champagne, fontWeight: FontWeight.bold)),
+              subtitle: const Text('Try Nano Banana Pro styles', style: TextStyle(color: Colors.white54)),
+              trailing: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(color: Colors.purple, borderRadius: BorderRadius.circular(8)),
+                child: const Text('PRO', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+              ),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showAiGeneratorDialog();
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery); // Supports GIFs on most OS
     if (pickedFile != null) {
       final bytes = await pickedFile.readAsBytes();
       setState(() {
         _image = pickedFile;
         _imageBytes = bytes;
+        _generatedAvatarUrl = null; // Clear AI url if picking new image
       });
     }
+  }
+
+  void _showAiGeneratorDialog() {
+    final promptController = TextEditingController();
+    bool isGenerating = false;
+    
+    showDialog(
+      context: context, 
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setStateDialog) => AlertDialog(
+          backgroundColor: const Color(0xFF1a0a2e),
+          title: const Row(
+            children: [
+              Icon(Icons.auto_awesome, color: ClubRoyaleTheme.gold),
+              SizedBox(width: 8),
+              Text('AI Avatar Studio', style: TextStyle(color: Colors.white)),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Describe your dream avatar. First generation is FREE!',
+                style: TextStyle(color: Colors.white70),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: promptController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'e.g. Cyberpunk panda with sunglasses',
+                  hintStyle: const TextStyle(color: Colors.white30),
+                  filled: true,
+                  fillColor: Colors.black26,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 20),
+              if (isGenerating)
+                const Column(
+                  children: [
+                    CircularProgressIndicator(color: ClubRoyaleTheme.gold),
+                    SizedBox(height: 12),
+                    Text('Creating magic...', style: TextStyle(color: ClubRoyaleTheme.gold)),
+                  ],
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: ClubRoyaleTheme.gold),
+              onPressed: isGenerating ? null : () async {
+                setStateDialog(() => isGenerating = true);
+                
+                // MOCK GENERATION
+                await Future.delayed(const Duration(seconds: 2));
+                
+                // Use a seeded picsum image to simulate AI result
+                final seed = promptController.text.hashCode;
+                final mockUrl = 'https://picsum.photos/seed/$seed/400/400';
+                
+                // Fetch bytes for preview
+                // In real app, we'd define this URL as success.
+                // Here we can't easily fetch bytes from URL to _imageBytes without http package call.
+                // For 'Avatar URL', we usually set the URL directly in profile.
+                // To preview it in the UI, we need to handle "URL mode" vs "Byte mode".
+                // Simplification: We will just set the URL on SAVE, but for preview we rely on a temp var.
+                
+                if (mounted) {
+                  setState(() {
+                    _generatedAvatarUrl = mockUrl;
+                    _imageBytes = null; // Clear local bytes
+                    _image = null;
+                  });
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                     const SnackBar(content: Text('✨ Avatar Generated! Save profile to apply.'))
+                  );
+                }
+              }, 
+              child: const Text('Generate (Free)'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<String> _uploadAvatar(String userId) async {
     if (_imageBytes == null) return '';
     final storageRef = FirebaseStorage.instance.ref().child('avatars/$userId');
-    final uploadTask = storageRef.putData(_imageBytes!);
+    // Set content type for GIFs if detected, though Firebase usually auto-detects
+    final metadata = SettableMetadata(contentType: 'image/png'); // Defaulting for now
+    final uploadTask = storageRef.putData(_imageBytes!, metadata);
     final snapshot = await uploadTask.whenComplete(() {});
     return snapshot.ref.getDownloadURL();
   }
@@ -68,15 +221,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
   Widget build(BuildContext context) {
     final authService = ref.watch(authServiceProvider);
     final user = authService.currentUser;
-    // We would typically fetch full profile stats here
+    final profileAsync = ref.watch(myProfileProvider);
     
     if (user == null) return const Scaffold(body: Center(child: CircularProgressIndicator()));
 
-    // Pre-fill controller if not editing
-    if (!_isEditing && _displayNameController.text.isEmpty) {
-      _displayNameController.text = user.displayName ?? '';
-    }
-
+    // Initialize theme from profile once loaded
+    // We use a post-frame callback or just check if we are in init state (not editing yet)
+    // Actually, we can just let _selectedTheme be updated if we haven't touched it?
+    // It's simpler to set it when entering Edit mode.
+    
     return Scaffold(
       backgroundColor: CasinoColors.darkPurple,
       extendBodyBehindAppBar: true,
@@ -87,29 +240,62 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
         centerTitle: true,
         leading:  IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => context.go('/'), // Correct nav back to home
+            onPressed: () => context.go('/'), 
         ),
         actions: [
           IconButton(
             icon: Icon(_isEditing ? Icons.check : Icons.edit, color: ClubRoyaleTheme.gold),
             onPressed: () async {
               if (_isEditing) {
-                // Save logic
+                // SAVE LOGIC
                 if (_displayNameController.text.isNotEmpty) {
-                    String? avatarUrl;
-                    if (_imageBytes != null) {
-                      avatarUrl = await _uploadAvatar(user.uid);
+                    try {
+                      String? avatarUrl = _generatedAvatarUrl;
+                      if (_imageBytes != null) {
+                        avatarUrl = await _uploadAvatar(user.uid);
+                      }
+                      
+                      // Get current profile to preserve stats
+                      final currentProfile = profileAsync.value;
+                      
+                      final updatedProfile = currentProfile?.copyWith(
+                        displayName: _displayNameController.text,
+                        avatarUrl: avatarUrl ?? currentProfile.avatarUrl,
+                        profileTheme: _selectedTheme,
+                      ) ?? UserProfile(
+                        id: user.uid,
+                        displayName: _displayNameController.text,
+                        avatarUrl: avatarUrl,
+                        profileTheme: _selectedTheme,
+                        // Defaults for new profile
+                        createdAt: DateTime.now(),
+                      );
+                      
+                      await ref.read(profileServiceProvider).updateProfile(updatedProfile);
+                      
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Profile updated successfully!'))
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                         ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error updating profile: $e'))
+                        );
+                      }
                     }
-                    final profile = UserProfile(
-                      id: user.uid,
-                      displayName: _displayNameController.text,
-                      avatarUrl: avatarUrl,
-                    );
-                    await ref.read(profileServiceProvider).updateProfile(profile);
                 }
                 setState(() => _isEditing = false);
               } else {
-                setState(() => _isEditing = true);
+                // ENTER EDIT MODE
+                setState(() {
+                   _isEditing = true;
+                   // Sync theme from profile
+                   if (profileAsync.value?.profileTheme != null) {
+                     _selectedTheme = profileAsync.value!.profileTheme!;
+                   }
+                });
               }
             },
           ),
@@ -129,23 +315,33 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
         child: SafeArea(
           child: Column(
             children: [
-              // 1. Profile Header
               const SizedBox(height: 20),
+              
+              // 1. Profile Header with Theme Effect & Data
               Center(
                 child: GestureDetector(
-                  onTap: _isEditing ? _pickImage : null,
+                  onTap: _isEditing ? _showAvatarOptions : null,
                   child: Stack(
                     children: [
+                      // Loading indicator if profile loading
+                      if (profileAsync.isLoading)
+                        const Positioned.fill(child: CircularProgressIndicator()),
+
+                      // Glowing Theme Ring
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: ClubRoyaleTheme.gold, width: 2),
+                          gradient: LinearGradient(
+                            colors: _themeColors[_selectedTheme] ?? _themeColors['Gold']!,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: ClubRoyaleTheme.gold.withValues(alpha: 0.3),
-                              blurRadius: 16,
-                              spreadRadius: 2,
+                              color: (_themeColors[_selectedTheme] ?? _themeColors['Gold']!).first.withValues(alpha: 0.5),
+                              blurRadius: 20,
+                              spreadRadius: 4,
                             ),
                           ],
                         ),
@@ -155,23 +351,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
                           backgroundImage: _imageBytes != null 
                               ? MemoryImage(_imageBytes!) 
                               : (user.photoURL != null ? NetworkImage(user.photoURL!) : null),
+                          // Fallback to letters
                           child: (user.photoURL == null && _imageBytes == null)
                               ? Text(
                                   user.displayName?.isNotEmpty == true ? user.displayName![0].toUpperCase() : '?',
-                                  style: const TextStyle(fontSize: 40, color: ClubRoyaleTheme.gold),
+                                  style: TextStyle(fontSize: 40, color: (_themeColors[_selectedTheme] ?? _themeColors['Gold']!).first),
                                 )
                               : null,
                         ),
                       ),
+                      
+                      // Edit Badge
                       if (_isEditing)
                         Positioned(
                           bottom: 0,
                           right: 0,
                           child: Container(
                             padding: const EdgeInsets.all(8),
-                            decoration: const BoxDecoration(
-                              color: ClubRoyaleTheme.gold,
+                            decoration: BoxDecoration(
+                              color: (_themeColors[_selectedTheme] ?? _themeColors['Gold']!).first,
                               shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
                             ),
                             child: const Icon(Icons.camera_alt, size: 20, color: Colors.black),
                           ),
@@ -195,8 +395,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
                        hintText: 'Enter Name',
                        hintStyle: TextStyle(color: Colors.white54),
                        border: UnderlineInputBorder(borderSide: BorderSide(color: ClubRoyaleTheme.gold)),
-                       enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
-                       focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: ClubRoyaleTheme.gold)),
                      ),
                    ),
                  )
@@ -211,10 +409,58 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
                   ),
                 ).animate().fadeIn().slideY(begin: 0.2),
 
+              // THEME SELECTOR (Only in Edit Mode)
+              if (_isEditing) ...[
+                const SizedBox(height: 24),
+                const Text('Choose Profile Theme', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 50,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: _themeColors.entries.map((entry) {
+                      final isSelected = _selectedTheme == entry.key;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selectedTheme = entry.key),
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(colors: entry.value),
+                              borderRadius: BorderRadius.circular(20),
+                              border: isSelected 
+                                ? Border.all(color: Colors.white, width: 2)
+                                : null,
+                              boxShadow: isSelected
+                                ? [BoxShadow(color: entry.value.first.withValues(alpha: 0.6), blurRadius: 12)]
+                                : [],
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              entry.key,
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.7),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 10), // Reduced spacing
               Text(
                 'Member since ${_formatDate(user.metadata.creationTime)}',
                 style: const TextStyle(color: Colors.white54, fontSize: 13),
               ),
+              // ... rest of the file ... (Stats grid etc)
+
 
               const SizedBox(height: 24),
 

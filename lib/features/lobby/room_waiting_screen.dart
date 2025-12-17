@@ -274,7 +274,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                                 Switch(
                                   value: _isVideoEnabled,
                                   onChanged: (value) => setState(() => _isVideoEnabled = value),
-                                  activeColor: Colors.deepPurple,
+                                  activeThumbColor: Colors.deepPurple,
                                 ),
                               ],
                             ),
@@ -731,7 +731,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                       ),
                     ),
                   );
-                }).toList(),
+                }),
 
                 const SizedBox(height: 24),
 

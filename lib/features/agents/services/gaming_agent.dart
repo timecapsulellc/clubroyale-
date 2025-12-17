@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:clubroyale/features/agents/models/agent.dart';
 
 /// Gaming Agent provider
 final gamingAgentProvider = Provider<GamingAgent>((ref) {

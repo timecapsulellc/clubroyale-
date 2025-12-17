@@ -1,6 +1,7 @@
 /// Marriage Game Scoring
 /// 
 /// Based on rummy-scorekeeper scoring algorithms
+library;
 
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/meld.dart';

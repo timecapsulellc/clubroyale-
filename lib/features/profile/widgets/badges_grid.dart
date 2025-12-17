@@ -1,6 +1,7 @@
 /// Badges Grid Widget
 /// 
 /// Displays user's earned badges and achievements in a horizontal grid
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

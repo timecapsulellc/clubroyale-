@@ -1,6 +1,7 @@
 /// Replay List Screen
 /// 
 /// Shows user's saved replays and public replays
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -155,7 +156,7 @@ class _ReplayCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${replay.playerNames.join(", ")}',
+                          replay.playerNames.join(", "),
                           style: Theme.of(context).textTheme.bodySmall,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

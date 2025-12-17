@@ -1,6 +1,7 @@
 /// Call Break Service - Firebase sync for multiplayer Call Break game
 /// 
 /// Handles real-time game state synchronization via Firestore
+library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

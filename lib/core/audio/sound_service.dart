@@ -1,6 +1,7 @@
 /// Sound Service
 /// 
 /// Manages audio playback for game sounds and effects
+library;
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';

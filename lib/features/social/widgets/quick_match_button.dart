@@ -1,6 +1,7 @@
 /// Quick Match Widget
 /// 
 /// Button for instant matchmaking with animation and status.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

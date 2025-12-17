@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/features/game/call_break_service.dart';
 import 'package:clubroyale/features/game/game_room.dart';
@@ -19,10 +18,7 @@ import 'package:clubroyale/features/game/services/bot_service.dart';
 
 // RTC, Chat, and AI imports
 import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
-import 'package:clubroyale/features/chat/chat_service.dart';
 import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
-import 'package:clubroyale/features/rtc/signaling_service.dart';
-import 'package:clubroyale/features/ai/ai_service.dart';
 import 'package:clubroyale/features/ai/ai_tip_widget.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
 
@@ -151,7 +147,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                 left: 8,
                 child: AudioFloatingButton(
                   roomId: widget.gameId,
-                  userId: currentUserId!,
+                  userId: currentUserId,
                 ),
               ),
               
@@ -161,7 +157,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                 right: 8,
                 child: ChatOverlay(
                   roomId: widget.gameId,
-                  userId: currentUserId!,
+                  userId: currentUserId,
                   userName: playerNames[currentUserId] ?? 'Player',
                   isExpanded: _isChatExpanded,
                   onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
@@ -182,7 +178,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                     ),
                     child: VideoGridWidget(
                       roomId: widget.gameId,
-                      userId: currentUserId!,
+                      userId: currentUserId,
                       userName: playerNames[currentUserId] ?? 'Player',
                     ),
                   ),
@@ -195,11 +191,11 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                   right: 8,
                   child: AiTipWidget(
                     hand: myHand.map((c) => c.displayString).toList(),
-                    trickCards: game.currentTrick?.cards.map((c) => '${c.card.displayString}').toList() ?? [],
+                    trickCards: game.currentTrick?.cards.map((c) => c.card.displayString).toList() ?? [],
                     tricksNeeded: (game.bids[currentUserId]?.amount ?? 0) - (game.tricksWon[currentUserId] ?? 0),
                     tricksWon: game.tricksWon[currentUserId] ?? 0,
                     bid: game.bids[currentUserId]?.amount ?? 0,
-                    ledSuit: game.currentTrick?.ledSuit?.name,
+                    ledSuit: game.currentTrick?.ledSuit.name,
                   ),
                 ),
             ],

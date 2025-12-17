@@ -2,6 +2,7 @@
 /// 
 /// UI for playing Royal Meld card game
 /// Uses GameTerminology for multi-region localization
+library;
 
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_animate/flutter_animate.dart';

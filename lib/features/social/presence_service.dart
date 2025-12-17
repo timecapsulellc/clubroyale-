@@ -2,6 +2,7 @@
 /// 
 /// Tracks user online/offline status in real-time using Firestore.
 /// Uses Firestore's offline capabilities for presence detection.
+library;
 
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';

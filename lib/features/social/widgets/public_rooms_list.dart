@@ -1,6 +1,7 @@
 /// Public Rooms List
 /// 
 /// Shows list of public game rooms that users can join.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

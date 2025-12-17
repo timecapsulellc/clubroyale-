@@ -3,23 +3,86 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/social/voice_rooms/models/voice_room.dart';
 import 'package:clubroyale/features/social/voice_rooms/services/voice_room_service.dart';
-import 'package:clubroyale/features/social/voice_rooms/services/voice_room_service.dart';
 import 'package:clubroyale/features/social/services/social_service.dart';
 import 'package:clubroyale/features/social/invite_service.dart';
 import 'package:clubroyale/features/social/services/friend_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/features/rtc/audio_service.dart';
+import 'package:clubroyale/features/rtc/signaling_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 /// Voice room screen displaying participants and controls
-class VoiceRoomScreen extends ConsumerWidget {
+/// Now with real WebRTC audio integration
+class VoiceRoomScreen extends ConsumerStatefulWidget {
   final String roomId;
 
   const VoiceRoomScreen({super.key, required this.roomId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<VoiceRoomScreen> createState() => _VoiceRoomScreenState();
+}
+
+class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
+  AudioService? _audioService;
+  bool _isAudioConnected = false;
+  bool _isConnecting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Audio connection will be initialized after we have user info
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initAudio();
+    });
+  }
+
+  Future<void> _initAudio() async {
+    final user = ref.read(authServiceProvider).currentUser;
+    if (user == null) return;
+    
+    setState(() => _isConnecting = true);
+    
+    try {
+      final params = SignalingParams(
+        roomId: widget.roomId,
+        localUserId: user.uid,
+      );
+      
+      _audioService = ref.read(audioServiceProvider(params));
+      await _audioService!.joinAudioRoom();
+      
+      if (mounted) {
+        setState(() {
+          _isAudioConnected = true;
+          _isConnecting = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error joining audio room: $e');
+      if (mounted) {
+        setState(() => _isConnecting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Audio connection failed: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _leaveAudio() async {
+    await _audioService?.leaveAudioRoom();
+    setState(() => _isAudioConnected = false);
+  }
+
+  @override
+  void dispose() {
+    _audioService?.leaveAudioRoom();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final roomStreamProvider = StreamProvider<VoiceRoom?>((ref) {
-      return ref.watch(voiceRoomServiceProvider).getRoomStream(roomId);
+      return ref.watch(voiceRoomServiceProvider).getRoomStream(widget.roomId);
     });
 
     final roomAsync = ref.watch(roomStreamProvider);
@@ -87,6 +150,33 @@ class VoiceRoomScreen extends ConsumerWidget {
 
           return Column(
             children: [
+              // Audio connection status
+              if (_isConnecting)
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  color: Colors.amber.shade800,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+                      SizedBox(width: 8),
+                      Text('Connecting audio...', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+              if (_isAudioConnected)
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  color: Colors.green.shade700,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.wifi, size: 16, color: Colors.white),
+                      SizedBox(width: 4),
+                      Text('Audio connected', style: TextStyle(color: Colors.white, fontSize: 12)),
+                    ],
+                  ),
+                ),
               // Room info
               Container(
                 padding: const EdgeInsets.all(16),
@@ -178,7 +268,7 @@ class VoiceRoomScreen extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Mute button
+                    // Mute button - controls both Firestore state AND actual WebRTC audio
                     Builder(
                       builder: (context) {
                         final userId = ref.watch(authServiceProvider).currentUser?.uid;
@@ -188,10 +278,13 @@ class VoiceRoomScreen extends ConsumerWidget {
                         return _ControlButton(
                           icon: Icons.mic_off,
                           activeIcon: Icons.mic,
-                          label: 'Mute',
+                          label: isMuted ? 'Unmute' : 'Mute',
                           isActive: !isMuted, 
                           onTap: () {
-                            ref.read(voiceRoomServiceProvider).toggleMute(roomId);
+                            // Update Firestore state
+                            ref.read(voiceRoomServiceProvider).toggleMute(widget.roomId);
+                            // Toggle actual WebRTC audio
+                            _audioService?.toggleMute();
                           },
                         );
                       }
@@ -206,15 +299,16 @@ class VoiceRoomScreen extends ConsumerWidget {
                         return _ControlButton(
                           icon: Icons.headset_off,
                           activeIcon: Icons.headset,
-                          label: 'Deafen',
+                          label: isDeafened ? 'Undeafen' : 'Deafen',
                           isActive: !isDeafened,
                           onTap: () {
-                            ref.read(voiceRoomServiceProvider).toggleDeafen(roomId);
+                            ref.read(voiceRoomServiceProvider).toggleDeafen(widget.roomId);
+                            // Note: Deafen affects incoming audio - would need to mute all remote peers
                           },
                         );
                       }
                     ),
-                    // Leave button
+                    // Leave button - disconnects audio AND updates Firestore
                     _ControlButton(
                       icon: Icons.call_end,
                       activeIcon: Icons.call_end,
@@ -222,6 +316,9 @@ class VoiceRoomScreen extends ConsumerWidget {
                       isActive: true,
                       activeColor: Colors.red,
                       onTap: () async {
+                        // Disconnect WebRTC audio first
+                        await _leaveAudio();
+                        // Then leave room in Firestore
                         await ref.read(voiceRoomServiceProvider).leaveCurrentRoom();
                         if (context.mounted) context.pop();
                       },

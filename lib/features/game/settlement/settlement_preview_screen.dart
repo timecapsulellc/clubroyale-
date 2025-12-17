@@ -1,6 +1,7 @@
 /// Settlement Preview Screen
 /// 
 /// Displays final game scores and diamond transfers between players
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';

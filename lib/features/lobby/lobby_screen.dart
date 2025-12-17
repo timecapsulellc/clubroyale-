@@ -9,7 +9,6 @@ import 'package:clubroyale/features/game/game_config.dart';
 import 'package:clubroyale/features/lobby/lobby_service.dart';
 import 'package:clubroyale/core/config/diamond_config.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart';
-import 'package:clubroyale/features/wallet/diamond_wallet.dart';
 import 'package:clubroyale/features/wallet/diamond_balance_widget.dart';
 import 'package:clubroyale/features/feedback/feedback_dialog.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
@@ -146,25 +145,37 @@ class LobbyScreen extends ConsumerWidget {
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.all(16),
-              child: Row(
+              child: Column(
                 children: [
-                  Expanded(
-                    child: _QuickActionButton(
-                      icon: Icons.add_rounded,
-                      label: 'Create Room',
-                      color: const Color(0xFF1A6B4A), // Casino green
-                      onTap: () => _showCreateGameDialog(context, ref),
-                    ).animate(delay: 100.ms).fadeIn().slideX(begin: -0.2),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _QuickActionButton(
+                          icon: Icons.add_rounded,
+                          label: 'Create Room',
+                          color: const Color(0xFF1A6B4A), // Casino green
+                          onTap: () => _showCreateGameDialog(context, ref),
+                        ).animate(delay: 100.ms).fadeIn().slideX(begin: -0.2),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _QuickActionButton(
+                          icon: Icons.pin_rounded,
+                          label: 'Join by Code',
+                          color: Colors.amber.shade700, // Gold
+                          onTap: () => _showJoinByCodeDialog(context, ref),
+                        ).animate(delay: 200.ms).fadeIn().slideX(begin: 0.2),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _QuickActionButton(
-                      icon: Icons.pin_rounded,
-                      label: 'Join by Code',
-                      color: Colors.amber.shade700, // Gold
-                      onTap: () => _showJoinByCodeDialog(context, ref),
-                    ).animate(delay: 200.ms).fadeIn().slideX(begin: 0.2),
-                  ),
+                  const SizedBox(height: 12),
+                  // Tournaments button
+                  _QuickActionButton(
+                    icon: Icons.emoji_events_rounded,
+                    label: '🏆 Tournaments',
+                    color: const Color(0xFF7C3AED), // Purple for tournaments
+                    onTap: () => context.push('/tournaments'),
+                  ).animate(delay: 300.ms).fadeIn().slideY(begin: 0.2),
                 ],
               ),
             ),

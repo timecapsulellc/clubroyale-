@@ -1,6 +1,7 @@
 /// Tournament Models
 /// 
 /// Models for tournament bracket system
+library;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 

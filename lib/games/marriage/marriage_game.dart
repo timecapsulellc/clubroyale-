@@ -3,6 +3,7 @@
 /// Implementation of Royal Meld (Marriage) card game
 /// 3 decks (156 cards) + 6 jokers, 21 cards per player
 /// Uses GameTerminology for multi-region support
+library;
 
 import 'package:clubroyale/games/base_game.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';

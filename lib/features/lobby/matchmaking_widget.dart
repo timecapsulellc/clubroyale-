@@ -1,6 +1,7 @@
 /// Matchmaking Widget
 /// 
 /// UI component for finding a match
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';

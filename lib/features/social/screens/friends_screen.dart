@@ -81,7 +81,7 @@ class MyFriendsTab extends ConsumerWidget {
                 const SizedBox(height: 16),
                 const Text('No friends yet.'),
                 TextButton(
-                  onPressed: () => DefaultTabController.of(context)?.animateTo(2), 
+                  onPressed: () => DefaultTabController.of(context).animateTo(2), 
                   // Note: DefaultTabController only works if provided above, but we used TabController manually.
                   // Just show simple text.
                   child: const Text('Find People'),

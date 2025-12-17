@@ -1,6 +1,7 @@
 /// Spectator Screen
 /// 
 /// Displays a read-only view of an ongoing game
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

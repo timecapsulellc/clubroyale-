@@ -77,7 +77,7 @@ class VideoService extends ChangeNotifier {
   VideoConnectionState _state = VideoConnectionState.disconnected;
   bool _isCameraEnabled = false;
   bool _isMicEnabled = false;
-  bool _isScreenSharing = false;
+  final bool _isScreenSharing = false;
   ParticipantRole _localRole = ParticipantRole.player;
 
   VideoService({

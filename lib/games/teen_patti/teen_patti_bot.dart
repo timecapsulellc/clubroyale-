@@ -2,6 +2,7 @@
 /// 
 /// AI-powered bot decision making for Teen Patti game
 /// Includes betting, folding, sideshow, and showdown logic
+library;
 
 import 'dart:math';
 import 'package:clubroyale/games/teen_patti/teen_patti_game.dart';

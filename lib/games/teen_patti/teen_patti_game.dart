@@ -2,6 +2,7 @@
 /// 
 /// Implementation of Indian Teen Patti (Three Patti) card game
 /// 52 cards, 3 cards per player, betting-based gameplay
+library;
 
 import 'package:clubroyale/games/base_game.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
@@ -81,10 +82,10 @@ class TeenPattiGame implements BaseGame {
   TeenPattiPhase _teenPattiPhase = TeenPattiPhase.dealing;
   
   // Betting state
-  int _bootAmount = 10;  // Initial ante
+  final int _bootAmount = 10;  // Initial ante
   int _pot = 0;
   int _currentStake = 1;  // Current betting unit
-  int _maxStake = 128;    // Maximum stake limit
+  final int _maxStake = 128;    // Maximum stake limit
   String? _gameWinner;
   
   @override

@@ -1,6 +1,7 @@
 /// Achievement Service
 /// 
 /// Handles checking, unlocking, and tracking achievements
+library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';

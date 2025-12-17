@@ -222,11 +222,11 @@ return $default(_that.id,_that.displayName,_that.avatarUrl,_that.status,_that.la
 @JsonSerializable()
 
 class _SocialUser extends SocialUser {
-  const _SocialUser({required this.id, required this.displayName, this.avatarUrl, this.status = UserStatus.offline, @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) this.lastSeen, this.currentActivityType, this.currentActivityId, this.currentActivityName, this.isFriend = false}): super._();
+  const _SocialUser({this.id = '', this.displayName = 'Player', this.avatarUrl, this.status = UserStatus.offline, @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) this.lastSeen, this.currentActivityType, this.currentActivityId, this.currentActivityName, this.isFriend = false}): super._();
   factory _SocialUser.fromJson(Map<String, dynamic> json) => _$SocialUserFromJson(json);
 
-@override final  String id;
-@override final  String displayName;
+@override@JsonKey() final  String id;
+@override@JsonKey() final  String displayName;
 @override final  String? avatarUrl;
 // Presence
 @override@JsonKey() final  UserStatus status;

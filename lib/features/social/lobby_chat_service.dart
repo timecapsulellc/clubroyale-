@@ -2,6 +2,7 @@
 /// 
 /// Chat for users in the lobby area (not in a game room).
 /// Uses GenKit moderation for content filtering.
+library;
 
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';

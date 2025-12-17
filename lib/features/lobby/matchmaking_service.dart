@@ -1,6 +1,7 @@
 /// Matchmaking Service
 /// 
 /// Auto-match algorithm to pair players for games
+library;
 
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';

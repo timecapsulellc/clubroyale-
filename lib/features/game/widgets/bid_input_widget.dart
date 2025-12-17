@@ -96,7 +96,7 @@ class _BidInputWidgetState extends State<BidInputWidget> {
               decoration: BoxDecoration(
                 color: isMyTurn
                     ? theme.colorScheme.primaryContainer
-                    : theme.colorScheme.surfaceVariant,
+                    : theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(

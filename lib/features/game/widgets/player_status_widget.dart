@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:clubroyale/features/game/game_room.dart';
-import 'package:clubroyale/features/game/models/game_state.dart';
 
 /// Widget showing player status around the game table
 class PlayerStatusWidget extends StatelessWidget {

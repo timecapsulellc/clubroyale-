@@ -1,6 +1,7 @@
 /// Direct Messages Service
 /// 
 /// Private 1:1 messaging between friends.
+library;
 
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';

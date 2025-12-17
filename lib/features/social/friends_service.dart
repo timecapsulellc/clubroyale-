@@ -1,6 +1,7 @@
 /// Friends Service
 /// 
 /// Manages friend relationships: sending requests, accepting, listing friends.
+library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';

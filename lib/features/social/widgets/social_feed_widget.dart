@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'package:clubroyale/features/social/models/social_activity.dart';
 import 'package:clubroyale/features/social/providers/dashboard_providers.dart';
 import 'dart:ui';

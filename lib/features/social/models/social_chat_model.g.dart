@@ -8,10 +8,12 @@ part of 'social_chat_model.dart';
 
 _SocialChat _$SocialChatFromJson(Map<String, dynamic> json) => _SocialChat(
   id: json['id'] as String,
-  type: $enumDecode(_$ChatTypeEnumMap, json['type']),
-  participants: (json['participants'] as List<dynamic>)
-      .map((e) => e as String)
-      .toList(),
+  type: $enumDecodeNullable(_$ChatTypeEnumMap, json['type']) ?? ChatType.direct,
+  participants:
+      (json['participants'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
   admins:
       (json['admins'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
@@ -64,11 +66,11 @@ const _$ChatTypeEnumMap = {
 _SocialMessagePreview _$SocialMessagePreviewFromJson(
   Map<String, dynamic> json,
 ) => _SocialMessagePreview(
-  messageId: json['messageId'] as String,
-  senderId: json['senderId'] as String,
-  senderName: json['senderName'] as String,
-  content: json['content'] as String,
-  type: json['type'] as String,
+  messageId: json['messageId'] as String? ?? '',
+  senderId: json['senderId'] as String? ?? '',
+  senderName: json['senderName'] as String? ?? 'Unknown',
+  content: json['content'] as String? ?? '',
+  type: json['type'] as String? ?? 'text',
   timestamp: _timestampFromJson(json['timestamp']),
 );
 

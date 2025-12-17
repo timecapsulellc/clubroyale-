@@ -1,6 +1,7 @@
 /// Theme Store Providers
 /// 
 /// Riverpod providers for managing selected theme and card skin state.
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/theme/game_themes.dart';

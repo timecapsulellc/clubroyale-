@@ -1,6 +1,7 @@
 /// Clubs List Screen
 /// 
 /// Shows user's clubs and discovery
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

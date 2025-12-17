@@ -1,6 +1,7 @@
 /// Teen Patti Service - Firebase sync for multiplayer Teen Patti game
 /// 
 /// Handles real-time game state synchronization via Firestore
+library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

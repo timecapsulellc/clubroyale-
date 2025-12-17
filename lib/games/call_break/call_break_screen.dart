@@ -1,6 +1,7 @@
 /// Call Break Game Screen
 /// 
 /// UI for the Call Break card game
+library;
 
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_animate/flutter_animate.dart';
@@ -23,7 +24,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
   late CallBreakGame _game;
   String? _selectedCardId;
   int _selectedBid = 1;
-  String _currentUserId = 'player_0';
+  final String _currentUserId = 'player_0';
   
   @override
   void initState() {

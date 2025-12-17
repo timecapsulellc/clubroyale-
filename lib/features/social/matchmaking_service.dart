@@ -2,6 +2,7 @@
 /// 
 /// ELO-based matchmaking with Quick Match functionality.
 /// Uses GenKit for intelligent player grouping.
+library;
 
 import 'dart:async';
 import 'dart:math';

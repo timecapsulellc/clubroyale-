@@ -16,6 +16,8 @@ export { upgradeToVerified } from './diamonds/upgradeToVerified';
 export { checkTierUpgrade, monitorDiamondSupply } from './diamonds/scheduled';
 export { onGrantApproved, executeCooledGrants, notifyAdminNewChat } from './admin/diamondAdmin';
 export { weeklyTasks, dailyCleanup } from './scheduled/dailyTasks';
+export { generateCode, getArchitectureGuidance, analyzeBug, planFeatureImplementation, generateStory, generateReelScript, generateCaption, generateAchievementCelebration, rankFeed, suggestFriends, recommendGames, enhanceStream, detectHighlights, moderateContent, analyzeBehavior, predictEngagement, analyzeTrends, } from './agents';
+export { grantSocialRewardFunction, processVoiceRoomTip, calculateWeeklyEngagement, calculateMonthlyMilestones } from './rewards/social';
 /**
  * Process settlement after game ends
  * UPDATED for Diamond Economy V5: Uses 'users' collection instead of 'wallets'

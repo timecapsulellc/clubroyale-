@@ -1,6 +1,7 @@
 /// Replay Models
 /// 
 /// Models for game replay/playback system
+library;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 

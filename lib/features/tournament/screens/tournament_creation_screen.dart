@@ -1,6 +1,7 @@
 /// Tournament Creation Screen
 /// 
 /// Allows users to create new tournaments
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

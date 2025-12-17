@@ -1,6 +1,7 @@
 /// Tournament Lobby Screen
 /// 
 /// Displays list of tournaments and join options
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

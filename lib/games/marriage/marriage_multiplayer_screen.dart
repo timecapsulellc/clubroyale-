@@ -2,6 +2,7 @@
 /// 
 /// Real-time multiplayer card game connected to Firebase
 /// Uses GameTerminology for multi-region localization
+library;
 
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,7 +43,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   // REMOVED: _hasDrawn flag - now using state.turnPhase from Firestore (P0 FIX)
   bool _isChatExpanded = false;
   bool _showVideoGrid = false;
-  Set<String> _highlightedCardIds = {};  // P2: Cards to highlight in meld suggestions
+  final Set<String> _highlightedCardIds = {};  // P2: Cards to highlight in meld suggestions
   
   // Card lookup cache
   final Map<String, Card> _cardCache = {};

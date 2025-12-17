@@ -44,7 +44,7 @@ class SettlementShareService {
     buffer.writeln('🎴 ${_getGameName(data.gameType)} Game Results');
     buffer.writeln('📍 Room: ${data.roomCode}');
     buffer.writeln('👤 Host: ${data.hostName}');
-    buffer.writeln('${'─' * 28}');
+    buffer.writeln('─' * 28);
     buffer.writeln();
     
     // Scores (sorted by rank)
@@ -73,7 +73,7 @@ class SettlementShareService {
     }
     
     // Disclaimer
-    buffer.writeln('${'─' * 28}');
+    buffer.writeln('─' * 28);
     buffer.writeln('ℹ️ This is a score summary only.');
     buffer.writeln('Players settle privately outside the app.');
     buffer.writeln();

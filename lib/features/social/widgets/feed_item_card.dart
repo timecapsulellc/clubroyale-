@@ -1,6 +1,7 @@
 /// Feed Item Card Widget
 /// 
 /// Displays a single activity feed item
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

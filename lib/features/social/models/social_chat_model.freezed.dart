@@ -241,15 +241,15 @@ return $default(_that.id,_that.type,_that.participants,_that.admins,_that.name,_
 @JsonSerializable()
 
 class _SocialChat extends SocialChat {
-  const _SocialChat({required this.id, required this.type, required final  List<String> participants, final  List<String> admins = const [], this.name, this.description, this.avatarUrl, @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) required this.createdAt, @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) this.updatedAt, this.lastMessage, final  Map<String, int> unreadCounts = const {}, this.isMuted = false, this.isArchived = false, final  Map<String, dynamic> metadata = const {}}): _participants = participants,_admins = admins,_unreadCounts = unreadCounts,_metadata = metadata,super._();
+  const _SocialChat({required this.id, this.type = ChatType.direct, final  List<String> participants = const [], final  List<String> admins = const [], this.name, this.description, this.avatarUrl, @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) required this.createdAt, @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) this.updatedAt, this.lastMessage, final  Map<String, int> unreadCounts = const {}, this.isMuted = false, this.isArchived = false, final  Map<String, dynamic> metadata = const {}}): _participants = participants,_admins = admins,_unreadCounts = unreadCounts,_metadata = metadata,super._();
   factory _SocialChat.fromJson(Map<String, dynamic> json) => _$SocialChatFromJson(json);
 
 @override final  String id;
-@override final  ChatType type;
+@override@JsonKey() final  ChatType type;
 // Participants
  final  List<String> _participants;
 // Participants
-@override List<String> get participants {
+@override@JsonKey() List<String> get participants {
   if (_participants is EqualUnmodifiableListView) return _participants;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_participants);
@@ -582,14 +582,14 @@ return $default(_that.messageId,_that.senderId,_that.senderName,_that.content,_t
 @JsonSerializable()
 
 class _SocialMessagePreview extends SocialMessagePreview {
-  const _SocialMessagePreview({required this.messageId, required this.senderId, required this.senderName, required this.content, required this.type, @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) required this.timestamp}): super._();
+  const _SocialMessagePreview({this.messageId = '', this.senderId = '', this.senderName = 'Unknown', this.content = '', this.type = 'text', @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) required this.timestamp}): super._();
   factory _SocialMessagePreview.fromJson(Map<String, dynamic> json) => _$SocialMessagePreviewFromJson(json);
 
-@override final  String messageId;
-@override final  String senderId;
-@override final  String senderName;
-@override final  String content;
-@override final  String type;
+@override@JsonKey() final  String messageId;
+@override@JsonKey() final  String senderId;
+@override@JsonKey() final  String senderName;
+@override@JsonKey() final  String content;
+@override@JsonKey() final  String type;
 // 'text', 'image', etc.
 @override@JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) final  DateTime timestamp;
 

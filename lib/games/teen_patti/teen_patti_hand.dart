@@ -2,6 +2,7 @@
 /// 
 /// Based on Indian card game Teen Patti (Three Patti)
 /// Port from JavaScript/Python open source patterns
+library;
 
 import 'package:clubroyale/core/card_engine/pile.dart';
 

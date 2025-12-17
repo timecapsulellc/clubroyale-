@@ -2,6 +2,7 @@
 /// 
 /// Implementation of the popular South Asian trick-taking card game
 /// 4 players, 13 cards each, spades are always trump
+library;
 
 import 'package:clubroyale/games/base_game.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';

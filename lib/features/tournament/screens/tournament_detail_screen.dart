@@ -1,6 +1,7 @@
 /// Tournament Detail Screen
 /// 
 /// Shows tournament info, bracket, and participants
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

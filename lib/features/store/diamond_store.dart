@@ -10,10 +10,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/wallet/diamond_wallet.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
-import 'package:clubroyale/features/wallet/services/user_tier_service.dart';
-import 'package:clubroyale/features/wallet/models/user_tier.dart';
-import 'package:clubroyale/core/config/diamond_config.dart';
-import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Diamond pack definitions
 class DiamondPack {

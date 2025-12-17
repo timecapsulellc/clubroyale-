@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clubroyale/features/wallet/models/user_tier.dart';
-import 'package:clubroyale/features/wallet/models/diamond_origin.dart';
 
 part 'diamond_wallet.freezed.dart';
 part 'diamond_wallet.g.dart';

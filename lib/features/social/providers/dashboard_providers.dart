@@ -5,7 +5,7 @@ import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/features/social/voice_rooms/models/voice_room.dart';
 import 'package:clubroyale/features/game/game_room.dart';
 import 'package:clubroyale/features/social/models/social_activity.dart';
-import 'package:clubroyale/features/social/models/social_activity.dart';
+import 'package:clubroyale/core/demo/demo_data.dart';
 
 // Unread chats count provider
 final unreadChatsCountProvider = StreamProvider<int>((ref) {
@@ -44,9 +44,12 @@ final activeVoiceRoomsProvider = StreamProvider<List<VoiceRoom>>((ref) {
       .orderBy('participantCount', descending: true)
       .limit(5)
       .snapshots()
-      .map((snapshot) => snapshot.docs
+      .map((snapshot) {
+        final rooms = snapshot.docs
           .map((doc) => VoiceRoom.fromJson({...doc.data(), 'id': doc.id}))
-          .toList());
+          .toList();
+        return rooms.isEmpty ? DemoData.voiceRooms : rooms;
+      });
 });
 
 // Spectatable games provider
@@ -58,9 +61,12 @@ final spectatorGamesProvider = StreamProvider<List<GameRoom>>((ref) {
       .orderBy('spectatorCount', descending: true)
       .limit(5)
       .snapshots()
-      .map((snapshot) => snapshot.docs
+      .map((snapshot) {
+        final rooms = snapshot.docs
           .map((doc) => GameRoom.fromJson({...doc.data(), 'id': doc.id}))
-          .toList());
+          .toList();
+        return rooms.isEmpty ? DemoData.games : rooms;
+      });
 });
 
 // Pending friend requests provider
@@ -87,7 +93,10 @@ final activityFeedProvider = StreamProvider.family<List<SocialActivity>, int>((r
       .orderBy('timestamp', descending: true)
       .limit(limit)
       .snapshots()
-      .map((snapshot) => snapshot.docs
+      .map((snapshot) {
+        final activities = snapshot.docs
           .map((doc) => SocialActivity.fromFirestore(doc))
-          .toList());
+          .toList();
+        return activities.isEmpty ? DemoData.activities : activities;
+      });
 });

@@ -17,8 +17,8 @@ abstract class SocialUser with _$SocialUser {
   const SocialUser._();
   
   const factory SocialUser({
-    required String id,
-    required String displayName,
+    @Default('') String id,
+    @Default('Player') String displayName,
     String? avatarUrl,
     
     // Presence

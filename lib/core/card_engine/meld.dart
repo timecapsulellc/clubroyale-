@@ -353,7 +353,9 @@ class MeldDetector {
      
      final tunnels = <TunnelMeld>[];
      final deckMap = <int, Card>{};
-     for (var c in matches) deckMap[c.deckIndex] = c;
+     for (var c in matches) {
+       deckMap[c.deckIndex] = c;
+     }
      
      if (deckMap.keys.toSet().length >= 3) {
        final distinct = deckMap.values.take(3).toList();

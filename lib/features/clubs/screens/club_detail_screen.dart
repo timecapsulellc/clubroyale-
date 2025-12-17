@@ -1,6 +1,7 @@
 /// Club Detail Screen
 /// 
 /// Shows club info, members, and leaderboard
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

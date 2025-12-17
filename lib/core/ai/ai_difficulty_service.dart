@@ -1,6 +1,7 @@
 /// AI Difficulty Service
 /// 
 /// Manages AI opponent difficulty levels for all games
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

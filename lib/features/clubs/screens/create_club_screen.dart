@@ -1,6 +1,7 @@
 /// Create Club Screen
 /// 
 /// Form to create a new gaming club
+library;
 
 import 'dart:io';
 import 'package:flutter/material.dart';

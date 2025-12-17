@@ -1,6 +1,7 @@
 /// In Between Game Screen
 /// 
 /// Real-time multiplayer In Between game UI
+library;
 
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -459,12 +460,12 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     switch (result) {
       case 'win':
         color = Colors.green;
-        text = '🎉 WIN! +${_betAmount}';
+        text = '🎉 WIN! +$_betAmount';
         icon = Icons.celebration;
         break;
       case 'lose':
         color = Colors.red;
-        text = '😢 LOSE -${_betAmount}';
+        text = '😢 LOSE -$_betAmount';
         icon = Icons.sentiment_dissatisfied;
         break;
       case 'post':

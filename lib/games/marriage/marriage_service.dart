@@ -2,13 +2,11 @@
 /// 
 /// Handles real-time game state synchronization via Firestore
 /// Supports both ClubRoyale (Global) and Marriage (South Asian) terminology
+library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
-import 'package:clubroyale/core/card_engine/meld.dart';
-import 'package:clubroyale/features/game/game_room.dart';
 
 /// Provider for Royal Meld (Marriage) Service
 final marriageServiceProvider = Provider((ref) => MarriageService());

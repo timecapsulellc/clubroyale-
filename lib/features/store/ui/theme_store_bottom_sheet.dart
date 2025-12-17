@@ -2,6 +2,7 @@
 /// 
 /// Premium UI for selecting table themes and card skins.
 /// Features live preview and unlockable progression.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
