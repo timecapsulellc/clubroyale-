@@ -166,13 +166,15 @@ class _GameScreenState extends ConsumerState<GameScreen>
   void _shareRoomCode(GameRoom game) {
     if (game.roomCode == null) return;
     
-    Share.share(
-      'Join my ClubRoyale game!\n\n'
-      '🎮 Room: ${game.name}\n'
-      '🔢 Code: ${game.roomCode}\n'
-      '💰 Point Value: ${game.config.pointValue.toInt()} units\n\n'
-      'Open the app and enter this code to join!',
-      subject: 'Join my game: ${game.name}',
+    SharePlus.instance.share(
+      ShareParams(
+        text: 'Join my ClubRoyale game!\n\n'
+            '🎮 Room: ${game.name}\n'
+            '🔢 Code: ${game.roomCode}\n'
+            '💰 Point Value: ${game.config.pointValue.toInt()} units\n\n'
+            'Open the app and enter this code to join!',
+        subject: 'Join my game: ${game.name}',
+      ),
     );
   }
 

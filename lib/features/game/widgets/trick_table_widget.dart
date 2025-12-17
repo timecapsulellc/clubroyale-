@@ -18,8 +18,6 @@ class TrickTableWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     // Arrange players: current user at bottom, others around the table
     final playerPositions = _getPlayerPositions();
 

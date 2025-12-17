@@ -58,7 +58,8 @@ class _ChatOverlayState extends ConsumerState<ChatOverlay> {
   }
 
   Widget _buildCollapsedBubble(ThemeData theme) {
-    final messagesAsync = ref.watch(chatMessagesProvider(_params));
+    // Watch messages provider to trigger updates
+    ref.watch(chatMessagesProvider(_params));
 
     return GestureDetector(
       onTap: () {

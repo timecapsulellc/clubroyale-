@@ -195,7 +195,7 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
         avatarUrl = await ref.read(clubServiceProvider).uploadClubAvatar(_imageFile!);
       }
 
-      final clubId = await ref.read(clubServiceProvider).createClub(
+      await ref.read(clubServiceProvider).createClub(
         ownerId: user.uid,
         ownerName: user.displayName ?? 'Host',
         name: _nameController.text,

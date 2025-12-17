@@ -174,7 +174,6 @@ class _TrickCollectionAnimationState extends State<TrickCollectionAnimation>
             final card = entry.value;
 
             // Calculate offset toward winner position
-            final angle = (index / widget.cards.length) * 2 * 3.14159;
             final radius = 60.0 * (1 - _animation.value);
             final targetRadius =
                 index == widget.winnerIndex ? 0 : 100 * _animation.value;

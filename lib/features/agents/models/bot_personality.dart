@@ -280,8 +280,6 @@ class BotPersonality {
 
   /// Get a reaction message for game events
   String getReaction(String event) {
-    final random = Random();
-    
     switch (event) {
       case 'win':
         return _pickRandom([

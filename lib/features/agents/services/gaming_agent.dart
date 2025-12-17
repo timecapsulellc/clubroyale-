@@ -148,7 +148,6 @@ class GamingAgent {
     String difficulty,
   ) {
     final currentBet = gameState['currentBet'] as int? ?? 0;
-    final pot = gameState['pot'] as int? ?? 0;
     final handStrength = _evaluateTeenPattiHand(hand);
 
     // Decision based on hand strength

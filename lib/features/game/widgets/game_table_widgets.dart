@@ -106,12 +106,6 @@ class TrickAreaWidget extends StatelessWidget {
             final playedCard = entry.value;
             final position = positions[index];
             final isWinner = winnerId == playedCard.playerId;
-            
-            // Calculate entry offset based on position (slide in from edge)
-            final entryOffset = Offset(
-              position.dx > 110 ? 50.0 : (position.dx < 110 ? -50.0 : 0.0),
-              position.dy > 110 ? 50.0 : (position.dy < 110 ? -50.0 : 0.0),
-            );
 
             return Positioned(
               left: position.dx,
@@ -149,7 +143,6 @@ class TrickAreaWidget extends StatelessWidget {
     // Position cards based on number played
     const centerX = 85.0; // (220 - 50) / 2
     const centerY = 75.0;
-    const radius = 60.0;
 
     switch (count) {
       case 1:
@@ -292,7 +285,6 @@ class RoundScoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Card(
       child: Padding(
