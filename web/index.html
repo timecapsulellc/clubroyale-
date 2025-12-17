@@ -286,8 +286,20 @@
     };
   </script>
 
-  <!-- Flutter Bootstrap -->
-  <script src="flutter_bootstrap.js" async=""></script>
+  <!-- Flutter Bootstrap - Cache busting v2.0 -->
+  <script>
+    // Force unregister old service worker to show new UI
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        for (let registration of registrations) {
+          registration.unregister().then(function () {
+            console.log('Old service worker unregistered for fresh build');
+          });
+        }
+      });
+    }
+  </script>
+  <script src="flutter_bootstrap.js?v=20251217-0810" async=""></script>
 
   <!-- Noscript Fallback -->
   <noscript>
