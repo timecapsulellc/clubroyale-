@@ -124,7 +124,7 @@ class _PlayingCardWidgetState extends State<PlayingCardWidget> with SingleTicker
           );
         },
       ),
-    );
+    ));
   }
 
   Widget _buildCardContent(bool isBackVisible, ThemeData theme, {bool isRotated = false}) {

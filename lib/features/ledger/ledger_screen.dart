@@ -533,6 +533,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
         ),
       ),
     ],
+    ),
     );
   }
 }
