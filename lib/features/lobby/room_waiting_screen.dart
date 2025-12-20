@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +9,7 @@ import 'package:clubroyale/features/game/game_room.dart';
 import 'package:clubroyale/features/game/game_config.dart';
 import 'package:clubroyale/features/lobby/lobby_service.dart';
 import 'package:clubroyale/games/marriage/marriage_service.dart';
+import 'package:clubroyale/games/marriage/marriage_config.dart';
 import 'package:clubroyale/games/teen_patti/teen_patti_service.dart';
 import 'package:clubroyale/games/in_between/in_between_service.dart';
 import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
@@ -971,9 +973,18 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
       // Start the appropriate game based on type
       if (room.gameType == 'marriage') {
         final marriageService = ref.read(marriageServiceProvider);
+        
+        // Read the Marriage-specific config from Firestore
+        final gameDoc = await FirebaseFirestore.instance.collection('games').doc(widget.roomId).get();
+        final marriageConfigJson = gameDoc.data()?['marriageConfig'] as Map<String, dynamic>?;
+        final marriageConfig = marriageConfigJson != null 
+            ? MarriageGameConfig.fromJson(marriageConfigJson)
+            : const MarriageGameConfig();
+        
         await marriageService.startGame(
           widget.roomId,
           room.players.map((p) => p.id).toList(),
+          config: marriageConfig,
         );
       } else if (room.gameType == 'teen_patti') {
         final teenPattiService = ref.read(teenPattiServiceProvider);

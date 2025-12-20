@@ -96,21 +96,22 @@ class MarriageGameState {
 class MarriageService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   
-  /// Cards per player in Marriage
-  static const int cardsPerPlayer = 21;
-  
-  /// Start a new Marriage game
-  Future<void> startGame(String roomId, List<String> playerIds) async {
+  /// Start a new Marriage game with configurable rules
+  Future<void> startGame(
+    String roomId, 
+    List<String> playerIds, {
+    MarriageGameConfig config = const MarriageGameConfig(),
+  }) async {
     // Use 4 decks for 6-8 players, 3 decks for 2-5 players
     final requiredDecks = playerIds.length > 5 ? 4 : 3;
     final deck = Deck.forMarriage(deckCount: requiredDecks);
     deck.shuffle();
     
-    // Deal cards to each player
+    // Deal cards to each player (configurable cards per player)
     final playerHands = <String, List<String>>{};
     for (final playerId in playerIds) {
       final hand = <String>[];
-      for (int i = 0; i < cardsPerPlayer; i++) {
+      for (int i = 0; i < config.cardsPerPlayer; i++) {
         final card = deck.drawCard();
         if (card != null) {
           hand.add(card.id);
@@ -128,7 +129,7 @@ class MarriageService {
     // Remaining deck
     final deckCards = deck.cards.map((c) => c.id).toList();
     
-    // Create game state with turnPhase initialized to 'drawing'
+    // Create game state with config and turnPhase initialized to 'drawing'
     final gameState = MarriageGameState(
       tipluCardId: tiplu?.id ?? '',
       playerHands: playerHands,
@@ -139,6 +140,7 @@ class MarriageService {
       phase: 'playing',
       turnPhase: 'drawing',  // P0 FIX: Start in drawing phase
       turnStartTime: DateTime.now(),  // P1: Turn timer start
+      config: config,  // Store the host's rule configuration
     );
     
     // Save to Firestore

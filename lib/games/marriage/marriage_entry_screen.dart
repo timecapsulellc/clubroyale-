@@ -8,6 +8,7 @@
 library;
 
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -469,7 +470,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
     try {
       final config = GameConfig(
         pointValue: 10,
-        totalRounds: 5,
+        totalRounds: _gameConfig.totalRounds,
       );
       
       final newGameRoom = GameRoom(
@@ -482,11 +483,14 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
         ],
         scores: {user.uid: 0},
         createdAt: DateTime.now(),
-        // TODO: Store Marriage-specific config in Firestore
-        // marriageConfig: _gameConfig,
       );
 
       final newGameId = await lobbyService.createGame(newGameRoom);
+      
+      // Store Marriage-specific config in the game document
+      await FirebaseFirestore.instance.collection('games').doc(newGameId).update({
+        'marriageConfig': _gameConfig.toJson(),
+      });
 
       // Deduct diamonds after successful room creation (skip in Test Mode)
       if (!isTestMode) {
