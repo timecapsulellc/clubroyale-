@@ -7,6 +7,8 @@ library;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
+import 'package:clubroyale/core/card_engine/pile.dart';
+import 'package:clubroyale/games/marriage/marriage_config.dart';
 
 /// Provider for Royal Meld (Marriage) Service
 final marriageServiceProvider = Provider((ref) => MarriageService());
@@ -23,7 +25,9 @@ class MarriageGameState {
   final String phase;  // 'dealing', 'playing', 'scoring'
   final String turnPhase;  // 'drawing' or 'discarding' - P0 FIX
   final String? lastDrawnCardId;  // Track what was drawn this turn
+  final String? lastDiscardedCardId;  // Track last discard for Joker block
   final DateTime? turnStartTime;  // For turn timer
+  final MarriageGameConfig config;  // Game configuration
   
   MarriageGameState({
     required this.tipluCardId,
@@ -35,7 +39,9 @@ class MarriageGameState {
     required this.phase,
     this.turnPhase = 'drawing',
     this.lastDrawnCardId,
+    this.lastDiscardedCardId,
     this.turnStartTime,
+    this.config = const MarriageGameConfig(),
   });
   
   factory MarriageGameState.fromJson(Map<String, dynamic> json) {
@@ -51,9 +57,13 @@ class MarriageGameState {
       phase: json['phase'] ?? 'waiting',
       turnPhase: json['turnPhase'] ?? 'drawing',
       lastDrawnCardId: json['lastDrawnCardId'],
+      lastDiscardedCardId: json['lastDiscardedCardId'],
       turnStartTime: json['turnStartTime'] != null 
           ? DateTime.tryParse(json['turnStartTime']) 
           : null,
+      config: json['config'] != null 
+          ? MarriageGameConfig.fromJson(json['config'] as Map<String, dynamic>)
+          : const MarriageGameConfig(),
     );
   }
   
@@ -67,7 +77,9 @@ class MarriageGameState {
     'phase': phase,
     'turnPhase': turnPhase,
     'lastDrawnCardId': lastDrawnCardId,
+    'lastDiscardedCardId': lastDiscardedCardId,
     'turnStartTime': turnStartTime?.toIso8601String(),
+    'config': config.toJson(),
   };
   
   /// Check if player has drawn this turn
@@ -200,6 +212,24 @@ class MarriageService {
     // P0 FIX: Validate player is in drawing phase
     if (state.turnPhase != 'drawing') return null;
     
+    // ===== JOKER BLOCK RULE =====
+    // If the last discarded card was a Joker or Wild, player MUST draw from deck
+    if (state.discardPile.isNotEmpty && state.config.jokerBlocksDiscard) {
+      final topCardId = state.discardPile.last;
+      if (_isBlockedCard(topCardId, state.tipluCardId, state.config)) {
+        return null; // Cannot pick from discard, must use deck
+      }
+    }
+    
+    // ===== WILD CARD PICKUP RESTRICTION =====
+    // If canPickupWildFromDiscard is false, block Tiplu/Jhiplu/Poplu pickup
+    if (!state.config.canPickupWildFromDiscard && state.discardPile.isNotEmpty) {
+      final topCardId = state.discardPile.last;
+      if (_isWildCard(topCardId, state.tipluCardId)) {
+        return null; // Cannot pick wild cards from discard
+      }
+    }
+    
     // Draw top card from discard
     final drawnCardId = state.discardPile.last;
     final newDiscard = List<String>.from(state.discardPile)..removeLast();
@@ -253,6 +283,7 @@ class MarriageService {
       'marriageState.currentPlayerId': nextPlayerId,
       'marriageState.turnPhase': 'drawing',  // Reset for next player
       'marriageState.lastDrawnCardId': null,  // Clear drawn card
+      'marriageState.lastDiscardedCardId': cardId,  // Track for Joker block
       'marriageState.turnStartTime': DateTime.now().toIso8601String(),  // P1: Reset timer
     });
   }
@@ -282,5 +313,83 @@ class MarriageService {
     });
     
     return true;
+  }
+  
+  // ========== HELPER METHODS FOR RULE ENFORCEMENT ==========
+  
+  /// Static card lookup cache
+  static final Map<String, Card> _cardCache = {};
+  
+  /// Build card cache from deck
+  static void _buildCardCache() {
+    if (_cardCache.isNotEmpty) return;
+    
+    // Build full deck for lookups
+    for (int deckIdx = 0; deckIdx < 4; deckIdx++) {
+      for (final suit in Suit.values) {
+        for (final rank in Rank.values) {
+          final card = Card(rank: rank, suit: suit, deckIndex: deckIdx);
+          _cardCache[card.id] = card;
+        }
+      }
+      // Add jokers
+      final joker = Card.joker(deckIdx);
+      _cardCache[joker.id] = joker;
+    }
+  }
+  
+  /// Get card from ID
+  static Card? _getCard(String cardId) {
+    _buildCardCache();
+    return _cardCache[cardId];
+  }
+  
+  /// Check if a card is a Joker (printed joker)
+  static bool _isJoker(String cardId) {
+    return cardId.startsWith('joker');
+  }
+  
+  /// Check if a card is a Wild card (Tiplu, Jhiplu, or Poplu)
+  static bool _isWildCard(String cardId, String tipluCardId) {
+    if (_isJoker(cardId)) return true;
+    if (tipluCardId.isEmpty) return false;
+    
+    final card = _getCard(cardId);
+    final tiplu = _getCard(tipluCardId);
+    if (card == null || tiplu == null) return false;
+    
+    // Exact Tiplu match (same rank and suit)
+    if (card.rank == tiplu.rank && card.suit == tiplu.suit) return true;
+    
+    // Jhiplu: Same rank, alternating color suits
+    if (card.rank == tiplu.rank) {
+      final tipluIsRed = tiplu.suit.isRed;
+      final cardIsRed = card.suit.isRed;
+      if (tipluIsRed != cardIsRed) return true; // Opposite color = Jhiplu
+    }
+    
+    // Poplu: Next rank above Tiplu, same suit
+    if (card.suit == tiplu.suit) {
+      final tipluValue = tiplu.rank.value;
+      final cardValue = card.rank.value;
+      // Handle wrap-around: K (13) -> A (1), otherwise value + 1
+      final popluValue = tipluValue == 13 ? 1 : tipluValue + 1;
+      if (cardValue == popluValue) return true;
+    }
+    
+    return false;
+  }
+  
+  /// Check if a card blocks picking from discard (Joker or Wild based on config)
+  static bool _isBlockedCard(String cardId, String tipluCardId, MarriageGameConfig config) {
+    // Printed Jokers always block if jokerBlocksDiscard is enabled
+    if (_isJoker(cardId)) return true;
+    
+    // Wild cards (Tiplu/Jhiplu/Poplu) only block if canPickupWildFromDiscard is false
+    if (!config.canPickupWildFromDiscard && _isWildCard(cardId, tipluCardId)) {
+      return true;
+    }
+    
+    return false;
   }
 }

@@ -20,6 +20,8 @@ import 'package:clubroyale/features/game/game_config.dart';
 import 'package:clubroyale/features/lobby/lobby_service.dart';
 import 'package:clubroyale/core/config/diamond_config.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart';
+import 'package:clubroyale/games/marriage/marriage_config.dart';
+import 'package:clubroyale/games/marriage/widgets/marriage_settings_widget.dart';
 
 class MarriageEntryScreen extends ConsumerStatefulWidget {
   const MarriageEntryScreen({super.key});
@@ -32,6 +34,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
   bool _isCreatingRoom = false;
   bool _isJoining = false;
   final _codeController = TextEditingController();
+  MarriageGameConfig _gameConfig = MarriageGameConfig.nepaliStandard;
 
   @override
   void dispose() {
@@ -93,6 +96,13 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
                 
                 // Main Actions
                 _buildCreateRoomButton(),
+                const SizedBox(height: 16),
+                
+                // Game Rules Settings
+                MarriageSettingsCompact(
+                  config: _gameConfig,
+                  onEditPressed: _showRulesEditor,
+                ),
                 const SizedBox(height: 16),
                 
                 _buildJoinRoomButton(),
@@ -472,6 +482,8 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
         ],
         scores: {user.uid: 0},
         createdAt: DateTime.now(),
+        // TODO: Store Marriage-specific config in Firestore
+        // marriageConfig: _gameConfig,
       );
 
       final newGameId = await lobbyService.createGame(newGameRoom);
@@ -522,6 +534,70 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
         );
       }
     }
+  }
+
+  void _showRulesEditor() {
+    MarriageGameConfig tempConfig = _gameConfig;
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.85,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade400,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            // Title
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Icon(Icons.tune, size: 24),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Game Rules',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      setState(() => _gameConfig = tempConfig);
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Apply'),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            // Settings content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: MarriageSettingsWidget(
+                  initialConfig: _gameConfig,
+                  onConfigChanged: (config) => tempConfig = config,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showInsufficientDiamondsDialog() {
