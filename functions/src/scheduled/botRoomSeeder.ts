@@ -6,11 +6,15 @@
  */
 
 import * as admin from 'firebase-admin';
+import { Timestamp } from 'firebase-admin/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { onCall } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
 
-const db = admin.firestore();
+// Helper to get DB instance
+function getDb() {
+    return admin.firestore();
+}
 
 // AI Bot Personalities
 const BOT_PERSONALITIES = [
@@ -44,7 +48,7 @@ interface GameRoom {
     isBotRoom: boolean;
     players: Player[];
     maxPlayers: number;
-    createdAt: FirebaseFirestore.Timestamp;
+    createdAt: Timestamp;
     config: Record<string, unknown>;
 }
 
@@ -106,7 +110,7 @@ async function createBotRoom(gameType: string): Promise<string> {
         isBotRoom: true,
         players,
         maxPlayers: 8,
-        createdAt: admin.firestore.Timestamp.now(),
+        createdAt: Timestamp.now(),
         config: {
             unitsPerPlay: gameType === 'marriage' ? 10 : 1,
             totalRounds: 5,
@@ -116,7 +120,7 @@ async function createBotRoom(gameType: string): Promise<string> {
         },
     };
 
-    await db.collection('games').doc(roomId).set({ ...gameRoom, id: roomId });
+    await getDb().collection('games').doc(roomId).set({ ...gameRoom, id: roomId });
     logger.info(`Created bot room: ${roomId} for ${gameType} hosted by ${hostBot.name}`);
 
     return roomId;
@@ -126,7 +130,7 @@ async function createBotRoom(gameType: string): Promise<string> {
  * Count active bot rooms for a game type
  */
 async function countActiveBotRooms(gameType: string): Promise<number> {
-    const snapshot = await db.collection('games')
+    const snapshot = await getDb().collection('games')
         .where('gameType', '==', gameType)
         .where('isBotRoom', '==', true)
         .where('status', '==', 'waiting')
@@ -142,12 +146,12 @@ async function cleanupStaleRooms(): Promise<number> {
     const cutoff = new Date();
     cutoff.setHours(cutoff.getHours() - 24);
 
-    const snapshot = await db.collection('games')
+    const snapshot = await getDb().collection('games')
         .where('status', '==', 'waiting')
-        .where('createdAt', '<', admin.firestore.Timestamp.fromDate(cutoff))
+        .where('createdAt', '<', Timestamp.fromDate(cutoff))
         .get();
 
-    const batch = db.batch();
+    const batch = getDb().batch();
     let count = 0;
 
     snapshot.docs.forEach(doc => {
@@ -251,11 +255,11 @@ export const cleanupAllWaitingRooms = onCall(
     async () => {
         logger.info('Cleaning up ALL waiting rooms...');
 
-        const snapshot = await db.collection('games')
+        const snapshot = await getDb().collection('games')
             .where('status', '==', 'waiting')
             .get();
 
-        const batch = db.batch();
+        const batch = getDb().batch();
         let count = 0;
 
         snapshot.docs.forEach(doc => {

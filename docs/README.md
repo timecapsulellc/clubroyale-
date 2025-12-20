@@ -1,172 +1,91 @@
-# TaasClub - Documentation Hub
+# ClubRoyale Documentation
 
-> **Version:** 1.1 | **Date:** December 10, 2025  
-> **Status:** 99% Complete (A+ Grade) | **Live:** https://taasclub-app.web.app  
-> **📊 Latest Audit:** [ULTIMATE_AUDIT_REPORT.md](./ULTIMATE_AUDIT_REPORT.md) | **📋 Whitepaper:** [PROJECT_TECHNICAL_SUMMARY.md](./PROJECT_TECHNICAL_SUMMARY.md)
+> **Version:** 2.1 | **Last Updated:** December 20, 2025
 
 ---
 
-## 📊 Current Implementation Analysis
+## 📋 Essential Documents
 
-### ✅ What's DONE (99% Complete)
+### Strategy & Planning
+| Document | Description |
+|----------|-------------|
+| [PRD_CLUBROYALE.md](./PRD_CLUBROYALE.md) | **Primary PRD** - Complete product requirements v2.1 |
+| [PROJECT_TECHNICAL_SUMMARY.md](./PROJECT_TECHNICAL_SUMMARY.md) | Technical whitepaper for stakeholders |
+| [DEVELOPMENT_ROADMAP.md](./DEVELOPMENT_ROADMAP.md) | 21-phase development history |
 
-| Component | Status | Logic |
-|-----------|--------|-------|
-| **4 Games** | ✅ | Marriage, Call Break, Teen Patti, In-Between |
-| **Settlement Service** | ✅ | Calculates "who owes whom" with min transactions |
-| **Diamond Wallet** | ✅ | RevenueCat IAP ready, spend for rooms |
-| **GenKit AI** | ✅ | 6 flows (bot play, tips, moderation, matchmaking) |
-| **Social Features** | ✅ | Friends, DMs, presence, global chat |
-| **Anti-Cheat** | ✅ | Server-side validation, rate limiting |
-| **Responsive Design** | ✅ | Mobile/Tablet/Desktop breakpoints |
-| **12 Cloud Functions** | ✅ | Deployed and working |
-| **169 Tests** | ✅ | All passing |
-| **Android APK** | ✅ | Built and tested on device |
-| **Web PWA** | ✅ | Live at taasclub-app.web.app |
+### Architecture
+| Document | Description |
+|----------|-------------|
+| [ARCHITECTURE_AUDIT.md](./ARCHITECTURE_AUDIT.md) | System architecture with AI Gaming Platform |
+| [GAME_ENGINE_SDK.md](./GAME_ENGINE_SDK.md) | Game engine integration guide |
 
----
+### Game Rules
+| Document | Description |
+|----------|-------------|
+| [MARRIAGE_RULES.md](./MARRIAGE_RULES.md) | Complete Marriage/Royal Meld rules |
+| [MARRIAGE_QUICK_REFERENCE.md](./MARRIAGE_QUICK_REFERENCE.md) | Quick reference card |
+| [MARRIAGE_GAME_SPEC.md](./MARRIAGE_GAME_SPEC.md) | Technical game specification |
 
+### Legal & Compliance
+| Document | Description |
+|----------|-------------|
+| [PRIVACY_POLICY.md](./PRIVACY_POLICY.md) | User privacy policy |
+| [TERMS_OF_SERVICE.md](./TERMS_OF_SERVICE.md) | Terms of service |
+| [DATA_SAFETY_DECLARATION.md](./DATA_SAFETY_DECLARATION.md) | Play Store data safety |
+| [DOC1_SAFE_HARBOR_LOGIC.md](./DOC1_SAFE_HARBOR_LOGIC.md) | Legal framework |
 
-## 🎯 Core Logic (Strategy A)
+### Setup Guides
+| Document | Description |
+|----------|-------------|
+| [GETTING_STARTED.md](./GETTING_STARTED.md) | Developer onboarding |
+| [EXTERNAL_SETUP_GUIDE.md](./EXTERNAL_SETUP_GUIDE.md) | External service setup |
+| [FCM_SETUP.md](./FCM_SETUP.md) | Push notifications |
+| [LIVEKIT_SETUP.md](./LIVEKIT_SETUP.md) | Video chat setup |
+| [DEEP_LINKS_SETUP.md](./DEEP_LINKS_SETUP.md) | Deep linking |
+| [TURN_SERVER_SETUP.md](./TURN_SERVER_SETUP.md) | WebRTC TURN server |
 
-```
-┌─────────────────────────────────────────────┐
-│           THE FIREWALL PRINCIPLE            │
-├─────────────────────────────────────────────┤
-│                                             │
-│  INSIDE APP          │   OUTSIDE APP        │
-│  ─────────           │   ───────────        │
-│  Points/Units        │   Cash/UPI           │
-│  Chips/Scores        │   Bank Transfers     │
-│  Diamonds (virtual)  │   Real Money         │
-│  Bill Image          │   Actual Payments    │
-│                                             │
-│  App = CALCULATOR    │   User = BANKER      │
-│                                             │
-└─────────────────────────────────────────────┘
-```
+### Store & Branding
+| Document | Description |
+|----------|-------------|
+| [STORE_LISTING.md](./STORE_LISTING.md) | App store listing copy |
+| [STORE_ASSETS.md](./STORE_ASSETS.md) | Screenshots and graphics |
+| [PLAY_STORE_COPY.md](./PLAY_STORE_COPY.md) | Play Store description |
+| [BRAND_STYLE_GUIDE.md](./BRAND_STYLE_GUIDE.md) | Visual identity |
+| [ICON_DESIGN_SPECS.md](./ICON_DESIGN_SPECS.md) | App icon specifications |
 
-### Settlement Flow
-```
-Game Ends → Calculate Scores → Match Losers to Winners 
-→ Generate Text: "Amit pays Ravi: 500 units" 
-→ Share as Image on WhatsApp 
-→ User settles offline via UPI/Cash
-```
+### Business
+| Document | Description |
+|----------|-------------|
+| [INVESTOR_PITCH_DECK.md](./INVESTOR_PITCH_DECK.md) | Investor presentation |
+| [SUCCESS_METRICS.md](./SUCCESS_METRICS.md) | KPIs and targets |
+| [DOC2_SETTLEMENT_ALGORITHM.md](./DOC2_SETTLEMENT_ALGORITHM.md) | Settlement logic |
+| [DOC3_MONETIZATION_FLOW.md](./DOC3_MONETIZATION_FLOW.md) | Revenue model |
 
----
-
-## 🚀 Further Development Roadmap
-
-### Phase 1: Foundation (Weeks 1-4)
-- [ ] CI/CD Pipeline - GitHub Actions for auto-deploy
-- [ ] Staging Environment - Test before production
-- [ ] Sentry Integration - Error monitoring
-- [ ] GameEngine Abstraction - Pluggable game framework
-
-### Phase 2: Platform (Months 2-3)
-- [ ] Clubs/Guilds - Create communities, shared treasury
-- [ ] Tournaments - Daily brackets, prize pools
-- [ ] Season Pass - 50-level progression with rewards
-- [ ] Spectator Mode - Watch friends play live
-
-### Phase 3: Engagement (Months 4-6)
-- [ ] AI Coach - Post-game analysis and tips
-- [ ] Replay System - Save and share epic games
-- [ ] Video Feeds - Short clips of highlights
-- [ ] Creator Economy - Sell avatars/card backs
-
-### Phase 4: Scale (Months 7-12)
-- [ ] Multi-Region - Deploy to asia-south
-- [ ] Esports - Ranked seasons, $10K tournaments
-- [ ] 1M MAU Target
+### Testing & QA
+| Document | Description |
+|----------|-------------|
+| [MANUAL_E2E_GUIDE.md](./MANUAL_E2E_GUIDE.md) | End-to-end testing guide |
+| [PWA_READINESS.md](./PWA_READINESS.md) | PWA compliance check |
+| [CLUB_COUNCIL_GOVERNANCE.md](./CLUB_COUNCIL_GOVERNANCE.md) | Club governance rules |
 
 ---
 
-## 💰 Revenue Logic
+## 📦 Archived Documents
 
-| Source | Model |
-|--------|-------|
-| **Diamonds (IAP)** | ₹100 = 100 💎, Host buys |
-| **Room Creation** | 10 💎 per room |
-| **Ad-Free Option** | 5 💎 per game |
-| **VIP (Future)** | ₹499/month subscription |
-
-**Break-even:** 140K MAU @ 5% VIP conversion
-
----
-
-## 📁 Documentation Structure
-
-```
-docs/
-├── Strategy A Foundation (The Law)
-│   ├── DOC1_SAFE_HARBOR_LOGIC.md    ← Legal rules
-│   ├── DOC2_SETTLEMENT_ALGORITHM.md ← Math/Code
-│   ├── DOC3_MONETIZATION_FLOW.md    ← Diamond economy
-│   ├── PRD_TAASCLUB.md              ← Product spec
-│   └── MASTER_ARCHITECT_PROMPT.md   ← AI instructions
-│
-├── Strategic Planning (The Vision)
-│   ├── ULTIMATE_ROADMAP.md          ← 12-month plan
-│   ├── MARRIAGE_GAME_SPEC.md        ← Game specs
-│   ├── GAME_ENGINE_SDK.md           ← SDK design
-│   ├── CLUB_COUNCIL_GOVERNANCE.md   ← Governance
-│   └── SUCCESS_METRICS.md           ← KPIs
-│
-└── Setup Guides
-    ├── FCM_SETUP.md                 ← Push notifications
-    ├── TURN_SERVER_SETUP.md         ← WebRTC/Video
-    └── STORE_ASSETS.md              ← App store assets
-```
-
----
-
-## 🎯 Immediate Next Steps
-
-### Critical for Beta Launch (2% Remaining)
-1. **FCM Push Notifications** (50 mins) → [FCM_SETUP.md](./FCM_SETUP.md)
-2. **RevenueCat API Keys** (85 mins) → Setup IAP products
-3. **Deploy Cloud Functions** (10 mins) → `firebase deploy --only functions`
-4. **Beta User Testing** (Ongoing) → 10-20 testers
-
-### Full Details
-See [REMAINING_TASKS.md](./REMAINING_TASKS.md) for complete checklist.
+Outdated documents have been moved to `./archive/`:
+- Old PRD versions
+- Completed phase checklists
+- Superseded audit reports
+- Legacy roadmaps
 
 ---
 
 ## 🔗 Quick Links
 
-| Resource | URL |
-|----------|-----|
-| **Live App** | https://taasclub-app.web.app |
-| **Firebase Console** | https://console.firebase.google.com/project/taasclub-app |
-| **GitHub** | https://github.com/timecapsulellc/TaasClub |
+- **Live App**: https://clubroyale-app.web.app
+- **GitHub**: https://github.com/timecapsulellc/TaasClub
+- **Firebase Console**: https://console.firebase.google.com/project/clubroyale-app
 
 ---
 
-## 📖 Document Quick Reference
-
-### 🔍 Audit Reports (NEW)
-→ [ULTIMATE_AUDIT_REPORT.md](./ULTIMATE_AUDIT_REPORT.md) - Complete codebase analysis (98/100)  
-→ [COMPREHENSIVE_AUDIT_REPORT.md](./COMPREHENSIVE_AUDIT_REPORT.md) - Feature inventory  
-→ [ARCHITECTURE_AUDIT.md](./ARCHITECTURE_AUDIT.md) - System architecture review
-
-### For Legal/Compliance Team
-→ [DOC1_SAFE_HARBOR_LOGIC.md](./DOC1_SAFE_HARBOR_LOGIC.md)  
-→ [PRIVACY_POLICY.md](./PRIVACY_POLICY.md)  
-→ [TERMS_OF_SERVICE.md](./TERMS_OF_SERVICE.md)
-
-### For Developers
-→ [MASTER_ARCHITECT_PROMPT.md](./MASTER_ARCHITECT_PROMPT.md)  
-→ [GAME_ENGINE_SDK.md](./GAME_ENGINE_SDK.md)  
-→ [GETTING_STARTED.md](./GETTING_STARTED.md)
-
-### For Product Managers
-→ [PRD_TAASCLUB.md](./PRD_TAASCLUB.md)  
-→ [SUCCESS_METRICS.md](./SUCCESS_METRICS.md)  
-→ [REMAINING_TASKS.md](./REMAINING_TASKS.md)
-
-### For Executive/Strategy
-→ [ULTIMATE_ROADMAP.md](./ULTIMATE_ROADMAP.md)  
-→ [BETA_TO_PRODUCTION_ROADMAP.md](./BETA_TO_PRODUCTION_ROADMAP.md)
+*© 2025 TimeCapsule LLC. All Rights Reserved.*

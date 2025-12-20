@@ -41,10 +41,14 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanupAllWaitingRooms = exports.seedBotRoomsManual = exports.seedBotRoomsScheduled = void 0;
 const admin = __importStar(require("firebase-admin"));
+const firestore_1 = require("firebase-admin/firestore");
 const scheduler_1 = require("firebase-functions/v2/scheduler");
 const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
-const db = admin.firestore();
+// Helper to get DB instance
+function getDb() {
+    return admin.firestore();
+}
 // AI Bot Personalities
 const BOT_PERSONALITIES = [
     { id: 'bot_trickmaster', name: 'TrickMaster', difficulty: 'hard', avatar: '🎭' },
@@ -108,7 +112,7 @@ async function createBotRoom(gameType) {
         isBotRoom: true,
         players,
         maxPlayers: 8,
-        createdAt: admin.firestore.Timestamp.now(),
+        createdAt: firestore_1.Timestamp.now(),
         config: {
             unitsPerPlay: gameType === 'marriage' ? 10 : 1,
             totalRounds: 5,
@@ -117,7 +121,7 @@ async function createBotRoom(gameType) {
             minPlayersToStart: 2,
         },
     };
-    await db.collection('games').doc(roomId).set({ ...gameRoom, id: roomId });
+    await getDb().collection('games').doc(roomId).set({ ...gameRoom, id: roomId });
     v2_1.logger.info(`Created bot room: ${roomId} for ${gameType} hosted by ${hostBot.name}`);
     return roomId;
 }
@@ -125,7 +129,7 @@ async function createBotRoom(gameType) {
  * Count active bot rooms for a game type
  */
 async function countActiveBotRooms(gameType) {
-    const snapshot = await db.collection('games')
+    const snapshot = await getDb().collection('games')
         .where('gameType', '==', gameType)
         .where('isBotRoom', '==', true)
         .where('status', '==', 'waiting')
@@ -138,11 +142,11 @@ async function countActiveBotRooms(gameType) {
 async function cleanupStaleRooms() {
     const cutoff = new Date();
     cutoff.setHours(cutoff.getHours() - 24);
-    const snapshot = await db.collection('games')
+    const snapshot = await getDb().collection('games')
         .where('status', '==', 'waiting')
-        .where('createdAt', '<', admin.firestore.Timestamp.fromDate(cutoff))
+        .where('createdAt', '<', firestore_1.Timestamp.fromDate(cutoff))
         .get();
-    const batch = db.batch();
+    const batch = getDb().batch();
     let count = 0;
     snapshot.docs.forEach(doc => {
         batch.delete(doc.ref);
@@ -218,10 +222,10 @@ exports.cleanupAllWaitingRooms = (0, https_1.onCall)({
     timeoutSeconds: 120,
 }, async () => {
     v2_1.logger.info('Cleaning up ALL waiting rooms...');
-    const snapshot = await db.collection('games')
+    const snapshot = await getDb().collection('games')
         .where('status', '==', 'waiting')
         .get();
-    const batch = db.batch();
+    const batch = getDb().batch();
     let count = 0;
     snapshot.docs.forEach(doc => {
         batch.delete(doc.ref);
