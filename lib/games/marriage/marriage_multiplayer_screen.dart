@@ -15,6 +15,7 @@ import 'package:clubroyale/core/card_engine/deck.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/games/marriage/marriage_service.dart';
+import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/core/card_engine/meld.dart';
 import 'package:clubroyale/features/game/widgets/player_avatar.dart';
@@ -232,7 +233,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                       // Sort mode toggle
                       _buildSortToggle(),
                       // Hand
-                      _buildMyHand(myHand, isMyTurn),
+                      _buildMyHand(myHand, isMyTurn, tiplu: tiplu),
                       // Action bar
                       _buildActionBar(isMyTurn, state, currentUser.uid),
                     ],
@@ -747,9 +748,14 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     );
   }
   
-  Widget _buildMyHand(List<String> cardIds, bool isMyTurn) {
+  Widget _buildMyHand(List<String> cardIds, bool isMyTurn, {Card? tiplu}) {
     // Sort cards based on current sort mode
     final sortedCards = _sortCardIds(cardIds);
+    
+    // Create Maal calculator if tiplu is available
+    final maalCalculator = tiplu != null 
+        ? MarriageMaalCalculator(tiplu: tiplu)
+        : null;
     
     return Container(
       height: 130,
@@ -765,6 +771,9 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             
             final isSelected = _selectedCardId == cardId;
             
+            // Detect Maal type for glow effect
+            final maalType = maalCalculator?.getMaalType(card) ?? MaalType.none;
+            
             return GestureDetector(
               onTap: isMyTurn ? () {
                 setState(() {
@@ -775,7 +784,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                 duration: const Duration(milliseconds: 150),
                 transform: Matrix4.translationValues(0, isSelected ? -15 : 0, 0),
                 margin: EdgeInsets.only(right: index < sortedCards.length - 1 ? -25 : 0),
-                child: _buildCardWidget(card, isSelected),
+                child: _buildCardWidget(card, isSelected, maalType: maalType),
               ),
             ).animate().fadeIn(delay: Duration(milliseconds: 30 * index));
           }).toList(),
@@ -812,50 +821,120 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     return cards.map((pair) => pair.$1).toList();
   }
   
-  Widget _buildCardWidget(Card card, bool isSelected, {bool isLarge = false}) {
+  Widget _buildCardWidget(Card card, bool isSelected, {bool isLarge = false, MaalType maalType = MaalType.none}) {
     final size = isLarge ? const Size(70, 100) : const Size(60, 85);
     
-    return Container(
-      width: size.width,
-      height: size.height,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isSelected ? CasinoColors.gold : Colors.grey.shade300,
-          width: isSelected ? 2 : 1,
+    // Maal glow colors
+    final hasMaalGlow = maalType != MaalType.none;
+    final maalColor = _getMaalColor(maalType);
+    final maalLabel = _getMaalLabel(maalType);
+    
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: size.width,
+          height: size.height,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: hasMaalGlow 
+                  ? maalColor 
+                  : (isSelected ? CasinoColors.gold : Colors.grey.shade300),
+              width: hasMaalGlow ? 2.5 : (isSelected ? 2 : 1),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: hasMaalGlow 
+                    ? maalColor.withValues(alpha: 0.5) 
+                    : (isSelected 
+                        ? CasinoColors.gold.withValues(alpha: 0.4) 
+                        : Colors.black.withValues(alpha: 0.2)),
+                blurRadius: hasMaalGlow ? 10 : (isSelected ? 8 : 4),
+                spreadRadius: hasMaalGlow ? 2 : 0,
+                offset: const Offset(1, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                card.rank.symbol,
+                style: TextStyle(
+                  color: card.suit.isRed ? Colors.red : Colors.black,
+                  fontSize: isLarge ? 24 : 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                card.suit.symbol,
+                style: TextStyle(
+                  color: card.suit.isRed ? Colors.red : Colors.black,
+                  fontSize: isLarge ? 20 : 16,
+                ),
+              ),
+            ],
+          ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: isSelected 
-                ? CasinoColors.gold.withValues(alpha: 0.4) 
-                : Colors.black.withValues(alpha: 0.2),
-            blurRadius: isSelected ? 8 : 4,
-            offset: const Offset(1, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            card.rank.symbol,
-            style: TextStyle(
-              color: card.suit.isRed ? Colors.red : Colors.black,
-              fontSize: isLarge ? 24 : 18,
-              fontWeight: FontWeight.bold,
+        
+        // Maal badge (only for non-large cards in hand)
+        if (hasMaalGlow && !isLarge)
+          Positioned(
+            top: -6,
+            right: -6,
+            child: Container(
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                color: maalColor,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 1.5),
+              ),
+              child: Text(
+                maalLabel,
+                style: const TextStyle(fontSize: 8),
+              ),
             ),
           ),
-          Text(
-            card.suit.symbol,
-            style: TextStyle(
-              color: card.suit.isRed ? Colors.red : Colors.black,
-              fontSize: isLarge ? 20 : 16,
-            ),
-          ),
-        ],
-      ),
+      ],
     );
+  }
+  
+  /// Get Maal type color for glow effect
+  Color _getMaalColor(MaalType type) {
+    switch (type) {
+      case MaalType.tiplu:
+        return Colors.purple;        // 3 pts - main wild
+      case MaalType.poplu:
+        return Colors.blue;          // 2 pts - rank +1
+      case MaalType.jhiplu:
+        return Colors.cyan;          // 2 pts - rank -1
+      case MaalType.alter:
+        return Colors.orange;        // 5 pts - same rank+color
+      case MaalType.man:
+        return Colors.green;         // Joker
+      case MaalType.none:
+        return Colors.transparent;
+    }
+  }
+  
+  /// Get Maal badge label
+  String _getMaalLabel(MaalType type) {
+    switch (type) {
+      case MaalType.tiplu:
+        return '👑';    // Crown for main wild
+      case MaalType.poplu:
+        return '⬆️';    // Up for +1
+      case MaalType.jhiplu:
+        return '⬇️';    // Down for -1
+      case MaalType.alter:
+        return '💎';    // Diamond for alter
+      case MaalType.man:
+        return '🃏';    // Joker
+      case MaalType.none:
+        return '';
+    }
   }
   
   Widget _buildActionBar(bool isMyTurn, MarriageGameState state, String myId) {
