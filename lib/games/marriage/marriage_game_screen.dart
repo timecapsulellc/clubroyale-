@@ -19,6 +19,13 @@ import 'package:clubroyale/features/game/ui/components/game_log_overlay.dart';
 import 'package:clubroyale/features/game/ui/components/casino_button.dart';
 import 'package:clubroyale/features/game/ui/components/card_widget.dart';
 import 'package:clubroyale/features/ai/ai_service.dart';
+import 'package:clubroyale/games/marriage/widgets/visit_button_widget.dart';
+import 'package:clubroyale/games/marriage/widgets/maal_indicator.dart';
+import 'package:clubroyale/games/marriage/widgets/game_timer_widget.dart';
+import 'package:clubroyale/games/marriage/marriage_visit_validator.dart';
+import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart';
+import 'package:clubroyale/games/marriage/marriage_config.dart';
+import 'dart:async';
 
 /// Marriage game screen with test mode
 class MarriageGameScreen extends ConsumerStatefulWidget {
@@ -35,10 +42,32 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   String? _selectedCardId;
   bool _isProcessing = false;
   
+  // Visit related state
+  final MarriageGameConfig _config = MarriageGameConfig.nepaliStandard;
+  bool _hasVisited = false;
+  VisitButtonState _visitStatus = VisitButtonState.locked;
+  String _visitLabel = 'VISIT';
+  String _visitSubLabel = 'Need 3 Pure Sequences';
+
+  // Maal state
+  int _maalPoints = 0;
+  bool _hasMarriageBonus = false;
+
+  // Timer state
+  Timer? _turnTimer;
+  int _remainingSeconds = 30;
+  
   @override
   void initState() {
     super.initState();
+    _remainingSeconds = _config.turnTimeoutSeconds;
     _initGame();
+  }
+
+  @override
+  void dispose() {
+    _stopTimer();
+    super.dispose();
   }
   
   void _initGame() {
@@ -48,8 +77,153 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     
     // Check if bots need to play (if user doesn't start)
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkVisitStatus();
       _playBotTurns();
     });
+    
+    // Start timer if it's my turn
+    if (_game.currentPlayerId == _playerId) {
+      _startTimer();
+    }
+  }
+
+  void _startTimer() {
+    _stopTimer();
+    setState(() => _remainingSeconds = _config.turnTimeoutSeconds);
+    
+    _turnTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      
+      setState(() {
+        if (_remainingSeconds > 0) {
+          _remainingSeconds--;
+        } else {
+          // Timeout! Auto-play
+          _stopTimer();
+          _handleTimeout();
+        }
+      });
+    });
+  }
+
+  void _stopTimer() {
+    _turnTimer?.cancel();
+    _turnTimer = null;
+  }
+
+  void _handleTimeout() {
+    // Basic auto-play logic: Draw if needed, Discard random
+    if (_game.currentPlayerId != _playerId) return;
+
+    final hand = _game.getHand(_playerId);
+    
+    // 1. Draw phase if needed
+    if (hand.length == 21) {
+       _game.drawFromDeck(_playerId);
+    }
+    
+    // 2. Discard phase
+    // Re-fetch hand
+    final newHand = _game.getHand(_playerId);
+    // Discard the last card (usually the one just picked or right-most)
+    final cardToDiscard = newHand.last;
+    
+    _game.playCard(_playerId, cardToDiscard);
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Turn Timeout! Auto-played.'), backgroundColor: Colors.orange),
+    );
+    
+    // Proceed
+    _playBotTurns();
+  }
+
+  void _updateMaalState() {
+    if (_game.tiplu == null) return;
+    
+    final hand = _game.getHand(_playerId);
+    final calculator = MarriageMaalCalculator(tiplu: _game.tiplu!, config: _config);
+    
+    setState(() {
+      _maalPoints = calculator.calculateMaalPoints(hand);
+      // Simple check for marriage bonus potential (not exact meld check, but close enough for indicator)
+      // Actual bonus mostly comes from melds, but let's check generic "Marriage" card presence
+      // For now, let's just use total points > 10 as a trigger for "high value" styling
+      _hasMarriageBonus = _maalPoints >= 10;
+    });
+  }
+
+  void _checkVisitStatus() {
+    _updateMaalState(); // Also update Maal when checking visit status
+    if (_hasVisited) {
+      setState(() {
+        _visitStatus = VisitButtonState.visited;
+      });
+      return;
+    }
+
+    final hand = _game.getHand(_playerId);
+    final validator = MarriageVisitValidator(config: _config, tiplu: _game.tiplu);
+    
+    // Check purely for availability to update button state
+    // We try 'attemptVisit' to see if ANY method works
+    final result = validator.attemptVisit(hand);
+    
+    setState(() {
+      if (result.canVisit) {
+        _visitStatus = VisitButtonState.ready;
+        _visitLabel = result.visitType == VisitType.tunnel ? 'TUNNEL WIN' : 'VISIT';
+        _visitSubLabel = result.visitType == VisitType.dublee ? '7 Dublees Ready' : 'Sequences Ready';
+      } else {
+        _visitStatus = VisitButtonState.locked;
+        // Provide hint based on what they are closest to or default
+        // For simple logic, just show default requirement
+        _visitSubLabel = 'Need ${_config.sequencesRequiredToVisit} Pure Seq';
+      }
+    });
+  }
+
+  void _handleVisit() {
+    final hand = _game.getHand(_playerId);
+    final validator = MarriageVisitValidator(config: _config, tiplu: _game.tiplu);
+    final result = validator.attemptVisit(hand);
+
+    if (result.canVisit) {
+      setState(() {
+        _hasVisited = true;
+        _visitStatus = VisitButtonState.visited;
+        
+        // If tunnel win (instant win), handle it
+        if (result.visitType == VisitType.tunnel) {
+           _showWinDialog(winnerName: 'You (Tunnel Win!)');
+        }
+      });
+      
+      // Show success feedback
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: const [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 8),
+              Text('Visited Successfully! Maal Unlocked.'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Cannot visit yet: ${result.reason}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
   
   @override
@@ -138,6 +312,20 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
             },
             tooltip: 'New Game',
           ),
+          // Status Indicator
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Row(
+              children: [
+                MaalIndicator(points: _maalPoints, hasMarriage: _hasMarriageBonus),
+                const SizedBox(width: 12),
+                Icon(
+                  _hasVisited ? Icons.lock_open : Icons.lock,
+                  color: _hasVisited ? Colors.greenAccent : Colors.white24,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
       body: TableLayout(
@@ -154,7 +342,15 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                     const SizedBox(width: 8),
                     _buildHeaderButton(Icons.volume_up, () { /* TODO: Sound */ }),
                     const SizedBox(width: 8),
-                    _buildHeaderButton(Icons.info_outline, () { /* TODO: Info */ }),
+                    // Timer if my turn
+                    if (_game.currentPlayerId == _playerId)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: GameTimerWidget(
+                          totalSeconds: _config.turnTimeoutSeconds,
+                          remainingSeconds: _remainingSeconds,
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -243,7 +439,26 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   Widget _buildCenterArea() {
     final topDiscard = _game.topDiscard;
     final isMyTurn = _game.currentPlayerId == _playerId;
-    final canDrawFromDiscard = isMyTurn && topDiscard != null && _game.getHand(_playerId).length == 21;
+    // Discard Pickup Rule: Check config and visit status
+    final bool visitRequirementMet = !_config.mustVisitToPickDiscard || _hasVisited;
+    
+    // Check for blocking cards (Joker/Wild)
+    bool isDiscardBlocked = false;
+    if (topDiscard != null) {
+      // Check if joker blocks discard
+      if (_config.jokerBlocksDiscard && (topDiscard.isJoker || (!topDiscard.isJoker && _game.tiplu != null && topDiscard.rank == _game.tiplu!.rank && topDiscard.suit == _game.tiplu!.suit && !_config.canPickupWildFromDiscard))) {
+         // Using simplified logic here:
+         // 1. Printed Joker always blocks if enabled
+         if (topDiscard.isJoker) isDiscardBlocked = true;
+         
+         // 2. Wild Cards block if cannot pickup wild
+         if (!_config.canPickupWildFromDiscard && _isWildCard(topDiscard)) {
+           isDiscardBlocked = true;
+         }
+      }
+    }
+
+    final canDrawFromDiscard = isMyTurn && topDiscard != null && _game.getHand(_playerId).length == 21 && visitRequirementMet && !isDiscardBlocked;
     final canDrawFromDeck = isMyTurn && _game.getHand(_playerId).length == 21;
 
     return Center(
@@ -264,11 +479,41 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           // Discard Pile
           GestureDetector(
             onTap: canDrawFromDiscard ? _drawFromDiscard : null,
-            child: CardWidget(
-              card: topDiscard ?? Card(rank: Rank.ace, suit: Suit.spades), // Show back styled dummy if no discard
-              isFaceUp: topDiscard != null,
-              isSelectable: canDrawFromDiscard,
-              isSelected: false,
+            child: Stack(
+              children: [
+                CardWidget(
+                  card: topDiscard ?? Card(rank: Rank.ace, suit: Suit.spades), // Show back styled dummy if no discard
+                  isFaceUp: topDiscard != null,
+                  isSelectable: canDrawFromDiscard,
+                  isSelected: false,
+                ),
+                // Lock Overlay (if visit needed)
+                if (topDiscard != null && !visitRequirementMet && isMyTurn)
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.lock, color: Colors.white70),
+                      ),
+                    ),
+                  ),
+                // Lock Overlay (if blocked by Joker/Wild)
+                if (topDiscard != null && isDiscardBlocked && isMyTurn)
+                   Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.3), // Red tint for blocked action
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.block, color: Colors.white70),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
@@ -314,6 +559,11 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   }
 
   Widget _buildMyHand(List<Card> hand) {
+    // Calculator for rendering badges
+    final calculator = _game.tiplu != null 
+        ? MarriageMaalCalculator(tiplu: _game.tiplu!, config: _config) 
+        : null;
+
     return Container(
       height: 120,
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -325,6 +575,39 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: hand.map((card) {
               final isSelected = _selectedCardId == card.id;
+              
+              // Determine Maal visuals
+              Color? glowColor;
+              Widget? badgeIcon;
+              
+              if (calculator != null) {
+                final type = calculator.getMaalType(card);
+                switch (type) {
+                  case MaalType.tiplu:
+                    glowColor = Colors.purpleAccent;
+                    badgeIcon = const Icon(Icons.star, color: Colors.purpleAccent, size: 14);
+                    break;
+                  case MaalType.poplu:
+                    glowColor = Colors.blueAccent;
+                    badgeIcon = const Icon(Icons.arrow_upward, color: Colors.blueAccent, size: 14);
+                    break;
+                  case MaalType.jhiplu:
+                    glowColor = Colors.cyanAccent;
+                    badgeIcon = const Icon(Icons.arrow_downward, color: Colors.cyanAccent, size: 14);
+                    break;
+                  case MaalType.alter:
+                    glowColor = Colors.orangeAccent;
+                    badgeIcon = const Icon(Icons.generating_tokens, color: Colors.orangeAccent, size: 14);
+                    break;
+                  case MaalType.man:
+                    glowColor = Colors.greenAccent;
+                    badgeIcon = const Icon(Icons.face, color: Colors.greenAccent, size: 14);
+                    break;
+                  case MaalType.none:
+                    break;
+                }
+              }
+
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: GestureDetector(
@@ -337,6 +620,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                     card: card,
                     isFaceUp: true,
                     isSelected: isSelected,
+                    glowColor: glowColor,
+                    cornerBadge: badgeIcon,
                   ),
                 ),
               );
@@ -367,10 +652,21 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
             borderColor: AppTheme.goldDark,
           ),
           
+          // Visit Button (New)
+          VisitButtonWidget(
+            state: _visitStatus,
+            onPressed: (_visitStatus == VisitButtonState.ready) ? _handleVisit : null,
+            label: _visitLabel,
+            subLabel: _visitSubLabel,
+          ),
+          
           // Sort button
            CasinoButton(
             label: 'Sort',
-            onPressed: () => setState(() {}),
+            onPressed: () {
+              setState(() {});
+              _checkVisitStatus(); // Re-check after sort
+            },
             backgroundColor: AppTheme.teal,
             borderColor: Colors.white.withValues(alpha: 0.5),
           ),
@@ -393,6 +689,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     setState(() {
       _isProcessing = true;
       _game.drawFromDeck(_playerId);
+      _checkVisitStatus(); // Update visit status after drawing
       _isProcessing = false;
     });
   }
@@ -402,6 +699,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     setState(() {
       _isProcessing = true;
       _game.drawFromDiscard(_playerId);
+      _checkVisitStatus(); // Update visit status after drawing
       _isProcessing = false;
     });
   }
@@ -415,6 +713,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     setState(() {
       _game.playCard(_playerId, card);
       _selectedCardId = null;
+      _stopTimer(); // specific stop timer for human turn end
       
       // Bot turns
       _playBotTurns();
@@ -425,6 +724,41 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   String _toAiString(Card card) {
     if (card.isJoker) return 'Joker';
     return '${card.rank.symbol}${card.suit.name[0].toUpperCase()}';
+  }
+
+  // Helper: Check if card is Wild
+  bool _isWildCard(Card card) {
+    if (_game.tiplu == null) return false;
+    final tiplu = _game.tiplu!;
+    
+    // 1. Exact Tiplu
+    if (card.rank == tiplu.rank && card.suit == tiplu.suit) return true;
+    
+    // 2. Jhiplu / Poplu logic matches MarriageMaalCalculator 
+    // Simplified: Jhiplu is same rank, opposite color. Poplu is next rank, same suit.
+    // For blocking purposes, usually "Maal" in discard is what we care about.
+    // Let's use the calculator if possible or simple logic.
+    // Replicating basic Maal check:
+    
+    // Jhiplu
+    if (card.rank == tiplu.rank) return true; 
+    
+    // Poplu
+    if (card.suit == tiplu.suit) {
+      final tipluVal = tiplu.rank.value == 1 ? 14 : tiplu.rank.value; // Ace high handled in rank?
+      // Actually standard rank use:
+      // Poplu is +1 rank.
+       int tipluV = tiplu.rank.value;
+       int cardV = card.rank.value;
+       // Adjust for Ace
+       if (tipluV == 1) tipluV = 14; 
+       if (cardV == 1) cardV = 14;
+       
+       if (cardV == tipluV + 1) return true;
+       if (tipluV == 13 && cardV == 1) return true; // K -> A
+    }
+    
+    return false;
   }
 
   Future<void> _playBotTurns() async {
@@ -486,6 +820,17 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           } else if (decision.action == 'declare') {
              _tryBotDeclare(botId);
           }
+          
+          // Trigger next turn logic
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _playBotTurns(); // Checks if next player is bot
+            
+            // If next player is ME, start my timer and check visits
+            if (_game.currentPlayerId == _playerId) {
+              _startTimer();
+              _checkVisitStatus();
+            }
+          });
         }
       });
       
@@ -534,13 +879,44 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
         title: Text('🎉 ${winnerName ?? 'You'} Win!', style: const TextStyle(color: AppTheme.gold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Congratulations!', style: TextStyle(color: Colors.white)),
+            const Text('Match Results:', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-              ..._game.calculateScores().entries.map((e) => 
-                Text('${_getPlayerName(e.key)}: ${e.value} points',
-                     style: TextStyle(color: AppTheme.gold.withValues(alpha: 0.7))),
-              ),
+            ..._game.calculateScores().entries.map((e) {
+              final pid = e.key;
+              final isMe = pid == _playerId;
+              final score = e.value;
+              final hasVisited = _game.getHand(pid).length < 21 || _game.findMelds(pid).isNotEmpty; // Crude check, ideally GameState tracks this
+              // For now display raw score
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _getPlayerName(pid),
+                      style: TextStyle(
+                        color: isMe ? Colors.greenAccent : Colors.white70,
+                        fontWeight: isMe ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                    Text(
+                      '$score pts',
+                      style: TextStyle(
+                        color: score < 0 ? Colors.green : (score > 50 ? Colors.red : AppTheme.gold),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            const Divider(color: Colors.white24),
+            const Text(
+              'Maal Exchange & Penalties applied.',
+              style: TextStyle(color: Colors.white38, fontSize: 10, fontStyle: FontStyle.italic),
+            ),
           ],
         ),
         actions: [

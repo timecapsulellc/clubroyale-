@@ -20,7 +20,12 @@ class CardWidget extends StatelessWidget {
     this.isSelectable = true,
     this.width,
     this.height,
+    this.glowColor,
+    this.cornerBadge,
   });
+
+  final Color? glowColor;
+  final Widget? cornerBadge;
 
   @override
   Widget build(BuildContext context) {
@@ -62,37 +67,48 @@ class CardWidget extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: isSelected ? AppTheme.gold : Colors.grey.shade300,
-          width: isSelected ? 2.5 : 1,
+          color: glowColor ?? (isSelected ? AppTheme.gold : Colors.grey.shade300),
+          width: (isSelected || glowColor != null) ? 2.5 : 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: isSelected 
-                ? AppTheme.gold.withValues(alpha: 0.5) 
-                : Colors.black.withValues(alpha: 0.2),
-            blurRadius: isSelected ? 8 : 3,
+            color: glowColor?.withOpacity(0.6) ?? 
+                   (isSelected ? AppTheme.gold.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.2)),
+            blurRadius: (isSelected || glowColor != null) ? 8 : 3,
             offset: const Offset(1, 1),
           ),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
         children: [
-          Text(
-            card.rank.symbol,
-            style: TextStyle(
-              color: card.suit.isRed ? Colors.red : Colors.black,
-              fontSize: isLarge ? 24 : 18,
-              fontWeight: FontWeight.bold,
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  card.rank.symbol,
+                  style: TextStyle(
+                    color: card.suit.isRed ? Colors.red : Colors.black,
+                    fontSize: isLarge ? 24 : 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  card.suit.symbol,
+                  style: TextStyle(
+                    color: card.suit.isRed ? Colors.red : Colors.black,
+                    fontSize: isLarge ? 20 : 16,
+                  ),
+                ),
+              ],
             ),
           ),
-          Text(
-            card.suit.symbol,
-            style: TextStyle(
-              color: card.suit.isRed ? Colors.red : Colors.black,
-              fontSize: isLarge ? 20 : 16,
+          if (cornerBadge != null)
+            Positioned(
+              top: 2,
+              right: 2,
+              child: cornerBadge!,
             ),
-          ),
         ],
       ),
     );

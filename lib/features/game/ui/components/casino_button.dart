@@ -6,6 +6,8 @@ class CasinoButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Color backgroundColor;
   final Color borderColor;
+  final Color? textColor;
+  final IconData? icon;
   final bool isLarge;
 
   const CasinoButton({
@@ -14,6 +16,8 @@ class CasinoButton extends StatelessWidget {
     required this.onPressed,
     this.backgroundColor = AppTheme.teal,
     this.borderColor = AppTheme.gold,
+    this.textColor,
+    this.icon,
     this.isLarge = false,
   });
 
@@ -35,7 +39,7 @@ class CasinoButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
-          foregroundColor: Colors.white,
+          foregroundColor: textColor ?? Colors.white,
           side: BorderSide(color: borderColor, width: 2), // The Gold Border
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
@@ -45,14 +49,23 @@ class CasinoButton extends StatelessWidget {
             vertical: isLarge ? 16 : 8,
           ),
         ),
-        child: Text(
-          label.toUpperCase(),
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: isLarge ? 18 : 14,
-            letterSpacing: 1.0,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: isLarge ? 20 : 16),
+              const SizedBox(width: 8),
+            ],
+            Text(
+              label.toUpperCase(),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: textColor ?? Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: isLarge ? 18 : 14,
+                letterSpacing: 1.0,
+              ),
+            ),
+          ],
         ),
       ),
     );
