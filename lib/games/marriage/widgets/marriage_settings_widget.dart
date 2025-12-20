@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
+import 'package:clubroyale/games/marriage/screens/marriage_rules_screen.dart';
 
 /// Widget for configuring Marriage game rules
 class MarriageSettingsWidget extends StatefulWidget {
@@ -46,6 +47,25 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // "Read Full Rules" Button
+        Center(
+          child: TextButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MarriageRulesScreen()),
+              );
+            },
+            icon: const Icon(Icons.menu_book, size: 18),
+            label: const Text('Read Full Rules & FAQ'),
+            style: TextButton.styleFrom(
+              foregroundColor: colorScheme.primary,
+              backgroundColor: colorScheme.surfaceVariant,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        
         // Preset selector
         _buildPresetSelector(colorScheme),
         
@@ -57,7 +77,7 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
         
         _buildToggle(
           title: 'Joker Blocks Discard',
-          subtitle: 'Next player cannot pick from discard if Joker is on top',
+          subtitle: 'Cannot start discard pile with Joker / Man',
           value: _config.jokerBlocksDiscard,
           onChanged: (v) => _updateConfig((c) => c.copyWith(jokerBlocksDiscard: v)),
           icon: Icons.block,
@@ -73,18 +93,39 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
         
         _buildToggle(
           title: 'Pure Sequence Required',
-          subtitle: 'Must have at least one sequence without wilds to declare',
+          subtitle: 'Pure sequence needed to "Visit" (unlock Maal)',
           value: _config.requirePureSequence,
           onChanged: (v) => _updateConfig((c) => c.copyWith(requirePureSequence: v)),
           icon: Icons.check_circle,
         ),
         
+        const Divider(),
+        
+        // Section: Visiting & Advanced (NEW)
+        _buildSectionHeader('Visiting & Advanced', Icons.lock_open),
+        
         _buildToggle(
-          title: 'Marriage Required to Win',
-          subtitle: 'Must have K+Q pair in melds to declare',
-          value: _config.requireMarriageToWin,
-          onChanged: (v) => _updateConfig((c) => c.copyWith(requireMarriageToWin: v)),
-          icon: Icons.favorite,
+          title: 'Must Visit to Pick',
+          subtitle: 'Cannot pick from discard pile until Visited',
+          value: _config.mustVisitToPickDiscard,
+          onChanged: (v) => _updateConfig((c) => c.copyWith(mustVisitToPickDiscard: v)),
+          icon: Icons.lock_clock,
+        ),
+        
+        _buildToggle(
+          title: 'Kidnap Rule',
+          subtitle: 'Unvisited player gets 0 Maal points (Winner takes advantage)',
+          value: _config.enableKidnap,
+          onChanged: (v) => _updateConfig((c) => c.copyWith(enableKidnap: v)),
+          icon: Icons.person_off,
+        ),
+        
+         _buildToggle(
+          title: 'Murder Rule',
+          subtitle: 'Unvisited player loses ALL Maal cards to winner (Strict)',
+          value: _config.enableMurder,
+          onChanged: (v) => _updateConfig((c) => c.copyWith(enableMurder: v)),
+          icon: Icons.dangerous,
         ),
         
         const Divider(),
