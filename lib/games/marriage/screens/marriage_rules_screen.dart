@@ -5,6 +5,7 @@ import 'package:clubroyale/core/theme/multi_theme.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 
 /// Screen displaying rules and FAQ for the Marriage card game
+/// Enhanced with "Nano Banner" style infographics for intuitive learning.
 class MarriageRulesScreen extends ConsumerWidget {
   const MarriageRulesScreen({super.key});
 
@@ -29,57 +30,43 @@ class MarriageRulesScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Quick Reference Card (highlighted)
-            _buildQuickReferenceCard(themeColors),
+            // Quick Reference "Nano Hero" Card
+            _buildHeroSection(themeColors),
             const SizedBox(height: 24),
             
-            // Detailed Sections
-            _buildSectionHeader('Game Basics', themeColors),
-            _buildExpandableTile(
-              title: 'Overview & Objective',
-              content: _buildOverviewContent(themeColors),
-              themeColors: themeColors,
-            ),
-            _buildExpandableTile(
-              title: 'Card Values & Terminology',
-              content: _buildTerminologyContent(themeColors),
-              themeColors: themeColors,
-            ),
+            // Visual Visiting Flowchart (Priority 1)
+            _buildSectionHeader('Key Requirement', themeColors, Icons.vpn_key),
+            _buildVisitingInfographic(themeColors),
             
-            _buildSectionHeader('Gameplay', themeColors),
-            _buildExpandableTile(
-              title: 'Turn Structure',
-              content: _buildTurnStructureContent(themeColors),
-              themeColors: themeColors,
-            ),
-            _buildExpandableTile(
-              title: 'Visiting (Gatekeeper) System',
-              content: _buildVisitingContent(themeColors),
-              themeColors: themeColors,
-              initiallyExpanded: true,
-            ),
+             // Visual Maal Guide (Priority 2)
+            _buildSectionHeader('Know Your Maal', themeColors, Icons.diamond),
+            _buildMaalInfographic(themeColors),
             
-            _buildSectionHeader('Scoring & Maal', themeColors),
-            _buildExpandableTile(
-              title: 'Maal Cards & Values',
-              content: _buildMaalContent(themeColors),
-              themeColors: themeColors,
-            ),
-            _buildExpandableTile(
-              title: 'Winning & Points',
-              content: _buildScoringContent(themeColors),
-              themeColors: themeColors,
-            ),
+             // Detailed Rules Expandables
+            const SizedBox(height: 16),
+            _buildSectionHeader('Detailed Rules', themeColors, Icons.menu_book),
             
-            _buildSectionHeader('Advanced', themeColors),
             _buildExpandableTile(
-              title: 'Kidnap, Murder & Variations',
+              title: 'Game Basics & Terms',
+              icon: Icons.info_outline,
+              content: _buildBasicsContent(themeColors),
+              themeColors: themeColors,
+            ),
+            _buildExpandableTile(
+              title: 'Turn Structure & Tips',
+              icon: Icons.sync,
+              content: _buildTurnContent(themeColors),
+              themeColors: themeColors,
+            ),
+            _buildExpandableTile(
+              title: 'Advanced: Kidnap & Murder',
+              icon: Icons.dangerous,
               content: _buildAdvancedContent(themeColors),
               themeColors: themeColors,
             ),
             
-             const SizedBox(height: 40),
-            _buildSectionHeader('FAQ', themeColors),
+            const SizedBox(height: 40),
+            _buildSectionHeader('FAQ', themeColors, Icons.help_outline),
             _buildFAQSection(themeColors),
             
             const SizedBox(height: 40),
@@ -89,73 +76,59 @@ class MarriageRulesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title, ThemeColors themeColors) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 24, 8, 8),
-      child: Text(
-        title.toUpperCase(),
-        style: TextStyle(
-          color: themeColors.gold,
-          fontSize: 13,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 1.2,
-        ),
-      ),
-    );
-  }
+  // --- Hero Section ---
 
-  Widget _buildQuickReferenceCard(ThemeColors themeColors) {
+  Widget _buildHeroSection(ThemeColors theme) {
     return Container(
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: themeColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: themeColors.gold, width: 2),
+        gradient: LinearGradient(
+          colors: [theme.gold.withOpacity(0.2), theme.surface],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.gold.withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-            color: themeColors.gold.withOpacity(0.2),
-            blurRadius: 15,
+            color: theme.gold.withOpacity(0.1),
+            blurRadius: 20,
             spreadRadius: 2,
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Text('⚡', style: TextStyle(fontSize: 24)),
-              const SizedBox(width: 8),
-              Text(
-                'Quick Reference',
-                style: TextStyle(
-                  color: themeColors.textPrimary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+          ListTile(
+            contentPadding: const EdgeInsets.all(20),
+            leading: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.gold.withOpacity(0.2),
+                shape: BoxShape.circle,
               ),
-            ],
-          ),
-          const Divider(color: Colors.white24, height: 24),
-          _buildQuickRow('Cards', '21 per player (3 decks)'),
-          _buildQuickRow('Tiplu', 'Center card = Wild 👑'),
-          _buildQuickRow('Objective', 'Melds: Sequences, Sets, pairs'),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.black26,
-              borderRadius: BorderRadius.circular(8),
+              child: const Text('👑', style: TextStyle(fontSize: 32)),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            title: Text(
+              'Marriage (Royal Meld)',
+              style: TextStyle(
+                color: theme.gold,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: const Text(
+              'The King of Rummy Games',
+              style: TextStyle(color: Colors.white70),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text('VISITING REQUIREMENTS (Choose 1)', 
-                  style: TextStyle(color: themeColors.gold, fontSize: 11, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                _buildCheckItem('3 Pure Sequences (No Wilds)'),
-                _buildCheckItem('7 Dublees (Pairs)'),
-                _buildCheckItem('3 Tunnels (Triple identical)'),
+                _buildHeroStat('21', 'Cards', Icons.style),
+                _buildHeroStat('3', 'Decks', Icons.copy),
+                _buildHeroStat('2-6', 'Players', Icons.people),
               ],
             ),
           ),
@@ -164,40 +137,296 @@ class MarriageRulesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuickRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
+  Widget _buildHeroStat(String value, String label, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.white54, size: 20),
+        const SizedBox(height: 4),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(label, style: const TextStyle(color: Colors.white38, fontSize: 12)),
+      ],
+    );
+  }
+
+  // --- Visiting Infographic ---
+
+  Widget _buildVisitingInfographic(ThemeColors theme) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Column(
         children: [
-          SizedBox(
-            width: 80,
-            child: Text(label, style: const TextStyle(color: Colors.white60, fontWeight: FontWeight.w500)),
+          const Text(
+            'Keepers of the Gate: To "Visit" and unlock Maal, you need listed melds.',
+            style: TextStyle(color: Colors.white60, fontSize: 13),
+            textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(child: _buildVisitChoice('3x', 'Pure Segments', 'No Wilds Allowed', Icons.check_circle_outline, Colors.blue)),
+              const Padding(
+                 padding: EdgeInsets.symmetric(horizontal: 8),
+                 child: Text('OR', style: TextStyle(color: Colors.white24, fontWeight: FontWeight.bold)),
+              ),
+              Expanded(child: _buildVisitChoice('7x', 'Dublees', 'Pairs of same card', Icons.copy, Colors.orange)),
+              const Padding(
+                 padding: EdgeInsets.symmetric(horizontal: 8),
+                 child: Text('OR', style: TextStyle(color: Colors.white24, fontWeight: FontWeight.bold)),
+              ),
+              Expanded(child: _buildVisitChoice('3x', 'Tunnels', 'Triplets of same card', Icons.filter_3, Colors.purple)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.green.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(50),
+              border: Border.all(color: Colors.green.withOpacity(0.5)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(Icons.lock_open, color: Colors.green, size: 16),
+                SizedBox(width: 8),
+                Text('UNLOCKS: Maal Points & Discard Pickup', style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold, fontSize: 12)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVisitChoice(String count, String title, String sub, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          Text(count, style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.w900)),
+          Text(title, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold), textAlign: TextAlign.center, maxLines: 2),
+          const SizedBox(height: 4),
+          Text(sub, style: const TextStyle(color: Colors.white54, fontSize: 9), textAlign: TextAlign.center),
+        ],
+      ),
+    );
+  }
+
+  // --- Maal Infographic ---
+
+  Widget _buildMaalInfographic(ThemeColors theme) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E2C),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildMiniCard('Tiplu', '👑', '+3', Colors.purple),
+              _buildMiniCard('Poplu', '⬆️', '+2', Colors.blue),
+              _buildMiniCard('Jhiplu', '⬇️', '+2', Colors.cyan),
+              _buildMiniCard('Alter', '💎', '+5', Colors.orange),
+              _buildMiniCard('Man', '🃏', '+2', Colors.green),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Divider(color: Colors.white10),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Text('🎉', style: TextStyle(fontSize: 24)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                     Text('MARRIAGE BONUS', style: TextStyle(color: theme.gold, fontWeight: FontWeight.bold)),
+                     const Text('Hold Tiplu + Poplu + Jhiplu sequence for 100 Points!', style: TextStyle(color: Colors.white60, fontSize: 12)),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(color: theme.gold, borderRadius: BorderRadius.circular(4)),
+                child: const Text('100 PTS', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMiniCard(String label, String icon, String points, Color color) {
+    return Column(
+      children: [
+        Container(
+          width: 44,
+          height: 60,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: color, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.4),
+                blurRadius: 8,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Text(icon, style: const TextStyle(fontSize: 20)),
+              Positioned(
+                top: 2, right: 3,
+                child: Container(
+                  width: 6, height: 6,
+                  decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600)),
+        Text(points, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  // --- Expandable Content ---
+
+  Widget _buildBasicsContent(ThemeColors theme) {
+    return Column(
+      children: [
+        _buildTermRow('Objective', 'Arrange 21 cards into valid sets/sequences. 0 penalty wins.'),
+        _buildTermRow('Pure Sequence', 'Consecutive cards of same suit. NO WILDS. Essential for visiting.'),
+        _buildTermRow('Wilds', 'Tiplu (Center) and its neighbors help complete impure sets.'),
+        _buildTermRow('Tunnel', 'Three identical cards (e.g. 7♠ 7♠ 7♠). Can convert to checking.'),
+      ],
+    );
+  }
+  
+  Widget _buildTurnContent(ThemeColors theme) {
+     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildRuleStep(1, 'Draw', 'From Deck (Always allowed) or Discard (Only if Visited).'),
+        _buildRuleStep(2, 'Check/Visit', 'If you have 3 Pure Sequences, show them to unlock Maal.'),
+        _buildRuleStep(3, 'Discard', 'Throw one card to end turn.'),
+      ],
+    );
+  }
+  
+  Widget _buildAdvancedContent(ThemeColors theme) {
+    return Column(
+      children: [
+        Container(
+           padding: const EdgeInsets.all(12),
+           margin: const EdgeInsets.only(bottom: 12),
+           decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.red.withOpacity(0.3))),
+           child: Row(
+             children: const [
+               Icon(Icons.person_off, color: Colors.red),
+               SizedBox(width: 12),
+               Expanded(
+                 child: Text('KIDNAP RULE: If a player wins and you haven\'t visited, your Maal cards are worth NOTHING (0 pts).', style: TextStyle(color: Colors.white, fontSize: 13)),
+               ),
+             ],
+           ),
+        ),
+         Container(
+           padding: const EdgeInsets.all(12),
+           decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.red.withOpacity(0.3))),
+           child: Row(
+             children: const [
+               Icon(Icons.dangerous, color: Colors.red),
+               SizedBox(width: 12),
+               Expanded(
+                 child: Text('MURDER RULE: In strict games, unvisited players give their Maal cards to the winner!', style: TextStyle(color: Colors.white, fontSize: 13)),
+               ),
+             ],
+           ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildRuleStep(int n, String title, String desc) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(4)),
+            child: Text('$n', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+          const SizedBox(width: 12),
           Expanded(
-            child: Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                Text(desc, style: const TextStyle(color: Colors.white70)),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
+  
+  // --- Standard Sections ---
 
-  Widget _buildCheckItem(String text) {
+  Widget _buildSectionHeader(String title, ThemeColors themeColors, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.fromLTRB(8, 24, 8, 12),
       child: Row(
         children: [
-          const Icon(Icons.check_circle, color: Colors.greenAccent, size: 16),
+          Icon(icon, size: 16, color: themeColors.gold),
           const SizedBox(width: 8),
-          Text(text, style: const TextStyle(color: Colors.white)),
+          Text(
+            title.toUpperCase(),
+            style: TextStyle(
+              color: themeColors.gold,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(child: Divider(color: themeColors.gold.withOpacity(0.3))),
         ],
       ),
     );
   }
-
+  
   Widget _buildExpandableTile({
     required String title,
     required Widget content,
     required ThemeColors themeColors,
+    required IconData icon,
     bool initiallyExpanded = false,
   }) {
     return Container(
@@ -211,6 +440,7 @@ class MarriageRulesScreen extends ConsumerWidget {
         data: ThemeData(dividerColor: Colors.transparent),
         child: ExpansionTile(
           initiallyExpanded: initiallyExpanded,
+          leading: Icon(icon, color: Colors.white60),
           title: Text(
             title,
             style: TextStyle(
@@ -230,289 +460,20 @@ class MarriageRulesScreen extends ConsumerWidget {
       ),
     );
   }
-
-  // --- Content Builders ---
-
-  Widget _buildOverviewContent(ThemeColors themeColors) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Marriage is a 3-deck rummy game where players draw and discard to form melds. The goal is to arrange all 21 cards into valid sets and sequences.',
-          style: TextStyle(color: Colors.white70, height: 1.5),
-        ),
-        const SizedBox(height: 12),
-        _buildBullet('Players: 2-6'),
-        _buildBullet('Cards: 21 per player'),
-        _buildBullet('Decks: 3 standard decks with Jokers'),
-      ],
-    );
-  }
-
-  Widget _buildTerminologyContent(ThemeColors themeColors) {
-    return Column(
-      children: [
-        _buildTermRow('Tiplu (Teen)', 'Wild Card (Center)'),
-        _buildTermRow('Jhiplu (Low)', 'Wild -1 Rank'),
-        _buildTermRow('Poplu (High)', 'Wild +1 Rank'),
-        _buildTermRow('Alter', 'Same Rank+Color, Diff Suit'),
-        _buildTermRow('Maal', 'Value Cards (Bonus Points)'),
-        _buildTermRow('Dublee', 'Pair (Two identical cards)'),
-      ],
-    );
-  }
-
-  Widget _buildTurnStructureContent(ThemeColors themeColors) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Each turn consists of:', style: TextStyle(color: themeColors.textPrimary, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        _buildStep(1, 'DRAW', 'Take a card from Deck or Discard pile.'),
-        _buildStep(2, 'ACTION', 'You may attempt to "Visit" if you have the requirements.'),
-        _buildStep(3, 'DISCARD', 'Place one card on the discard pile to end turn.'),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: Colors.red.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-          child: const Text(
-            '⚠️ IMPORTANT: You cannot pick from the discard pile until you have Visited (Nepali Variant Rule).',
-            style: TextStyle(color: Colors.white, fontSize: 12, fontStyle: FontStyle.italic),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildVisitingContent(ThemeColors themeColors) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          '"Visiting" is the most important phase. It unlocks your Maal points and allows you to pick discarded cards.',
-          style: TextStyle(color: Colors.white70, height: 1.5),
-        ),
-        const SizedBox(height: 12),
-        Text('REQUIREMENTS', style: TextStyle(color: themeColors.gold, fontWeight: FontWeight.bold, fontSize: 12)),
-        const SizedBox(height: 8),
-        const Text('You must show ONE of the following:', style: TextStyle(color: Colors.white70)),
-        const SizedBox(height: 4),
-        _buildBullet('3 Pure Sequences (e.g. 5♠6♠7♠, J♥Q♥K♥, A♣2♣3♣) - No wilds allowed!'),
-        _buildBullet('7 Dublees (Pairs of identical cards)'),
-        const SizedBox(height: 12),
-        Text('BENEFITS', style: TextStyle(color: themeColors.gold, fontWeight: FontWeight.bold, fontSize: 12)),
-        const SizedBox(height: 8),
-        _buildBenefitRow('🔓 Maal Points', 'Active (Counted)'),
-        _buildBenefitRow('🔓 Discard Pile', 'Can pick cards'),
-        _buildBenefitRow('🔓 Loss Penalty', 'Reduced to 3 pts'),
-      ],
-    );
-  }
-
-  Widget _buildMaalContent(ThemeColors themeColors) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Maal cards are worth bonus points. In the app, they glow with specific colors:',
-          style: TextStyle(color: Colors.white70, height: 1.5),
-        ),
-        const SizedBox(height: 12),
-        _buildMaalRow('👑 Tiplu', '3 pts', Colors.purple, 'The center card'),
-        _buildMaalRow('⬆️ Poplu', '2 pts', Colors.blue, 'Rank +1 (Same Suit)'),
-        _buildMaalRow('⬇️ Jhiplu', '2 pts', Colors.cyan, 'Rank -1 (Same Suit)'),
-        _buildMaalRow('💎 Alter', '5 pts', Colors.orange, 'Same Rank & Color'),
-        _buildMaalRow('🃏 Man', '2 pts', Colors.green, 'Printed Joker'),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [themeColors.gold.withOpacity(0.3), Colors.transparent]),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: themeColors.gold.withOpacity(0.5)),
-          ),
-          child: Row(
-            children: [
-              const Text('🎉', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('MARRIAGE BONUS', style: TextStyle(color: themeColors.gold, fontWeight: FontWeight.bold)),
-                    const Text('Jhiplu + Tiplu + Poplu sequence = 100 POINTS!', style: TextStyle(color: Colors.white, fontSize: 12)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildScoringContent(ThemeColors themeColors) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Scores are calculated at the end of every round.',
-          style: TextStyle(color: Colors.white70, height: 1.5),
-        ),
-        const SizedBox(height: 12),
-        _buildScoreRow('Winner', 'Collects from all losers'),
-        _buildScoreRow('Visited Loser', 'Pays 3 points'),
-        _buildScoreRow('Unvisited Loser', 'Pays 10 points (Flat Penalty)'),
-        const Divider(color: Colors.white24, height: 24),
-        const Text('Maal Exchange', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
-        const Text(
-          'Players exchange the difference in Maal points. Unvisited players have 0 effective Maal.',
-          style: TextStyle(color: Colors.white60, fontSize: 12),
-        ),
-      ],
-    );
-  }
   
-  Widget _buildAdvancedContent(ThemeColors themeColors) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildAdvancedItem('Kidnap Rule', 'If you haven\'t visited when the game ends, your Maal points are treated as 0, even if you hold Maal cards.'),
-        _buildAdvancedItem('Murder Rule', 'In strict variants (optional), unvisited players lose their Maal cards to the winner.'),
-        _buildAdvancedItem('Joker Block', 'You cannot start a discard pile with a printed Joker.'),
-      ],
-    );
-  }
-
-  Widget _buildFAQSection(ThemeColors themeColors) {
-    return Column(
-      children: [
-        _buildFAQItem('How many decks?', '3 standard decks are used.'),
-        _buildFAQItem('Do I need to visit to win?', 'No, but unvisited players pay a high penalty (10 pts) and get 0 Maal points.'),
-        _buildFAQItem('Can I use Jokers to visit?', 'No! Visiting sequences must be PURE (natural cards only).'),
-        _buildFAQItem('What if I have 7 pairs?', 'You can Visit! Show your 7 Dublees to unlock Maal.'),
-      ],
-    );
-  }
-
-  // --- Helper Widgets ---
-
-  Widget _buildBullet(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('• ', style: TextStyle(color: Colors.white54, fontSize: 16)),
-          Expanded(child: Text(text, style: const TextStyle(color: Colors.white70))),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildStep(int num, String title, String desc) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Container(
-            width: 24, height: 24,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
-            child: Text('$num', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(text: '$title: ', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                  TextSpan(text: desc, style: const TextStyle(color: Colors.white70)),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildTermRow(String term, String def) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          SizedBox(width: 100, child: Text(term, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
-          Expanded(child: Text(def, style: const TextStyle(color: Colors.white70))),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildBenefitRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.white)),
-          Text(value, style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMaalRow(String name, String points, Color color, String desc) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              border: Border.all(color: color),
-              borderRadius: BorderRadius.circular(4),
-              color: color.withOpacity(0.1),
-            ),
-            child: Text(name, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12)),
-          ),
-          const SizedBox(width: 12),
-          Text(points, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          const SizedBox(width: 12),
-          Expanded(child: Text(desc, style: const TextStyle(color: Colors.white60, fontSize: 12))),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildScoreRow(String role, String points) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(role, style: const TextStyle(color: Colors.white70)),
-          Text(points, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildAdvancedItem(String title, String desc) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 2),
-          Text(desc, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+          SizedBox(width: 100, child: Text(term, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))),
+          Expanded(child: Text(def, style: const TextStyle(color: Colors.white70, fontSize: 13))),
         ],
       ),
     );
   }
-
+  
   Widget _buildFAQItem(String q, String a) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -524,6 +485,17 @@ class MarriageRulesScreen extends ConsumerWidget {
           Text('A: $a', style: const TextStyle(color: Colors.white70)),
         ],
       ),
+    );
+  }
+  
+  Widget _buildFAQSection(ThemeColors themeColors) {
+    return Column(
+      children: [
+        _buildFAQItem('How many decks?', '3 standard decks are used.'),
+        _buildFAQItem('Do I need to visit to win?', 'No, but unvisited players pay a high penalty (10 pts) and get 0 Maal points.'),
+        _buildFAQItem('Can I use Jokers to visit?', 'No! Visiting sequences must be PURE (natural cards only).'),
+        _buildFAQItem('What if I have 7 pairs?', 'You can Visit! Show your 7 Dublees to unlock Maal.'),
+      ],
     );
   }
 }
