@@ -64,21 +64,21 @@ export declare const PlayCardRequestSchema: z.ZodObject<{
         rank: z.ZodEnum<["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]>;
     }, "strip", z.ZodTypeAny, {
         rank: "2" | "3" | "4" | "5" | "A" | "K" | "Q" | "7" | "6" | "8" | "9" | "10" | "J";
-        suit: "spades" | "diamonds" | "hearts" | "clubs";
+        suit: "spades" | "diamonds" | "clubs" | "hearts";
     }, {
         rank: "2" | "3" | "4" | "5" | "A" | "K" | "Q" | "7" | "6" | "8" | "9" | "10" | "J";
-        suit: "spades" | "diamonds" | "hearts" | "clubs";
+        suit: "spades" | "diamonds" | "clubs" | "hearts";
     }>;
 }, "strip", z.ZodTypeAny, {
     card: {
         rank: "2" | "3" | "4" | "5" | "A" | "K" | "Q" | "7" | "6" | "8" | "9" | "10" | "J";
-        suit: "spades" | "diamonds" | "hearts" | "clubs";
+        suit: "spades" | "diamonds" | "clubs" | "hearts";
     };
     gameId: string;
 }, {
     card: {
         rank: "2" | "3" | "4" | "5" | "A" | "K" | "Q" | "7" | "6" | "8" | "9" | "10" | "J";
-        suit: "spades" | "diamonds" | "hearts" | "clubs";
+        suit: "spades" | "diamonds" | "clubs" | "hearts";
     };
     gameId: string;
 }>;
