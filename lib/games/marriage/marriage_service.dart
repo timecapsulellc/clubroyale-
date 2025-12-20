@@ -8,7 +8,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
+import 'package:clubroyale/core/card_engine/meld.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
+import 'package:clubroyale/games/marriage/marriage_scorer.dart';
 
 /// Provider for Royal Meld (Marriage) Service
 final marriageServiceProvider = Provider((ref) => MarriageService());
@@ -303,14 +305,61 @@ class MarriageService {
     
     if (state.currentPlayerId != playerId) return false;
     
-    // TODO: Validate all cards are in valid melds
-    // For now, allow declaration if player has 21 or fewer cards
-    final hand = state.playerHands[playerId] ?? [];
-    if (hand.length > 21) return false;
+    // Get player's hand as Card objects
+    final handIds = state.playerHands[playerId] ?? [];
+    final hand = handIds.map((id) => _getCard(id)).whereType<Card>().toList();
     
-    // Update game state to scoring phase
+    // Get tiplu card
+    final tiplu = _getCard(state.tipluCardId);
+    
+    // Initialize scorer with config
+    final scorer = MarriageScorer(tiplu: tiplu, config: state.config);
+    
+    // Find all melds in the player's hand
+    final melds = MeldDetector.findAllMelds(hand, tiplu: tiplu);
+    
+    // Validate the declaration
+    final (isValid, errorReason) = scorer.validateDeclaration(hand, melds);
+    
+    if (!isValid) {
+      // Invalid declaration - player cannot declare
+      // Return false so UI can show error to player
+      return false;
+    }
+    
+    // Calculate scores for all players
+    final scores = <String, int>{};
+    final scoreResults = <String, Map<String, dynamic>>{};
+    
+    for (final pid in state.playerHands.keys) {
+      final playerHandIds = state.playerHands[pid] ?? [];
+      final playerHand = playerHandIds.map((id) => _getCard(id)).whereType<Card>().toList();
+      final playerMelds = MeldDetector.findAllMelds(playerHand, tiplu: tiplu);
+      
+      final score = scorer.calculateRoundScore(
+        hand: playerHand,
+        melds: playerMelds,
+        isDeclarer: pid == playerId,
+        isValidDeclaration: true, // Declaration was validated above
+      );
+      
+      scores[pid] = score;
+      scoreResults[pid] = {
+        'score': score,
+        'isDeclarer': pid == playerId,
+        'meldCount': playerMelds.length,
+        'hasPureSequence': scorer.hasPureSequence(playerMelds),
+        'hasDublee': scorer.hasDublee(playerMelds),
+        'marriageCount': scorer.countMarriages(playerMelds),
+      };
+    }
+    
+    // Update game state to scoring phase with results
     await _firestore.collection('games').doc(roomId).update({
       'marriageState.phase': 'scoring',
+      'marriageState.roundScores': scores,
+      'marriageState.scoreDetails': scoreResults,
+      'marriageState.declarerId': playerId,
       'status': 'finished',
     });
     
@@ -393,5 +442,84 @@ class MarriageService {
     }
     
     return false;
+  }
+  
+  // ========== TURN TIMER METHODS ==========
+  
+  /// Check if current player's turn has timed out
+  bool hasTurnTimedOut(MarriageGameState state) {
+    if (state.config.turnTimeoutSeconds == 0) return false; // No timeout
+    if (state.turnStartTime == null) return false;
+    
+    final elapsed = DateTime.now().difference(state.turnStartTime!);
+    return elapsed.inSeconds >= state.config.turnTimeoutSeconds;
+  }
+  
+  /// Get remaining seconds for current turn
+  int getRemainingTurnTime(MarriageGameState state) {
+    if (state.config.turnTimeoutSeconds == 0) return -1; // No timeout
+    if (state.turnStartTime == null) return state.config.turnTimeoutSeconds;
+    
+    final elapsed = DateTime.now().difference(state.turnStartTime!);
+    final remaining = state.config.turnTimeoutSeconds - elapsed.inSeconds;
+    return remaining < 0 ? 0 : remaining;
+  }
+  
+  /// Auto-play for a timed-out player
+  /// This should be called by a server-side function or a client that detects timeout
+  Future<void> autoPlayTimeout(String roomId, String playerId) async {
+    final doc = await _firestore.collection('games').doc(roomId).get();
+    final data = doc.data();
+    if (data == null || data['marriageState'] == null) return;
+    
+    final state = MarriageGameState.fromJson(
+      data['marriageState'] as Map<String, dynamic>,
+    );
+    
+    // Only auto-play for current player
+    if (state.currentPlayerId != playerId) return;
+    
+    // Check if turn actually timed out
+    if (!hasTurnTimedOut(state)) return;
+    
+    if (state.turnPhase == 'drawing') {
+      // Auto-draw from deck
+      await drawFromDeck(roomId, playerId);
+      
+      // If draw succeeded, also auto-discard to complete the turn
+      final updatedDoc = await _firestore.collection('games').doc(roomId).get();
+      final updatedData = updatedDoc.data();
+      if (updatedData != null && updatedData['marriageState'] != null) {
+        final updatedState = MarriageGameState.fromJson(
+          updatedData['marriageState'] as Map<String, dynamic>,
+        );
+        
+        if (updatedState.turnPhase == 'discarding') {
+          // Discard the last drawn card (if available) or first card in hand
+          final hand = updatedState.playerHands[playerId] ?? [];
+          String? cardToDiscard = updatedState.lastDrawnCardId;
+          
+          if (cardToDiscard == null || !hand.contains(cardToDiscard)) {
+            cardToDiscard = hand.isNotEmpty ? hand.first : null;
+          }
+          
+          if (cardToDiscard != null) {
+            await discardCard(roomId, playerId, cardToDiscard);
+          }
+        }
+      }
+    } else if (state.turnPhase == 'discarding') {
+      // Auto-discard the first card in hand (or last drawn if available)
+      final hand = state.playerHands[playerId] ?? [];
+      String? cardToDiscard = state.lastDrawnCardId;
+      
+      if (cardToDiscard == null || !hand.contains(cardToDiscard)) {
+        cardToDiscard = hand.isNotEmpty ? hand.first : null;
+      }
+      
+      if (cardToDiscard != null) {
+        await discardCard(roomId, playerId, cardToDiscard);
+      }
+    }
   }
 }
