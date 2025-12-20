@@ -1,38 +1,74 @@
-
-# TaasClub Blueprint
+# ClubRoyale Blueprint
 
 ## Overview
 
-TaasClub is a Flutter application that allows users to create and join game rooms, play games with real-time score updates, and view the results of completed games on a ledger screen. The application is built with Flutter and Firebase, and it uses the `go_router` package for navigation.
+ClubRoyale (v2.1) is a **Play & Connect** social gaming platform built with Flutter and Firebase. It features 4 premium card games, a complete social network (stories, feed, clubs), and an **AI Gaming Platform** with cognitive bot personalities.
 
-## Features
+**Live URL:** https://clubroyale-app.web.app
 
-- **Real-time score updates:** Players can see their scores update in real-time during the game.
-- **User profile integration:** The game displays players' avatars and display names from their profiles.
-- **Ledger screen:** A ledger screen displays the final results of each game, with a share button to share the results.
+## Core Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     FLUTTER FRONTEND (70K+ LOC)                  │
+│  • 4 Game Engines  • 35+ Feature Modules  • 5 Theme Presets     │
+├─────────────────────────────────────────────────────────────────┤
+│                     STATE (Riverpod 3.x)                         │
+├─────────────────────────────────────────────────────────────────┤
+│                     SERVICE LAYER (30+ Services)                 │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     FIREBASE BACKEND                             │
+│  • Firestore  • Auth  • 30+ Cloud Functions  • FCM  • Storage   │
+├─────────────────────────────────────────────────────────────────┤
+│                     AI LAYER (Agentic AI + ToT)                  │
+│  • 12 Autonomous Agents  • 5 Bot Personalities  • Instant Play  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Key Features
+
+### Games (4 Complete)
+- **Royal Meld (Marriage)**: 2-8 players, 52 tests passing
+- **Call Break**: 4 players, trick-taking
+- **Teen Patti**: 2-8 players, three-card poker
+- **In-Between**: 2-8 players, hi-lo betting
+
+### AI Gaming Platform (NEW - December 2025)
+- **Cognitive Bot Personalities**: TrickMaster, CardShark, LuckyDice, DeepThink, RoyalAce
+- **Instant Play**: Pre-seeded bot rooms for zero-wait gaming
+- **Tree of Thoughts**: Human-like decision making
+- **Play Now Button**: One-tap join to available AI games
+- **Bot Room Seeder**: Automated hourly room population
+
+### Social Features
+- Activity Feed, Stories, Online Friends Bar
+- Voice Rooms, Clubs, Spectator Mode
+- Diamond Economy V5, Tournaments, Replays
 
 ## Project Structure
 
-The project is structured as follows:
+```
+ClubRoyale/
+├── lib/                     # Flutter app (250+ files)
+│   ├── features/            # 35+ feature modules
+│   └── games/               # 4 game engines
+├── functions/               # Cloud Functions (30+)
+│   └── src/
+│       ├── agents/          # 12 AI Agents + Cognitive Play
+│       ├── scheduled/       # Bot Room Seeder
+│       └── triggers/        # Firestore triggers
+└── docs/                    # 50+ documentation files
+```
 
-- `lib/`
-  - `features/`
-    - `auth/`: Contains the authentication-related files, including the `AuthGate` widget, the `AuthScreen` widget, and the `AuthService` class.
-    - `game/`: Contains the game-related files, including the `GameScreen` widget, the `GameService` class, and the `GameRoom` model.
-    - `lobby/`: Contains the lobby-related files, including the `LobbyScreen` widget and the `LobbyService` class.
-    - `ledger/`: Contains the ledger-related files, including the `LedgerScreen` widget and the `LedgerService` class.
-    - `profile/`: Contains the profile-related files, including the `ProfileScreen` widget and the `ProfileService` class.
-  - `main.dart`: The main entry point of the application.
-- `blueprint.md`: This file.
+## Development Phases
 
-## Current Plan
+| Phase | Description | Status |
+|-------|-------------|--------|
+| 1-19 | Core Platform + Social | ✅ Complete |
+| 20 | AI Gaming Platform | ✅ Complete |
+| 21 | Documentation Update | ✅ Complete |
 
-I have now implemented all three features you requested:
-
-1.  **Real-time score updates:** Players can see their scores update in real-time during the game.
-2.  **User profile integration:** The game displays players' avatars and display names from their profiles.
-3.  **Ledger screen:** A ledger screen displays the final results of each game, with a share button to share the results.
-
-I also created a blueprint for the project, which you can find in the `blueprint.md` file.
-
-Is there anything else I can help you with?
+**Last Updated:** December 20, 2025

@@ -1,15 +1,16 @@
-# TaasClub Development Roadmap 🗺️
+# ClubRoyale Development Roadmap 🗺️
 
 > **Philosophy:** Clone & Develop Faster — Don't reinvent the wheel, build on proven foundations.
 
 ## 🎯 Project Vision
 
-TaasClub is a multiplayer Call Break card game with a unique focus on **settlement tracking** and **financial transparency** in gaming sessions. The app enables players to:
+ClubRoyale (v2.1) is a **Play & Connect** premium multiplayer card game platform with:
 
-- Create and join game lobbies
-- Play Call Break with real-time updates
-- Track settlements and financial ledgers
-- View game history and statistics
+- 4 Premium Card Games (Marriage, Call Break, Teen Patti, In-Between)
+- Complete Social Network (Stories, Feed, Clubs, Voice Rooms)
+- **AI Gaming Platform** with Cognitive Bot Personalities
+- Diamond Economy V5 with Social Earning
+- 12 Autonomous AI Agents using Tree of Thoughts reasoning
 
 ---
 
@@ -427,6 +428,10 @@ export const validateMove = functions.https.onCall(async (data, context) => {
 | **Phase 6: Call Break Logic** | ✅ Complete | **100%** |
 | **Phase 7: Anti-Cheat** | ✅ Complete | **100%** |
 | **Phase 8: Testing & Polish** | ✅ Complete | **100%** |
+| **Phase 9-18: Social Features** | ✅ Complete | **100%** |
+| **Phase 19: Agentic AI + ToT** | ✅ Complete | **100%** |
+| **Phase 20: AI Gaming Platform** | ✅ Complete | **100%** |
+| **Phase 21: Documentation Update** | ✅ Complete | **100%** |
 
 ---
 
@@ -486,6 +491,6 @@ export const validateMove = functions.https.onCall(async (data, context) => {
 
 ---
 
-**Last Updated:** December 5, 2025  
-**Version:** 1.1  
-**Status:** MVP Completed - Maintenance Mode
+**Last Updated:** December 20, 2025  
+**Version:** 2.1  
+**Status:** AI Gaming Platform Complete - 21 Phases Done
