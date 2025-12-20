@@ -8,8 +8,8 @@ part of 'game_room.dart';
 
 _GameRoom _$GameRoomFromJson(Map<String, dynamic> json) => _GameRoom(
   id: json['id'] as String?,
-  name: json['name'] as String,
-  hostId: json['hostId'] as String,
+  name: json['name'] as String? ?? 'Game Room',
+  hostId: json['hostId'] as String? ?? '',
   roomCode: json['roomCode'] as String?,
   status: json['status'] == null
       ? GameStatus.waiting
@@ -82,7 +82,7 @@ Map<String, dynamic> _$GameRoomToJson(_GameRoom instance) => <String, dynamic>{
 
 _Player _$PlayerFromJson(Map<String, dynamic> json) => _Player(
   id: json['id'] as String,
-  name: json['name'] as String,
+  name: json['name'] as String? ?? 'Player',
   profile: json['profile'] == null
       ? null
       : UserProfile.fromJson(json['profile'] as Map<String, dynamic>),

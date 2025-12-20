@@ -60,6 +60,8 @@ dependencies:
   cached_network_image: ^3.4.1
   confetti: ^0.8.0
   flip_card: ^0.7.0
+  lottie: ^3.1.0  # Lottie animations
+  rive: ^0.13.0     # Interactive state machine animations
 
 dev_dependencies:
   flutter_test:
@@ -79,10 +81,17 @@ flutter:
   uses-material-design: true
   assets:
     - assets/sounds/
+    - assets/sounds/cards/
+    - assets/sounds/chips/
+    - assets/sounds/ui/
+    - assets/sounds/game/
     - assets/cards/png/
     - assets/images/
     - assets/images/chips/
     - assets/store/
+    - assets/animations/
+    - assets/rive/
+
 
 flutter_native_splash:
   color: "#1a0a2e"

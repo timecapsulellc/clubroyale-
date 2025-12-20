@@ -34,10 +34,10 @@ abstract class GameRoom with _$GameRoom {
     String? id,
     
     /// Room name/title
-    required String name,
+    @Default('Game Room') String name,
     
     /// Host user ID (creator of the room)
-    required String hostId,
+    @Default('') String hostId,
     
     /// 6-digit room code for joining
     String? roomCode,
@@ -132,7 +132,7 @@ abstract class GameRoom with _$GameRoom {
 abstract class Player with _$Player {
   const factory Player({
     required String id,
-    required String name,
+    @Default('Player') String name, // Default to 'Player' if null from Firestore
     UserProfile? profile,
     @Default(false) bool isReady,
     @Default(false) bool isBot,

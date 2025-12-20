@@ -274,15 +274,15 @@ return $default(_that.id,_that.name,_that.hostId,_that.roomCode,_that.status,_th
 @JsonSerializable()
 
 class _GameRoom extends GameRoom {
-  const _GameRoom({this.id, required this.name, required this.hostId, this.roomCode, @GameStatusConverter() this.status = GameStatus.waiting, this.gameType = 'call_break', this.config = const GameConfig(), required final  List<Player> players, required final  Map<String, int> scores, this.isFinished = false, this.isPublic = false, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) this.createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) this.finishedAt, this.currentRound = 1, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) this.gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) final  Map<String, List<PlayingCard>> playerHands = const {}, final  Map<String, Bid> bids = const {}, this.currentTrick, final  List<Trick> trickHistory = const [], final  Map<String, int> tricksWon = const {}, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) final  Map<String, List<double>> roundScores = const {}, this.currentTurn}): _players = players,_scores = scores,_playerHands = playerHands,_bids = bids,_trickHistory = trickHistory,_tricksWon = tricksWon,_roundScores = roundScores,super._();
+  const _GameRoom({this.id, this.name = 'Game Room', this.hostId = '', this.roomCode, @GameStatusConverter() this.status = GameStatus.waiting, this.gameType = 'call_break', this.config = const GameConfig(), required final  List<Player> players, required final  Map<String, int> scores, this.isFinished = false, this.isPublic = false, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) this.createdAt, @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson) this.finishedAt, this.currentRound = 1, @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson) this.gamePhase, @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson) final  Map<String, List<PlayingCard>> playerHands = const {}, final  Map<String, Bid> bids = const {}, this.currentTrick, final  List<Trick> trickHistory = const [], final  Map<String, int> tricksWon = const {}, @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson) final  Map<String, List<double>> roundScores = const {}, this.currentTurn}): _players = players,_scores = scores,_playerHands = playerHands,_bids = bids,_trickHistory = trickHistory,_tricksWon = tricksWon,_roundScores = roundScores,super._();
   factory _GameRoom.fromJson(Map<String, dynamic> json) => _$GameRoomFromJson(json);
 
 /// Firestore document ID
 @override final  String? id;
 /// Room name/title
-@override final  String name;
+@override@JsonKey() final  String name;
 /// Host user ID (creator of the room)
-@override final  String hostId;
+@override@JsonKey() final  String hostId;
 /// 6-digit room code for joining
 @override final  String? roomCode;
 /// Current game status
@@ -478,7 +478,8 @@ $TrickCopyWith<$Res>? get currentTrick {
 /// @nodoc
 mixin _$Player {
 
- String get id; String get name; UserProfile? get profile; bool get isReady; bool get isBot;
+ String get id; String get name;// Default to 'Player' if null from Firestore
+ UserProfile? get profile; bool get isReady; bool get isBot;
 /// Create a copy of Player
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -688,11 +689,12 @@ return $default(_that.id,_that.name,_that.profile,_that.isReady,_that.isBot);cas
 @JsonSerializable()
 
 class _Player implements Player {
-  const _Player({required this.id, required this.name, this.profile, this.isReady = false, this.isBot = false});
+  const _Player({required this.id, this.name = 'Player', this.profile, this.isReady = false, this.isBot = false});
   factory _Player.fromJson(Map<String, dynamic> json) => _$PlayerFromJson(json);
 
 @override final  String id;
-@override final  String name;
+@override@JsonKey() final  String name;
+// Default to 'Player' if null from Firestore
 @override final  UserProfile? profile;
 @override@JsonKey() final  bool isReady;
 @override@JsonKey() final  bool isBot;

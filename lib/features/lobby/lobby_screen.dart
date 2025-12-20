@@ -848,16 +848,70 @@ class LobbyScreen extends ConsumerWidget {
           context.go('/lobby/${targetRoom.id}');
         }
       } else {
-        // No available rooms, create a new one with bots
+        // No available rooms, create a new one with bots for instant play
         if (context.mounted) {
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('No rooms available. Creating one for you...'),
+              content: Text('Creating AI game...'),
               backgroundColor: Colors.orange,
             ),
           );
-          _showCreateGameDialog(context, ref);
+
+          // Create room with this player
+          final botConfig = GameConfig(
+            pointValue: 10,
+            totalRounds: 5,
+            maxPlayers: 4,
+          );
+
+          final newRoom = GameRoom(
+            name: 'AI Match #${Random().nextInt(1000)}',
+            hostId: user.uid,
+            config: botConfig,
+            gameType: 'call_break',
+            players: [
+              Player(id: user.uid, name: user.displayName ?? 'Player'),
+            ],
+            scores: {user.uid: 0},
+            createdAt: DateTime.now(),
+          );
+
+          try {
+            final gameId = await lobbyService.createGame(newRoom);
+
+            // Add 3 bots to fill the room
+            await lobbyService.addBot(gameId);
+            await lobbyService.addBot(gameId);
+            await lobbyService.addBot(gameId);
+
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('AI game ready! Tap Start when ready.'),
+                    ],
+                  ),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              context.go('/lobby/$gameId');
+            }
+          } catch (e) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Failed to create AI game: $e'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
         }
       }
     } catch (e) {

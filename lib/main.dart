@@ -24,6 +24,7 @@ import 'features/game/test_game_screen.dart';
 import 'games/marriage/marriage_game_screen.dart';
 import 'games/marriage/marriage_entry_screen.dart';
 import 'games/marriage/marriage_multiplayer_screen.dart';
+import 'games/marriage/premium_marriage_screen.dart';
 import 'games/teen_patti/teen_patti_screen.dart';
 import 'games/in_between/in_between_screen.dart';
 import 'features/game/settlement/settlement_preview_screen.dart';
@@ -195,6 +196,13 @@ final GoRouter _router = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             final String roomId = state.pathParameters['roomId']!;
             return MarriageMultiplayerScreen(roomId: roomId);
+          },
+        ),
+        GoRoute(
+          path: 'marriage-premium/:roomId',
+          builder: (BuildContext context, GoRouterState state) {
+            final String roomId = state.pathParameters['roomId']!;
+            return PremiumMarriageScreen(roomId: roomId);
           },
         ),
         GoRoute(

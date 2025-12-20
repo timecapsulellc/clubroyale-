@@ -37,7 +37,8 @@ class MarriageGameState {
   final Map<String, bool> playerVisited;  // playerId -> has visited
   final Map<String, String?> playerVisitType;  // playerId -> 'sequence' or 'dublee'
   final Map<String, int> playerMaalPoints;  // playerId -> current Maal points
-  
+  final Map<String, List<Map<String, dynamic>>> playerDeclaredMelds; // playerId -> list of serialized melds
+
   MarriageGameState({
     required this.tipluCardId,
     required this.playerHands,
@@ -54,6 +55,7 @@ class MarriageGameState {
     this.playerVisited = const {},
     this.playerVisitType = const {},
     this.playerMaalPoints = const {},
+    this.playerDeclaredMelds = const {},
   });
   
   factory MarriageGameState.fromJson(Map<String, dynamic> json) {
@@ -86,6 +88,9 @@ class MarriageGameState {
       playerMaalPoints: (json['playerMaalPoints'] as Map<String, dynamic>?)?.map(
         (k, v) => MapEntry(k, v as int),
       ) ?? {},
+      playerDeclaredMelds: (json['playerDeclaredMelds'] as Map<String, dynamic>?)?.map(
+        (k, v) => MapEntry(k, List<Map<String, dynamic>>.from(v as List)),
+      ) ?? {},
     );
   }
   
@@ -105,6 +110,7 @@ class MarriageGameState {
     'playerVisited': playerVisited,
     'playerVisitType': playerVisitType,
     'playerMaalPoints': playerMaalPoints,
+    'playerDeclaredMelds': playerDeclaredMelds,
   };
   
   /// Check if player has drawn this turn
@@ -369,6 +375,7 @@ class MarriageService {
     }
     
     // Calculate Maal points for this player
+    // Calculate Maal points for this player
     int maalPoints = 0;
     if (tiplu != null) {
       final maalCalculator = MarriageMaalCalculator(
@@ -377,12 +384,20 @@ class MarriageService {
       );
       maalPoints = maalCalculator.calculateMaalPoints(hand);
     }
+
+    // Persist melds and update hand
+    final serializedMelds = result.validMelds.map((m) => m.toJson()).toList();
+    final meldCardIds = result.validMelds.expand((m) => m.cards.map((c) => c.id)).toSet();
+    final currentHand = state.playerHands[playerId] ?? [];
+    final newHand = currentHand.where((id) => !meldCardIds.contains(id)).toList();
     
     // Update Firestore with visited status
     await _firestore.collection('games').doc(roomId).update({
       'marriageState.playerVisited.$playerId': true,
       'marriageState.playerVisitType.$playerId': result.visitType.name,
       'marriageState.playerMaalPoints.$playerId': maalPoints,
+      'marriageState.playerDeclaredMelds.$playerId': serializedMelds,
+      'marriageState.playerHands.$playerId': newHand,
     });
     
     return (true, result.visitType.name, null);
@@ -401,7 +416,13 @@ class MarriageService {
     if (state.currentPlayerId != playerId) return false;
     
     // Get player's hand as Card objects
-    final handIds = state.playerHands[playerId] ?? [];
+    final handIds = List<String>.from(state.playerHands[playerId] ?? []);
+    
+    // Add declared meld cards (recombine for validation)
+    final declaredMelds = state.playerDeclaredMelds[playerId] ?? [];
+    for (final meld in declaredMelds) {
+       handIds.addAll(List<String>.from(meld['cardIds'] ?? []));
+    }
     final hand = handIds.map((id) => _getCard(id)).whereType<Card>().toList();
     
     // Get tiplu card

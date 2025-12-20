@@ -28,7 +28,31 @@ abstract class Meld {
   int get points;
   
   /// Does this meld contain a specific card?
+  /// Does this meld contain a specific card?
   bool contains(Card card) => cards.any((c) => c.id == card.id);
+
+  /// Convert to JSON for storage
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type.name,
+      'cardIds': cards.map((c) => c.id).toList(),
+    };
+  }
+
+  /// Reconstruct a Meld from type and cards
+  static Meld fromTypeAndCards(MeldType type, List<Card> cards, {Card? tiplu}) {
+    switch (type) {
+      case MeldType.set:
+        return SetMeld(cards);
+      case MeldType.run:
+        return RunMeld(cards);
+      case MeldType.tunnel:
+        return TunnelMeld(cards);
+      case MeldType.marriage:
+        if (tiplu == null) throw ArgumentError('Tiplu required for MarriageMeld');
+        return MarriageMeld(cards, tiplu: tiplu);
+    }
+  }
 }
 
 /// SetMeld - 3+ cards of same rank, different suits (Trial in Marriage)
