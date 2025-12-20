@@ -72,10 +72,18 @@ class ChatListScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Center(
+    // AI Companion Bots for instant engagement
+    final aiBots = [
+      {'id': 'tips_bot', 'name': '🎯 Tips Bot', 'desc': 'Get game strategies & tips', 'color': Colors.blue},
+      {'id': 'news_bot', 'name': '📰 News Bot', 'desc': 'Latest updates & features', 'color': Colors.orange},
+      {'id': 'finder_bot', 'name': '🎲 Club Finder', 'desc': 'Discover clubs to join', 'color': Colors.purple},
+    ];
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const SizedBox(height: 32),
           Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey.shade400),
           const SizedBox(height: 16),
           const Text(
@@ -89,7 +97,80 @@ class ChatListScreen extends ConsumerWidget {
             onPressed: () {},
             child: const Text('Start New Chat'),
           ),
+          const SizedBox(height: 32),
+          // AI Companions Section
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.deepPurple.shade50, Colors.blue.shade50],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.deepPurple.shade100),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.smart_toy, color: Colors.deepPurple.shade600),
+                    const SizedBox(width: 8),
+                    Text(
+                      'AI Companions',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.deepPurple.shade800,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Chat with our bots for help & discovery!',
+                  style: TextStyle(color: Colors.grey.shade700),
+                ),
+                const SizedBox(height: 16),
+                ...aiBots.map((bot) => _buildBotTile(context, bot)),
+              ],
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBotTile(BuildContext context, Map<String, dynamic> bot) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: (bot['color'] as Color).withValues(alpha: 0.2),
+          child: Text(
+            bot['name'].toString().substring(0, 2),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: bot['color'] as Color,
+            ),
+          ),
+        ),
+        title: Text(
+          bot['name'] as String,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(bot['desc'] as String),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade400),
+        onTap: () {
+          // Navigate to AI bot chat
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Starting chat with ${bot['name']}...'),
+              backgroundColor: bot['color'] as Color,
+            ),
+          );
+          // TODO: Implement AI bot chat - context.push('/social/ai-chat/${bot['id']}');
+        },
       ),
     );
   }

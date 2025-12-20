@@ -6,7 +6,7 @@
  * Total: 12 Specialized AI Agents
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.analyzeTrends = exports.predictEngagement = exports.analyzeBehavior = exports.moderateContent = exports.detectHighlights = exports.enhanceStream = exports.recommendGames = exports.suggestFriends = exports.rankFeed = exports.generateAchievementCelebration = exports.generateCaption = exports.generateReelScript = exports.generateStory = exports.planFeatureImplementation = exports.analyzeBug = exports.getArchitectureGuidance = exports.generateCode = void 0;
+exports.getRandomPersonality = exports.getPersonalityById = exports.AI_PERSONALITIES = exports.cognitivePlayFlow = exports.analyzeTrends = exports.predictEngagement = exports.analyzeBehavior = exports.moderateContent = exports.detectHighlights = exports.enhanceStream = exports.recommendGames = exports.suggestFriends = exports.rankFeed = exports.generateAchievementCelebration = exports.generateCaption = exports.generateReelScript = exports.generateStory = exports.planFeatureImplementation = exports.analyzeBug = exports.getArchitectureGuidance = exports.generateCode = void 0;
 // IDE Guide Agent - Development Assistant
 var ide_guide_1 = require("./ide_guide");
 Object.defineProperty(exports, "generateCode", { enumerable: true, get: function () { return ide_guide_1.generateCode; } });
@@ -36,4 +36,10 @@ Object.defineProperty(exports, "analyzeBehavior", { enumerable: true, get: funct
 var analytics_1 = require("./analytics");
 Object.defineProperty(exports, "predictEngagement", { enumerable: true, get: function () { return analytics_1.predictEngagement; } });
 Object.defineProperty(exports, "analyzeTrends", { enumerable: true, get: function () { return analytics_1.analyzeTrends; } });
+// Cognitive Agent - Advanced Bot AI
+var cognitive_1 = require("./cognitive");
+Object.defineProperty(exports, "cognitivePlayFlow", { enumerable: true, get: function () { return cognitive_1.cognitivePlayFlow; } });
+Object.defineProperty(exports, "AI_PERSONALITIES", { enumerable: true, get: function () { return cognitive_1.AI_PERSONALITIES; } });
+Object.defineProperty(exports, "getPersonalityById", { enumerable: true, get: function () { return cognitive_1.getPersonalityById; } });
+Object.defineProperty(exports, "getRandomPersonality", { enumerable: true, get: function () { return cognitive_1.getRandomPersonality; } });
 //# sourceMappingURL=index.js.map

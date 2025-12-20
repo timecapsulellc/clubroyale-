@@ -32,39 +32,55 @@ class QuickSocialActions extends ConsumerWidget {
         // Pill Buttons Row
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
+          child: Column(
             children: [
-              // Voice Room Button (Filled Purple)
-              Expanded(
+              // PLAY VS AI - Featured Action
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 10),
                 child: _ActionPillButton(
-                  icon: Icons.mic,
-                  label: 'Voice Room',
+                  icon: Icons.smart_toy,
+                  label: '🎮 Play vs AI',
                   isFilled: true,
-                  onTap: () => context.push('/voice-rooms'),
-                ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.1),
+                  fillColor: const Color(0xFF16a34a), // Green
+                  onTap: () => context.go('/lobby'),
+                ).animate().fadeIn(delay: 50.ms).shimmer(duration: 1500.ms, color: Colors.white24),
               ),
-              const SizedBox(width: 10),
+              Row(
+                children: [
+                  // Voice Room Button (Filled Purple)
+                  Expanded(
+                    child: _ActionPillButton(
+                      icon: Icons.mic,
+                      label: 'Voice Room',
+                      isFilled: true,
+                      onTap: () => context.push('/voice-rooms'),
+                    ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.1),
+                  ),
+                  const SizedBox(width: 10),
 
-              // Message Button (Outlined with badge)
-              Expanded(
-                child: _ActionPillButton(
-                  icon: Icons.chat_bubble_outline,
-                  label: 'Message',
-                  isFilled: false,
-                  badge: unreadCount,
-                  onTap: () => context.go('/chats'),
-                ).animate().fadeIn(delay: 150.ms).slideY(begin: 0.1),
-              ),
-              const SizedBox(width: 10),
+                  // Message Button (Outlined with badge)
+                  Expanded(
+                    child: _ActionPillButton(
+                      icon: Icons.chat_bubble_outline,
+                      label: 'Message',
+                      isFilled: false,
+                      badge: unreadCount,
+                      onTap: () => context.go('/chats'),
+                    ).animate().fadeIn(delay: 150.ms).slideY(begin: 0.1),
+                  ),
+                  const SizedBox(width: 10),
 
-              // Post Button (Outlined)
-              Expanded(
-                child: _ActionPillButton(
-                  icon: Icons.add,
-                  label: 'Post',
-                  isFilled: false,
-                  onTap: () => context.push('/stories/create'),
-                ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1),
+                  // Post Button (Outlined)
+                  Expanded(
+                    child: _ActionPillButton(
+                      icon: Icons.add,
+                      label: 'Post',
+                      isFilled: false,
+                      onTap: () => context.push('/stories/create'),
+                    ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1),
+                  ),
+                ],
               ),
             ],
           ),
@@ -80,6 +96,7 @@ class _ActionPillButton extends StatelessWidget {
   final String label;
   final bool isFilled;
   final int badge;
+  final Color? fillColor;
   final VoidCallback onTap;
 
   const _ActionPillButton({
@@ -87,6 +104,7 @@ class _ActionPillButton extends StatelessWidget {
     required this.label,
     required this.isFilled,
     this.badge = 0,
+    this.fillColor,
     required this.onTap,
   });
 
@@ -100,7 +118,7 @@ class _ActionPillButton extends StatelessWidget {
         child: Container(
           height: 44,
           decoration: BoxDecoration(
-            color: isFilled ? const Color(0xFF7c3aed) : Colors.transparent,
+            color: isFilled ? (fillColor ?? const Color(0xFF7c3aed)) : Colors.transparent,
             borderRadius: BorderRadius.circular(25),
             border: Border.all(
               color: isFilled ? Colors.transparent : const Color(0xFF7c3aed).withOpacity(0.5),

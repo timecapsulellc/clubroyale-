@@ -52,6 +52,7 @@ export { checkTierUpgrade, monitorDiamondSupply } from './diamonds/scheduled';
 // export { onTransferConfirmed, expireStaleTransfers } from './transfers/diamondTransfers';
 export { onGrantApproved, executeCooledGrants, notifyAdminNewChat } from './admin/diamondAdmin';
 export { weeklyTasks, dailyCleanup } from './scheduled/dailyTasks';
+export { seedBotRoomsScheduled, seedBotRoomsManual, cleanupAllWaitingRooms } from './scheduled/botRoomSeeder';
 
 // Export AI Agents (12 Total)
 export {

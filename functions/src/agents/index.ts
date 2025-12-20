@@ -45,3 +45,11 @@ export {
     predictEngagement,
     analyzeTrends,
 } from './analytics';
+
+// Cognitive Agent - Advanced Bot AI
+export {
+    cognitivePlayFlow,
+    AI_PERSONALITIES,
+    getPersonalityById,
+    getRandomPersonality,
+} from './cognitive';

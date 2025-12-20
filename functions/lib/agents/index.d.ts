@@ -10,4 +10,5 @@ export { rankFeed, suggestFriends, recommendGames, } from './recommendation';
 export { enhanceStream, detectHighlights, } from './streaming';
 export { moderateContent, analyzeBehavior, } from './safety';
 export { predictEngagement, analyzeTrends, } from './analytics';
+export { cognitivePlayFlow, AI_PERSONALITIES, getPersonalityById, getRandomPersonality, } from './cognitive';
 //# sourceMappingURL=index.d.ts.map

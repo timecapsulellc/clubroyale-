@@ -238,40 +238,111 @@ class _DiscoverTabState extends ConsumerState<_DiscoverTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'Search clubs...',
-              prefixIcon: const Icon(Icons.search),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() => _searchResults = []);
-                      },
-                    )
-                  : null,
+    // Featured Bot Clubs for instant discovery
+    final featuredClubs = [
+      {'name': '🏆 ClubRoyale Academy', 'desc': 'Learn from AI coaches', 'members': 1247, 'color': Colors.blue},
+      {'name': '⚔️ Pro Arena', 'desc': 'Competitive matches, hard bots', 'members': 892, 'color': Colors.red},
+      {'name': '🎉 Casual Lounge', 'desc': 'Relaxed games, easy bots', 'members': 2103, 'color': Colors.green},
+    ];
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search clubs...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchResults = []);
+                        },
+                      )
+                    : null,
+              ),
+              onSubmitted: _search,
             ),
-            onSubmitted: _search,
           ),
-        ),
-        Expanded(
-          child: _isSearching
-              ? const Center(child: CircularProgressIndicator())
-              : _searchResults.isEmpty
-                  ? const Center(child: Text('Search for clubs to join'))
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: _searchResults.length,
-                      itemBuilder: (context, index) => _ClubCard(club: _searchResults[index]),
+          // Featured Clubs Section
+          if (_searchResults.isEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Row(
+                children: [
+                  Icon(Icons.stars, color: Colors.amber.shade600, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Featured Clubs',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
+                ],
+              ),
+            ),
+            ...featuredClubs.map((club) => _buildFeaturedClubTile(context, club)),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Search for more clubs above...',
+                style: TextStyle(color: Colors.grey.shade600),
+              ),
+            ),
+          ],
+          // Search Results
+          if (_isSearching)
+            const Center(child: Padding(
+              padding: EdgeInsets.all(32),
+              child: CircularProgressIndicator(),
+            ))
+          else if (_searchResults.isNotEmpty)
+            ...(_searchResults.map((club) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _ClubCard(club: club),
+            ))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeaturedClubTile(BuildContext context, Map<String, dynamic> club) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: (club['color'] as Color).withValues(alpha: 0.2),
+          child: Icon(Icons.smart_toy, color: club['color'] as Color),
         ),
-      ],
+        title: Text(
+          club['name'] as String,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(club['desc'] as String),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text('${club['members']}', style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text('members', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+          ],
+        ),
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Opening ${club['name']}...'),
+              backgroundColor: club['color'] as Color,
+            ),
+          );
+          // TODO: Navigate to club detail - context.push('/clubs/${club['id']}');
+        },
+      ),
     );
   }
 

@@ -8,7 +8,7 @@
  * - Push notifications (FCM)
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processSettlement = exports.calculateMonthlyMilestones = exports.calculateWeeklyEngagement = exports.processVoiceRoomTip = exports.grantSocialRewardFunction = exports.analyzeTrends = exports.predictEngagement = exports.analyzeBehavior = exports.moderateContent = exports.detectHighlights = exports.enhanceStream = exports.recommendGames = exports.suggestFriends = exports.rankFeed = exports.generateAchievementCelebration = exports.generateCaption = exports.generateReelScript = exports.generateStory = exports.planFeatureImplementation = exports.analyzeBug = exports.getArchitectureGuidance = exports.generateCode = exports.dailyCleanup = exports.weeklyTasks = exports.notifyAdminNewChat = exports.executeCooledGrants = exports.onGrantApproved = exports.monitorDiamondSupply = exports.checkTierUpgrade = exports.upgradeToVerified = exports.claimDailyLogin = exports.grantGameplayReward = exports.validateTransfer = exports.validateSpectatorAccess = exports.generateLiveKitToken = exports.onVoiceRoomCreated = exports.onFriendshipUpdated = exports.onFriendRequestCreated = exports.onStoryCreated = exports.onSocialMessageSent = exports.auditGameUpdate = void 0;
+exports.processSettlement = exports.calculateMonthlyMilestones = exports.calculateWeeklyEngagement = exports.processVoiceRoomTip = exports.grantSocialRewardFunction = exports.analyzeTrends = exports.predictEngagement = exports.analyzeBehavior = exports.moderateContent = exports.detectHighlights = exports.enhanceStream = exports.recommendGames = exports.suggestFriends = exports.rankFeed = exports.generateAchievementCelebration = exports.generateCaption = exports.generateReelScript = exports.generateStory = exports.planFeatureImplementation = exports.analyzeBug = exports.getArchitectureGuidance = exports.generateCode = exports.cleanupAllWaitingRooms = exports.seedBotRoomsManual = exports.seedBotRoomsScheduled = exports.dailyCleanup = exports.weeklyTasks = exports.notifyAdminNewChat = exports.executeCooledGrants = exports.onGrantApproved = exports.monitorDiamondSupply = exports.checkTierUpgrade = exports.upgradeToVerified = exports.claimDailyLogin = exports.grantGameplayReward = exports.validateTransfer = exports.validateSpectatorAccess = exports.generateLiveKitToken = exports.onVoiceRoomCreated = exports.onFriendshipUpdated = exports.onFriendRequestCreated = exports.onStoryCreated = exports.onSocialMessageSent = exports.auditGameUpdate = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const app_1 = require("firebase-admin/app");
 const firestore_1 = require("firebase-admin/firestore");
@@ -48,6 +48,10 @@ Object.defineProperty(exports, "notifyAdminNewChat", { enumerable: true, get: fu
 var dailyTasks_1 = require("./scheduled/dailyTasks");
 Object.defineProperty(exports, "weeklyTasks", { enumerable: true, get: function () { return dailyTasks_1.weeklyTasks; } });
 Object.defineProperty(exports, "dailyCleanup", { enumerable: true, get: function () { return dailyTasks_1.dailyCleanup; } });
+var botRoomSeeder_1 = require("./scheduled/botRoomSeeder");
+Object.defineProperty(exports, "seedBotRoomsScheduled", { enumerable: true, get: function () { return botRoomSeeder_1.seedBotRoomsScheduled; } });
+Object.defineProperty(exports, "seedBotRoomsManual", { enumerable: true, get: function () { return botRoomSeeder_1.seedBotRoomsManual; } });
+Object.defineProperty(exports, "cleanupAllWaitingRooms", { enumerable: true, get: function () { return botRoomSeeder_1.cleanupAllWaitingRooms; } });
 // Export AI Agents (12 Total)
 var agents_1 = require("./agents");
 // IDE Guide Agent

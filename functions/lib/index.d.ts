@@ -16,6 +16,7 @@ export { upgradeToVerified } from './diamonds/upgradeToVerified';
 export { checkTierUpgrade, monitorDiamondSupply } from './diamonds/scheduled';
 export { onGrantApproved, executeCooledGrants, notifyAdminNewChat } from './admin/diamondAdmin';
 export { weeklyTasks, dailyCleanup } from './scheduled/dailyTasks';
+export { seedBotRoomsScheduled, seedBotRoomsManual, cleanupAllWaitingRooms } from './scheduled/botRoomSeeder';
 export { generateCode, getArchitectureGuidance, analyzeBug, planFeatureImplementation, generateStory, generateReelScript, generateCaption, generateAchievementCelebration, rankFeed, suggestFriends, recommendGames, enhanceStream, detectHighlights, moderateContent, analyzeBehavior, predictEngagement, analyzeTrends, } from './agents';
 export { grantSocialRewardFunction, processVoiceRoomTip, calculateWeeklyEngagement, calculateMonthlyMilestones } from './rewards/social';
 /**

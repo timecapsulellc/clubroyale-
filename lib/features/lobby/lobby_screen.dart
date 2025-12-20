@@ -147,6 +147,24 @@ class LobbyScreen extends ConsumerWidget {
               margin: const EdgeInsets.all(16),
               child: Column(
                 children: [
+                  // INSTANT PLAY - Featured Action
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: FilledButton.icon(
+                      onPressed: () => _playNow(context, ref),
+                      icon: const Icon(Icons.play_arrow_rounded, size: 28),
+                      label: const Text('⚡ PLAY NOW', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.green.shade600,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        elevation: 8,
+                        shadowColor: Colors.green.shade300,
+                      ),
+                    ),
+                  ).animate(delay: 50.ms).fadeIn().shimmer(duration: 1500.ms, color: Colors.white30),
                   Row(
                     children: [
                       Expanded(
@@ -760,6 +778,101 @@ class LobbyScreen extends ConsumerWidget {
     }
   }
 
+  /// Instant play - joins the first available bot room
+  Future<void> _playNow(BuildContext context, WidgetRef ref) async {
+    final authService = ref.read(authServiceProvider);
+    final lobbyService = ref.read(lobbyServiceProvider);
+    final user = authService.currentUser;
+
+    if (user == null) return;
+
+    // Show loading
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+            SizedBox(width: 12),
+            Text('Finding a game for you...'),
+          ],
+        ),
+        backgroundColor: Colors.green.shade700,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+
+    try {
+      // Get all public waiting games
+      final games = await lobbyService.getGames().first;
+      
+      // Filter for bot rooms first (instant play), then any room with space
+      final botRooms = games.where((g) => 
+        g.status == GameStatus.waiting && 
+        g.players.length < 8 &&
+        g.players.any((p) => p.isBot) // Has at least one bot
+      ).toList();
+      
+      final anyAvailableRoom = games.where((g) =>
+        g.status == GameStatus.waiting && 
+        g.players.length < 8 &&
+        !g.players.any((p) => p.id == user.uid) // Not already in room
+      ).toList();
+
+      GameRoom? targetRoom;
+      if (botRooms.isNotEmpty) {
+        targetRoom = botRooms.first;
+      } else if (anyAvailableRoom.isNotEmpty) {
+        targetRoom = anyAvailableRoom.first;
+      }
+
+      if (targetRoom != null && targetRoom.id != null) {
+        await lobbyService.joinGame(
+          targetRoom.id!,
+          Player(id: user.uid, name: user.displayName ?? 'Player'),
+        );
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text('Joined ${targetRoom.name}!'),
+                ],
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+          context.go('/lobby/${targetRoom.id}');
+        }
+      } else {
+        // No available rooms, create a new one with bots
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No rooms available. Creating one for you...'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+          _showCreateGameDialog(context, ref);
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to find game: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   void _shareRoomCode(BuildContext context, GameRoom game) {
     if (game.roomCode == null) return;
     
@@ -928,6 +1041,31 @@ class _EnhancedGameCard extends StatelessWidget {
                                       const SizedBox(width: 4),
                                       const Text(
                                         'Host',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              // Bot Room Badge - shows when room has bot players
+                              if (game.players.any((p) => p.isBot))
+                                Container(
+                                  margin: const EdgeInsets.only(left: 6),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.cyan.shade600,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.smart_toy, size: 12, color: Colors.white),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'AI',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
