@@ -86,6 +86,57 @@ abstract class MarriageGameConfig with _$MarriageGameConfig {
     
     /// Point value per unit (for settlements).
     @Default(1.0) double pointValue,
+    
+    // === Visiting Rules (Gatekeeper Logic) ===
+    
+    /// Number of pure sequences required to "Visit" (unlock Maal).
+    @Default(3) int sequencesRequiredToVisit,
+    
+    /// Allow Dublee Visit: Player can visit with 7 pairs instead of sequences.
+    @Default(true) bool allowDubleeVisit,
+    
+    /// Number of pairs required for Dublee visit.
+    @Default(7) int dubleeCountRequired,
+    
+    /// Tunnel counts as a sequence for visiting purposes.
+    @Default(true) bool tunnelAsSequence,
+    
+    /// Must visit before picking from discard pile (strict visiting).
+    @Default(false) bool mustVisitToPickDiscard,
+    
+    // === Maal (Value Card) System ===
+    
+    /// Tiplu value (exact match of drawn wild card).
+    @Default(3) int tipluValue,
+    
+    /// Poplu value (rank +1, same suit as Tiplu).
+    @Default(2) int popluValue,
+    
+    /// Jhiplu value (rank -1, same suit as Tiplu).
+    @Default(2) int jhipluValue,
+    
+    /// Alter value (same rank+color, different suit as Tiplu).
+    @Default(5) int alterValue,
+    
+    /// Man (printed Joker) value.
+    @Default(2) int manValue,
+    
+    /// Enable Man (printed Joker) as Maal.
+    @Default(true) bool isManEnabled,
+    
+    // === Kidnap/Murder Rules ===
+    
+    /// Kidnap: If winner and opponent not visited, opponent's Maal goes to winner.
+    @Default(true) bool enableKidnap,
+    
+    /// Murder: If not visited, Maal points are set to 0 (stricter than Kidnap).
+    @Default(false) bool enableMurder,
+    
+    /// Penalty for losing while not visited.
+    @Default(10) int unvisitedPenalty,
+    
+    /// Penalty for losing while visited.
+    @Default(3) int visitedPenalty,
   }) = _MarriageGameConfig;
 
   factory MarriageGameConfig.fromJson(Map<String, dynamic> json) =>
@@ -108,6 +159,24 @@ abstract class MarriageGameConfig with _$MarriageGameConfig {
     noLifePenalty: 100,
     fullCountPenalty: 120,
     wrongDeclarationPenalty: 50,
+    // Visiting rules
+    sequencesRequiredToVisit: 3,
+    allowDubleeVisit: true,
+    dubleeCountRequired: 7,
+    tunnelAsSequence: true,
+    mustVisitToPickDiscard: false,
+    // Maal values
+    tipluValue: 3,
+    popluValue: 2,
+    jhipluValue: 2,
+    alterValue: 5,
+    manValue: 2,
+    isManEnabled: true,
+    // Kidnap/Murder
+    enableKidnap: true,
+    enableMurder: false,
+    unvisitedPenalty: 10,
+    visitedPenalty: 3,
   );
   
   /// Indian Rummy variant (more relaxed rules)

@@ -43,7 +43,25 @@ mixin _$MarriageGameConfig {
  bool get autoSortHand;/// Show meld suggestions to help player.
  bool get showMeldSuggestions;/// Total rounds to play.
  int get totalRounds;/// Point value per unit (for settlements).
- double get pointValue;
+ double get pointValue;// === Visiting Rules (Gatekeeper Logic) ===
+/// Number of pure sequences required to "Visit" (unlock Maal).
+ int get sequencesRequiredToVisit;/// Allow Dublee Visit: Player can visit with 7 pairs instead of sequences.
+ bool get allowDubleeVisit;/// Number of pairs required for Dublee visit.
+ int get dubleeCountRequired;/// Tunnel counts as a sequence for visiting purposes.
+ bool get tunnelAsSequence;/// Must visit before picking from discard pile (strict visiting).
+ bool get mustVisitToPickDiscard;// === Maal (Value Card) System ===
+/// Tiplu value (exact match of drawn wild card).
+ int get tipluValue;/// Poplu value (rank +1, same suit as Tiplu).
+ int get popluValue;/// Jhiplu value (rank -1, same suit as Tiplu).
+ int get jhipluValue;/// Alter value (same rank+color, different suit as Tiplu).
+ int get alterValue;/// Man (printed Joker) value.
+ int get manValue;/// Enable Man (printed Joker) as Maal.
+ bool get isManEnabled;// === Kidnap/Murder Rules ===
+/// Kidnap: If winner and opponent not visited, opponent's Maal goes to winner.
+ bool get enableKidnap;/// Murder: If not visited, Maal points are set to 0 (stricter than Kidnap).
+ bool get enableMurder;/// Penalty for losing while not visited.
+ int get unvisitedPenalty;/// Penalty for losing while visited.
+ int get visitedPenalty;
 /// Create a copy of MarriageGameConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -56,16 +74,16 @@ $MarriageGameConfigCopyWith<MarriageGameConfig> get copyWith => _$MarriageGameCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MarriageGameConfig&&(identical(other.jokerBlocksDiscard, jokerBlocksDiscard) || other.jokerBlocksDiscard == jokerBlocksDiscard)&&(identical(other.canPickupWildFromDiscard, canPickupWildFromDiscard) || other.canPickupWildFromDiscard == canPickupWildFromDiscard)&&(identical(other.requirePureSequence, requirePureSequence) || other.requirePureSequence == requirePureSequence)&&(identical(other.requireMarriageToWin, requireMarriageToWin) || other.requireMarriageToWin == requireMarriageToWin)&&(identical(other.dubleeBonus, dubleeBonus) || other.dubleeBonus == dubleeBonus)&&(identical(other.tunnelBonus, tunnelBonus) || other.tunnelBonus == tunnelBonus)&&(identical(other.marriageBonus, marriageBonus) || other.marriageBonus == marriageBonus)&&(identical(other.minSequenceLength, minSequenceLength) || other.minSequenceLength == minSequenceLength)&&(identical(other.maxWildsInMeld, maxWildsInMeld) || other.maxWildsInMeld == maxWildsInMeld)&&(identical(other.cardsPerPlayer, cardsPerPlayer) || other.cardsPerPlayer == cardsPerPlayer)&&(identical(other.firstDrawFromDeck, firstDrawFromDeck) || other.firstDrawFromDeck == firstDrawFromDeck)&&(identical(other.turnTimeoutSeconds, turnTimeoutSeconds) || other.turnTimeoutSeconds == turnTimeoutSeconds)&&(identical(other.noLifePenalty, noLifePenalty) || other.noLifePenalty == noLifePenalty)&&(identical(other.fullCountPenalty, fullCountPenalty) || other.fullCountPenalty == fullCountPenalty)&&(identical(other.wrongDeclarationPenalty, wrongDeclarationPenalty) || other.wrongDeclarationPenalty == wrongDeclarationPenalty)&&(identical(other.autoSortHand, autoSortHand) || other.autoSortHand == autoSortHand)&&(identical(other.showMeldSuggestions, showMeldSuggestions) || other.showMeldSuggestions == showMeldSuggestions)&&(identical(other.totalRounds, totalRounds) || other.totalRounds == totalRounds)&&(identical(other.pointValue, pointValue) || other.pointValue == pointValue));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MarriageGameConfig&&(identical(other.jokerBlocksDiscard, jokerBlocksDiscard) || other.jokerBlocksDiscard == jokerBlocksDiscard)&&(identical(other.canPickupWildFromDiscard, canPickupWildFromDiscard) || other.canPickupWildFromDiscard == canPickupWildFromDiscard)&&(identical(other.requirePureSequence, requirePureSequence) || other.requirePureSequence == requirePureSequence)&&(identical(other.requireMarriageToWin, requireMarriageToWin) || other.requireMarriageToWin == requireMarriageToWin)&&(identical(other.dubleeBonus, dubleeBonus) || other.dubleeBonus == dubleeBonus)&&(identical(other.tunnelBonus, tunnelBonus) || other.tunnelBonus == tunnelBonus)&&(identical(other.marriageBonus, marriageBonus) || other.marriageBonus == marriageBonus)&&(identical(other.minSequenceLength, minSequenceLength) || other.minSequenceLength == minSequenceLength)&&(identical(other.maxWildsInMeld, maxWildsInMeld) || other.maxWildsInMeld == maxWildsInMeld)&&(identical(other.cardsPerPlayer, cardsPerPlayer) || other.cardsPerPlayer == cardsPerPlayer)&&(identical(other.firstDrawFromDeck, firstDrawFromDeck) || other.firstDrawFromDeck == firstDrawFromDeck)&&(identical(other.turnTimeoutSeconds, turnTimeoutSeconds) || other.turnTimeoutSeconds == turnTimeoutSeconds)&&(identical(other.noLifePenalty, noLifePenalty) || other.noLifePenalty == noLifePenalty)&&(identical(other.fullCountPenalty, fullCountPenalty) || other.fullCountPenalty == fullCountPenalty)&&(identical(other.wrongDeclarationPenalty, wrongDeclarationPenalty) || other.wrongDeclarationPenalty == wrongDeclarationPenalty)&&(identical(other.autoSortHand, autoSortHand) || other.autoSortHand == autoSortHand)&&(identical(other.showMeldSuggestions, showMeldSuggestions) || other.showMeldSuggestions == showMeldSuggestions)&&(identical(other.totalRounds, totalRounds) || other.totalRounds == totalRounds)&&(identical(other.pointValue, pointValue) || other.pointValue == pointValue)&&(identical(other.sequencesRequiredToVisit, sequencesRequiredToVisit) || other.sequencesRequiredToVisit == sequencesRequiredToVisit)&&(identical(other.allowDubleeVisit, allowDubleeVisit) || other.allowDubleeVisit == allowDubleeVisit)&&(identical(other.dubleeCountRequired, dubleeCountRequired) || other.dubleeCountRequired == dubleeCountRequired)&&(identical(other.tunnelAsSequence, tunnelAsSequence) || other.tunnelAsSequence == tunnelAsSequence)&&(identical(other.mustVisitToPickDiscard, mustVisitToPickDiscard) || other.mustVisitToPickDiscard == mustVisitToPickDiscard)&&(identical(other.tipluValue, tipluValue) || other.tipluValue == tipluValue)&&(identical(other.popluValue, popluValue) || other.popluValue == popluValue)&&(identical(other.jhipluValue, jhipluValue) || other.jhipluValue == jhipluValue)&&(identical(other.alterValue, alterValue) || other.alterValue == alterValue)&&(identical(other.manValue, manValue) || other.manValue == manValue)&&(identical(other.isManEnabled, isManEnabled) || other.isManEnabled == isManEnabled)&&(identical(other.enableKidnap, enableKidnap) || other.enableKidnap == enableKidnap)&&(identical(other.enableMurder, enableMurder) || other.enableMurder == enableMurder)&&(identical(other.unvisitedPenalty, unvisitedPenalty) || other.unvisitedPenalty == unvisitedPenalty)&&(identical(other.visitedPenalty, visitedPenalty) || other.visitedPenalty == visitedPenalty));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,jokerBlocksDiscard,canPickupWildFromDiscard,requirePureSequence,requireMarriageToWin,dubleeBonus,tunnelBonus,marriageBonus,minSequenceLength,maxWildsInMeld,cardsPerPlayer,firstDrawFromDeck,turnTimeoutSeconds,noLifePenalty,fullCountPenalty,wrongDeclarationPenalty,autoSortHand,showMeldSuggestions,totalRounds,pointValue]);
+int get hashCode => Object.hashAll([runtimeType,jokerBlocksDiscard,canPickupWildFromDiscard,requirePureSequence,requireMarriageToWin,dubleeBonus,tunnelBonus,marriageBonus,minSequenceLength,maxWildsInMeld,cardsPerPlayer,firstDrawFromDeck,turnTimeoutSeconds,noLifePenalty,fullCountPenalty,wrongDeclarationPenalty,autoSortHand,showMeldSuggestions,totalRounds,pointValue,sequencesRequiredToVisit,allowDubleeVisit,dubleeCountRequired,tunnelAsSequence,mustVisitToPickDiscard,tipluValue,popluValue,jhipluValue,alterValue,manValue,isManEnabled,enableKidnap,enableMurder,unvisitedPenalty,visitedPenalty]);
 
 @override
 String toString() {
-  return 'MarriageGameConfig(jokerBlocksDiscard: $jokerBlocksDiscard, canPickupWildFromDiscard: $canPickupWildFromDiscard, requirePureSequence: $requirePureSequence, requireMarriageToWin: $requireMarriageToWin, dubleeBonus: $dubleeBonus, tunnelBonus: $tunnelBonus, marriageBonus: $marriageBonus, minSequenceLength: $minSequenceLength, maxWildsInMeld: $maxWildsInMeld, cardsPerPlayer: $cardsPerPlayer, firstDrawFromDeck: $firstDrawFromDeck, turnTimeoutSeconds: $turnTimeoutSeconds, noLifePenalty: $noLifePenalty, fullCountPenalty: $fullCountPenalty, wrongDeclarationPenalty: $wrongDeclarationPenalty, autoSortHand: $autoSortHand, showMeldSuggestions: $showMeldSuggestions, totalRounds: $totalRounds, pointValue: $pointValue)';
+  return 'MarriageGameConfig(jokerBlocksDiscard: $jokerBlocksDiscard, canPickupWildFromDiscard: $canPickupWildFromDiscard, requirePureSequence: $requirePureSequence, requireMarriageToWin: $requireMarriageToWin, dubleeBonus: $dubleeBonus, tunnelBonus: $tunnelBonus, marriageBonus: $marriageBonus, minSequenceLength: $minSequenceLength, maxWildsInMeld: $maxWildsInMeld, cardsPerPlayer: $cardsPerPlayer, firstDrawFromDeck: $firstDrawFromDeck, turnTimeoutSeconds: $turnTimeoutSeconds, noLifePenalty: $noLifePenalty, fullCountPenalty: $fullCountPenalty, wrongDeclarationPenalty: $wrongDeclarationPenalty, autoSortHand: $autoSortHand, showMeldSuggestions: $showMeldSuggestions, totalRounds: $totalRounds, pointValue: $pointValue, sequencesRequiredToVisit: $sequencesRequiredToVisit, allowDubleeVisit: $allowDubleeVisit, dubleeCountRequired: $dubleeCountRequired, tunnelAsSequence: $tunnelAsSequence, mustVisitToPickDiscard: $mustVisitToPickDiscard, tipluValue: $tipluValue, popluValue: $popluValue, jhipluValue: $jhipluValue, alterValue: $alterValue, manValue: $manValue, isManEnabled: $isManEnabled, enableKidnap: $enableKidnap, enableMurder: $enableMurder, unvisitedPenalty: $unvisitedPenalty, visitedPenalty: $visitedPenalty)';
 }
 
 
@@ -76,7 +94,7 @@ abstract mixin class $MarriageGameConfigCopyWith<$Res>  {
   factory $MarriageGameConfigCopyWith(MarriageGameConfig value, $Res Function(MarriageGameConfig) _then) = _$MarriageGameConfigCopyWithImpl;
 @useResult
 $Res call({
- bool jokerBlocksDiscard, bool canPickupWildFromDiscard, bool requirePureSequence, bool requireMarriageToWin, bool dubleeBonus, bool tunnelBonus, bool marriageBonus, int minSequenceLength, int maxWildsInMeld, int cardsPerPlayer, bool firstDrawFromDeck, int turnTimeoutSeconds, int noLifePenalty, int fullCountPenalty, int wrongDeclarationPenalty, bool autoSortHand, bool showMeldSuggestions, int totalRounds, double pointValue
+ bool jokerBlocksDiscard, bool canPickupWildFromDiscard, bool requirePureSequence, bool requireMarriageToWin, bool dubleeBonus, bool tunnelBonus, bool marriageBonus, int minSequenceLength, int maxWildsInMeld, int cardsPerPlayer, bool firstDrawFromDeck, int turnTimeoutSeconds, int noLifePenalty, int fullCountPenalty, int wrongDeclarationPenalty, bool autoSortHand, bool showMeldSuggestions, int totalRounds, double pointValue, int sequencesRequiredToVisit, bool allowDubleeVisit, int dubleeCountRequired, bool tunnelAsSequence, bool mustVisitToPickDiscard, int tipluValue, int popluValue, int jhipluValue, int alterValue, int manValue, bool isManEnabled, bool enableKidnap, bool enableMurder, int unvisitedPenalty, int visitedPenalty
 });
 
 
@@ -93,7 +111,7 @@ class _$MarriageGameConfigCopyWithImpl<$Res>
 
 /// Create a copy of MarriageGameConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? jokerBlocksDiscard = null,Object? canPickupWildFromDiscard = null,Object? requirePureSequence = null,Object? requireMarriageToWin = null,Object? dubleeBonus = null,Object? tunnelBonus = null,Object? marriageBonus = null,Object? minSequenceLength = null,Object? maxWildsInMeld = null,Object? cardsPerPlayer = null,Object? firstDrawFromDeck = null,Object? turnTimeoutSeconds = null,Object? noLifePenalty = null,Object? fullCountPenalty = null,Object? wrongDeclarationPenalty = null,Object? autoSortHand = null,Object? showMeldSuggestions = null,Object? totalRounds = null,Object? pointValue = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? jokerBlocksDiscard = null,Object? canPickupWildFromDiscard = null,Object? requirePureSequence = null,Object? requireMarriageToWin = null,Object? dubleeBonus = null,Object? tunnelBonus = null,Object? marriageBonus = null,Object? minSequenceLength = null,Object? maxWildsInMeld = null,Object? cardsPerPlayer = null,Object? firstDrawFromDeck = null,Object? turnTimeoutSeconds = null,Object? noLifePenalty = null,Object? fullCountPenalty = null,Object? wrongDeclarationPenalty = null,Object? autoSortHand = null,Object? showMeldSuggestions = null,Object? totalRounds = null,Object? pointValue = null,Object? sequencesRequiredToVisit = null,Object? allowDubleeVisit = null,Object? dubleeCountRequired = null,Object? tunnelAsSequence = null,Object? mustVisitToPickDiscard = null,Object? tipluValue = null,Object? popluValue = null,Object? jhipluValue = null,Object? alterValue = null,Object? manValue = null,Object? isManEnabled = null,Object? enableKidnap = null,Object? enableMurder = null,Object? unvisitedPenalty = null,Object? visitedPenalty = null,}) {
   return _then(_self.copyWith(
 jokerBlocksDiscard: null == jokerBlocksDiscard ? _self.jokerBlocksDiscard : jokerBlocksDiscard // ignore: cast_nullable_to_non_nullable
 as bool,canPickupWildFromDiscard: null == canPickupWildFromDiscard ? _self.canPickupWildFromDiscard : canPickupWildFromDiscard // ignore: cast_nullable_to_non_nullable
@@ -114,7 +132,22 @@ as int,autoSortHand: null == autoSortHand ? _self.autoSortHand : autoSortHand //
 as bool,showMeldSuggestions: null == showMeldSuggestions ? _self.showMeldSuggestions : showMeldSuggestions // ignore: cast_nullable_to_non_nullable
 as bool,totalRounds: null == totalRounds ? _self.totalRounds : totalRounds // ignore: cast_nullable_to_non_nullable
 as int,pointValue: null == pointValue ? _self.pointValue : pointValue // ignore: cast_nullable_to_non_nullable
-as double,
+as double,sequencesRequiredToVisit: null == sequencesRequiredToVisit ? _self.sequencesRequiredToVisit : sequencesRequiredToVisit // ignore: cast_nullable_to_non_nullable
+as int,allowDubleeVisit: null == allowDubleeVisit ? _self.allowDubleeVisit : allowDubleeVisit // ignore: cast_nullable_to_non_nullable
+as bool,dubleeCountRequired: null == dubleeCountRequired ? _self.dubleeCountRequired : dubleeCountRequired // ignore: cast_nullable_to_non_nullable
+as int,tunnelAsSequence: null == tunnelAsSequence ? _self.tunnelAsSequence : tunnelAsSequence // ignore: cast_nullable_to_non_nullable
+as bool,mustVisitToPickDiscard: null == mustVisitToPickDiscard ? _self.mustVisitToPickDiscard : mustVisitToPickDiscard // ignore: cast_nullable_to_non_nullable
+as bool,tipluValue: null == tipluValue ? _self.tipluValue : tipluValue // ignore: cast_nullable_to_non_nullable
+as int,popluValue: null == popluValue ? _self.popluValue : popluValue // ignore: cast_nullable_to_non_nullable
+as int,jhipluValue: null == jhipluValue ? _self.jhipluValue : jhipluValue // ignore: cast_nullable_to_non_nullable
+as int,alterValue: null == alterValue ? _self.alterValue : alterValue // ignore: cast_nullable_to_non_nullable
+as int,manValue: null == manValue ? _self.manValue : manValue // ignore: cast_nullable_to_non_nullable
+as int,isManEnabled: null == isManEnabled ? _self.isManEnabled : isManEnabled // ignore: cast_nullable_to_non_nullable
+as bool,enableKidnap: null == enableKidnap ? _self.enableKidnap : enableKidnap // ignore: cast_nullable_to_non_nullable
+as bool,enableMurder: null == enableMurder ? _self.enableMurder : enableMurder // ignore: cast_nullable_to_non_nullable
+as bool,unvisitedPenalty: null == unvisitedPenalty ? _self.unvisitedPenalty : unvisitedPenalty // ignore: cast_nullable_to_non_nullable
+as int,visitedPenalty: null == visitedPenalty ? _self.visitedPenalty : visitedPenalty // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -199,10 +232,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool jokerBlocksDiscard,  bool canPickupWildFromDiscard,  bool requirePureSequence,  bool requireMarriageToWin,  bool dubleeBonus,  bool tunnelBonus,  bool marriageBonus,  int minSequenceLength,  int maxWildsInMeld,  int cardsPerPlayer,  bool firstDrawFromDeck,  int turnTimeoutSeconds,  int noLifePenalty,  int fullCountPenalty,  int wrongDeclarationPenalty,  bool autoSortHand,  bool showMeldSuggestions,  int totalRounds,  double pointValue)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool jokerBlocksDiscard,  bool canPickupWildFromDiscard,  bool requirePureSequence,  bool requireMarriageToWin,  bool dubleeBonus,  bool tunnelBonus,  bool marriageBonus,  int minSequenceLength,  int maxWildsInMeld,  int cardsPerPlayer,  bool firstDrawFromDeck,  int turnTimeoutSeconds,  int noLifePenalty,  int fullCountPenalty,  int wrongDeclarationPenalty,  bool autoSortHand,  bool showMeldSuggestions,  int totalRounds,  double pointValue,  int sequencesRequiredToVisit,  bool allowDubleeVisit,  int dubleeCountRequired,  bool tunnelAsSequence,  bool mustVisitToPickDiscard,  int tipluValue,  int popluValue,  int jhipluValue,  int alterValue,  int manValue,  bool isManEnabled,  bool enableKidnap,  bool enableMurder,  int unvisitedPenalty,  int visitedPenalty)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MarriageGameConfig() when $default != null:
-return $default(_that.jokerBlocksDiscard,_that.canPickupWildFromDiscard,_that.requirePureSequence,_that.requireMarriageToWin,_that.dubleeBonus,_that.tunnelBonus,_that.marriageBonus,_that.minSequenceLength,_that.maxWildsInMeld,_that.cardsPerPlayer,_that.firstDrawFromDeck,_that.turnTimeoutSeconds,_that.noLifePenalty,_that.fullCountPenalty,_that.wrongDeclarationPenalty,_that.autoSortHand,_that.showMeldSuggestions,_that.totalRounds,_that.pointValue);case _:
+return $default(_that.jokerBlocksDiscard,_that.canPickupWildFromDiscard,_that.requirePureSequence,_that.requireMarriageToWin,_that.dubleeBonus,_that.tunnelBonus,_that.marriageBonus,_that.minSequenceLength,_that.maxWildsInMeld,_that.cardsPerPlayer,_that.firstDrawFromDeck,_that.turnTimeoutSeconds,_that.noLifePenalty,_that.fullCountPenalty,_that.wrongDeclarationPenalty,_that.autoSortHand,_that.showMeldSuggestions,_that.totalRounds,_that.pointValue,_that.sequencesRequiredToVisit,_that.allowDubleeVisit,_that.dubleeCountRequired,_that.tunnelAsSequence,_that.mustVisitToPickDiscard,_that.tipluValue,_that.popluValue,_that.jhipluValue,_that.alterValue,_that.manValue,_that.isManEnabled,_that.enableKidnap,_that.enableMurder,_that.unvisitedPenalty,_that.visitedPenalty);case _:
   return orElse();
 
 }
@@ -220,10 +253,10 @@ return $default(_that.jokerBlocksDiscard,_that.canPickupWildFromDiscard,_that.re
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool jokerBlocksDiscard,  bool canPickupWildFromDiscard,  bool requirePureSequence,  bool requireMarriageToWin,  bool dubleeBonus,  bool tunnelBonus,  bool marriageBonus,  int minSequenceLength,  int maxWildsInMeld,  int cardsPerPlayer,  bool firstDrawFromDeck,  int turnTimeoutSeconds,  int noLifePenalty,  int fullCountPenalty,  int wrongDeclarationPenalty,  bool autoSortHand,  bool showMeldSuggestions,  int totalRounds,  double pointValue)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool jokerBlocksDiscard,  bool canPickupWildFromDiscard,  bool requirePureSequence,  bool requireMarriageToWin,  bool dubleeBonus,  bool tunnelBonus,  bool marriageBonus,  int minSequenceLength,  int maxWildsInMeld,  int cardsPerPlayer,  bool firstDrawFromDeck,  int turnTimeoutSeconds,  int noLifePenalty,  int fullCountPenalty,  int wrongDeclarationPenalty,  bool autoSortHand,  bool showMeldSuggestions,  int totalRounds,  double pointValue,  int sequencesRequiredToVisit,  bool allowDubleeVisit,  int dubleeCountRequired,  bool tunnelAsSequence,  bool mustVisitToPickDiscard,  int tipluValue,  int popluValue,  int jhipluValue,  int alterValue,  int manValue,  bool isManEnabled,  bool enableKidnap,  bool enableMurder,  int unvisitedPenalty,  int visitedPenalty)  $default,) {final _that = this;
 switch (_that) {
 case _MarriageGameConfig():
-return $default(_that.jokerBlocksDiscard,_that.canPickupWildFromDiscard,_that.requirePureSequence,_that.requireMarriageToWin,_that.dubleeBonus,_that.tunnelBonus,_that.marriageBonus,_that.minSequenceLength,_that.maxWildsInMeld,_that.cardsPerPlayer,_that.firstDrawFromDeck,_that.turnTimeoutSeconds,_that.noLifePenalty,_that.fullCountPenalty,_that.wrongDeclarationPenalty,_that.autoSortHand,_that.showMeldSuggestions,_that.totalRounds,_that.pointValue);case _:
+return $default(_that.jokerBlocksDiscard,_that.canPickupWildFromDiscard,_that.requirePureSequence,_that.requireMarriageToWin,_that.dubleeBonus,_that.tunnelBonus,_that.marriageBonus,_that.minSequenceLength,_that.maxWildsInMeld,_that.cardsPerPlayer,_that.firstDrawFromDeck,_that.turnTimeoutSeconds,_that.noLifePenalty,_that.fullCountPenalty,_that.wrongDeclarationPenalty,_that.autoSortHand,_that.showMeldSuggestions,_that.totalRounds,_that.pointValue,_that.sequencesRequiredToVisit,_that.allowDubleeVisit,_that.dubleeCountRequired,_that.tunnelAsSequence,_that.mustVisitToPickDiscard,_that.tipluValue,_that.popluValue,_that.jhipluValue,_that.alterValue,_that.manValue,_that.isManEnabled,_that.enableKidnap,_that.enableMurder,_that.unvisitedPenalty,_that.visitedPenalty);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -240,10 +273,10 @@ return $default(_that.jokerBlocksDiscard,_that.canPickupWildFromDiscard,_that.re
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool jokerBlocksDiscard,  bool canPickupWildFromDiscard,  bool requirePureSequence,  bool requireMarriageToWin,  bool dubleeBonus,  bool tunnelBonus,  bool marriageBonus,  int minSequenceLength,  int maxWildsInMeld,  int cardsPerPlayer,  bool firstDrawFromDeck,  int turnTimeoutSeconds,  int noLifePenalty,  int fullCountPenalty,  int wrongDeclarationPenalty,  bool autoSortHand,  bool showMeldSuggestions,  int totalRounds,  double pointValue)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool jokerBlocksDiscard,  bool canPickupWildFromDiscard,  bool requirePureSequence,  bool requireMarriageToWin,  bool dubleeBonus,  bool tunnelBonus,  bool marriageBonus,  int minSequenceLength,  int maxWildsInMeld,  int cardsPerPlayer,  bool firstDrawFromDeck,  int turnTimeoutSeconds,  int noLifePenalty,  int fullCountPenalty,  int wrongDeclarationPenalty,  bool autoSortHand,  bool showMeldSuggestions,  int totalRounds,  double pointValue,  int sequencesRequiredToVisit,  bool allowDubleeVisit,  int dubleeCountRequired,  bool tunnelAsSequence,  bool mustVisitToPickDiscard,  int tipluValue,  int popluValue,  int jhipluValue,  int alterValue,  int manValue,  bool isManEnabled,  bool enableKidnap,  bool enableMurder,  int unvisitedPenalty,  int visitedPenalty)?  $default,) {final _that = this;
 switch (_that) {
 case _MarriageGameConfig() when $default != null:
-return $default(_that.jokerBlocksDiscard,_that.canPickupWildFromDiscard,_that.requirePureSequence,_that.requireMarriageToWin,_that.dubleeBonus,_that.tunnelBonus,_that.marriageBonus,_that.minSequenceLength,_that.maxWildsInMeld,_that.cardsPerPlayer,_that.firstDrawFromDeck,_that.turnTimeoutSeconds,_that.noLifePenalty,_that.fullCountPenalty,_that.wrongDeclarationPenalty,_that.autoSortHand,_that.showMeldSuggestions,_that.totalRounds,_that.pointValue);case _:
+return $default(_that.jokerBlocksDiscard,_that.canPickupWildFromDiscard,_that.requirePureSequence,_that.requireMarriageToWin,_that.dubleeBonus,_that.tunnelBonus,_that.marriageBonus,_that.minSequenceLength,_that.maxWildsInMeld,_that.cardsPerPlayer,_that.firstDrawFromDeck,_that.turnTimeoutSeconds,_that.noLifePenalty,_that.fullCountPenalty,_that.wrongDeclarationPenalty,_that.autoSortHand,_that.showMeldSuggestions,_that.totalRounds,_that.pointValue,_that.sequencesRequiredToVisit,_that.allowDubleeVisit,_that.dubleeCountRequired,_that.tunnelAsSequence,_that.mustVisitToPickDiscard,_that.tipluValue,_that.popluValue,_that.jhipluValue,_that.alterValue,_that.manValue,_that.isManEnabled,_that.enableKidnap,_that.enableMurder,_that.unvisitedPenalty,_that.visitedPenalty);case _:
   return null;
 
 }
@@ -255,7 +288,7 @@ return $default(_that.jokerBlocksDiscard,_that.canPickupWildFromDiscard,_that.re
 @JsonSerializable()
 
 class _MarriageGameConfig extends MarriageGameConfig {
-  const _MarriageGameConfig({this.jokerBlocksDiscard = true, this.canPickupWildFromDiscard = false, this.requirePureSequence = true, this.requireMarriageToWin = false, this.dubleeBonus = true, this.tunnelBonus = true, this.marriageBonus = true, this.minSequenceLength = 3, this.maxWildsInMeld = 2, this.cardsPerPlayer = 21, this.firstDrawFromDeck = true, this.turnTimeoutSeconds = 30, this.noLifePenalty = 100, this.fullCountPenalty = 120, this.wrongDeclarationPenalty = 50, this.autoSortHand = true, this.showMeldSuggestions = true, this.totalRounds = 5, this.pointValue = 1.0}): super._();
+  const _MarriageGameConfig({this.jokerBlocksDiscard = true, this.canPickupWildFromDiscard = false, this.requirePureSequence = true, this.requireMarriageToWin = false, this.dubleeBonus = true, this.tunnelBonus = true, this.marriageBonus = true, this.minSequenceLength = 3, this.maxWildsInMeld = 2, this.cardsPerPlayer = 21, this.firstDrawFromDeck = true, this.turnTimeoutSeconds = 30, this.noLifePenalty = 100, this.fullCountPenalty = 120, this.wrongDeclarationPenalty = 50, this.autoSortHand = true, this.showMeldSuggestions = true, this.totalRounds = 5, this.pointValue = 1.0, this.sequencesRequiredToVisit = 3, this.allowDubleeVisit = true, this.dubleeCountRequired = 7, this.tunnelAsSequence = true, this.mustVisitToPickDiscard = false, this.tipluValue = 3, this.popluValue = 2, this.jhipluValue = 2, this.alterValue = 5, this.manValue = 2, this.isManEnabled = true, this.enableKidnap = true, this.enableMurder = false, this.unvisitedPenalty = 10, this.visitedPenalty = 3}): super._();
   factory _MarriageGameConfig.fromJson(Map<String, dynamic> json) => _$MarriageGameConfigFromJson(json);
 
 // === Core Rules ===
@@ -305,6 +338,39 @@ class _MarriageGameConfig extends MarriageGameConfig {
 @override@JsonKey() final  int totalRounds;
 /// Point value per unit (for settlements).
 @override@JsonKey() final  double pointValue;
+// === Visiting Rules (Gatekeeper Logic) ===
+/// Number of pure sequences required to "Visit" (unlock Maal).
+@override@JsonKey() final  int sequencesRequiredToVisit;
+/// Allow Dublee Visit: Player can visit with 7 pairs instead of sequences.
+@override@JsonKey() final  bool allowDubleeVisit;
+/// Number of pairs required for Dublee visit.
+@override@JsonKey() final  int dubleeCountRequired;
+/// Tunnel counts as a sequence for visiting purposes.
+@override@JsonKey() final  bool tunnelAsSequence;
+/// Must visit before picking from discard pile (strict visiting).
+@override@JsonKey() final  bool mustVisitToPickDiscard;
+// === Maal (Value Card) System ===
+/// Tiplu value (exact match of drawn wild card).
+@override@JsonKey() final  int tipluValue;
+/// Poplu value (rank +1, same suit as Tiplu).
+@override@JsonKey() final  int popluValue;
+/// Jhiplu value (rank -1, same suit as Tiplu).
+@override@JsonKey() final  int jhipluValue;
+/// Alter value (same rank+color, different suit as Tiplu).
+@override@JsonKey() final  int alterValue;
+/// Man (printed Joker) value.
+@override@JsonKey() final  int manValue;
+/// Enable Man (printed Joker) as Maal.
+@override@JsonKey() final  bool isManEnabled;
+// === Kidnap/Murder Rules ===
+/// Kidnap: If winner and opponent not visited, opponent's Maal goes to winner.
+@override@JsonKey() final  bool enableKidnap;
+/// Murder: If not visited, Maal points are set to 0 (stricter than Kidnap).
+@override@JsonKey() final  bool enableMurder;
+/// Penalty for losing while not visited.
+@override@JsonKey() final  int unvisitedPenalty;
+/// Penalty for losing while visited.
+@override@JsonKey() final  int visitedPenalty;
 
 /// Create a copy of MarriageGameConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -319,16 +385,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MarriageGameConfig&&(identical(other.jokerBlocksDiscard, jokerBlocksDiscard) || other.jokerBlocksDiscard == jokerBlocksDiscard)&&(identical(other.canPickupWildFromDiscard, canPickupWildFromDiscard) || other.canPickupWildFromDiscard == canPickupWildFromDiscard)&&(identical(other.requirePureSequence, requirePureSequence) || other.requirePureSequence == requirePureSequence)&&(identical(other.requireMarriageToWin, requireMarriageToWin) || other.requireMarriageToWin == requireMarriageToWin)&&(identical(other.dubleeBonus, dubleeBonus) || other.dubleeBonus == dubleeBonus)&&(identical(other.tunnelBonus, tunnelBonus) || other.tunnelBonus == tunnelBonus)&&(identical(other.marriageBonus, marriageBonus) || other.marriageBonus == marriageBonus)&&(identical(other.minSequenceLength, minSequenceLength) || other.minSequenceLength == minSequenceLength)&&(identical(other.maxWildsInMeld, maxWildsInMeld) || other.maxWildsInMeld == maxWildsInMeld)&&(identical(other.cardsPerPlayer, cardsPerPlayer) || other.cardsPerPlayer == cardsPerPlayer)&&(identical(other.firstDrawFromDeck, firstDrawFromDeck) || other.firstDrawFromDeck == firstDrawFromDeck)&&(identical(other.turnTimeoutSeconds, turnTimeoutSeconds) || other.turnTimeoutSeconds == turnTimeoutSeconds)&&(identical(other.noLifePenalty, noLifePenalty) || other.noLifePenalty == noLifePenalty)&&(identical(other.fullCountPenalty, fullCountPenalty) || other.fullCountPenalty == fullCountPenalty)&&(identical(other.wrongDeclarationPenalty, wrongDeclarationPenalty) || other.wrongDeclarationPenalty == wrongDeclarationPenalty)&&(identical(other.autoSortHand, autoSortHand) || other.autoSortHand == autoSortHand)&&(identical(other.showMeldSuggestions, showMeldSuggestions) || other.showMeldSuggestions == showMeldSuggestions)&&(identical(other.totalRounds, totalRounds) || other.totalRounds == totalRounds)&&(identical(other.pointValue, pointValue) || other.pointValue == pointValue));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MarriageGameConfig&&(identical(other.jokerBlocksDiscard, jokerBlocksDiscard) || other.jokerBlocksDiscard == jokerBlocksDiscard)&&(identical(other.canPickupWildFromDiscard, canPickupWildFromDiscard) || other.canPickupWildFromDiscard == canPickupWildFromDiscard)&&(identical(other.requirePureSequence, requirePureSequence) || other.requirePureSequence == requirePureSequence)&&(identical(other.requireMarriageToWin, requireMarriageToWin) || other.requireMarriageToWin == requireMarriageToWin)&&(identical(other.dubleeBonus, dubleeBonus) || other.dubleeBonus == dubleeBonus)&&(identical(other.tunnelBonus, tunnelBonus) || other.tunnelBonus == tunnelBonus)&&(identical(other.marriageBonus, marriageBonus) || other.marriageBonus == marriageBonus)&&(identical(other.minSequenceLength, minSequenceLength) || other.minSequenceLength == minSequenceLength)&&(identical(other.maxWildsInMeld, maxWildsInMeld) || other.maxWildsInMeld == maxWildsInMeld)&&(identical(other.cardsPerPlayer, cardsPerPlayer) || other.cardsPerPlayer == cardsPerPlayer)&&(identical(other.firstDrawFromDeck, firstDrawFromDeck) || other.firstDrawFromDeck == firstDrawFromDeck)&&(identical(other.turnTimeoutSeconds, turnTimeoutSeconds) || other.turnTimeoutSeconds == turnTimeoutSeconds)&&(identical(other.noLifePenalty, noLifePenalty) || other.noLifePenalty == noLifePenalty)&&(identical(other.fullCountPenalty, fullCountPenalty) || other.fullCountPenalty == fullCountPenalty)&&(identical(other.wrongDeclarationPenalty, wrongDeclarationPenalty) || other.wrongDeclarationPenalty == wrongDeclarationPenalty)&&(identical(other.autoSortHand, autoSortHand) || other.autoSortHand == autoSortHand)&&(identical(other.showMeldSuggestions, showMeldSuggestions) || other.showMeldSuggestions == showMeldSuggestions)&&(identical(other.totalRounds, totalRounds) || other.totalRounds == totalRounds)&&(identical(other.pointValue, pointValue) || other.pointValue == pointValue)&&(identical(other.sequencesRequiredToVisit, sequencesRequiredToVisit) || other.sequencesRequiredToVisit == sequencesRequiredToVisit)&&(identical(other.allowDubleeVisit, allowDubleeVisit) || other.allowDubleeVisit == allowDubleeVisit)&&(identical(other.dubleeCountRequired, dubleeCountRequired) || other.dubleeCountRequired == dubleeCountRequired)&&(identical(other.tunnelAsSequence, tunnelAsSequence) || other.tunnelAsSequence == tunnelAsSequence)&&(identical(other.mustVisitToPickDiscard, mustVisitToPickDiscard) || other.mustVisitToPickDiscard == mustVisitToPickDiscard)&&(identical(other.tipluValue, tipluValue) || other.tipluValue == tipluValue)&&(identical(other.popluValue, popluValue) || other.popluValue == popluValue)&&(identical(other.jhipluValue, jhipluValue) || other.jhipluValue == jhipluValue)&&(identical(other.alterValue, alterValue) || other.alterValue == alterValue)&&(identical(other.manValue, manValue) || other.manValue == manValue)&&(identical(other.isManEnabled, isManEnabled) || other.isManEnabled == isManEnabled)&&(identical(other.enableKidnap, enableKidnap) || other.enableKidnap == enableKidnap)&&(identical(other.enableMurder, enableMurder) || other.enableMurder == enableMurder)&&(identical(other.unvisitedPenalty, unvisitedPenalty) || other.unvisitedPenalty == unvisitedPenalty)&&(identical(other.visitedPenalty, visitedPenalty) || other.visitedPenalty == visitedPenalty));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,jokerBlocksDiscard,canPickupWildFromDiscard,requirePureSequence,requireMarriageToWin,dubleeBonus,tunnelBonus,marriageBonus,minSequenceLength,maxWildsInMeld,cardsPerPlayer,firstDrawFromDeck,turnTimeoutSeconds,noLifePenalty,fullCountPenalty,wrongDeclarationPenalty,autoSortHand,showMeldSuggestions,totalRounds,pointValue]);
+int get hashCode => Object.hashAll([runtimeType,jokerBlocksDiscard,canPickupWildFromDiscard,requirePureSequence,requireMarriageToWin,dubleeBonus,tunnelBonus,marriageBonus,minSequenceLength,maxWildsInMeld,cardsPerPlayer,firstDrawFromDeck,turnTimeoutSeconds,noLifePenalty,fullCountPenalty,wrongDeclarationPenalty,autoSortHand,showMeldSuggestions,totalRounds,pointValue,sequencesRequiredToVisit,allowDubleeVisit,dubleeCountRequired,tunnelAsSequence,mustVisitToPickDiscard,tipluValue,popluValue,jhipluValue,alterValue,manValue,isManEnabled,enableKidnap,enableMurder,unvisitedPenalty,visitedPenalty]);
 
 @override
 String toString() {
-  return 'MarriageGameConfig(jokerBlocksDiscard: $jokerBlocksDiscard, canPickupWildFromDiscard: $canPickupWildFromDiscard, requirePureSequence: $requirePureSequence, requireMarriageToWin: $requireMarriageToWin, dubleeBonus: $dubleeBonus, tunnelBonus: $tunnelBonus, marriageBonus: $marriageBonus, minSequenceLength: $minSequenceLength, maxWildsInMeld: $maxWildsInMeld, cardsPerPlayer: $cardsPerPlayer, firstDrawFromDeck: $firstDrawFromDeck, turnTimeoutSeconds: $turnTimeoutSeconds, noLifePenalty: $noLifePenalty, fullCountPenalty: $fullCountPenalty, wrongDeclarationPenalty: $wrongDeclarationPenalty, autoSortHand: $autoSortHand, showMeldSuggestions: $showMeldSuggestions, totalRounds: $totalRounds, pointValue: $pointValue)';
+  return 'MarriageGameConfig(jokerBlocksDiscard: $jokerBlocksDiscard, canPickupWildFromDiscard: $canPickupWildFromDiscard, requirePureSequence: $requirePureSequence, requireMarriageToWin: $requireMarriageToWin, dubleeBonus: $dubleeBonus, tunnelBonus: $tunnelBonus, marriageBonus: $marriageBonus, minSequenceLength: $minSequenceLength, maxWildsInMeld: $maxWildsInMeld, cardsPerPlayer: $cardsPerPlayer, firstDrawFromDeck: $firstDrawFromDeck, turnTimeoutSeconds: $turnTimeoutSeconds, noLifePenalty: $noLifePenalty, fullCountPenalty: $fullCountPenalty, wrongDeclarationPenalty: $wrongDeclarationPenalty, autoSortHand: $autoSortHand, showMeldSuggestions: $showMeldSuggestions, totalRounds: $totalRounds, pointValue: $pointValue, sequencesRequiredToVisit: $sequencesRequiredToVisit, allowDubleeVisit: $allowDubleeVisit, dubleeCountRequired: $dubleeCountRequired, tunnelAsSequence: $tunnelAsSequence, mustVisitToPickDiscard: $mustVisitToPickDiscard, tipluValue: $tipluValue, popluValue: $popluValue, jhipluValue: $jhipluValue, alterValue: $alterValue, manValue: $manValue, isManEnabled: $isManEnabled, enableKidnap: $enableKidnap, enableMurder: $enableMurder, unvisitedPenalty: $unvisitedPenalty, visitedPenalty: $visitedPenalty)';
 }
 
 
@@ -339,7 +405,7 @@ abstract mixin class _$MarriageGameConfigCopyWith<$Res> implements $MarriageGame
   factory _$MarriageGameConfigCopyWith(_MarriageGameConfig value, $Res Function(_MarriageGameConfig) _then) = __$MarriageGameConfigCopyWithImpl;
 @override @useResult
 $Res call({
- bool jokerBlocksDiscard, bool canPickupWildFromDiscard, bool requirePureSequence, bool requireMarriageToWin, bool dubleeBonus, bool tunnelBonus, bool marriageBonus, int minSequenceLength, int maxWildsInMeld, int cardsPerPlayer, bool firstDrawFromDeck, int turnTimeoutSeconds, int noLifePenalty, int fullCountPenalty, int wrongDeclarationPenalty, bool autoSortHand, bool showMeldSuggestions, int totalRounds, double pointValue
+ bool jokerBlocksDiscard, bool canPickupWildFromDiscard, bool requirePureSequence, bool requireMarriageToWin, bool dubleeBonus, bool tunnelBonus, bool marriageBonus, int minSequenceLength, int maxWildsInMeld, int cardsPerPlayer, bool firstDrawFromDeck, int turnTimeoutSeconds, int noLifePenalty, int fullCountPenalty, int wrongDeclarationPenalty, bool autoSortHand, bool showMeldSuggestions, int totalRounds, double pointValue, int sequencesRequiredToVisit, bool allowDubleeVisit, int dubleeCountRequired, bool tunnelAsSequence, bool mustVisitToPickDiscard, int tipluValue, int popluValue, int jhipluValue, int alterValue, int manValue, bool isManEnabled, bool enableKidnap, bool enableMurder, int unvisitedPenalty, int visitedPenalty
 });
 
 
@@ -356,7 +422,7 @@ class __$MarriageGameConfigCopyWithImpl<$Res>
 
 /// Create a copy of MarriageGameConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? jokerBlocksDiscard = null,Object? canPickupWildFromDiscard = null,Object? requirePureSequence = null,Object? requireMarriageToWin = null,Object? dubleeBonus = null,Object? tunnelBonus = null,Object? marriageBonus = null,Object? minSequenceLength = null,Object? maxWildsInMeld = null,Object? cardsPerPlayer = null,Object? firstDrawFromDeck = null,Object? turnTimeoutSeconds = null,Object? noLifePenalty = null,Object? fullCountPenalty = null,Object? wrongDeclarationPenalty = null,Object? autoSortHand = null,Object? showMeldSuggestions = null,Object? totalRounds = null,Object? pointValue = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? jokerBlocksDiscard = null,Object? canPickupWildFromDiscard = null,Object? requirePureSequence = null,Object? requireMarriageToWin = null,Object? dubleeBonus = null,Object? tunnelBonus = null,Object? marriageBonus = null,Object? minSequenceLength = null,Object? maxWildsInMeld = null,Object? cardsPerPlayer = null,Object? firstDrawFromDeck = null,Object? turnTimeoutSeconds = null,Object? noLifePenalty = null,Object? fullCountPenalty = null,Object? wrongDeclarationPenalty = null,Object? autoSortHand = null,Object? showMeldSuggestions = null,Object? totalRounds = null,Object? pointValue = null,Object? sequencesRequiredToVisit = null,Object? allowDubleeVisit = null,Object? dubleeCountRequired = null,Object? tunnelAsSequence = null,Object? mustVisitToPickDiscard = null,Object? tipluValue = null,Object? popluValue = null,Object? jhipluValue = null,Object? alterValue = null,Object? manValue = null,Object? isManEnabled = null,Object? enableKidnap = null,Object? enableMurder = null,Object? unvisitedPenalty = null,Object? visitedPenalty = null,}) {
   return _then(_MarriageGameConfig(
 jokerBlocksDiscard: null == jokerBlocksDiscard ? _self.jokerBlocksDiscard : jokerBlocksDiscard // ignore: cast_nullable_to_non_nullable
 as bool,canPickupWildFromDiscard: null == canPickupWildFromDiscard ? _self.canPickupWildFromDiscard : canPickupWildFromDiscard // ignore: cast_nullable_to_non_nullable
@@ -377,7 +443,22 @@ as int,autoSortHand: null == autoSortHand ? _self.autoSortHand : autoSortHand //
 as bool,showMeldSuggestions: null == showMeldSuggestions ? _self.showMeldSuggestions : showMeldSuggestions // ignore: cast_nullable_to_non_nullable
 as bool,totalRounds: null == totalRounds ? _self.totalRounds : totalRounds // ignore: cast_nullable_to_non_nullable
 as int,pointValue: null == pointValue ? _self.pointValue : pointValue // ignore: cast_nullable_to_non_nullable
-as double,
+as double,sequencesRequiredToVisit: null == sequencesRequiredToVisit ? _self.sequencesRequiredToVisit : sequencesRequiredToVisit // ignore: cast_nullable_to_non_nullable
+as int,allowDubleeVisit: null == allowDubleeVisit ? _self.allowDubleeVisit : allowDubleeVisit // ignore: cast_nullable_to_non_nullable
+as bool,dubleeCountRequired: null == dubleeCountRequired ? _self.dubleeCountRequired : dubleeCountRequired // ignore: cast_nullable_to_non_nullable
+as int,tunnelAsSequence: null == tunnelAsSequence ? _self.tunnelAsSequence : tunnelAsSequence // ignore: cast_nullable_to_non_nullable
+as bool,mustVisitToPickDiscard: null == mustVisitToPickDiscard ? _self.mustVisitToPickDiscard : mustVisitToPickDiscard // ignore: cast_nullable_to_non_nullable
+as bool,tipluValue: null == tipluValue ? _self.tipluValue : tipluValue // ignore: cast_nullable_to_non_nullable
+as int,popluValue: null == popluValue ? _self.popluValue : popluValue // ignore: cast_nullable_to_non_nullable
+as int,jhipluValue: null == jhipluValue ? _self.jhipluValue : jhipluValue // ignore: cast_nullable_to_non_nullable
+as int,alterValue: null == alterValue ? _self.alterValue : alterValue // ignore: cast_nullable_to_non_nullable
+as int,manValue: null == manValue ? _self.manValue : manValue // ignore: cast_nullable_to_non_nullable
+as int,isManEnabled: null == isManEnabled ? _self.isManEnabled : isManEnabled // ignore: cast_nullable_to_non_nullable
+as bool,enableKidnap: null == enableKidnap ? _self.enableKidnap : enableKidnap // ignore: cast_nullable_to_non_nullable
+as bool,enableMurder: null == enableMurder ? _self.enableMurder : enableMurder // ignore: cast_nullable_to_non_nullable
+as bool,unvisitedPenalty: null == unvisitedPenalty ? _self.unvisitedPenalty : unvisitedPenalty // ignore: cast_nullable_to_non_nullable
+as int,visitedPenalty: null == visitedPenalty ? _self.visitedPenalty : visitedPenalty // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

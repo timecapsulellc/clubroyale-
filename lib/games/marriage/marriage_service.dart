@@ -11,6 +11,8 @@ import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/meld.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
 import 'package:clubroyale/games/marriage/marriage_scorer.dart';
+import 'package:clubroyale/games/marriage/marriage_visit_validator.dart';
+import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart';
 
 /// Provider for Royal Meld (Marriage) Service
 final marriageServiceProvider = Provider((ref) => MarriageService());
@@ -31,6 +33,11 @@ class MarriageGameState {
   final DateTime? turnStartTime;  // For turn timer
   final MarriageGameConfig config;  // Game configuration
   
+  // === Visiting Collections System ===
+  final Map<String, bool> playerVisited;  // playerId -> has visited
+  final Map<String, String?> playerVisitType;  // playerId -> 'sequence' or 'dublee'
+  final Map<String, int> playerMaalPoints;  // playerId -> current Maal points
+  
   MarriageGameState({
     required this.tipluCardId,
     required this.playerHands,
@@ -44,6 +51,9 @@ class MarriageGameState {
     this.lastDiscardedCardId,
     this.turnStartTime,
     this.config = const MarriageGameConfig(),
+    this.playerVisited = const {},
+    this.playerVisitType = const {},
+    this.playerMaalPoints = const {},
   });
   
   factory MarriageGameState.fromJson(Map<String, dynamic> json) {
@@ -66,6 +76,16 @@ class MarriageGameState {
       config: json['config'] != null 
           ? MarriageGameConfig.fromJson(json['config'] as Map<String, dynamic>)
           : const MarriageGameConfig(),
+      // Visiting fields
+      playerVisited: (json['playerVisited'] as Map<String, dynamic>?)?.map(
+        (k, v) => MapEntry(k, v as bool),
+      ) ?? {},
+      playerVisitType: (json['playerVisitType'] as Map<String, dynamic>?)?.map(
+        (k, v) => MapEntry(k, v as String?),
+      ) ?? {},
+      playerMaalPoints: (json['playerMaalPoints'] as Map<String, dynamic>?)?.map(
+        (k, v) => MapEntry(k, v as int),
+      ) ?? {},
     );
   }
   
@@ -82,6 +102,9 @@ class MarriageGameState {
     'lastDiscardedCardId': lastDiscardedCardId,
     'turnStartTime': turnStartTime?.toIso8601String(),
     'config': config.toJson(),
+    'playerVisited': playerVisited,
+    'playerVisitType': playerVisitType,
+    'playerMaalPoints': playerMaalPoints,
   };
   
   /// Check if player has drawn this turn
@@ -92,6 +115,15 @@ class MarriageGameState {
   
   /// Check if in discarding phase
   bool get isDiscardingPhase => turnPhase == 'discarding';
+  
+  /// Check if a specific player has visited
+  bool hasVisited(String playerId) => playerVisited[playerId] ?? false;
+  
+  /// Get a player's visit type
+  String? getVisitType(String playerId) => playerVisitType[playerId];
+  
+  /// Get a player's current Maal points
+  int getMaalPoints(String playerId) => playerMaalPoints[playerId] ?? 0;
 }
 
 
@@ -216,6 +248,12 @@ class MarriageService {
     // P0 FIX: Validate player is in drawing phase
     if (state.turnPhase != 'drawing') return null;
     
+    // ===== VISITING RESTRICTION =====
+    // If mustVisitToPickDiscard is enabled, player cannot pick from discard until visited
+    if (state.config.mustVisitToPickDiscard && !state.hasVisited(playerId)) {
+      return null; // Must visit before picking from discard
+    }
+    
     // ===== JOKER BLOCK RULE =====
     // If the last discarded card was a Joker or Wild, player MUST draw from deck
     if (state.discardPile.isNotEmpty && state.config.jokerBlocksDiscard) {
@@ -292,6 +330,63 @@ class MarriageService {
     });
   }
 
+  
+  /// Attempt to "Visit" - show 3 pure sequences to unlock Maal access
+  /// Returns (success, visitType, reason)
+  Future<(bool, String?, String?)> attemptVisit(String roomId, String playerId) async {
+    final doc = await _firestore.collection('games').doc(roomId).get();
+    final data = doc.data();
+    if (data == null || data['marriageState'] == null) {
+      return (false, null, 'Game not found');
+    }
+    
+    final state = MarriageGameState.fromJson(
+      data['marriageState'] as Map<String, dynamic>,
+    );
+    
+    // Already visited?
+    if (state.hasVisited(playerId)) {
+      return (false, state.getVisitType(playerId), 'Already visited');
+    }
+    
+    // Get player's hand as Card objects
+    final handIds = state.playerHands[playerId] ?? [];
+    final hand = handIds.map((id) => _getCard(id)).whereType<Card>().toList();
+    
+    // Get tiplu card
+    final tiplu = _getCard(state.tipluCardId);
+    
+    // Validate visiting
+    final validator = MarriageVisitValidator(
+      config: state.config,
+      tiplu: tiplu,
+    );
+    
+    final result = validator.attemptVisit(hand);
+    
+    if (!result.canVisit) {
+      return (false, null, result.reason);
+    }
+    
+    // Calculate Maal points for this player
+    int maalPoints = 0;
+    if (tiplu != null) {
+      final maalCalculator = MarriageMaalCalculator(
+        tiplu: tiplu,
+        config: state.config,
+      );
+      maalPoints = maalCalculator.calculateMaalPoints(hand);
+    }
+    
+    // Update Firestore with visited status
+    await _firestore.collection('games').doc(roomId).update({
+      'marriageState.playerVisited.$playerId': true,
+      'marriageState.playerVisitType.$playerId': result.visitType.name,
+      'marriageState.playerMaalPoints.$playerId': maalPoints,
+    });
+    
+    return (true, result.visitType.name, null);
+  }
   
   /// Declare/show hand (attempt to win)
   Future<bool> declare(String roomId, String playerId) async {
