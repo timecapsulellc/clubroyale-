@@ -384,6 +384,9 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   
   Widget _buildTurnIndicator(MarriageGameState state, String myId) {
     final isMyTurn = state.currentPlayerId == myId;
+    final marriageService = ref.read(marriageServiceProvider);
+    final remainingTime = marriageService.getRemainingTurnTime(state);
+    final hasTimeout = state.config.turnTimeoutSeconds > 0;
     
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -409,9 +412,65 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
               fontWeight: isMyTurn ? FontWeight.bold : FontWeight.normal,
             ),
           ),
+          // Timer display
+          if (hasTimeout && isMyTurn) ...[
+            const SizedBox(width: 16),
+            _buildTimerWidget(remainingTime, state.config.turnTimeoutSeconds),
+          ],
         ],
       ),
     ).animate().fadeIn();
+  }
+  
+  /// Build circular timer widget
+  Widget _buildTimerWidget(int remaining, int total) {
+    final progress = remaining / total;
+    final isLow = remaining <= 10;
+    final isCritical = remaining <= 5;
+    
+    final color = isCritical 
+        ? Colors.red 
+        : isLow 
+            ? Colors.orange 
+            : Colors.green;
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+              value: progress,
+              strokeWidth: 2,
+              backgroundColor: color.withValues(alpha: 0.3),
+              valueColor: AlwaysStoppedAnimation(color),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '${remaining}s',
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    ).animate(
+      onComplete: (controller) => controller.repeat(),
+    ).shimmer(
+      duration: isCritical ? 500.ms : 1000.ms,
+      color: isCritical ? Colors.red.withValues(alpha: 0.3) : Colors.transparent,
+    );
   }
   
   List<Widget> _buildOpponentWidgets(MarriageGameState state, String myId) {
@@ -724,9 +783,45 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       final userId = authService.currentUser?.uid;
       
       if (userId != null) {
-        await marriageService.drawFromDiscard(widget.roomId, userId);
-        SoundService.playCardSlide();
-        // P0 FIX: No need to set _hasDrawn - state updates from Firestore stream
+        final result = await marriageService.drawFromDiscard(widget.roomId, userId);
+        
+        if (result == null) {
+          // Draw was blocked - show toast explaining why
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.block, color: Colors.white),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '🃏 Cannot pick this card!',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            'Joker or Wild card blocks pickup. Draw from deck instead.',
+                            style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.8)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                backgroundColor: Colors.orange.shade800,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+        } else {
+          SoundService.playCardSlide();
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -805,22 +900,166 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   }
   
   void _showWinDialog() {
+    // Get the score details from Firestore stream
+    final marriageService = ref.read(marriageServiceProvider);
+    
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: CasinoColors.cardBackground,
-        title: const Text('🎉 You Win!', style: TextStyle(color: CasinoColors.gold)),
-        content: const Text('Congratulations!', style: TextStyle(color: Colors.white)),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.go('/lobby');
-            },
-            child: const Text('Back to Lobby'),
-          ),
-        ],
+      builder: (context) => StreamBuilder<MarriageGameState?>(
+        stream: marriageService.watchGameState(widget.roomId),
+        builder: (context, snapshot) {
+          final state = snapshot.data;
+          final scores = state?.toJson()['roundScores'] as Map<String, dynamic>? ?? {};
+          final details = state?.toJson()['scoreDetails'] as Map<String, dynamic>? ?? {};
+          final declarerId = state?.toJson()['declarerId'] as String?;
+          
+          return AlertDialog(
+            backgroundColor: CasinoColors.cardBackground,
+            title: Row(
+              children: [
+                const Text('🎉 ', style: TextStyle(fontSize: 28)),
+                const Text('Round Complete!', style: TextStyle(color: CasinoColors.gold)),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Winner announcement
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.emoji_events, color: CasinoColors.gold, size: 32),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Winner', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                              Text(
+                                declarerId != null ? 'Player ${declarerId.substring(0, 4)}...' : 'Unknown',
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Score breakdown header
+                  const Text('Score Breakdown', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                  const Divider(color: Colors.white24),
+                  
+                  // Player scores
+                  ...scores.entries.map((entry) {
+                    final playerId = entry.key;
+                    final score = entry.value as int;
+                    final playerDetails = details[playerId] as Map<String, dynamic>? ?? {};
+                    final isDeclarer = playerDetails['isDeclarer'] == true;
+                    final hasPure = playerDetails['hasPureSequence'] == true;
+                    final hasDublee = playerDetails['hasDublee'] == true;
+                    final marriages = playerDetails['marriageCount'] as int? ?? 0;
+                    
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                      margin: const EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: isDeclarer 
+                            ? Colors.green.withValues(alpha: 0.1) 
+                            : Colors.grey.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isDeclarer ? Colors.green.withValues(alpha: 0.5) : Colors.white24,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                isDeclarer ? Icons.star : Icons.person,
+                                color: isDeclarer ? CasinoColors.gold : Colors.white54,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Player ${playerId.substring(0, 6)}...',
+                                  style: TextStyle(
+                                    color: isDeclarer ? Colors.white : Colors.white70,
+                                    fontWeight: isDeclarer ? FontWeight.bold : FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                score >= 0 ? '+$score' : '$score',
+                                style: TextStyle(
+                                  color: score <= 0 ? Colors.green : Colors.red.shade300,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
+                          // Bonuses/penalties
+                          if (hasPure || hasDublee || marriages > 0 || isDeclarer)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Wrap(
+                                spacing: 6,
+                                children: [
+                                  if (hasPure) _buildBadge('Pure ✓', Colors.blue),
+                                  if (hasDublee) _buildBadge('Dublee +25', Colors.purple),
+                                  if (marriages > 0) _buildBadge('Marriage x$marriages', Colors.pink),
+                                  if (isDeclarer) _buildBadge('Winner', Colors.green),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  context.go('/lobby');
+                },
+                child: const Text('Back to Lobby'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+  
+  /// Build a small badge for bonuses
+  Widget _buildBadge(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
       ),
     );
   }
