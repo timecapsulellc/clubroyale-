@@ -23,7 +23,7 @@ import 'package:clubroyale/core/config/diamond_config.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_settings_widget.dart';
-import 'package:clubroyale/games/marriage/screens/marriage_rules_screen.dart';
+import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
 
 class MarriageEntryScreen extends ConsumerStatefulWidget {
   const MarriageEntryScreen({super.key});
@@ -188,7 +188,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const MarriageRulesScreen()),
+                MaterialPageRoute(builder: (context) => const MarriageGuidebookScreen()),
               );
             },
             icon: const Icon(Icons.help_outline, color: Colors.amberAccent),

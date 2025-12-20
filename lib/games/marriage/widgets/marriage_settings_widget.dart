@@ -6,7 +6,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
-import 'package:clubroyale/games/marriage/screens/marriage_rules_screen.dart';
+import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
 
 /// Widget for configuring Marriage game rules
 class MarriageSettingsWidget extends StatefulWidget {
@@ -53,7 +53,7 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const MarriageRulesScreen()),
+                MaterialPageRoute(builder: (context) => const MarriageGuidebookScreen()),
               );
             },
             icon: const Icon(Icons.menu_book, size: 18),
