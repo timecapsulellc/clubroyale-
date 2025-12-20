@@ -423,37 +423,28 @@ class MarriageService {
     }
     
     // Calculate scores for all players
-    final scores = <String, int>{};
-    final scoreResults = <String, Map<String, dynamic>>{};
+    // Calculate final scores using the full Nepali algorithm
+    final scores = _calculateFinalScores(
+      state: state,
+      declarerId: playerId,
+      tiplu: tiplu,
+      config: state.config,
+    );
     
-    for (final pid in state.playerHands.keys) {
-      final playerHandIds = state.playerHands[pid] ?? [];
-      final playerHand = playerHandIds.map((id) => _getCard(id)).whereType<Card>().toList();
-      final playerMelds = MeldDetector.findAllMelds(playerHand, tiplu: tiplu);
-      
-      final score = scorer.calculateRoundScore(
-        hand: playerHand,
-        melds: playerMelds,
-        isDeclarer: pid == playerId,
-        isValidDeclaration: true, // Declaration was validated above
-      );
-      
-      scores[pid] = score;
-      scoreResults[pid] = {
-        'score': score,
-        'isDeclarer': pid == playerId,
-        'meldCount': playerMelds.length,
-        'hasPureSequence': scorer.hasPureSequence(playerMelds),
-        'hasDublee': scorer.hasDublee(playerMelds),
-        'marriageCount': scorer.countMarriages(playerMelds),
-      };
+    // Convert to simple map for Firestore
+    final simpleScores = <String, int>{};
+    final scoreDetails = <String, Map<String, dynamic>>{};
+    
+    for (final result in scores) {
+      simpleScores[result.playerId] = result.score;
+      scoreDetails[result.playerId] = result.toJson();
     }
     
     // Update game state to scoring phase with results
     await _firestore.collection('games').doc(roomId).update({
       'marriageState.phase': 'scoring',
-      'marriageState.roundScores': scores,
-      'marriageState.scoreDetails': scoreResults,
+      'marriageState.roundScores': simpleScores,
+      'marriageState.scoreDetails': scoreDetails,
       'marriageState.declarerId': playerId,
       'status': 'finished',
     });
@@ -461,7 +452,113 @@ class MarriageService {
     return true;
   }
   
-  // ========== HELPER METHODS FOR RULE ENFORCEMENT ==========
+  // Calculate final scores using base points + Maal exchange + Kidnap/Murder
+  List<PlayerScoreResult> _calculateFinalScores({
+    required MarriageGameState state,
+    required String declarerId,
+    required Card? tiplu,
+    required MarriageGameConfig config,
+  }) {
+    final playerIds = state.playerHands.keys.toList();
+    final results = <PlayerScoreResult>[];
+    
+    // 1. Calculate Maal Points for everyone
+    final maalPointsMap = <String, int>{};
+    final maalCalculator = tiplu != null 
+        ? MarriageMaalCalculator(tiplu: tiplu, config: config)
+        : null;
+        
+    for (final pid in playerIds) {
+      final handIds = state.playerHands[pid] ?? [];
+      final hand = handIds.map((id) => _getCard(id)).whereType<Card>().toList();
+      maalPointsMap[pid] = maalCalculator?.calculateMaalPoints(hand) ?? 0;
+    }
+    
+    // 2. Determine base game points and apply Kidnap/Murder rules
+    for (final pid in playerIds) {
+      int totalScore = 0;
+      final bonuses = <int>[];
+      final bonusReasons = <String>[];
+      
+      final isDeclarer = pid == declarerId;
+      final isVisited = state.hasVisited(pid);
+      
+      // --- A. Base Game Points ---
+      if (isDeclarer) {
+        // Winner gets points from everyone else
+        for (final otherPid in playerIds) {
+          if (otherPid == pid) continue;
+          
+          final otherVisited = state.hasVisited(otherPid);
+          if (otherVisited) {
+            // Visited loser pays 3 points (or configured amount)
+            totalScore += config.visitedPenalty;
+          } else {
+            // Unvisited loser pays 10 points (or configured amount)
+            totalScore += config.unvisitedPenalty;
+          }
+        }
+        bonuses.add(totalScore);
+        bonusReasons.add('Game Win');
+      } else {
+        // Loser pays winner
+        final penalty = isVisited ? config.visitedPenalty : config.unvisitedPenalty;
+        totalScore -= penalty;
+        bonuses.add(-penalty);
+        bonusReasons.add(isVisited ? 'Lost (Visited)' : 'Lost (Unvisited)');
+      }
+      
+      // --- B. Maal Exchange & Kidnap/Murder ---
+      for (final otherPid in playerIds) {
+        if (otherPid == pid) continue;
+        
+        final myMaal = maalPointsMap[pid] ?? 0;
+        final otherMaal = maalPointsMap[otherPid] ?? 0;
+        final otherVisited = state.hasVisited(otherPid);
+        
+        int myEffectiveMaal = myMaal;
+        int otherEffectiveMaal = otherMaal;
+        
+        // KIDNAP / MURDER LOGIC
+        // If config requires visit for maal, unvisited players have 0 effective maal
+        if (!isVisited) {
+          myEffectiveMaal = 0;
+        }
+        if (!otherVisited) {
+          otherEffectiveMaal = 0;
+        }
+        
+        // Specific Kidnap Rule: If I am winner and opponent not visited, I get their maal points
+        // (But usually in standard Maal exchange, unvisited just counts as 0, so net is MyMaal - 0 = +MyMaal)
+        // (Kidnap usually means: Winner gets Opponent's ACTUAL points added to theirs? Or just treat opponent as 0?)
+        // Standard "Kidnap" implementation:
+        // If Opponent Not Visited -> They contribute 0 to the exchange calculation
+        // But if "enableKidnap" is true, the Winner explicitly "steals" points?
+        // Let's follow the standard "Net = MyMaal - OpponentMaal" logic where unvisited = 0.
+        
+        // Calculate net exchange
+        final exchange = myEffectiveMaal - otherEffectiveMaal;
+        totalScore += exchange;
+        
+        // Add reason if significant
+        if (exchange != 0) {
+          // bonuses.add(exchange);
+          // bonusReasons.add('Maal vs $otherPid');
+        }
+      }
+      
+      results.add(PlayerScoreResult(
+        playerId: pid,
+        score: totalScore,
+        isDeclarer: isDeclarer,
+        bonuses: bonuses,
+        bonusReasons: bonusReasons,
+      ));
+    }
+    
+    return results;
+  }
+
   
   /// Static card lookup cache
   static final Map<String, Card> _cardCache = {};

@@ -479,13 +479,63 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     return opponents.map((playerId) {
       final cardCount = state.playerHands[playerId]?.length ?? 0;
       final isCurrentTurn = state.currentPlayerId == playerId;
+      final visited = state.hasVisited(playerId);
+      final maalPoints = state.getMaalPoints(playerId);
       
-      return PlayerAvatar(
-        name: 'Player ${opponents.indexOf(playerId) + 2}', // TODO: Get real name
-        isCurrentTurn: isCurrentTurn,
-        isHost: false, // TODO: Get host status
-        bid: null,
-        tricksWon: cardCount, // Showing card count as "score" for now
+      // Use Stack to overlay lock/unlock icon on avatar
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          PlayerAvatar(
+            name: 'Player ${opponents.indexOf(playerId) + 2}', // TODO: Get real name
+            isCurrentTurn: isCurrentTurn,
+            isHost: false, // TODO: Get host status
+            bid: null,
+            tricksWon: cardCount, // Showing card count as "score" for now
+          ),
+          
+          // Visited Status Indicator
+          Positioned(
+            right: -4,
+            top: -4,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: visited ? Colors.green : Colors.grey.shade800,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 1.5),
+              ),
+              child: Icon(
+                visited ? Icons.lock_open : Icons.lock,
+                color: Colors.white,
+                size: 12,
+              ),
+            ),
+          ),
+          
+          // Maal Points Badge (only if visited)
+          if (visited && maalPoints > 0)
+            Positioned(
+              bottom: -4,
+              right: -4,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.purple,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.white, width: 1),
+                ),
+                child: Text(
+                  '💎$maalPoints',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ).animate().fadeIn(delay: 200.ms);
     }).toList();
   }
@@ -695,6 +745,9 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     final canDiscard = isMyTurn && state.isDiscardingPhase && _selectedCardId != null;
     final canDeclare = isMyTurn && state.isDiscardingPhase;
     
+    final hasVisited = state.hasVisited(myId);
+    final canVisit = isMyTurn && !hasVisited;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -716,16 +769,35 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             ),
           ),
           
-          // Sort button
-          OutlinedButton.icon(
-            onPressed: () => setState(() {}),
-            icon: const Icon(Icons.sort),
-            label: const Text('Sort'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              side: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
+          // Visit Button / Status
+          if (!hasVisited)
+            ElevatedButton.icon(
+              onPressed: canVisit ? _attemptVisit : null,
+              icon: const Icon(Icons.lock_open),
+              label: const Text('Visit'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.grey.shade700,
+              ),
+            )
+          else
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.purple.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.purple),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.purple, size: 16),
+                  const SizedBox(width: 4),
+                  Text('Visited (💎${state.getMaalPoints(myId)})', 
+                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                ],
+              ),
             ),
-          ),
           
           // Declare button (Go Royale in global mode)
           ElevatedButton.icon(
@@ -742,6 +814,67 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
         ],
       ),
     );
+  }
+  
+  Future<void> _attemptVisit() async {
+    if (_isProcessing) return;
+    
+    setState(() => _isProcessing = true);
+    
+    try {
+      final marriageService = ref.read(marriageServiceProvider);
+      final authService = ref.read(authServiceProvider);
+      final currentUser = authService.currentUser;
+      
+      if (currentUser == null) return;
+      
+      // Attempt to visit
+      final (success, type, reason) = await marriageService.attemptVisit(
+        widget.roomId, 
+        currentUser.uid
+      );
+      
+      if (success) {
+        // Show success animation
+        if (mounted) {
+           _showCelebrationEffect(context);
+           ScaffoldMessenger.of(context).showSnackBar(
+             SnackBar(
+               content: Text('🎉 Visited Successfully via $type! Maal Unlocked!'),
+               backgroundColor: Colors.purple,
+               duration: const Duration(seconds: 3),
+             ),
+           );
+        }
+      } else {
+        // Show error toast
+        if (mounted && reason != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('❌ Cannot Visit: $reason'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
+    }
+  }
+  
+  // Celebration effect for visiting
+  void _showCelebrationEffect(BuildContext context) {
+    // Uses the existing particle system or creates a specialized overlay
+    // For now, simple sound effect
+    SoundService.playTrickWon(); // Reuse win sound or add 'unlock'
   }
   
   Future<void> _drawFromDeck() async {
