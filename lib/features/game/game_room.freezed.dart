@@ -478,7 +478,8 @@ $TrickCopyWith<$Res>? get currentTrick {
 /// @nodoc
 mixin _$Player {
 
- String get id; String get name;// Default to 'Player' if null from Firestore
+ String get id;// Default to empty string to prevent null type errors
+ String get name;// Default to 'Player' if null from Firestore
  UserProfile? get profile; bool get isReady; bool get isBot;
 /// Create a copy of Player
 /// with the given fields replaced by the non-null parameter values.
@@ -689,10 +690,11 @@ return $default(_that.id,_that.name,_that.profile,_that.isReady,_that.isBot);cas
 @JsonSerializable()
 
 class _Player implements Player {
-  const _Player({required this.id, this.name = 'Player', this.profile, this.isReady = false, this.isBot = false});
+  const _Player({this.id = '', this.name = 'Player', this.profile, this.isReady = false, this.isBot = false});
   factory _Player.fromJson(Map<String, dynamic> json) => _$PlayerFromJson(json);
 
-@override final  String id;
+@override@JsonKey() final  String id;
+// Default to empty string to prevent null type errors
 @override@JsonKey() final  String name;
 // Default to 'Player' if null from Firestore
 @override final  UserProfile? profile;

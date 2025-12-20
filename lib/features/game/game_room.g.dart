@@ -81,7 +81,7 @@ Map<String, dynamic> _$GameRoomToJson(_GameRoom instance) => <String, dynamic>{
 };
 
 _Player _$PlayerFromJson(Map<String, dynamic> json) => _Player(
-  id: json['id'] as String,
+  id: json['id'] as String? ?? '',
   name: json['name'] as String? ?? 'Player',
   profile: json['profile'] == null
       ? null

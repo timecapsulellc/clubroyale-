@@ -249,4 +249,35 @@ class DiamondService {
     
     return snapshot.docs.map((d) => d.data()).toList();
   }
+  
+  // ============ TEST MODE ============
+  
+  /// Grant test diamonds for development/testing (10,000 diamonds)
+  /// This should be removed or disabled in production
+  Future<void> grantTestDiamonds(String userId, {int amount = 10000}) async {
+    await _firestore.collection('users').doc(userId).set({
+      'diamonds': FieldValue.increment(amount),
+      'testDiamondsGranted': true,
+      'testDiamondsAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+    
+    await _firestore.collection('diamond_rewards').add({
+      'userId': userId,
+      'type': 'test_grant',
+      'amount': amount,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+    
+    debugPrint('💎 Test diamonds granted: $amount to $userId');
+  }
+  
+  /// Reset test diamonds (remove all diamonds from user)
+  Future<void> resetTestDiamonds(String userId) async {
+    await _firestore.collection('users').doc(userId).update({
+      'diamonds': 0,
+      'testDiamondsGranted': false,
+    });
+    
+    debugPrint('💎 Test diamonds reset for $userId');
+  }
 }

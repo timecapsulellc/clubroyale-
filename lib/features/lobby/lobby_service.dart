@@ -87,7 +87,16 @@ class LobbyService {
             debugPrint('⚠️ Skipping corrupted game ${doc.id}: missing players');
             continue;
           }
-          final game = GameRoom.fromJson(data).copyWith(id: doc.id);
+          var game = GameRoom.fromJson(data).copyWith(id: doc.id);
+          
+          // Filter out invalid players (empty IDs from corrupted data)
+          final validPlayers = game.players.where((p) => p.id.isNotEmpty).toList();
+          if (validPlayers.isEmpty) {
+            debugPrint('⚠️ Skipping corrupted game ${doc.id}: no valid players');
+            continue;
+          }
+          game = game.copyWith(players: validPlayers);
+          
           validGames.add(game);
         } catch (e) {
           debugPrint('⚠️ Skipping corrupted game ${doc.id}: $e');

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:clubroyale/core/config/diamond_config.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/features/wallet/diamond_rewards_service.dart';
 import 'package:clubroyale/features/wallet/social_diamond_service.dart';
+import 'package:clubroyale/features/store/diamond_service.dart';
 import 'package:clubroyale/core/services/ad_service.dart';
 import 'package:clubroyale/core/services/share_service.dart';
 
@@ -225,6 +227,85 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
             ),
           ),
           const SizedBox(height: 16),
+
+          // TEST MODE - Dev only (grants diamonds for testing)
+          if (kDebugMode)
+            Card(
+              color: Colors.red.shade100,
+              margin: const EdgeInsets.only(bottom: 16),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade200,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.bug_report, color: Colors.red),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '🧪 TEST MODE',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                            ),
+                          ),
+                          const Text(
+                            'Grant 10,000 test diamonds',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : () async {
+                        final user = ref.read(authServiceProvider).currentUser;
+                        if (user == null) return;
+                        
+                        setState(() => _isLoading = true);
+                        try {
+                          final diamondService = DiamondService();
+                          await diamondService.grantTestDiamonds(user.uid);
+                          
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('🎉 Granted 10,000 test diamonds!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          }
+                        } finally {
+                          if (mounted) setState(() => _isLoading = false);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text('Grant'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
           // Daily Login
           _buildRewardCard(

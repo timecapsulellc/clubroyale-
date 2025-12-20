@@ -131,7 +131,7 @@ abstract class GameRoom with _$GameRoom {
 @freezed
 abstract class Player with _$Player {
   const factory Player({
-    required String id,
+    @Default('') String id, // Default to empty string to prevent null type errors
     @Default('Player') String name, // Default to 'Player' if null from Firestore
     UserProfile? profile,
     @Default(false) bool isReady,
