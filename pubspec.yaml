@@ -58,6 +58,8 @@ dependencies:
   url_launcher: ^6.3.2
   firebase_database: ^12.1.1
   cached_network_image: ^3.4.1
+  confetti: ^0.8.0
+  flip_card: ^0.7.0
 
 dev_dependencies:
   flutter_test:

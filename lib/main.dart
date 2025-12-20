@@ -76,6 +76,9 @@ import 'package:clubroyale/features/onboarding/onboarding_screen.dart';
 // Analytics service singleton for screen tracking
 final _analyticsService = AnalyticsService();
 
+// Global key for SnackBars
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 // 1. Define your routes
 final GoRouter _router = GoRouter(
   initialLocation: '/', // Start directly at home/auth gate
@@ -473,6 +476,7 @@ class MyApp extends ConsumerWidget {
     final themeState = ref.watch(themeProvider);
     
     return MaterialApp.router(
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
       routerConfig: _router,
       title: 'ClubRoyale',
       theme: themeData, // Dynamic theme from provider

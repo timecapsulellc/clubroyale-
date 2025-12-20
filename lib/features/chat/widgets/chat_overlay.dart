@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../chat_message.dart';
 import '../chat_service.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 
 /// Compact floating chat overlay for game screen
 class ChatOverlay extends ConsumerStatefulWidget {
@@ -169,7 +170,24 @@ class _ChatOverlayState extends ConsumerState<ChatOverlay> {
           Expanded(
             child: messagesAsync.when(
               data: (messages) => _buildMessagesList(messages, theme),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: 4,
+                itemBuilder: (context, index) {
+                  final isMe = index % 2 == 0;
+                  return Align(
+                    alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: SkeletonBox(
+                        width: 120 + (index * 20) % 80,
+                        height: 36,
+                        borderRadius: 12,
+                      ),
+                    ),
+                  );
+                },
+              ),
               error: (e, _) => Center(child: Text('Error: $e')),
             ),
           ),

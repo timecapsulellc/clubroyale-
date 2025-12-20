@@ -7,6 +7,7 @@ import 'package:clubroyale/features/social/services/voice_room_service.dart';
 import 'package:clubroyale/core/services/share_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:intl/intl.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 
 /// In-game social overlay panel
 /// Collapsible panel on the right side of game screen with Chat, Voice, and Spectator tabs
@@ -289,8 +290,19 @@ class _GameChatPanel extends ConsumerWidget {
                 },
               );
             },
-            loading: () => const Center(
-              child: CircularProgressIndicator(strokeWidth: 2),
+            loading: () => ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: 8,
+              itemBuilder: (context, index) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    SkeletonBox(width: 60, height: 12),
+                    const SizedBox(width: 8),
+                    Expanded(child: SkeletonBox(width: double.infinity, height: 12)),
+                  ],
+                ),
+              ),
             ),
             error: (e, _) => Center(
               child: Text('Error: $e', style: const TextStyle(color: Colors.red, fontSize: 12)),

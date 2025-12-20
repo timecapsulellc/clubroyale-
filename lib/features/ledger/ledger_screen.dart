@@ -8,6 +8,8 @@ import 'package:clubroyale/features/ledger/ledger_service.dart';
 import 'package:clubroyale/features/ledger/settlement_service.dart';
 import 'package:clubroyale/features/ledger/transaction_model.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:confetti/confetti.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/core/services/receipt_service.dart';
 
 final ledgerProvider = FutureProvider.family<GameRoom?, String>((ref, gameId) {
@@ -26,7 +28,35 @@ class LedgerScreen extends ConsumerStatefulWidget {
 
 class _LedgerScreenState extends ConsumerState<LedgerScreen> {
   final GlobalKey _receiptKey = GlobalKey();
+  late ConfettiController _confettiController;
   bool _isGeneratingImage = false;
+  bool _hasPlayedConfetti = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  void _checkAndPlayConfetti(GameRoom game) {
+    if (_hasPlayedConfetti) return;
+    
+    final authService = ref.read(authServiceProvider);
+    final currentUser = authService.currentUser;
+    if (currentUser == null) return;
+    
+    final myScore = game.scores[currentUser.uid] ?? 0;
+    if (myScore > 0) {
+      _hasPlayedConfetti = true;
+      _confettiController.play();
+    }
+  }
 
   /// Calculate settlements from game scores
   List<Transaction> _calculateSettlements(GameRoom game) {
@@ -171,7 +201,9 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
           ),
         ],
       ),
-      body: ledgerAsyncValue.when(
+      body: Stack(
+        children: [
+          ledgerAsyncValue.when(
         data: (game) {
           if (game == null) {
             return Center(
@@ -190,6 +222,11 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
               ),
             );
           }
+
+          // Check for win and play confetti
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _checkAndPlayConfetti(game);
+          });
 
           final transactions = _calculateSettlements(game);
           
@@ -485,6 +522,17 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
           ),
         ),
       ),
+      // Confetti Overlay
+      Align(
+        alignment: Alignment.topCenter,
+        child: ConfettiWidget(
+          confettiController: _confettiController,
+          blastDirectionality: BlastDirectionality.explosive,
+          shouldLoop: false,
+          colors: const [Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.purple],
+        ),
+      ),
+    ],
     );
   }
 }

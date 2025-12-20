@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/social/activity_feed.dart';
 import 'package:clubroyale/features/social/widgets/feed_item_card.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 
 /// Main activity feed screen
 class ActivityFeedScreen extends ConsumerWidget {
@@ -61,7 +62,10 @@ class ActivityFeedScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(
-          child: CircularProgressIndicator(),
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: SkeletonLeaderboard(itemCount: 6),
+          ),
         ),
         error: (error, stack) => Center(
           child: Column(

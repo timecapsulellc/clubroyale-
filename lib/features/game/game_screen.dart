@@ -11,6 +11,7 @@ import 'game_config.dart';
 import 'call_break_service.dart';
 import '../auth/auth_service.dart';
 import '../lobby/lobby_service.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 
 final gameProvider = StreamProvider.family<GameRoom?, String>((ref, gameId) {
   final gameService = ref.watch(gameServiceProvider);
@@ -461,16 +462,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
             ],
           );
         },
-        loading: () => const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Loading game...'),
-            ],
-          ),
-        ),
+        loading: () => const SkeletonScreen(title: 'Game Room'),
         error: (error, stack) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

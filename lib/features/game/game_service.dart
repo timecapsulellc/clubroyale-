@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'game_room.dart';
 import '../leaderboard/leaderboard_screen.dart';
+import '../../core/services/toast_service.dart';
 
 final gameServiceProvider = Provider<GameService>((ref) => GameService());
 
@@ -117,6 +118,7 @@ class GameService {
       return entries;
     } catch (e) {
       debugPrint('Error getting leaderboard: $e');
+      ToastService.showError('Failed to load leaderboard');
       return [];
     }
   }
@@ -130,6 +132,7 @@ class GameService {
       });
     } catch (e) {
       debugPrint('Error updating player score: $e');
+      ToastService.showError('Failed to update score');
     }
   }
 
@@ -139,6 +142,7 @@ class GameService {
       await _gamesRef.doc(gameId).update({'scores': scores});
     } catch (e) {
       debugPrint('Error updating scores: $e');
+      ToastService.showError('Failed to update scores');
     }
   }
 
@@ -151,6 +155,7 @@ class GameService {
       });
     } catch (e) {
       debugPrint('Error finishing game: $e');
+      ToastService.showError('Failed to finish game');
     }
   }
 
@@ -160,6 +165,7 @@ class GameService {
       await _gamesRef.doc(gameId).delete();
     } catch (e) {
       debugPrint('Error deleting game: $e');
+      ToastService.showError('Failed to delete game');
     }
   }
 }
