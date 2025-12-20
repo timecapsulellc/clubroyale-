@@ -24,6 +24,15 @@ import 'package:clubroyale/features/video/widgets/video_grid.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_table_layout.dart';
 
 
+/// Sort modes for hand display
+enum SortMode {
+  /// Sort by suit first, then rank (good for sequences)
+  bySuit,
+  
+  /// Sort by rank first, then suit (good for pairs/dublee)
+  byRank,
+}
+
 /// Multiplayer Marriage game screen
 class MarriageMultiplayerScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -44,6 +53,9 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   bool _isChatExpanded = false;
   bool _showVideoGrid = false;
   final Set<String> _highlightedCardIds = {};  // P2: Cards to highlight in meld suggestions
+  
+  // Sort mode: 'suit' for sequences, 'rank' for dublee pairs
+  SortMode _sortMode = SortMode.bySuit;
   
   // Card lookup cache
   final Map<String, Card> _cardCache = {};
@@ -217,6 +229,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                     children: [
                       // Turn indicator
                       _buildTurnIndicator(state, currentUser.uid),
+                      // Sort mode toggle
+                      _buildSortToggle(),
                       // Hand
                       _buildMyHand(myHand, isMyTurn),
                       // Action bar
@@ -420,6 +434,79 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
         ],
       ),
     ).animate().fadeIn();
+  }
+  
+  /// Build sort mode toggle bar
+  Widget _buildSortToggle() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('Sort: ', style: TextStyle(color: Colors.white70, fontSize: 12)),
+          const SizedBox(width: 4),
+          
+          // By Suit button (for sequences)
+          _buildSortButton(
+            mode: SortMode.bySuit,
+            label: '♠♥♦♣ Suit',
+            tooltip: 'Group by suit (for sequences)',
+          ),
+          
+          const SizedBox(width: 8),
+          
+          // By Rank button (for dublee/pairs)
+          _buildSortButton(
+            mode: SortMode.byRank,
+            label: 'AKQJ Rank',
+            tooltip: 'Group by rank (for pairs/dublee)',
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildSortButton({
+    required SortMode mode,
+    required String label,
+    required String tooltip,
+  }) {
+    final isSelected = _sortMode == mode;
+    
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        onTap: () {
+          if (!isSelected) {
+            setState(() => _sortMode = mode);
+            // Play subtle sound
+            SoundService.playCardSlide();
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: isSelected 
+                ? CasinoColors.gold.withValues(alpha: 0.3) 
+                : Colors.black.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? CasinoColors.gold : Colors.white24,
+              width: isSelected ? 1.5 : 1,
+            ),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? CasinoColors.gold : Colors.white54,
+              fontSize: 11,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ),
+      ),
+    );
   }
   
   /// Build circular timer widget
@@ -661,13 +748,16 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   }
   
   Widget _buildMyHand(List<String> cardIds, bool isMyTurn) {
+    // Sort cards based on current sort mode
+    final sortedCards = _sortCardIds(cardIds);
+    
     return Container(
       height: 130,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: cardIds.asMap().entries.map((entry) {
+          children: sortedCards.asMap().entries.map((entry) {
             final index = entry.key;
             final cardId = entry.value;
             final card = _getCard(cardId);
@@ -684,7 +774,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
                 transform: Matrix4.translationValues(0, isSelected ? -15 : 0, 0),
-                margin: EdgeInsets.only(right: index < cardIds.length - 1 ? -25 : 0),
+                margin: EdgeInsets.only(right: index < sortedCards.length - 1 ? -25 : 0),
                 child: _buildCardWidget(card, isSelected),
               ),
             ).animate().fadeIn(delay: Duration(milliseconds: 30 * index));
@@ -692,6 +782,34 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
         ),
       ),
     );
+  }
+  
+  /// Sort card IDs based on current sort mode
+  List<String> _sortCardIds(List<String> cardIds) {
+    // Convert to cards, sort, return IDs
+    final cards = cardIds
+        .map((id) => (id, _getCard(id)))
+        .where((pair) => pair.$2 != null)
+        .toList();
+    
+    cards.sort((a, b) {
+      final cardA = a.$2!;
+      final cardB = b.$2!;
+      
+      if (_sortMode == SortMode.bySuit) {
+        // Primary: Suit, Secondary: Rank
+        final suitCompare = cardA.suit.index.compareTo(cardB.suit.index);
+        if (suitCompare != 0) return suitCompare;
+        return cardA.rank.value.compareTo(cardB.rank.value);
+      } else {
+        // Primary: Rank, Secondary: Suit (for Dublee/pairs)
+        final rankCompare = cardA.rank.value.compareTo(cardB.rank.value);
+        if (rankCompare != 0) return rankCompare;
+        return cardA.suit.index.compareTo(cardB.suit.index);
+      }
+    });
+    
+    return cards.map((pair) => pair.$1).toList();
   }
   
   Widget _buildCardWidget(Card card, bool isSelected, {bool isLarge = false}) {
