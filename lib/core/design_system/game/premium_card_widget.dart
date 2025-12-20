@@ -6,19 +6,22 @@
 /// - Selection glow effects
 /// - Maal badge overlay
 /// - Playable/disabled states
+/// - Audio feedback on flip
 library;
 
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/card_engine/pile.dart' as engine;
 import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart';
 import 'package:clubroyale/core/design_system/game/maal_badge_widget.dart';
 import 'package:clubroyale/core/design_system/animations/rive_animations.dart';
+import 'package:clubroyale/core/services/game_audio_mixin.dart';
 
 /// Premium 3D card widget with animations and Maal badges
-class PremiumCardWidget extends StatefulWidget {
+class PremiumCardWidget extends ConsumerStatefulWidget {
   final engine.Card card;
   final bool isSelected;
   final bool isFaceUp;
@@ -43,10 +46,19 @@ class PremiumCardWidget extends StatefulWidget {
   });
 
   @override
-  State<PremiumCardWidget> createState() => _PremiumCardWidgetState();
+  ConsumerState<PremiumCardWidget> createState() => _PremiumCardWidgetState();
 }
 
-class _PremiumCardWidgetState extends State<PremiumCardWidget> {
+class _PremiumCardWidgetState extends ConsumerState<PremiumCardWidget> with GameAudioMixin {
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize audio after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      initAudio(ref);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +66,7 @@ class _PremiumCardWidgetState extends State<PremiumCardWidget> {
     Widget cardWidget = GestureDetector(
       onTap: widget.isPlayable ? () {
         HapticFeedback.lightImpact();
+        playCardFlip(); // Play card flip sound
         widget.onTap?.call();
       } : null,
       child: RiveCardFlip(

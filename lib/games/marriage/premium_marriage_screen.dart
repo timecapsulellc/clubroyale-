@@ -26,6 +26,7 @@ import 'package:clubroyale/features/video/widgets/video_grid.dart';
 // Premium UI Components
 import 'package:clubroyale/core/design_system/game/game_design_system.dart';
 import 'package:clubroyale/core/design_system/animations/rive_animations.dart';
+import 'package:clubroyale/core/services/game_audio_mixin.dart';
 
 /// Premium Marriage game screen with enhanced UI
 class PremiumMarriageScreen extends ConsumerStatefulWidget {
@@ -40,7 +41,7 @@ class PremiumMarriageScreen extends ConsumerStatefulWidget {
   ConsumerState<PremiumMarriageScreen> createState() => _PremiumMarriageScreenState();
 }
 
-class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> {
+class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> with GameAudioMixin {
   String? _selectedCardId;
   bool _isProcessing = false;
   bool _isChatExpanded = false;
@@ -54,6 +55,10 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> {
   void initState() {
     super.initState();
     _buildCardCache();
+    // Initialize audio
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      initAudio(ref);
+    });
   }
 
   void _buildCardCache() {
@@ -812,6 +817,8 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> {
       
       // Success! Show effects
       if (mounted) {
+        playMarriageDeclare(); // Play declare sound
+        playWin(); // Play win sound
         setState(() => _showConfetti = true);
         
         // Hide confetti after 5 seconds

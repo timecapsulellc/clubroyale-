@@ -75,8 +75,25 @@ class LobbyService {
     if (TestMode.isEnabled) {
       return _TestModeStorage.watchGames();
     }
-    return _gamesRef.snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => doc.data().copyWith(id: doc.id)).toList();
+    // Use raw collection to manually parse with error handling
+    return _db.collection('games').snapshots().map((snapshot) {
+      final validGames = <GameRoom>[];
+      for (final doc in snapshot.docs) {
+        try {
+          final data = doc.data();
+          // Skip documents with missing critical fields
+          if (data['players'] == null) {
+            debugPrint('⚠️ Skipping corrupted game ${doc.id}: missing players');
+            continue;
+          }
+          final game = GameRoom.fromJson(data).copyWith(id: doc.id);
+          validGames.add(game);
+        } catch (e) {
+          debugPrint('⚠️ Skipping corrupted game ${doc.id}: $e');
+          // Skip corrupted documents instead of crashing
+        }
+      }
+      return validGames;
     });
   }
 
