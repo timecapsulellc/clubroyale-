@@ -858,18 +858,18 @@ class LobbyScreen extends ConsumerWidget {
             ),
           );
 
-          // Create room with this player
+          // Create 8-player Marriage room with bots for testing
           final botConfig = GameConfig(
             pointValue: 10,
-            totalRounds: 5,
-            maxPlayers: 4,
+            totalRounds: 3,
+            maxPlayers: 8, // 8-player Marriage game
           );
 
           final newRoom = GameRoom(
-            name: 'AI Match #${Random().nextInt(1000)}',
+            name: 'Marriage AI #${Random().nextInt(1000)}',
             hostId: user.uid,
             config: botConfig,
-            gameType: 'call_break',
+            gameType: 'marriage', // Marriage game (supports 2-8 players)
             players: [
               Player(id: user.uid, name: user.displayName ?? 'Player'),
             ],
@@ -880,10 +880,11 @@ class LobbyScreen extends ConsumerWidget {
           try {
             final gameId = await lobbyService.createGame(newRoom);
 
-            // Add 3 bots to fill the room
-            await lobbyService.addBot(gameId);
-            await lobbyService.addBot(gameId);
-            await lobbyService.addBot(gameId);
+            // Add 7 bots to fill the 8-player room
+            for (int i = 0; i < 7; i++) {
+              await lobbyService.addBot(gameId);
+              await Future.delayed(const Duration(milliseconds: 50)); // Small delay between adds
+            }
 
             if (context.mounted) {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -893,7 +894,7 @@ class LobbyScreen extends ConsumerWidget {
                     children: [
                       Icon(Icons.check_circle, color: Colors.white),
                       SizedBox(width: 8),
-                      Text('AI game ready! Tap Start when ready.'),
+                      Text('8-player Marriage game ready! Tap Start.'),
                     ],
                   ),
                   backgroundColor: Colors.green,

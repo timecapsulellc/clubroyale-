@@ -850,7 +850,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                           ),
                         ),
                       ),
-                      if (room.players.length < 4) ...[
+                      if (room.players.length < room.config.maxPlayers) ...[
                         const SizedBox(width: 12),
                         IconButton.filledTonal(
                           onPressed: () => _addBot(context, lobbyService),

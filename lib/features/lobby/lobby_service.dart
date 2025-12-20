@@ -10,6 +10,7 @@ import 'package:clubroyale/features/game/engine/models/deck.dart';
 import 'package:clubroyale/features/profile/profile_service.dart';
 import 'package:clubroyale/features/lobby/room_code_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/features/wallet/bot_diamond_service.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -459,14 +460,15 @@ class LobbyService {
   }
 
   /// Add a bot player to the game (for testing)
+  /// Bots are automatically funded with diamonds
   Future<void> addBot(String gameId) async {
     // Use in-memory storage for Test Mode
     if (TestMode.isEnabled) {
       final game = _TestModeStorage.getGame(gameId);
       if (game == null) return;
       
-      if (game.players.length >= 4) {
-        throw Exception('Room is full');
+      if (game.players.length >= game.config.maxPlayers) {
+        throw Exception('Room is full (max ${game.config.maxPlayers} players)');
       }
       
       final botId = 'bot_${DateTime.now().millisecondsSinceEpoch}';
@@ -474,6 +476,7 @@ class LobbyService {
         id: botId,
         name: 'Bot ${game.players.length + 1}',
         isReady: true,
+        isBot: true,
       );
       
       final updatedPlayers = [...game.players, botPlayer];
@@ -492,8 +495,8 @@ class LobbyService {
       if (!doc.exists) return;
       
       final game = doc.data()!;
-      if (game.players.length >= 4) {
-        throw Exception('Room is full');
+      if (game.players.length >= game.config.maxPlayers) {
+        throw Exception('Room is full (max ${game.config.maxPlayers} players)');
       }
       
       final botId = 'bot_${DateTime.now().millisecondsSinceEpoch}';
@@ -501,7 +504,18 @@ class LobbyService {
         id: botId,
         name: 'Bot ${game.players.length + 1}',
         isReady: true, // Bots are always ready
+        isBot: true,   // Mark as bot for tracking
       );
+      
+      // Fund the bot with diamonds
+      try {
+        final botDiamondService = _ref.read(botDiamondServiceProvider);
+        await botDiamondService.ensureBotFunded(botId);
+        debugPrint('💎 Bot $botId funded and ready to play');
+      } catch (e) {
+        debugPrint('Warning: Could not fund bot $botId: $e');
+        // Continue anyway - bot can still play in test scenarios
+      }
       
       await _db.collection('games').doc(gameId).update({
         'players': FieldValue.arrayUnion([botPlayer.toJson()]),

@@ -177,11 +177,22 @@ class _StatChip extends StatelessWidget {
   }
 }
 
-/// Position of a player around the table
-enum TablePosition { bottom, left, top, right }
+/// Position of a player around the table (supports up to 8 players)
+enum TablePosition { 
+  bottom,      // Position 0 - Current user (always at bottom)
+  bottomLeft,  // Position 1
+  left,        // Position 2
+  topLeft,     // Position 3
+  top,         // Position 4
+  topRight,    // Position 5
+  right,       // Position 6
+  bottomRight, // Position 7
+}
 
 /// Helper to get player positions based on current user index
+/// Dynamically distributes players around the table for 2-8 players
 class PlayerPositionHelper {
+  /// Returns position mapping for each player ID
   static Map<String, TablePosition> getPositions(
     List<Player> players,
     String currentUserId,
@@ -191,18 +202,123 @@ class PlayerPositionHelper {
 
     if (currentUserIndex == -1) return positions;
 
-    final positionOrder = [
-      TablePosition.bottom, // Current user
-      TablePosition.left,
-      TablePosition.top,
-      TablePosition.right,
-    ];
+    // Get the appropriate position order based on player count
+    final positionOrder = _getPositionOrderForCount(players.length);
 
-    for (int i = 0; i < players.length && i < 4; i++) {
+    for (int i = 0; i < players.length && i < positionOrder.length; i++) {
       final playerIndex = (currentUserIndex + i) % players.length;
       positions[players[playerIndex].id] = positionOrder[i];
     }
 
     return positions;
+  }
+
+  /// Get optimal position distribution based on player count
+  static List<TablePosition> _getPositionOrderForCount(int count) {
+    switch (count) {
+      case 2:
+        return [
+          TablePosition.bottom,
+          TablePosition.top,
+        ];
+      case 3:
+        return [
+          TablePosition.bottom,
+          TablePosition.topLeft,
+          TablePosition.topRight,
+        ];
+      case 4:
+        return [
+          TablePosition.bottom,
+          TablePosition.left,
+          TablePosition.top,
+          TablePosition.right,
+        ];
+      case 5:
+        return [
+          TablePosition.bottom,
+          TablePosition.bottomLeft,
+          TablePosition.topLeft,
+          TablePosition.topRight,
+          TablePosition.bottomRight,
+        ];
+      case 6:
+        return [
+          TablePosition.bottom,
+          TablePosition.bottomLeft,
+          TablePosition.left,
+          TablePosition.top,
+          TablePosition.right,
+          TablePosition.bottomRight,
+        ];
+      case 7:
+        return [
+          TablePosition.bottom,
+          TablePosition.bottomLeft,
+          TablePosition.left,
+          TablePosition.topLeft,
+          TablePosition.topRight,
+          TablePosition.right,
+          TablePosition.bottomRight,
+        ];
+      case 8:
+        return [
+          TablePosition.bottom,
+          TablePosition.bottomLeft,
+          TablePosition.left,
+          TablePosition.topLeft,
+          TablePosition.top,
+          TablePosition.topRight,
+          TablePosition.right,
+          TablePosition.bottomRight,
+        ];
+      default:
+        // Fallback for any count - distribute evenly
+        return TablePosition.values.take(count.clamp(1, 8)).toList();
+    }
+  }
+
+  /// Get the angle in radians for a table position (useful for UI layout)
+  static double getAngleForPosition(TablePosition position) {
+    switch (position) {
+      case TablePosition.bottom:
+        return 3.14159 / 2;      // 90° (bottom)
+      case TablePosition.bottomLeft:
+        return 3.14159 * 0.75;   // 135°
+      case TablePosition.left:
+        return 3.14159;          // 180° (left)
+      case TablePosition.topLeft:
+        return 3.14159 * 1.25;   // 225°
+      case TablePosition.top:
+        return 3.14159 * 1.5;    // 270° (top)
+      case TablePosition.topRight:
+        return 3.14159 * 1.75;   // 315°
+      case TablePosition.right:
+        return 0;                // 0° (right)
+      case TablePosition.bottomRight:
+        return 3.14159 * 0.25;   // 45°
+    }
+  }
+
+  /// Get normalized x,y coordinates (0-1 range) for a table position
+  static ({double x, double y}) getCoordinatesForPosition(TablePosition position) {
+    switch (position) {
+      case TablePosition.bottom:
+        return (x: 0.5, y: 0.95);
+      case TablePosition.bottomLeft:
+        return (x: 0.15, y: 0.80);
+      case TablePosition.left:
+        return (x: 0.05, y: 0.50);
+      case TablePosition.topLeft:
+        return (x: 0.15, y: 0.20);
+      case TablePosition.top:
+        return (x: 0.5, y: 0.05);
+      case TablePosition.topRight:
+        return (x: 0.85, y: 0.20);
+      case TablePosition.right:
+        return (x: 0.95, y: 0.50);
+      case TablePosition.bottomRight:
+        return (x: 0.85, y: 0.80);
+    }
   }
 }

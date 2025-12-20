@@ -21,3 +21,6 @@ export 'analytics_service.dart';
 
 // Crashlytics
 export 'crashlytics_service.dart';
+
+// Bot Diamond Management
+export 'package:clubroyale/features/wallet/bot_diamond_service.dart';
