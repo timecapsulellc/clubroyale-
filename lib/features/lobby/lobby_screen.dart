@@ -18,6 +18,7 @@ import 'dart:math';
 import 'package:clubroyale/core/responsive/responsive_utils.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/widgets/skeleton_loading.dart';
+import 'package:clubroyale/core/error/error_display.dart';
 
 import '../auth/auth_service.dart';
 
@@ -238,7 +239,12 @@ class LobbyScreen extends ConsumerWidget {
 
               if (snapshot.hasError) {
                 return SliverFillRemaining(
-                  child: _ErrorState(error: snapshot.error.toString()),
+                  child: ErrorDisplay(
+                    title: 'Connection Error',
+                    message: snapshot.error.toString(),
+                    icon: Icons.wifi_off_rounded,
+                    onRetry: () => ref.invalidate(lobbyServiceProvider),
+                  ),
                 );
               }
 
@@ -1425,54 +1431,7 @@ class _EmptyState extends StatelessWidget {
 }
 
 // Error state
-class _ErrorState extends StatelessWidget {
-  final String error;
 
-  const _ErrorState({required this.error});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.error_outline_rounded,
-                size: 64,
-                color: Colors.red.shade400,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Something went wrong',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: Colors.grey.shade600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 /// Game type option widget for create dialog
 class _GameTypeOption extends StatelessWidget {

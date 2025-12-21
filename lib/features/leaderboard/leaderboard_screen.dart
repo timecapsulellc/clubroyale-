@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/game/game_service.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
+import 'package:clubroyale/core/error/error_display.dart';
 
 /// Provider for leaderboard data - aggregates scores across all finished games
 final leaderboardProvider = FutureProvider<List<LeaderboardEntry>>((ref) async {
@@ -184,20 +186,15 @@ class LeaderboardScreen extends ConsumerWidget {
               );
             },
             loading: () => const SliverFillRemaining(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(color: Colors.amber),
-                    SizedBox(height: 16),
-                    Text('Loading rankings...'),
-                  ],
-                ),
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: SkeletonLeaderboard(itemCount: 8),
               ),
             ),
             error: (error, stack) => SliverFillRemaining(
-              child: _ErrorState(
-                error: error.toString(),
+              child: ErrorDisplay(
+                title: 'Leaderboard Error',
+                message: error.toString(),
                 onRetry: () => ref.invalidate(leaderboardProvider),
               ),
             ),
@@ -661,62 +658,4 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-// Error state
-class _ErrorState extends StatelessWidget {
-  final String error;
-  final VoidCallback onRetry;
 
-  const _ErrorState({required this.error, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.error_outline_rounded,
-                size: 64,
-                color: Colors.red.shade400,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Failed to load rankings',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: Colors.grey.shade600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Try Again'),
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.amber.shade700,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../services/social_service.dart';
 import '../models/social_message_model.dart';
 import 'package:intl/intl.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 
 class ChatRoomScreen extends ConsumerStatefulWidget {
   final String chatId;
@@ -102,7 +103,12 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
               stream: messagesStream,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return ListView.builder(
+                    itemCount: 12,
+                    reverse: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    itemBuilder: (context, index) => SkeletonMessage(isMe: index % 2 == 0),
+                  );
                 }
 
                 final messages = snapshot.data ?? [];
