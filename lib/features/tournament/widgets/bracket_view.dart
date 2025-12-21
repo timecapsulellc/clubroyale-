@@ -5,6 +5,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:clubroyale/features/tournament/tournament_model.dart';
+import 'package:clubroyale/features/tournament/widgets/bracket_connector.dart';
 
 class BracketView extends StatelessWidget {
   final List<TournamentBracket> brackets;
@@ -33,7 +34,17 @@ class BracketView extends StatelessWidget {
               matches: roundsMap[round]!,
               isLastRound: round == rounds.last,
             ),
-            if (round != rounds.last) const SizedBox(width: 24),
+            if (round != rounds.last) 
+              BracketConnector(
+                itemCount: roundsMap[round]!.length,
+                // Assuming standard _MatchCard height ~100 + padding. 
+                // We might need to adjust this to match _MatchCard logic exactly or make dynamic.
+                // _MatchCard content height is variable based on font/padding. 
+                // For a robust implementation, we'd need fixed height cards.
+                // Let's enforce fixed height on _MatchCard later or assume ~120.
+                itemHeight: 120.0, 
+                gap: 16.0,
+              ),
           ],
         ],
       ),
@@ -94,6 +105,7 @@ class _MatchCard extends StatelessWidget {
 
     return Container(
       width: 200,
+      height: 120, // Fixed height for alignment with connectors
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),

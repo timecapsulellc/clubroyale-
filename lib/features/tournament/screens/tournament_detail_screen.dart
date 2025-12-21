@@ -10,6 +10,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:clubroyale/features/tournament/tournament_model.dart';
 import 'package:clubroyale/features/tournament/tournament_service.dart';
 import 'package:clubroyale/features/tournament/widgets/bracket_view.dart';
+import 'package:clubroyale/features/tournament/widgets/prize_distribution_card.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
@@ -184,6 +185,15 @@ class _InfoTab extends ConsumerWidget {
             ],
           ],
         ).animate().fadeIn(delay: 100.ms),
+        
+        if (tournament.prizePool != null) ...[
+          const SizedBox(height: 16),
+          PrizeDistributionCard(
+            prizePool: tournament.prizePool!,
+            participantCount: tournament.maxParticipants,
+          ),
+        ],
+
         const SizedBox(height: 24),
 
         // Action buttons
