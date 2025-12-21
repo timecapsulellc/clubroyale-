@@ -14,7 +14,7 @@ exports.FunctionConfigs = exports.SCHEDULED_CONFIG = exports.BACKGROUND_CONFIG =
  */
 exports.CRITICAL_CONFIG = {
     timeoutSeconds: 60,
-    memory: '512MB',
+    memory: '512MiB',
     minInstances: 1, // Always keep 1 warm
     maxInstances: 100,
 };
@@ -24,7 +24,7 @@ exports.CRITICAL_CONFIG = {
  */
 exports.STANDARD_CONFIG = {
     timeoutSeconds: 60,
-    memory: '256MB',
+    memory: '256MiB',
     minInstances: 0,
     maxInstances: 50,
 };
@@ -34,7 +34,7 @@ exports.STANDARD_CONFIG = {
  */
 exports.AI_AGENT_CONFIG = {
     timeoutSeconds: 120, // AI can take longer
-    memory: '1GB',
+    memory: '1GiB',
     minInstances: 0,
     maxInstances: 30,
 };
@@ -44,7 +44,7 @@ exports.AI_AGENT_CONFIG = {
  */
 exports.BACKGROUND_CONFIG = {
     timeoutSeconds: 540, // 9 minutes for batch jobs
-    memory: '256MB',
+    memory: '256MiB',
     minInstances: 0,
     maxInstances: 10,
 };
@@ -54,7 +54,7 @@ exports.BACKGROUND_CONFIG = {
  */
 exports.SCHEDULED_CONFIG = {
     timeoutSeconds: 300,
-    memory: '512MB',
+    memory: '512MiB',
     minInstances: 0,
     maxInstances: 5,
 };

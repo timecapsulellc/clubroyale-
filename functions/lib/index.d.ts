@@ -9,6 +9,7 @@
 export { auditGameUpdate } from './triggers/auditTriggers';
 export { onSocialMessageSent, onStoryCreated, onFriendRequestCreated, onFriendshipUpdated, onVoiceRoomCreated } from './triggers/social';
 export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenService';
+export { healthCheck } from './utils/health';
 export { validateTransfer } from './diamonds/validateTransfer';
 export { grantGameplayReward } from './diamonds/grantGameplayReward';
 export { claimDailyLogin } from './diamonds/claimDailyLogin';

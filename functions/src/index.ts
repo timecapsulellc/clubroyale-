@@ -41,6 +41,9 @@ export {
 // Export LiveKit token functions
 export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenService';
 
+// Export Health Check
+export { healthCheck } from './utils/health';
+
 // Export Diamond Economy V5 functions
 export { validateTransfer } from './diamonds/validateTransfer';
 export { grantGameplayReward } from './diamonds/grantGameplayReward';

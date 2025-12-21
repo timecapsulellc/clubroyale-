@@ -4,7 +4,7 @@
  */
 interface FunctionConfig {
     timeoutSeconds: number;
-    memory: '128MB' | '256MB' | '512MB' | '1GB' | '2GB' | '4GB';
+    memory: '128MiB' | '256MiB' | '512MiB' | '1GiB' | '2GiB' | '4GiB';
     minInstances: number;
     maxInstances: number;
 }

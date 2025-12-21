@@ -6,7 +6,7 @@
 // Define config type inline (Firebase v2 uses GlobalOptions)
 interface FunctionConfig {
     timeoutSeconds: number;
-    memory: '128MB' | '256MB' | '512MB' | '1GB' | '2GB' | '4GB';
+    memory: '128MiB' | '256MiB' | '512MiB' | '1GiB' | '2GiB' | '4GiB';
     minInstances: number;
     maxInstances: number;
 }
@@ -21,7 +21,7 @@ interface FunctionConfig {
  */
 export const CRITICAL_CONFIG: FunctionConfig = {
     timeoutSeconds: 60,
-    memory: '512MB',
+    memory: '512MiB',
     minInstances: 1,  // Always keep 1 warm
     maxInstances: 100,
 };
@@ -32,7 +32,7 @@ export const CRITICAL_CONFIG: FunctionConfig = {
  */
 export const STANDARD_CONFIG: FunctionConfig = {
     timeoutSeconds: 60,
-    memory: '256MB',
+    memory: '256MiB',
     minInstances: 0,
     maxInstances: 50,
 };
@@ -43,7 +43,7 @@ export const STANDARD_CONFIG: FunctionConfig = {
  */
 export const AI_AGENT_CONFIG: FunctionConfig = {
     timeoutSeconds: 120,  // AI can take longer
-    memory: '1GB',
+    memory: '1GiB',
     minInstances: 0,
     maxInstances: 30,
 };
@@ -54,7 +54,7 @@ export const AI_AGENT_CONFIG: FunctionConfig = {
  */
 export const BACKGROUND_CONFIG: FunctionConfig = {
     timeoutSeconds: 540,  // 9 minutes for batch jobs
-    memory: '256MB',
+    memory: '256MiB',
     minInstances: 0,
     maxInstances: 10,
 };
@@ -65,7 +65,7 @@ export const BACKGROUND_CONFIG: FunctionConfig = {
  */
 export const SCHEDULED_CONFIG: FunctionConfig = {
     timeoutSeconds: 300,
-    memory: '512MB',
+    memory: '512MiB',
     minInstances: 0,
     maxInstances: 5,
 };
