@@ -43,7 +43,7 @@ export declare const generateStoryFlow: import("genkit").CallableFlow<z.ZodObjec
     style: z.ZodEnum<["celebratory", "funny", "dramatic", "minimal", "professional"]>;
     language: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    storyType: "custom" | "social" | "achievement" | "game_result" | "highlight";
+    storyType: "social" | "custom" | "achievement" | "game_result" | "highlight";
     language: string;
     context: {
         gameType?: string | undefined;
@@ -55,7 +55,7 @@ export declare const generateStoryFlow: import("genkit").CallableFlow<z.ZodObjec
     };
     style: "celebratory" | "funny" | "dramatic" | "minimal" | "professional";
 }, {
-    storyType: "custom" | "social" | "achievement" | "game_result" | "highlight";
+    storyType: "social" | "custom" | "achievement" | "game_result" | "highlight";
     context: {
         gameType?: string | undefined;
         score?: number | undefined;

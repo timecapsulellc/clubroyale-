@@ -82,13 +82,13 @@ export declare const codeGenerationFlow: import("genkit").CallableFlow<z.ZodObje
         content: z.ZodString;
         description: z.ZodString;
     }, "strip", z.ZodTypeAny, {
+        description: string;
         path: string;
         content: string;
-        description: string;
     }, {
+        description: string;
         path: string;
         content: string;
-        description: string;
     }>, "many">>;
     filesToModify: z.ZodOptional<z.ZodArray<z.ZodObject<{
         path: z.ZodString;
@@ -110,9 +110,9 @@ export declare const codeGenerationFlow: import("genkit").CallableFlow<z.ZodObje
     explanation: string;
     dependencies?: string[] | undefined;
     filesToCreate?: {
+        description: string;
         path: string;
         content: string;
-        description: string;
     }[] | undefined;
     filesToModify?: {
         path: string;
@@ -125,9 +125,9 @@ export declare const codeGenerationFlow: import("genkit").CallableFlow<z.ZodObje
     explanation: string;
     dependencies?: string[] | undefined;
     filesToCreate?: {
+        description: string;
         path: string;
         content: string;
-        description: string;
     }[] | undefined;
     filesToModify?: {
         path: string;
@@ -342,8 +342,8 @@ export declare const featureImplementationFlow: import("genkit").CallableFlow<z.
             codeSnippet?: string | undefined;
         }>, "many">;
     }, "strip", z.ZodTypeAny, {
-        phase: number;
         description: string;
+        phase: number;
         title: string;
         tasks: {
             task: string;
@@ -353,8 +353,8 @@ export declare const featureImplementationFlow: import("genkit").CallableFlow<z.
             codeSnippet?: string | undefined;
         }[];
     }, {
-        phase: number;
         description: string;
+        phase: number;
         title: string;
         tasks: {
             task: string;
@@ -370,8 +370,8 @@ export declare const featureImplementationFlow: import("genkit").CallableFlow<z.
     filesAffected: z.ZodArray<z.ZodString, "many">;
 }, "strip", z.ZodTypeAny, {
     implementationPlan: {
-        phase: number;
         description: string;
+        phase: number;
         title: string;
         tasks: {
             task: string;
@@ -387,8 +387,8 @@ export declare const featureImplementationFlow: import("genkit").CallableFlow<z.
     filesAffected: string[];
 }, {
     implementationPlan: {
-        phase: number;
         description: string;
+        phase: number;
         title: string;
         tasks: {
             task: string;
@@ -411,9 +411,9 @@ export declare const generateCode: import("firebase-functions/v2/https").Callabl
     explanation: string;
     dependencies?: string[] | undefined;
     filesToCreate?: {
+        description: string;
         path: string;
         content: string;
-        description: string;
     }[] | undefined;
     filesToModify?: {
         path: string;
@@ -461,8 +461,8 @@ export declare const analyzeBug: import("firebase-functions/v2/https").CallableF
  */
 export declare const planFeatureImplementation: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
     implementationPlan: {
-        phase: number;
         description: string;
+        phase: number;
         title: string;
         tasks: {
             task: string;

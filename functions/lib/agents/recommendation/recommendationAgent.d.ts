@@ -167,6 +167,25 @@ export declare const recommendFriendsFlow: import("genkit").CallableFlow<z.ZodOb
         suggestedActivity: string;
     }[];
 }>, z.ZodTypeAny>;
+/**
+ * Rank social feed (stub)
+ */
+export declare const rankFeedFlow: import("genkit").CallableFlow<z.ZodObject<{
+    userId: z.ZodString;
+    feedItems: z.ZodArray<z.ZodAny, "many">;
+}, "strip", z.ZodTypeAny, {
+    userId: string;
+    feedItems: any[];
+}, {
+    userId: string;
+    feedItems: any[];
+}>, z.ZodObject<{
+    rankedItems: z.ZodArray<z.ZodAny, "many">;
+}, "strip", z.ZodTypeAny, {
+    rankedItems: any[];
+}, {
+    rankedItems: any[];
+}>, z.ZodTypeAny>;
 declare const _default: {
     recommendGamesFlow: import("genkit").CallableFlow<z.ZodObject<{
         userId: z.ZodString;
@@ -325,6 +344,22 @@ declare const _default: {
             sharedInterests: string[];
             suggestedActivity: string;
         }[];
+    }>, z.ZodTypeAny>;
+    rankFeedFlow: import("genkit").CallableFlow<z.ZodObject<{
+        userId: z.ZodString;
+        feedItems: z.ZodArray<z.ZodAny, "many">;
+    }, "strip", z.ZodTypeAny, {
+        userId: string;
+        feedItems: any[];
+    }, {
+        userId: string;
+        feedItems: any[];
+    }>, z.ZodObject<{
+        rankedItems: z.ZodArray<z.ZodAny, "many">;
+    }, "strip", z.ZodTypeAny, {
+        rankedItems: any[];
+    }, {
+        rankedItems: any[];
     }>, z.ZodTypeAny>;
 };
 export default _default;

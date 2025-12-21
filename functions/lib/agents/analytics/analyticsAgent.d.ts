@@ -126,8 +126,8 @@ export declare const calculateEngagementFlow: import("genkit").CallableFlow<z.Zo
         diamondSpentTotal: number;
         clubMemberships: number;
         accountAgedays: number;
-        storiesPosted?: number | undefined;
         messagesLast30Days?: number | undefined;
+        storiesPosted?: number | undefined;
     }, {
         userId: string;
         diamondBalance: number;
@@ -140,8 +140,8 @@ export declare const calculateEngagementFlow: import("genkit").CallableFlow<z.Zo
         diamondSpentTotal: number;
         clubMemberships: number;
         accountAgedays: number;
-        storiesPosted?: number | undefined;
         messagesLast30Days?: number | undefined;
+        storiesPosted?: number | undefined;
     }>;
 }, "strip", z.ZodTypeAny, {
     userData: {
@@ -156,8 +156,8 @@ export declare const calculateEngagementFlow: import("genkit").CallableFlow<z.Zo
         diamondSpentTotal: number;
         clubMemberships: number;
         accountAgedays: number;
-        storiesPosted?: number | undefined;
         messagesLast30Days?: number | undefined;
+        storiesPosted?: number | undefined;
     };
 }, {
     userData: {
@@ -172,8 +172,8 @@ export declare const calculateEngagementFlow: import("genkit").CallableFlow<z.Zo
         diamondSpentTotal: number;
         clubMemberships: number;
         accountAgedays: number;
-        storiesPosted?: number | undefined;
         messagesLast30Days?: number | undefined;
+        storiesPosted?: number | undefined;
     };
 }>, z.ZodObject<{
     overallScore: z.ZodNumber;
@@ -196,8 +196,7 @@ export declare const calculateEngagementFlow: import("genkit").CallableFlow<z.Zo
     tier: z.ZodEnum<["casual", "regular", "engaged", "power_user", "whale"]>;
     insights: z.ZodArray<z.ZodString, "many">;
 }, "strip", z.ZodTypeAny, {
-    tier: "casual" | "regular" | "engaged" | "power_user" | "whale";
-    insights: string[];
+    tier: "casual" | "engaged" | "regular" | "power_user" | "whale";
     overallScore: number;
     dimensions: {
         social: number;
@@ -205,9 +204,9 @@ export declare const calculateEngagementFlow: import("genkit").CallableFlow<z.Zo
         spending: number;
         loyalty: number;
     };
+    insights: string[];
 }, {
-    tier: "casual" | "regular" | "engaged" | "power_user" | "whale";
-    insights: string[];
+    tier: "casual" | "engaged" | "regular" | "power_user" | "whale";
     overallScore: number;
     dimensions: {
         social: number;
@@ -215,6 +214,7 @@ export declare const calculateEngagementFlow: import("genkit").CallableFlow<z.Zo
         spending: number;
         loyalty: number;
     };
+    insights: string[];
 }>, z.ZodTypeAny>;
 declare const _default: {
     predictChurnFlow: import("genkit").CallableFlow<z.ZodObject<{
@@ -334,8 +334,8 @@ declare const _default: {
             diamondSpentTotal: number;
             clubMemberships: number;
             accountAgedays: number;
-            storiesPosted?: number | undefined;
             messagesLast30Days?: number | undefined;
+            storiesPosted?: number | undefined;
         }, {
             userId: string;
             diamondBalance: number;
@@ -348,8 +348,8 @@ declare const _default: {
             diamondSpentTotal: number;
             clubMemberships: number;
             accountAgedays: number;
-            storiesPosted?: number | undefined;
             messagesLast30Days?: number | undefined;
+            storiesPosted?: number | undefined;
         }>;
     }, "strip", z.ZodTypeAny, {
         userData: {
@@ -364,8 +364,8 @@ declare const _default: {
             diamondSpentTotal: number;
             clubMemberships: number;
             accountAgedays: number;
-            storiesPosted?: number | undefined;
             messagesLast30Days?: number | undefined;
+            storiesPosted?: number | undefined;
         };
     }, {
         userData: {
@@ -380,8 +380,8 @@ declare const _default: {
             diamondSpentTotal: number;
             clubMemberships: number;
             accountAgedays: number;
-            storiesPosted?: number | undefined;
             messagesLast30Days?: number | undefined;
+            storiesPosted?: number | undefined;
         };
     }>, z.ZodObject<{
         overallScore: z.ZodNumber;
@@ -404,8 +404,7 @@ declare const _default: {
         tier: z.ZodEnum<["casual", "regular", "engaged", "power_user", "whale"]>;
         insights: z.ZodArray<z.ZodString, "many">;
     }, "strip", z.ZodTypeAny, {
-        tier: "casual" | "regular" | "engaged" | "power_user" | "whale";
-        insights: string[];
+        tier: "casual" | "engaged" | "regular" | "power_user" | "whale";
         overallScore: number;
         dimensions: {
             social: number;
@@ -413,9 +412,9 @@ declare const _default: {
             spending: number;
             loyalty: number;
         };
+        insights: string[];
     }, {
-        tier: "casual" | "regular" | "engaged" | "power_user" | "whale";
-        insights: string[];
+        tier: "casual" | "engaged" | "regular" | "power_user" | "whale";
         overallScore: number;
         dimensions: {
             social: number;
@@ -423,6 +422,7 @@ declare const _default: {
             spending: number;
             loyalty: number;
         };
+        insights: string[];
     }>, z.ZodTypeAny>;
 };
 export default _default;

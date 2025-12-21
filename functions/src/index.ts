@@ -12,6 +12,7 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
+import { withRateLimit } from './middleware/rateLimiter';
 
 // Import Genkit flows
 import { gameTipFlow, GameTipInput } from './genkit/flows/gameTipFlow';
@@ -106,7 +107,7 @@ const messaging = getMessaging();
  * Process settlement after game ends
  * UPDATED for Diamond Economy V5: Uses 'users' collection instead of 'wallets'
  */
-export const processSettlement = onCall(async (request) => {
+export const processSettlement = onCall(withRateLimit('game')(async (request: any) => {
     const { gameId } = request.data;
     const userId = request.auth?.uid;
 
@@ -224,4 +225,4 @@ export const processSettlement = onCall(async (request) => {
         settlements: settlements,
         message: `Processed ${settlements.length} settlements`,
     };
-});
+}));

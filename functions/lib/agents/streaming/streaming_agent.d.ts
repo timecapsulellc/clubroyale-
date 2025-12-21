@@ -29,7 +29,7 @@ export declare const enhanceStreamFlow: import("genkit").CallableFlow<z.ZodObjec
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     streamId: string;
-    streamType: "social" | "tutorial" | "game" | "chat";
+    streamType: "chat" | "game" | "social" | "tutorial";
     viewerCount: number;
     streamDuration: number;
     gameType?: string | undefined;
@@ -40,7 +40,7 @@ export declare const enhanceStreamFlow: import("genkit").CallableFlow<z.ZodObjec
     }[] | undefined;
 }, {
     streamId: string;
-    streamType: "social" | "tutorial" | "game" | "chat";
+    streamType: "chat" | "game" | "social" | "tutorial";
     viewerCount: number;
     streamDuration: number;
     gameType?: string | undefined;
@@ -125,13 +125,13 @@ export declare const detectHighlightsFlow: import("genkit").CallableFlow<z.ZodOb
         type: z.ZodString;
         count: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
+        count: number;
         type: string;
         timestamp: number;
-        count: number;
     }, {
+        count: number;
         type: string;
         timestamp: number;
-        count: number;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     gameEvents: {
@@ -141,9 +141,9 @@ export declare const detectHighlightsFlow: import("genkit").CallableFlow<z.ZodOb
     }[];
     streamId: string;
     viewerReactions?: {
+        count: number;
         type: string;
         timestamp: number;
-        count: number;
     }[] | undefined;
 }, {
     gameEvents: {
@@ -153,9 +153,9 @@ export declare const detectHighlightsFlow: import("genkit").CallableFlow<z.ZodOb
     }[];
     streamId: string;
     viewerReactions?: {
+        count: number;
         type: string;
         timestamp: number;
-        count: number;
     }[] | undefined;
 }>, z.ZodObject<{
     highlights: z.ZodArray<z.ZodObject<{
@@ -181,11 +181,11 @@ export declare const detectHighlightsFlow: import("genkit").CallableFlow<z.ZodOb
         timestamp: z.ZodNumber;
         description: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        timestamp: number;
         description: string;
+        timestamp: number;
     }, {
-        timestamp: number;
         description: string;
+        timestamp: number;
     }>>;
 }, "strip", z.ZodTypeAny, {
     highlights: {
@@ -196,8 +196,8 @@ export declare const detectHighlightsFlow: import("genkit").CallableFlow<z.ZodOb
         endTime: number;
     }[];
     bestMoment?: {
-        timestamp: number;
         description: string;
+        timestamp: number;
     } | undefined;
 }, {
     highlights: {
@@ -208,8 +208,8 @@ export declare const detectHighlightsFlow: import("genkit").CallableFlow<z.ZodOb
         endTime: number;
     }[];
     bestMoment?: {
-        timestamp: number;
         description: string;
+        timestamp: number;
     } | undefined;
 }>, z.ZodTypeAny>;
 export declare const enhanceStream: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
@@ -235,8 +235,8 @@ export declare const detectHighlights: import("firebase-functions/v2/https").Cal
         endTime: number;
     }[];
     bestMoment?: {
-        timestamp: number;
         description: string;
+        timestamp: number;
     } | undefined;
 }>, unknown>;
 //# sourceMappingURL=streaming_agent.d.ts.map

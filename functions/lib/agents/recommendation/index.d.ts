@@ -1,5 +1,5 @@
 /**
  * Recommendation Agent - Index
  */
-export { rankFeed, suggestFriends, recommendGames, } from './recommendation_agent';
+export { rankFeedFlow as rankFeed, recommendFriendsFlow as suggestFriends, recommendGamesFlow as recommendGames, } from './recommendationAgent';
 //# sourceMappingURL=index.d.ts.map

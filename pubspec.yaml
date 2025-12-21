@@ -62,6 +62,7 @@ dependencies:
   flip_card: ^0.7.0
   lottie: ^3.1.0  # Lottie animations
   rive: ^0.13.0     # Interactive state machine animations
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -88,6 +89,8 @@ flutter:
     - assets/cards/png/
     - assets/images/
     - assets/images/chips/
+    - assets/images/bots/
+    - assets/images/tables/
     - assets/store/
     - assets/animations/
     - assets/rive/

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../chat_message.dart';
 import '../chat_service.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 
 /// Main chat widget for in-game messaging
 class ChatWidget extends ConsumerStatefulWidget {
@@ -114,7 +115,11 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
           Expanded(
             child: messagesAsync.when(
               data: (messages) => _buildMessagesList(messages, theme),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: 5,
+                itemBuilder: (context, index) => SkeletonMessage(isMe: index % 2 == 0),
+              ),
               error: (e, _) => Center(child: Text('Error: $e')),
             ),
           ),

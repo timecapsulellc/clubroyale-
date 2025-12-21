@@ -13,6 +13,7 @@ const https_1 = require("firebase-functions/v2/https");
 const app_1 = require("firebase-admin/app");
 const firestore_1 = require("firebase-admin/firestore");
 const messaging_1 = require("firebase-admin/messaging");
+const rateLimiter_1 = require("./middleware/rateLimiter");
 // Import Triggers
 var auditTriggers_1 = require("./triggers/auditTriggers");
 Object.defineProperty(exports, "auditGameUpdate", { enumerable: true, get: function () { return auditTriggers_1.auditGameUpdate; } });
@@ -96,7 +97,7 @@ const messaging = (0, messaging_1.getMessaging)();
  * Process settlement after game ends
  * UPDATED for Diamond Economy V5: Uses 'users' collection instead of 'wallets'
  */
-exports.processSettlement = (0, https_1.onCall)(async (request) => {
+exports.processSettlement = (0, https_1.onCall)((0, rateLimiter_1.withRateLimit)('game')(async (request) => {
     const { gameId } = request.data;
     const userId = request.auth?.uid;
     if (!userId) {
@@ -190,5 +191,5 @@ exports.processSettlement = (0, https_1.onCall)(async (request) => {
         settlements: settlements,
         message: `Processed ${settlements.length} settlements`,
     };
-});
+}));
 //# sourceMappingURL=index.js.map

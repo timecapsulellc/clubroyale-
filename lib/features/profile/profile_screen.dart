@@ -14,6 +14,7 @@ import '../store/ui/theme_store_bottom_sheet.dart';
 import 'profile_service.dart';
 import 'user_profile.dart';
 import 'widgets/badges_grid.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -223,7 +224,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
     final user = authService.currentUser;
     final profileAsync = ref.watch(myProfileProvider);
     
-    if (user == null) return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (user == null || (profileAsync.isLoading && !profileAsync.hasValue)) {
+      return const SkeletonProfile();
+    }
 
     // Initialize theme from profile once loaded
     // We use a post-frame callback or just check if we are in init state (not editing yet)

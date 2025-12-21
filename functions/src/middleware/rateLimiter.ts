@@ -88,8 +88,18 @@ export async function checkRateLimit(
 export function withRateLimit(endpoint: string) {
     return function <T extends (...args: any[]) => Promise<any>>(fn: T): T {
         return (async (...args: any[]) => {
-            const context = args[1]; // onCall context
-            const userId = context?.auth?.uid;
+            // Support both V1 (data, context) and V2 (request) signatures
+            let userId: string | undefined;
+
+            if (args.length === 1) {
+                // V2 CallableRequest
+                const request = args[0];
+                userId = request.auth?.uid;
+            } else {
+                // V1 (data, context)
+                const context = args[1];
+                userId = context?.auth?.uid;
+            }
 
             if (!userId) {
                 throw new Error('Authentication required');

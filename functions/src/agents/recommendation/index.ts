@@ -2,7 +2,7 @@
  * Recommendation Agent - Index
  */
 export {
-    rankFeed,
-    suggestFriends,
-    recommendGames,
-} from './recommendation_agent';
+    rankFeedFlow as rankFeed,
+    recommendFriendsFlow as suggestFriends,
+    recommendGamesFlow as recommendGames,
+} from './recommendationAgent';

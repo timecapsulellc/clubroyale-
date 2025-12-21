@@ -4,7 +4,7 @@
 // The shimmer effect gives users a sense of the content layout while loading.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 
 /// Base shimmer container
@@ -22,18 +22,18 @@ class SkeletonBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(borderRadius),
+    return Shimmer.fromColors(
+      baseColor: Colors.white.withValues(alpha: 0.1),
+      highlightColor: Colors.white.withValues(alpha: 0.2),
+      period: const Duration(milliseconds: 1500),
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
       ),
-    )
-    .animate(onPlay: (c) => c.repeat())
-    .shimmer(
-      duration: 1500.ms,
-      color: Colors.white.withValues(alpha: 0.2),
     );
   }
 }
@@ -46,18 +46,18 @@ class SkeletonCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withValues(alpha: 0.1),
+    return Shimmer.fromColors(
+      baseColor: Colors.white.withValues(alpha: 0.1),
+      highlightColor: Colors.white.withValues(alpha: 0.2),
+      period: const Duration(milliseconds: 1500),
+      child: Container(
+        width: size,
+        height: size,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white,
+        ),
       ),
-    )
-    .animate(onPlay: (c) => c.repeat())
-    .shimmer(
-      duration: 1500.ms,
-      color: Colors.white.withValues(alpha: 0.2),
     );
   }
 }
@@ -87,14 +87,14 @@ class SkeletonGameCard extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: const [
                     SkeletonBox(width: 120, height: 16),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     SkeletonBox(width: 80, height: 12),
                   ],
                 ),
               ),
-              SkeletonBox(width: 60, height: 28, borderRadius: 14),
+              const SkeletonBox(width: 60, height: 28, borderRadius: 14),
             ],
           ),
           const SizedBox(height: 16),
@@ -102,7 +102,7 @@ class SkeletonGameCard extends StatelessWidget {
           Row(
             children: List.generate(4, (i) => Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: SkeletonCircle(size: 32),
+              child: const SkeletonCircle(size: 32),
             )),
           ),
         ],
@@ -131,14 +131,14 @@ class SkeletonPlayerTile extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: const [
                 SkeletonBox(width: 100, height: 16),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 SkeletonBox(width: 60, height: 12),
               ],
             ),
           ),
-          SkeletonBox(width: 40, height: 16),
+          const SkeletonBox(width: 40, height: 16),
         ],
       ),
     );
@@ -154,13 +154,47 @@ class SkeletonLeaderboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: List.generate(itemCount, (i) => Padding(
-        padding: const EdgeInsets.only(bottom: 8),
+      children: List.generate(itemCount, (i) => const Padding(
+        padding: EdgeInsets.only(bottom: 8),
         child: SkeletonPlayerTile(),
       )),
     );
   }
 }
+
+/// Message skeleton for chat
+class SkeletonMessage extends StatelessWidget {
+  final bool isMe;
+
+  const SkeletonMessage({super.key, required this.isMe});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (!isMe) ...[
+              const SkeletonCircle(size: 24),
+              const SizedBox(width: 8),
+            ],
+            SkeletonBox(
+              width: 120 + (isMe ? 20 : 0), 
+              height: 36, 
+              borderRadius: 18
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 /// Full screen loading skeleton
 class SkeletonScreen extends StatelessWidget {
@@ -184,9 +218,9 @@ class SkeletonScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header section
-              SkeletonBox(width: 200, height: 28),
+              const SkeletonBox(width: 200, height: 28),
               const SizedBox(height: 8),
-              SkeletonBox(width: 300, height: 16),
+              const SkeletonBox(width: 300, height: 16),
               
               const SizedBox(height: 32),
               
@@ -194,9 +228,9 @@ class SkeletonScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(3, (i) => Column(
-                  children: [
+                  children: const [
                     SkeletonBox(width: 60, height: 40),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     SkeletonBox(width: 50, height: 12),
                   ],
                 )),
@@ -237,9 +271,9 @@ class SkeletonProfile extends StatelessWidget {
               const SizedBox(height: 16),
               
               // Name
-              SkeletonBox(width: 150, height: 24),
+              const SkeletonBox(width: 150, height: 24),
               const SizedBox(height: 8),
-              SkeletonBox(width: 100, height: 14),
+              const SkeletonBox(width: 100, height: 14),
               
               const SizedBox(height: 32),
               
@@ -247,9 +281,9 @@ class SkeletonProfile extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(3, (i) => Column(
-                  children: [
+                  children: const [
                     SkeletonBox(width: 50, height: 30),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     SkeletonBox(width: 40, height: 12),
                   ],
                 )),
@@ -258,7 +292,7 @@ class SkeletonProfile extends StatelessWidget {
               const SizedBox(height: 32),
               
               // Recent games
-              Align(
+              const Align(
                 alignment: Alignment.centerLeft,
                 child: SkeletonBox(width: 120, height: 18),
               ),

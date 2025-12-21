@@ -98,8 +98,18 @@ async function checkRateLimit(userId, endpoint) {
 function withRateLimit(endpoint) {
     return function (fn) {
         return (async (...args) => {
-            const context = args[1]; // onCall context
-            const userId = context?.auth?.uid;
+            // Support both V1 (data, context) and V2 (request) signatures
+            let userId;
+            if (args.length === 1) {
+                // V2 CallableRequest
+                const request = args[0];
+                userId = request.auth?.uid;
+            }
+            else {
+                // V1 (data, context)
+                const context = args[1];
+                userId = context?.auth?.uid;
+            }
             if (!userId) {
                 throw new Error('Authentication required');
             }

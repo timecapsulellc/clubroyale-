@@ -17,6 +17,7 @@ import 'dart:math';
 
 import 'package:clubroyale/core/responsive/responsive_utils.dart';
 import 'package:clubroyale/config/casino_theme.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 
 import '../auth/auth_service.dart';
 
@@ -218,15 +219,18 @@ class LobbyScreen extends ConsumerWidget {
             stream: gamesStream,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(color: Colors.amber),
-                        SizedBox(height: 16),
-                        Text('Finding rooms...', style: TextStyle(color: Colors.white70)),
-                      ],
+                return SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverGrid(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: context.responsive(mobile: 1, tablet: 2, desktop: 4),
+                      childAspectRatio: context.responsive(mobile: 1.1, tablet: 0.9, desktop: 0.85),
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => const SkeletonGameCard(),
+                      childCount: 4,
                     ),
                   ),
                 );

@@ -371,7 +371,28 @@ export const recommendFriendsFlow = ai.defineFlow(
     }
 );
 
+/**
+ * Rank social feed (stub)
+ */
+export const rankFeedFlow = ai.defineFlow(
+    {
+        name: 'rankFeed',
+        inputSchema: z.object({
+            userId: z.string(),
+            feedItems: z.array(z.any()),
+        }),
+        outputSchema: z.object({
+            rankedItems: z.array(z.any()),
+        }),
+    },
+    async (input) => {
+        // Stub implementation - just return as is for now
+        return { rankedItems: input.feedItems };
+    }
+);
+
 export default {
     recommendGamesFlow,
     recommendFriendsFlow,
+    rankFeedFlow,
 };

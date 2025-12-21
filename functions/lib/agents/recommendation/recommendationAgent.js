@@ -4,7 +4,7 @@
  * 4D Personalization: Time, Mood, Social, Skill
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.recommendFriendsFlow = exports.recommendGamesFlow = void 0;
+exports.rankFeedFlow = exports.recommendFriendsFlow = exports.recommendGamesFlow = void 0;
 const genkit_1 = require("genkit");
 const googleai_1 = require("@genkit-ai/googleai");
 const logger_1 = require("../../utils/logger");
@@ -279,8 +279,25 @@ exports.recommendFriendsFlow = ai.defineFlow({
     await metrics_1.BusinessMetrics.aiAgentAction('recommendation', 'friends', Date.now() - startTime);
     return { recommendations };
 });
+/**
+ * Rank social feed (stub)
+ */
+exports.rankFeedFlow = ai.defineFlow({
+    name: 'rankFeed',
+    inputSchema: genkit_1.z.object({
+        userId: genkit_1.z.string(),
+        feedItems: genkit_1.z.array(genkit_1.z.any()),
+    }),
+    outputSchema: genkit_1.z.object({
+        rankedItems: genkit_1.z.array(genkit_1.z.any()),
+    }),
+}, async (input) => {
+    // Stub implementation - just return as is for now
+    return { rankedItems: input.feedItems };
+});
 exports.default = {
     recommendGamesFlow: exports.recommendGamesFlow,
     recommendFriendsFlow: exports.recommendFriendsFlow,
+    rankFeedFlow: exports.rankFeedFlow,
 };
 //# sourceMappingURL=recommendationAgent.js.map

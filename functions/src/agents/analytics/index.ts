@@ -1,1 +1,4 @@
-export { predictEngagement, analyzeTrends } from './analytics_agent';
+export {
+    predictChurnFlow as predictEngagement,
+    calculateEngagementFlow as analyzeTrends
+} from './analyticsAgent';
