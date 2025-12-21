@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:clubroyale/core/services/share_service.dart';
 import '../services/spectator_service.dart';
 
 /// Badge showing spectator count on game screen
@@ -199,7 +200,11 @@ class SpectatorListSheet extends ConsumerWidget {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // TODO: Share game link
+                  // Share game spectator link
+                  ShareService.shareAppDownload(
+                    context: context,
+                    customMessage: '👀 Watch this game live on ClubRoyale! 🃏\n\nJoin as a spectator: https://clubroyale-app.web.app/spectate/$gameId',
+                  );
                   Navigator.pop(context);
                 },
                 icon: const Icon(Icons.share),

@@ -12,6 +12,7 @@ import 'call_break_service.dart';
 import '../auth/auth_service.dart';
 import '../lobby/lobby_service.dart';
 import 'package:clubroyale/core/widgets/skeleton_loading.dart';
+import 'package:clubroyale/core/error/error_display.dart';
 
 final gameProvider = StreamProvider.family<GameRoom?, String>((ref, gameId) {
   final gameService = ref.watch(gameServiceProvider);
@@ -463,17 +464,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
           );
         },
         loading: () => const SkeletonScreen(title: 'Game Room'),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 64, color: colorScheme.error),
-              const SizedBox(height: 16),
-              Text('Error loading game', style: theme.textTheme.titleLarge),
-              const SizedBox(height: 8),
-              Text('$error', style: theme.textTheme.bodySmall),
-            ],
-          ),
+        error: (error, stack) => ErrorDisplay(
+          title: 'Error Loading Game',
+          message: error.toString(),
+          icon: Icons.error_outline,
+          onRetry: () => ref.invalidate(gameProvider(widget.gameId)),
         ),
       ),
       floatingActionButton: gameAsyncValue.maybeWhen(
@@ -717,16 +712,20 @@ class _PlayerScoreCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Decrement
-                Material(
-                  color: colorScheme.errorContainer,
-                  borderRadius: BorderRadius.circular(8),
-                  child: InkWell(
-                    onTap: onDecrement,
+                Semantics(
+                  button: true,
+                  label: 'Decrease score for ${player.name}',
+                  child: Material(
+                    color: colorScheme.errorContainer,
                     borderRadius: BorderRadius.circular(8),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(Icons.remove,
-                          color: colorScheme.onErrorContainer, size: 20),
+                    child: InkWell(
+                      onTap: onDecrement,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(Icons.remove,
+                            color: colorScheme.onErrorContainer, size: 20),
+                      ),
                     ),
                   ),
                 ),
@@ -758,16 +757,20 @@ class _PlayerScoreCard extends StatelessWidget {
                 const SizedBox(width: 8),
 
                 // Increment
-                Material(
-                  color: colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(8),
-                  child: InkWell(
-                    onTap: onIncrement,
+                Semantics(
+                  button: true,
+                  label: 'Increase score for ${player.name}',
+                  child: Material(
+                    color: colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(8),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(Icons.add,
-                          color: colorScheme.onPrimaryContainer, size: 20),
+                    child: InkWell(
+                      onTap: onIncrement,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(Icons.add,
+                            color: colorScheme.onPrimaryContainer, size: 20),
+                      ),
                     ),
                   ),
                 ),

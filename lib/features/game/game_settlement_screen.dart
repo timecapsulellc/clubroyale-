@@ -8,6 +8,8 @@ import 'package:clubroyale/features/game/providers/game_state_provider.dart';
 import 'package:clubroyale/features/ledger/services/settlement_service.dart';
 import 'package:clubroyale/features/game/services/sound_service.dart';
 import 'package:clubroyale/core/services/share_service.dart';
+import 'package:clubroyale/core/design_system/animations/game_animations.dart';
+import 'package:clubroyale/core/error/error_display.dart';
 
 class GameSettlementScreen extends ConsumerStatefulWidget {
   final String gameId;
@@ -106,7 +108,7 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
                 ),
               ),
               
-              // Confetti overlay
+              // Confetti overlay (Custom painter)
               AnimatedBuilder(
                 animation: _confettiController,
                 builder: (context, child) {
@@ -118,6 +120,13 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
                     size: Size.infinite,
                   );
                 },
+              ),
+              
+              // Lottie Confetti Animation (enhanced celebration)
+              const Positioned.fill(
+                child: IgnorePointer(
+                  child: ConfettiAnimation(repeat: true),
+                ),
               ),
               
               // Main content
@@ -159,7 +168,11 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, st) => Center(child: Text('Error: $err')),
+        error: (err, st) => ErrorDisplay(
+          title: 'Error Loading Results',
+          message: err.toString(),
+          onRetry: () => ref.invalidate(currentGameProvider(widget.gameId)),
+        ),
       ),
     );
   }

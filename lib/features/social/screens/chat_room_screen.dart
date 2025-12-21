@@ -240,7 +240,7 @@ class MessageBubble extends StatelessWidget {
       case SocialMessageType.text:
         contentWidget = Text(
           message.content.text ?? '',
-          style: TextStyle(color: isMe ? Colors.white : Colors.black87),
+          style: TextStyle(color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface),
         );
         break;
       case SocialMessageType.image:
@@ -278,9 +278,10 @@ class MessageBubble extends StatelessWidget {
     final bool isDiamondGift = message.type == SocialMessageType.diamondGift;
     final bool isGameInvite = message.type == SocialMessageType.gameInvite;
     
-    // Styling base
-    Color bubbleColor = isMe ? Colors.deepPurple : Colors.grey.shade200;
-    Color textColor = isMe ? Colors.white : Colors.black87;
+    // Styling base - use theme colors for dark mode support
+    final colorScheme = Theme.of(context).colorScheme;
+    Color bubbleColor = isMe ? colorScheme.primary : colorScheme.surfaceContainerHighest;
+    Color textColor = isMe ? Colors.white : colorScheme.onSurface;
     
     if (isDiamondGift) {
       textColor = Colors.white;
@@ -396,7 +397,7 @@ class MessageBubble extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 11, 
-              color: isMe ? Colors.white70 : Colors.black87,
+              color: isMe ? Colors.white70 : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],

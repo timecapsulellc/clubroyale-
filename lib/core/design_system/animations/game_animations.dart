@@ -22,12 +22,14 @@ import 'package:lottie/lottie.dart';
 /// Use when: Player wins, Maal declared, Round complete
 class ConfettiAnimation extends StatelessWidget {
   final bool play;
+  final bool repeat;
   final VoidCallback? onComplete;
   final double? width;
   final double? height;
   
   const ConfettiAnimation({
     this.play = true,
+    this.repeat = false,
     this.onComplete,
     this.width,
     this.height,
@@ -39,7 +41,7 @@ class ConfettiAnimation extends StatelessWidget {
     return Lottie.asset(
       'assets/animations/confetti.json',
       animate: play,
-      repeat: false,
+      repeat: repeat,
       width: width,
       height: height,
       errorBuilder: (context, error, stackTrace) {
