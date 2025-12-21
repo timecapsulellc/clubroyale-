@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart';
 import 'package:clubroyale/features/profile/profile_service.dart';
+import 'package:clubroyale/features/feedback/widgets/feedback_dialog.dart';
 
 /// Watch wallet stream for current user
 final walletStreamProvider = StreamProvider<int?>((ref) {
@@ -147,6 +148,18 @@ class CompactHeader extends ConsumerWidget {
             ),
             const SizedBox(width: 4),
 
+            // Feedback Button
+            IconButton(
+              icon: const Icon(Icons.bug_report_outlined, color: Colors.white70),
+              tooltip: 'Report Issue / Feedback',
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => const FeedbackDialog(),
+                );
+              },
+            ),
+            
             // Settings Button
             IconButton(
               icon: const Icon(Icons.settings_outlined, color: Colors.white70),

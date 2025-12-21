@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:clubroyale/core/card_engine/pile.dart' as engine;
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart';
 import 'package:clubroyale/core/design_system/game/maal_badge_widget.dart';
 import 'package:clubroyale/core/design_system/animations/rive_animations.dart';
@@ -22,7 +22,7 @@ import 'package:clubroyale/core/services/game_audio_mixin.dart';
 
 /// Premium 3D card widget with animations and Maal badges
 class PremiumCardWidget extends ConsumerStatefulWidget {
-  final engine.Card card;
+  final PlayingCard card;
   final bool isSelected;
   final bool isFaceUp;
   final bool isPlayable;

@@ -179,7 +179,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                       children: [
                         const Text('👑 ', style: TextStyle(fontSize: 12)),
                         Text(
-                          tiplu.displayName,
+                          tiplu.displayString,
                           style: TextStyle(
                             color: tiplu.suit.isRed ? Colors.red.shade300 : Colors.white,
                             fontWeight: FontWeight.bold,
@@ -317,7 +317,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                 ...meld.cards.take(3).map((c) => Padding(
                   padding: const EdgeInsets.only(right: 2),
                   child: Text(
-                    c.displayName,
+                    c.displayString,
                     style: TextStyle(
                       color: c.suit.isRed ? Colors.red : Colors.white,
                       fontWeight: FontWeight.bold,

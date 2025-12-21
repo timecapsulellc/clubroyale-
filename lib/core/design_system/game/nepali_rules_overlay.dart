@@ -10,11 +10,11 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:clubroyale/core/card_engine/pile.dart' as engine;
+import 'package:clubroyale/core/models/playing_card.dart';
 
 /// Overlay widget showing Marriage game status
 class NepaliRulesOverlay extends StatelessWidget {
-  final engine.Card? tiplu;
+  final PlayingCard? tiplu;
   final bool isVisited;
   final int maalPoints;
   final bool hasMarriageBonus;
@@ -122,7 +122,7 @@ class _RoundBadge extends StatelessWidget {
 }
 
 class _TipluIndicator extends StatelessWidget {
-  final engine.Card tiplu;
+  final PlayingCard tiplu;
 
   const _TipluIndicator({required this.tiplu});
 
@@ -328,7 +328,7 @@ class _MarriageBonusIndicator extends StatelessWidget {
 
 /// Compact version for smaller screens
 class NepaliRulesCompact extends StatelessWidget {
-  final engine.Card? tiplu;
+  final PlayingCard? tiplu;
   final bool isVisited;
   final int maalPoints;
 

@@ -17,7 +17,7 @@ enum MeldType {
 /// Abstract base class for all meld types
 abstract class Meld {
   final MeldType type;
-  final List<Card> cards;
+  final List<PlayingCard> cards;
   
   const Meld({required this.type, required this.cards});
   
@@ -28,8 +28,7 @@ abstract class Meld {
   int get points;
   
   /// Does this meld contain a specific card?
-  /// Does this meld contain a specific card?
-  bool contains(Card card) => cards.any((c) => c.id == card.id);
+  bool contains(PlayingCard card) => cards.any((c) => c.id == card.id);
 
   /// Convert to JSON for storage
   Map<String, dynamic> toJson() {
@@ -40,7 +39,7 @@ abstract class Meld {
   }
 
   /// Reconstruct a Meld from type and cards
-  static Meld fromTypeAndCards(MeldType type, List<Card> cards, {Card? tiplu}) {
+  static Meld fromTypeAndCards(MeldType type, List<PlayingCard> cards, {PlayingCard? tiplu}) {
     switch (type) {
       case MeldType.set:
         return SetMeld(cards);
@@ -57,7 +56,7 @@ abstract class Meld {
 
 /// SetMeld - 3+ cards of same rank, different suits (Trial in Marriage)
 class SetMeld extends Meld {
-  SetMeld(List<Card> cards) : super(type: MeldType.set, cards: cards);
+  SetMeld(List<PlayingCard> cards) : super(type: MeldType.set, cards: cards);
   
   @override
   bool get isValid {
@@ -78,7 +77,7 @@ class SetMeld extends Meld {
 
 /// RunMeld - 3+ consecutive cards of same suit (Sequence)
 class RunMeld extends Meld {
-  RunMeld(List<Card> cards) : super(type: MeldType.run, cards: cards);
+  RunMeld(List<PlayingCard> cards) : super(type: MeldType.run, cards: cards);
   
   @override
   bool get isValid {
@@ -89,7 +88,7 @@ class RunMeld extends Meld {
     if (!cards.every((c) => c.suit == suit)) return false;
     
     // Sort by rank and check consecutive
-    final sorted = List<Card>.from(cards)
+    final sorted = List<PlayingCard>.from(cards)
       ..sort((a, b) => a.rank.value.compareTo(b.rank.value));
     
     for (int i = 1; i < sorted.length; i++) {
@@ -108,7 +107,7 @@ class RunMeld extends Meld {
 /// TunnelMeld - 3 identical cards (Marriage game only)
 /// Three cards of exact same rank and suit from different decks
 class TunnelMeld extends Meld {
-  TunnelMeld(List<Card> cards) : super(type: MeldType.tunnel, cards: cards);
+  TunnelMeld(List<PlayingCard> cards) : super(type: MeldType.tunnel, cards: cards);
   
   @override
   bool get isValid {
@@ -132,9 +131,9 @@ class TunnelMeld extends Meld {
 /// MarriageMeld - Special combination in Marriage game
 /// Tiplu (wild) + Poplu (card above tiplu) + Jhiplu (card below tiplu)
 class MarriageMeld extends Meld {
-  final Card tiplu; // The wild card for this round
+  final PlayingCard tiplu; // The wild card for this round
   
-  MarriageMeld(List<Card> cards, {required this.tiplu}) 
+  MarriageMeld(List<PlayingCard> cards, {required this.tiplu}) 
       : super(type: MeldType.marriage, cards: cards);
   
   @override
@@ -159,9 +158,9 @@ class MarriageMeld extends Meld {
 /// Utility class for detecting melds in a hand
 class MeldDetector {
   /// Find all possible set melds in a hand
-  static List<SetMeld> findSets(List<Card> hand) {
+  static List<SetMeld> findSets(List<PlayingCard> hand) {
     final melds = <SetMeld>[];
-    final byRank = <Rank, List<Card>>{};
+    final byRank = <CardRank, List<PlayingCard>>{};
     
     for (final card in hand) {
       byRank.putIfAbsent(card.rank, () => []).add(card);
@@ -180,9 +179,9 @@ class MeldDetector {
   }
   
   /// Find all possible run melds in a hand
-  static List<RunMeld> findRuns(List<Card> hand) {
+  static List<RunMeld> findRuns(List<PlayingCard> hand) {
     final melds = <RunMeld>[];
-    final bySuit = <Suit, List<Card>>{};
+    final bySuit = <CardSuit, List<PlayingCard>>{};
     
     for (final card in hand) {
       bySuit.putIfAbsent(card.suit, () => []).add(card);
@@ -191,7 +190,7 @@ class MeldDetector {
     for (final cards in bySuit.values) {
       if (cards.length < 3) continue;
       
-      final sorted = List<Card>.from(cards)
+      final sorted = List<PlayingCard>.from(cards)
         ..sort((a, b) => a.rank.value.compareTo(b.rank.value));
       
       // Find consecutive sequences
@@ -214,9 +213,9 @@ class MeldDetector {
   }
   
   /// Find all tunnel melds (Marriage game only)
-  static List<TunnelMeld> findTunnels(List<Card> hand) {
+  static List<TunnelMeld> findTunnels(List<PlayingCard> hand) {
     final melds = <TunnelMeld>[];
-    final byRankSuit = <String, List<Card>>{};
+    final byRankSuit = <String, List<PlayingCard>>{};
     
     for (final card in hand) {
       final key = '${card.rank.value}_${card.suit.index}';
@@ -229,7 +228,7 @@ class MeldDetector {
         final deckIndices = cards.map((c) => c.deckIndex).toSet();
         if (deckIndices.length >= 3) {
           // Take one from each deck
-          final tunnel = <Card>[];
+          final tunnel = <PlayingCard>[];
           for (int d = 0; d < 3; d++) {
             final card = cards.firstWhere((c) => c.deckIndex == d, orElse: () => cards.first);
             tunnel.add(card);
@@ -243,7 +242,7 @@ class MeldDetector {
   }
   
   /// Find all possible melds including marriage (if tiplu provided)
-  static List<Meld> findAllMelds(List<Card> hand, {Card? tiplu}) {
+  static List<Meld> findAllMelds(List<PlayingCard> hand, {PlayingCard? tiplu}) {
     final melds = <Meld>[];
     melds.addAll(findSets(hand));
     melds.addAll(findRuns(hand));
@@ -274,17 +273,17 @@ class MeldDetector {
     return melds;
   }
   /// Validates if a hand can be completely partitioned into valid melds
-  static bool validateHand(List<Card> hand, {Card? tiplu}) {
+  static bool validateHand(List<PlayingCard> hand, {PlayingCard? tiplu}) {
     if (hand.isEmpty) return true;
     
     // Sort hand to ensure consistent processing
-    final sortedHand = List<Card>.from(hand)
+    final sortedHand = List<PlayingCard>.from(hand)
       ..sort((a, b) => a.id.compareTo(b.id)); 
       
     return _canPartition(sortedHand, tiplu);
   }
   
-  static bool _canPartition(List<Card> remaining, Card? tiplu) {
+  static bool _canPartition(List<PlayingCard> remaining, PlayingCard? tiplu) {
     if (remaining.isEmpty) return true;
     
     // Optimization: Always try to fuse the first card
@@ -320,7 +319,7 @@ class MeldDetector {
     return false;
   }
   
-  static bool _tryMeld(Meld meld, List<Card> remaining, Card? tiplu) {
+  static bool _tryMeld(Meld meld, List<PlayingCard> remaining, PlayingCard? tiplu) {
     final meldIds = meld.cards.map((c) => c.id).toSet();
     if (!meld.cards.every((c) => remaining.any((r) => r.id == c.id))) return false;
     
@@ -328,7 +327,7 @@ class MeldDetector {
     return _canPartition(newRemaining, tiplu);
   }
   
-  static List<SetMeld> _findSetsWithCard(Card target, List<Card> pool) {
+  static List<SetMeld> _findSetsWithCard(PlayingCard target, List<PlayingCard> pool) {
     final matches = pool.where((c) => c.rank == target.rank).toList();
     if (matches.length < 3) return [];
     
@@ -344,7 +343,7 @@ class MeldDetector {
     return sets;
   }
   
-  static List<RunMeld> _findRunsWithCard(Card target, List<Card> pool) {
+  static List<RunMeld> _findRunsWithCard(PlayingCard target, List<PlayingCard> pool) {
     final sameSuit = pool.where((c) => c.suit == target.suit).toList()
       ..sort((a, b) => a.rank.value.compareTo(b.rank.value));
       
@@ -371,12 +370,12 @@ class MeldDetector {
     return runs;
   }
   
-  static List<TunnelMeld> _findTunnelsWithCard(Card target, List<Card> pool) {
+  static List<TunnelMeld> _findTunnelsWithCard(PlayingCard target, List<PlayingCard> pool) {
      final matches = pool.where((c) => c.rank == target.rank && c.suit == target.suit).toList();
      if (matches.length < 3) return [];
      
      final tunnels = <TunnelMeld>[];
-     final deckMap = <int, Card>{};
+     final deckMap = <int, PlayingCard>{};
      for (var c in matches) {
        deckMap[c.deckIndex] = c;
      }
@@ -390,7 +389,7 @@ class MeldDetector {
      return tunnels;
   }
   
-  static List<MarriageMeld> _findMarriagesWithCard(Card target, List<Card> pool, Card tiplu) {
+  static List<MarriageMeld> _findMarriagesWithCard(PlayingCard target, List<PlayingCard> pool, PlayingCard tiplu) {
      final marriages = <MarriageMeld>[];
      if (target.suit != tiplu.suit) return [];
      

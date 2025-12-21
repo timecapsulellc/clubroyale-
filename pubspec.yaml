@@ -1,7 +1,7 @@
 name: clubroyale
 description: "ClubRoyale - Your Private Card Club - Premium multiplayer card games"
 publish_to: 'none'
-version: 1.1.0+2
+version: 1.2.0+3
 
 
 environment:
@@ -63,6 +63,8 @@ dependencies:
   lottie: ^3.1.0  # Lottie animations
   rive: ^0.13.0     # Interactive state machine animations
   shimmer: ^3.0.0
+  firebase_remote_config: ^6.1.3
+  package_info_plus: ^8.3.1
 
 dev_dependencies:
   flutter_test:

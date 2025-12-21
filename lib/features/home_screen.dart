@@ -10,6 +10,9 @@ import 'package:clubroyale/features/social/providers/dashboard_providers.dart';
 import 'package:clubroyale/features/stories/services/story_service.dart';
 import 'package:clubroyale/features/home/widgets/compact_header.dart';
 import 'package:clubroyale/core/widgets/social_bottom_nav.dart' as social_nav;
+import 'package:clubroyale/features/home/widgets/game_modes_section.dart';
+import 'package:clubroyale/features/home/widgets/personal_stats_card.dart';
+import 'package:clubroyale/features/home/widgets/quick_match_banner.dart';
 
 /// HomeScreen - Nanobanana Dashboard Design
 /// 
@@ -80,6 +83,25 @@ class HomeScreen extends ConsumerWidget {
                                 // Story Bar (Feature Flagged)
                                 if (featureFlags.storiesEnabled)
                                   const StoryBar().animate().fadeIn(delay: 100.ms),
+                                
+                                const SizedBox(height: 16),
+                                
+                                // Personal Stats (Premium Feature)
+                                const PersonalStatsCard().animate().fadeIn(delay: 150.ms),
+                                
+                                // Quick Match Banner (Mocked data for now, ideally fetched from service)
+                                const QuickMatchBanner(
+                                  gameType: 'Marriage',
+                                  playersWaiting: 3,
+                                  roomId: 'bot_room_001', // Placeholder room
+                                ).animate().fadeIn(delay: 200.ms),
+                                
+                                const SizedBox(height: 16),
+                                
+                                // Game Modes (Solo, Public, Private, Local)
+                                const GameModesSection().animate().slideY(begin: 0.2, end: 0, delay: 150.ms).fadeIn(),
+
+                                const SizedBox(height: 16),
                                 
                                 const SizedBox(height: 8),
                                 

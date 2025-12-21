@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:clubroyale/core/theme/app_theme.dart';
 // content for card engine import might vary, assuming Card is imported from core/card_engine/pile.dart but `Card` name conflicts with Flutter Material Card.
 // The game screen logic used `import 'package:flutter/material.dart' hide Card;`
-import 'package:clubroyale/core/card_engine/pile.dart' as game;
+import 'package:clubroyale/core/models/playing_card.dart';
 
 class CardWidget extends StatelessWidget {
-  final game.Card card;
+  final PlayingCard card;
   final bool isSelected;
   final bool isFaceUp;
   final bool isSelectable;
@@ -72,7 +72,7 @@ class CardWidget extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: glowColor?.withOpacity(0.6) ?? 
+            color: glowColor?.withValues(alpha: 0.6) ?? 
                    (isSelected ? AppTheme.gold.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.2)),
             blurRadius: (isSelected || glowColor != null) ? 8 : 3,
             offset: const Offset(1, 1),

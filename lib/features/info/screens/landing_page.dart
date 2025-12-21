@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/core/theme/multi_theme.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Landing Page - Beautiful introduction with features and roadmap
 class LandingPage extends ConsumerStatefulWidget {
@@ -185,6 +186,17 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
                       Text('Play Now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     ],
                   ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => launchUrl(Uri.parse('https://clubroyale-app.web.app/app-release.apk')),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3DDC84),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  ),
+                  icon: const Icon(Icons.android),
+                  label: const Text('Download APK', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
                 OutlinedButton(
                   onPressed: () => context.push('/about'),

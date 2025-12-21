@@ -571,6 +571,8 @@ class MarriageService {
       results.add(PlayerScoreResult(
         playerId: pid,
         score: totalScore,
+        maalPoints: maalPointsMap[pid] ?? 0, // Fix scope issue
+        gamePoints: 0, 
         isDeclarer: isDeclarer,
         bonuses: bonuses,
         bonusReasons: bonusReasons,

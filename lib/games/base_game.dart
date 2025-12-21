@@ -58,10 +58,10 @@ abstract class BaseGame {
   void endRound();
   
   /// Check if a move is valid
-  bool isValidMove(String playerId, Card card);
+  bool isValidMove(String playerId, PlayingCard card);
   
   /// Play a card
-  void playCard(String playerId, Card card);
+  void playCard(String playerId, PlayingCard card);
   
   /// Get the winner of current round/trick
   String? getRoundWinner();
@@ -70,7 +70,7 @@ abstract class BaseGame {
   Map<String, int> calculateScores();
   
   /// Get a player's hand
-  List<Card> getHand(String playerId);
+  List<PlayingCard> getHand(String playerId);
   
   /// Advance to next player's turn
   void nextTurn();

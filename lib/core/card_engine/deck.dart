@@ -1,10 +1,10 @@
 /// Deck - A pile of cards representing a game deck
 /// 
 /// Supports single deck (52 cards), double deck (104), triple deck (156)
-/// Based on gin_rummy Deck pattern
 library;
 
 import 'pile.dart';
+// Note: pile.dart exports PlayingCard, CardSuit, CardRank
 
 /// Deck configuration
 enum DeckConfig {
@@ -47,16 +47,16 @@ class Deck extends Pile {
     
     for (int deckIndex = 0; deckIndex < config.deckCount; deckIndex++) {
       // Add all standard cards
-      for (final suit in Suit.values) {
-        for (final rank in Rank.values) {
-          addCard(Card(rank: rank, suit: suit, deckIndex: deckIndex));
+      for (final suit in CardSuit.values) {
+        for (final rank in CardRank.values) {
+          addCard(PlayingCard(rank: rank, suit: suit, deckIndex: deckIndex));
         }
       }
       
       // Add jokers if configured
       if (config.includeJokers) {
-        addCard(Card.joker(deckIndex * 2));
-        addCard(Card.joker(deckIndex * 2 + 1));
+        addCard(PlayingCard.joker(deckIndex * 2));
+        addCard(PlayingCard.joker(deckIndex * 2 + 1));
       }
     }
   }
@@ -68,8 +68,8 @@ class Deck extends Pile {
   }
   
   /// Deal cards to multiple hands
-  List<List<Card>> deal(int playerCount, int cardsPerPlayer) {
-    final hands = List.generate(playerCount, (_) => <Card>[]);
+  List<List<PlayingCard>> deal(int playerCount, int cardsPerPlayer) {
+    final hands = List.generate(playerCount, (_) => <PlayingCard>[]);
     
     for (int c = 0; c < cardsPerPlayer; c++) {
       for (int p = 0; p < playerCount; p++) {

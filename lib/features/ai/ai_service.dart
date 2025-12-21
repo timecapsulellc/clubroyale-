@@ -1,5 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:clubroyale/core/ai/hybrid_ai_service.dart';
 
 /// AI Service for interacting with Genkit-powered Cloud Functions
 class AiService {
@@ -121,19 +122,41 @@ class AiService {
     required List<String> hand,
     required Map<String, dynamic> gameState,
   }) async {
-    final callable = _functions.httpsCallable('marriageBotPlay');
-    final result = await callable.call<Map<String, dynamic>>({
-      'difficulty': difficulty,
-      'hand': hand,
-      'gameState': gameState,
-    });
+    // FALLBACK: Use local Hybrid AI service to avoid CORS/Cloud issues during development
+    try {
+      final request = AIDecisionRequest(
+        gameType: 'marriage',
+        phase: gameState['phase'] ?? 'playing', 
+        hand: hand,
+        gameState: gameState,
+        difficulty: difficulty,
+      );
+      
+      final data = await HybridAIService.getMove(request);
 
-    final data = result.data;
-    return MarriageBotPlayResult(
-      action: data['action'] as String,
-      card: data['card'] as String?,
-      reasoning: data['reasoning'] as String?,
-    );
+      return MarriageBotPlayResult(
+        action: data['action'] as String,
+        card: data['card'] as String?,
+        reasoning: data['reasoning'] as String?,
+      );
+    } catch (e) {
+      // If local AI fails, try cloud (or just return fallback)
+      print('Local AI failed, falling back to cloud (which might fail with CORS): $e');
+      
+      final callable = _functions.httpsCallable('marriageBotPlay');
+      final result = await callable.call<Map<String, dynamic>>({
+        'difficulty': difficulty,
+        'hand': hand,
+        'gameState': gameState,
+      });
+
+      final data = result.data;
+      return MarriageBotPlayResult(
+        action: data['action'] as String,
+        card: data['card'] as String?,
+        reasoning: data['reasoning'] as String?,
+      );
+    }
   }
 }
 

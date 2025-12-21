@@ -165,5 +165,5 @@ class MaalCardInfo {
   });
   
   @override
-  String toString() => '${MarriageMaalCalculator.getMaalName(type)}: ${card.displayName} ($value pts)';
+  String toString() => '${MarriageMaalCalculator.getMaalName(type)}: ${card.displayString} ($value pts)';
 }

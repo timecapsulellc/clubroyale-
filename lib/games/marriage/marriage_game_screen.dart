@@ -9,6 +9,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/theme/app_theme.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/games/base_game.dart';
 import 'package:clubroyale/core/card_engine/meld.dart' as meld_engine;
 import 'package:clubroyale/core/card_engine/pile.dart'; // For Card class
@@ -22,6 +23,8 @@ import 'package:clubroyale/features/ai/ai_service.dart';
 import 'package:clubroyale/games/marriage/widgets/visit_button_widget.dart';
 import 'package:clubroyale/games/marriage/widgets/maal_indicator.dart';
 import 'package:clubroyale/games/marriage/widgets/game_timer_widget.dart';
+import 'package:clubroyale/games/marriage/widgets/marriage_hud_overlay.dart';
+import 'package:clubroyale/features/game/ui/screens/game_settlement_dialog.dart';
 import 'package:clubroyale/games/marriage/marriage_visit_validator.dart';
 import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
@@ -225,6 +228,32 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       );
     }
   }
+
+  void _showWinDialog({required String winnerName}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => GameSettlementDialog(
+        winnerName: winnerName,
+        winAmount: 1500, // Placeholder
+        isWinner: winnerName.contains('You'),
+        scores: const {
+          'You': 150, 
+          'Bot 1': -45,
+          'Bot 2': -30,
+          'Bot 3': -75
+        }, // Placeholder scores
+        onNextRound: () {
+          Navigator.pop(context);
+          setState(() => _initGame());
+        },
+        onExit: () {
+          Navigator.pop(context);
+          Navigator.pop(context); // Exit screen
+        }, 
+      ),
+    );
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -295,7 +324,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                 children: [
                   Text('${GameTerminology.wildCard}: ', style: const TextStyle(color: Colors.white70, fontSize: 12)),
                   Text(
-                    _game.tiplu!.displayName,
+                    _game.tiplu!.displayString,
                     style: TextStyle(
                       color: _game.tiplu!.suit.isRed ? Colors.red : Colors.white,
                       fontWeight: FontWeight.bold,
@@ -312,13 +341,11 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
             },
             tooltip: 'New Game',
           ),
-          // Status Indicator
+          // Status Indicator (Simplified - Maal now in HUD)
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: Row(
               children: [
-                MaalIndicator(points: _maalPoints, hasMarriage: _hasMarriageBonus),
-                const SizedBox(width: 12),
                 Icon(
                   _hasVisited ? Icons.lock_open : Icons.lock,
                   color: _hasVisited ? Colors.greenAccent : Colors.white24,
@@ -395,6 +422,18 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                   _buildActionBar(),
                 ],
               ),
+              
+              // Polished HUD Overlay (Turn Indicator, Maal, Emotes)
+              MarriageHUDOverlay(
+                currentPlayerId: _game.currentPlayerId,
+                myPlayerId: _playerId,
+                maalPoints: _maalPoints,
+                onEmoteTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Emotes coming soon!')),
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -469,7 +508,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           GestureDetector(
             onTap: canDrawFromDeck ? _drawFromDeck : null,
             child: CardWidget(
-              card: Card(rank: Rank.ace, suit: Suit.spades), // Dummy card for back
+              card: PlayingCard(rank: CardRank.ace, suit: CardSuit.spades), // Dummy card for back
               isFaceUp: false,
               isSelectable: canDrawFromDeck,
               isSelected: false,
@@ -482,7 +521,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
             child: Stack(
               children: [
                 CardWidget(
-                  card: topDiscard ?? Card(rank: Rank.ace, suit: Suit.spades), // Show back styled dummy if no discard
+                  card: topDiscard ?? PlayingCard(rank: CardRank.ace, suit: CardSuit.spades), // Show back styled dummy if no discard
                   isFaceUp: topDiscard != null,
                   isSelectable: canDrawFromDiscard,
                   isSelected: false,
@@ -492,7 +531,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Center(
@@ -505,7 +544,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                    Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.3), // Red tint for blocked action
+                        color: Colors.red.withValues(alpha: 0.3), // Red tint for blocked action
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Center(
@@ -558,7 +597,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     );
   }
 
-  Widget _buildMyHand(List<Card> hand) {
+  Widget _buildMyHand(List<PlayingCard> hand) {
     // Calculator for rendering badges
     final calculator = _game.tiplu != null 
         ? MarriageMaalCalculator(tiplu: _game.tiplu!, config: _config) 
@@ -720,14 +759,14 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     });
   }
   
-  // Helper to convert Card to AI-friendly string (e.g., "AS", "10H")
-  String _toAiString(Card card) {
+  // Helper to convert PlayingCard to AI-friendly string (e.g., "AS", "10H")
+  String _toAiString(PlayingCard card) {
     if (card.isJoker) return 'Joker';
     return '${card.rank.symbol}${card.suit.name[0].toUpperCase()}';
   }
 
   // Helper: Check if card is Wild
-  bool _isWildCard(Card card) {
+  bool _isWildCard(PlayingCard card) {
     if (_game.tiplu == null) return false;
     final tiplu = _game.tiplu!;
     
@@ -860,7 +899,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   void _tryDeclare() {
     final success = _game.declare(_playerId);
     if (success) {
-      _showWinDialog();
+      _showWinDialog(winnerName: 'You');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -869,67 +908,6 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
         ),
       );
     }
-  }
-  
-  void _showWinDialog({String? winnerName}) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.teal,
-        title: Text('🎉 ${winnerName ?? 'You'} Win!', style: const TextStyle(color: AppTheme.gold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Match Results:', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            ..._game.calculateScores().entries.map((e) {
-              final pid = e.key;
-              final isMe = pid == _playerId;
-              final score = e.value;
-              final hasVisited = _game.getHand(pid).length < 21 || _game.findMelds(pid).isNotEmpty; // Crude check, ideally GameState tracks this
-              // For now display raw score
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      _getPlayerName(pid),
-                      style: TextStyle(
-                        color: isMe ? Colors.greenAccent : Colors.white70,
-                        fontWeight: isMe ? FontWeight.bold : FontWeight.normal,
-                      ),
-                    ),
-                    Text(
-                      '$score pts',
-                      style: TextStyle(
-                        color: score < 0 ? Colors.green : (score > 50 ? Colors.red : AppTheme.gold),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-            const Divider(color: Colors.white24),
-            const Text(
-              'Maal Exchange & Penalties applied.',
-              style: TextStyle(color: Colors.white38, fontSize: 10, fontStyle: FontStyle.italic),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() => _initGame());
-            },
-            child: const Text('New Game'),
-          ),
-        ],
-      ),
-    );
   }
   
   String _getBotName(String botId) {

@@ -10,19 +10,19 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:clubroyale/core/card_engine/pile.dart' as engine;
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart';
 import 'package:clubroyale/core/design_system/game/premium_card_widget.dart';
 
 /// Expandable hand widget with drag-to-rearrange
 class PremiumHandWidget extends StatefulWidget {
-  final List<engine.Card> cards;
+  final List<PlayingCard> cards;
   final String? selectedCardId;
-  final engine.Card? tiplu;
+  final PlayingCard? tiplu;
   final Set<String> highlightedCardIds;
   final bool isMyTurn;
   final bool canSelect;
-  final Function(engine.Card)? onCardTap;
+  final Function(PlayingCard)? onCardTap;
   final Function(int fromIndex, int toIndex)? onCardReorder;
 
   const PremiumHandWidget({
@@ -68,8 +68,8 @@ class _PremiumHandWidgetState extends State<PremiumHandWidget> {
     }
   }
 
-  List<engine.Card> get _sortedCards {
-    final cards = List<engine.Card>.from(widget.cards);
+  List<PlayingCard> get _sortedCards {
+    final cards = List<PlayingCard>.from(widget.cards);
     
     switch (_sortMode) {
       case SortMode.suit:
@@ -99,7 +99,7 @@ class _PremiumHandWidgetState extends State<PremiumHandWidget> {
     return cards;
   }
 
-  MaalType? _getMaalType(engine.Card card) {
+  MaalType? _getMaalType(PlayingCard card) {
     if (_maalCalculator == null) return null;
     final type = _maalCalculator!.getMaalType(card);
     return type == MaalType.none ? null : type;

@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:clubroyale/firebase_options.dart';
 import 'package:clubroyale/core/services/feature_flags.dart';
 import 'core/services/analytics_service.dart';
+import 'core/services/update_service.dart';
 
 import 'features/lobby/lobby_screen.dart';
 import 'features/lobby/room_waiting_screen.dart';
@@ -59,7 +60,7 @@ import 'package:clubroyale/features/info/screens/faq_screen.dart';
 import 'package:clubroyale/features/info/screens/how_to_play_screen.dart';
 import 'package:clubroyale/features/info/screens/terms_screen.dart';
 import 'package:clubroyale/features/info/screens/about_screen.dart';
-import 'package:clubroyale/features/info/screens/landing_page.dart';
+import 'package:clubroyale/features/landing/landing_page.dart' as landing;
 import 'package:clubroyale/features/info/screens/privacy_screen.dart';
 
 // Social & Gaming Features imports
@@ -369,7 +370,7 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'landing',
           builder: (BuildContext context, GoRouterState state) {
-            return const LandingPage();
+            return const landing.LandingPage();
           },
         ),
         // Social & Gaming Feature Routes
@@ -469,7 +470,12 @@ void main() async {
   
   // Initialize Feature Flags (Gaming-First Strategy)
   await featureFlags.init();
+  await featureFlags.init();
   debugPrint('🏴 Feature Flags initialized: Social=${featureFlags.socialEnabled}');
+  
+  // Initialize Update Service (Remote Config)
+  final updateService = UpdateService();
+  await updateService.init();
   
   runApp(
 

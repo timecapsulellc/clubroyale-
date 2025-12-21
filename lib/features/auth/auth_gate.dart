@@ -10,6 +10,8 @@ import 'auth_service.dart';
 // TestMode is imported from auth_service.dart
 
 import '../social/services/presence_service.dart';
+import '../../core/services/update_service.dart';
+import '../../core/services/notification_service.dart';
 
 class AuthGate extends ConsumerStatefulWidget {
   const AuthGate({super.key});
@@ -24,6 +26,12 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     super.initState();
     // Initialize presence system (idempotent listener)
     ref.read(presenceServiceProvider).initialize();
+    
+    // Check for updates (Daily OTA) based on Beta Launch Strategy
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(updateServiceProvider).checkForUpdate(context);
+      ref.read(notificationServiceProvider).init(context);
+    });
   }
 
   @override
