@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:clubroyale/core/services/feature_flags.dart';
 import 'package:clubroyale/features/stories/widgets/story_bar.dart';
 import 'package:clubroyale/features/social/widgets/quick_social_actions.dart';
 import 'package:clubroyale/features/social/widgets/social_feed_widget.dart';
@@ -76,8 +77,9 @@ class HomeScreen extends ConsumerWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Story Bar
-                                const StoryBar().animate().fadeIn(delay: 100.ms),
+                                // Story Bar (Feature Flagged)
+                                if (featureFlags.storiesEnabled)
+                                  const StoryBar().animate().fadeIn(delay: 100.ms),
                                 
                                 const SizedBox(height: 8),
                                 
@@ -86,13 +88,15 @@ class HomeScreen extends ConsumerWidget {
                                 
                                 const SizedBox(height: 8),
                                 
-                                // Quick Actions
-                                const QuickSocialActions().animate().fadeIn(delay: 200.ms),
+                                // Quick Actions (Feature Flagged)
+                                if (featureFlags.socialEnabled)
+                                  const QuickSocialActions().animate().fadeIn(delay: 200.ms),
                                 
                                 const SizedBox(height: 8),
                                 
-                                // Activity Feed (Glassmorphism)
-                                const SocialFeedWidget(maxItems: 5).animate().fadeIn(delay: 250.ms),
+                                // Activity Feed (Feature Flagged)
+                                if (featureFlags.feedEnabled)
+                                  const SocialFeedWidget(maxItems: 5).animate().fadeIn(delay: 250.ms),
                                 
                                 const SizedBox(height: 24),
                               ],

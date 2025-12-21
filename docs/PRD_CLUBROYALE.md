@@ -1,19 +1,19 @@
 # ClubRoyale PRD (Product Requirements Document)
-## The Agentic Social Gaming Platform
+## The Premier Card Gaming Platform
 
-**Version:** 2.1  
-**Date:** December 20, 2025  
-**Strategy:** Strategy B - Agentic Social Ecosystem + AI Gaming Platform
+**Version:** 2.2  
+**Date:** December 21, 2025  
+**Strategy:** Gaming-First (Social features flag-gated for future enablement)
 
 ---
 
 ## 1. Executive Summary
 
-ClubRoyale is a next-generation **Play & Connect** platform that combines classic card games with a deeply integrated social network, powered by **Agentic AI**. Unlike traditional game apps, ClubRoyale uses autonomous AI agents to manage content, moderate safety, recommend interactions, and enhance the gameplay experience in real-time.
+ClubRoyale is a next-generation **Card Gaming Platform** focused on premium gameplay experiences. Features classic card games with AI opponents, tournaments, and real-time multiplayer.
 
-**NEW in v2.1:** The **AI Gaming Platform** enables instant play with pre-seeded bot rooms and 5 cognitive bot personalities using Tree of Thoughts reasoning.
+**NEW in v2.2:** **Gaming-First Strategy** - Social features (stories, feeds) are flag-gated and can be enabled post-launch based on retention data.
 
-> **One-Liner:** A social gaming ecosystem where AI agents facilitate meaningful connections and premium gameplay—with instant access to AI opponents.
+> **One-Liner:** The best card gaming experience with AI opponents and competitive multiplayer—social features ready to enable when needed.
 
 ---
 

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/firebase_options.dart';
+import 'package:clubroyale/core/services/feature_flags.dart';
 import 'core/services/analytics_service.dart';
 
 import 'features/lobby/lobby_screen.dart';
@@ -465,6 +466,10 @@ void main() async {
   // Revenue comes from AdMob ads only
   // initialized in ProviderScope
   debugPrint('ℹ️ App runs in FREE mode (ads only)');
+  
+  // Initialize Feature Flags (Gaming-First Strategy)
+  await featureFlags.init();
+  debugPrint('🏴 Feature Flags initialized: Social=${featureFlags.socialEnabled}');
   
   runApp(
 
