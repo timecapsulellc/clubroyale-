@@ -87,6 +87,7 @@ flutter:
     - assets/sounds/ui/
     - assets/sounds/game/
     - assets/cards/png/
+    - assets/cards/backs/
     - assets/images/
     - assets/images/chips/
     - assets/images/bots/

@@ -18,9 +18,9 @@
 ### Special Cards (7)
 - `back.png` - Standard card back
 - `back@2x.png` - Retina card back
-- `back_premium.png` - Premium design (Placeholder)
-- `back_vip.png` - VIP exclusive (Placeholder)
-- `back_seasonal.png` - Seasonal/Limited (Placeholder)
+- `royal_back.png` - Royal Theme (Generated)
+- `dragon_back.png` - Dragon Theme (Generated)
+- `diamond_back.png` - Diamond Theme (Generated)
 - `black_joker.png` - Black joker
 - `red_joker.png` - Red joker
 
@@ -111,23 +111,23 @@
 
 | File | Purpose | Note |
 |------|---------|------|
-| `table_wood.png` | Wood premium table | Placeholder |
-| `table_luxury.png` | VIP room theme | Placeholder |
-| `table_classic.png` | Green felt theme | Placeholder |
-| `chip_stack_low.png` | 1-100 chips | Placeholder |
-| `chip_stack_medium.png` | 100-1000 chips | Placeholder |
-| `chip_stack_high.png` | 1000+ chips | Placeholder |
+| `table_wood.png` | Wood premium table | AI Generated |
+| `table_luxury.png` | VIP room theme | AI Generated |
+| `table_felt_green.png` | Green felt theme | AI Generated |
+| `stack_small.png` | 1-100 chips | AI Generated |
+| `stack_medium.png` | 100-1000 chips | AI Generated |
+| `stack_large.png` | 1000+ chips | AI Generated |
 
 ## Bot Assets (5) ✅
 **Location:** `assets/images/bots/`
 
 | File | Purpose | Note |
 |------|---------|------|
-| `trickmaster.png` | 🎭 Aggressive bot | Placeholder |
-| `cardshark.png` | 🃏 Conservative bot | Placeholder |
-| `luckydice.png` | 🎲 Chaotic bot | Placeholder |
-| `deepthink.png` | 🧠 Analytical bot | Placeholder |
-| `royalace.png` | 💎 Balanced bot | Placeholder |
+| `trickmaster.png` | 🎭 Aggressive bot | AI Generated |
+| `cardshark.png` | 🃏 Conservative bot | AI Generated |
+| `luckydice.png` | 🎲 Chaotic bot | AI Generated |
+| `deepthink.png` | 🧠 Analytical bot | AI Generated |
+| `royalace.png` | 💎 Balanced bot | AI Generated |
 
 ---
 
