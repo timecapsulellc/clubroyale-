@@ -1,8 +1,7 @@
 {
   "projects": {
-    "default": "taasclub-app",
-    "production": "taasclub-app",
-    "staging": "clubroyale-staging"
+    "default": "clubroyale-app",
+    "production": "clubroyale-app"
   },
   "targets": {},
   "etags": {}
