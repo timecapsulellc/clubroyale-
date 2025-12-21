@@ -4,7 +4,7 @@
 library;
 
 import 'package:clubroyale/core/config/game_terminology.dart';
-import 'package:clubroyale/core/card_engine/pile.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 
 /// Game phases common to most card games
 enum GamePhase {

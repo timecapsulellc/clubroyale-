@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 
 /// Widget to display a single playing card with flip animation
 class PlayingCardWidget extends StatefulWidget {

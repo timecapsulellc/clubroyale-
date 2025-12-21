@@ -8,6 +8,7 @@ library;
 import 'package:clubroyale/games/base_game.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 
 /// In Between game state
 enum InBetweenPhase {
@@ -53,9 +54,9 @@ class InBetweenGame implements BaseGame {
   InBetweenPhase _inBetweenPhase = InBetweenPhase.dealing;
   
   // Round state
-  Card? _lowCard;
-  Card? _highCard;
-  Card? _middleCard;
+  PlayingCard? _lowCard;
+  PlayingCard? _highCard;
+  PlayingCard? _middleCard;
   int _currentBet = 0;
   int _pot = 0;
   final Map<String, int> _chips = {};
@@ -77,9 +78,9 @@ class InBetweenGame implements BaseGame {
   
   // Getters
   int get pot => _pot;
-  Card? get lowCard => _lowCard;
-  Card? get highCard => _highCard;
-  Card? get middleCard => _middleCard;
+  PlayingCard? get lowCard => _lowCard;
+  PlayingCard? get highCard => _highCard;
+  PlayingCard? get middleCard => _middleCard;
   int get currentBet => _currentBet;
   
   /// Get chips for a player
@@ -207,12 +208,13 @@ class InBetweenGame implements BaseGame {
   }
   
   /// Get card numeric value (Ace = 14 for consistency)
-  int _cardValue(Card card) {
+  /// Get card numeric value (Ace = 14 for consistency)
+  int _cardValue(PlayingCard card) {
     switch (card.rank) {
-      case Rank.ace: return 14;
-      case Rank.king: return 13;
-      case Rank.queen: return 12;
-      case Rank.jack: return 11;
+      case CardRank.ace: return 14;
+      case CardRank.king: return 13;
+      case CardRank.queen: return 12;
+      case CardRank.jack: return 11;
       default: return card.rank.points;
     }
   }
@@ -237,10 +239,10 @@ class InBetweenGame implements BaseGame {
   }
   
   @override
-  bool isValidMove(String playerId, Card card) => false;
+  bool isValidMove(String playerId, PlayingCard card) => false;
   
   @override
-  void playCard(String playerId, Card card) {
+  void playCard(String playerId, PlayingCard card) {
     // Not applicable
   }
   
@@ -264,7 +266,7 @@ class InBetweenGame implements BaseGame {
   Map<String, int> calculateScores() => Map.from(_chips);
   
   @override
-  List<Card> getHand(String playerId) => [];
+  List<PlayingCard> getHand(String playerId) => [];
   
   @override
   void nextTurn() {

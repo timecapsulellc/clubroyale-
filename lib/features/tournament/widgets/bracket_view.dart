@@ -3,9 +3,12 @@
 /// Displays tournament brackets visually
 library;
 
+
 import 'package:flutter/material.dart';
 import 'package:clubroyale/features/tournament/tournament_model.dart';
 import 'package:clubroyale/features/tournament/widgets/bracket_connector.dart';
+import 'package:clubroyale/config/casino_theme.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class BracketView extends StatelessWidget {
   final List<TournamentBracket> brackets;
@@ -37,11 +40,6 @@ class BracketView extends StatelessWidget {
             if (round != rounds.last) 
               BracketConnector(
                 itemCount: roundsMap[round]!.length,
-                // Assuming standard _MatchCard height ~100 + padding. 
-                // We might need to adjust this to match _MatchCard logic exactly or make dynamic.
-                // _MatchCard content height is variable based on font/padding. 
-                // For a robust implementation, we'd need fixed height cards.
-                // Let's enforce fixed height on _MatchCard later or assume ~120.
                 itemHeight: 120.0, 
                 gap: 16.0,
               ),
@@ -82,7 +80,7 @@ class _RoundColumn extends StatelessWidget {
               color: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
           ),
-        ),
+        ).animate().fadeIn(delay: 100.ms * roundNumber),
         const SizedBox(height: 16),
         ...matches.map((match) => Padding(
           padding: const EdgeInsets.only(bottom: 16),
@@ -107,22 +105,35 @@ class _MatchCard extends StatelessWidget {
       width: 200,
       height: 120, // Fixed height for alignment with connectors
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        gradient: LinearGradient(
+          colors: [
+            CasinoColors.cardBackgroundLight,
+            CasinoColors.cardBackground,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isLive
-              ? Colors.orange
+              ? CasinoColors.gold
               : isComplete
-                  ? Colors.green
-                  : Theme.of(context).colorScheme.outline,
+                  ? CasinoColors.feltGreen
+                  : Colors.white10,
           width: isLive ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
+          if (isLive)
+            BoxShadow(
+              color: CasinoColors.gold.withValues(alpha: 0.2),
+              blurRadius: 12,
+              spreadRadius: 1,
+            ),
         ],
       ),
       child: Column(
@@ -131,7 +142,7 @@ class _MatchCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              color: Colors.black26,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
             ),
             child: Row(
@@ -139,26 +150,32 @@ class _MatchCard extends StatelessWidget {
               children: [
                 Text(
                   'Match ${bracket.matchNumber}',
-                  style: Theme.of(context).textTheme.labelSmall,
+                  style: const TextStyle(
+                    color: Colors.white54,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
                 ),
                 if (isLive)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.orange,
+                      color: CasinoColors.gold,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Text(
                       'LIVE',
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
+                        color: Colors.black,
+                        fontSize: 9,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
+                  ).animate(onPlay: (c) => c.repeat(reverse: true))
+                   .fade(duration: 600.ms, begin: 0.5, end: 1.0),
                 if (isComplete)
-                  const Icon(Icons.check_circle, color: Colors.green, size: 16),
+                  const Icon(Icons.check_circle, color: CasinoColors.feltGreen, size: 14),
               ],
             ),
           ),
@@ -169,7 +186,7 @@ class _MatchCard extends StatelessWidget {
             isWinner: bracket.winnerId == bracket.player1Id,
             isComplete: isComplete,
           ),
-          const Divider(height: 1),
+          Divider(height: 1, color: Colors.white.withValues(alpha: 0.1)),
           // Player 2
           _PlayerRow(
             name: bracket.player2Name ?? 'BYE',
@@ -180,7 +197,7 @@ class _MatchCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ).animate().fadeIn().slideX(begin: -0.1, duration: 300.ms);
   }
 }
 

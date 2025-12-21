@@ -7,6 +7,7 @@ library;
 import 'package:clubroyale/games/base_game.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'teen_patti_hand.dart';
 
 /// Player status in Teen Patti
@@ -29,7 +30,7 @@ enum TeenPattiPhase {
 class TeenPattiPlayer {
   final String id;
   final String name;
-  List<Card> cards;
+  List<PlayingCard> cards;
   PlayerStatus status;
   int totalBet;
   bool hasFolded;
@@ -304,13 +305,13 @@ class TeenPattiGame implements BaseGame {
   }
   
   @override
-  bool isValidMove(String playerId, Card card) {
+  bool isValidMove(String playerId, PlayingCard card) {
     // In Teen Patti, cards aren't "played" - betting is the action
     return false;
   }
   
   @override
-  void playCard(String playerId, Card card) {
+  void playCard(String playerId, PlayingCard card) {
     // Not applicable for Teen Patti
   }
   
@@ -331,7 +332,7 @@ class TeenPattiGame implements BaseGame {
   }
   
   @override
-  List<Card> getHand(String playerId) {
+  List<PlayingCard> getHand(String playerId) {
     return _players[playerId]?.cards ?? [];
   }
   

@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/features/game/call_break_service.dart';
 import 'package:clubroyale/features/game/game_room.dart';
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/models/game_state.dart';
 import 'package:clubroyale/features/lobby/lobby_service.dart';
 import 'package:clubroyale/config/casino_theme.dart';

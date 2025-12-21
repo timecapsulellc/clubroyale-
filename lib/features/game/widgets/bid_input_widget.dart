@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:clubroyale/features/game/models/game_state.dart';
 import 'package:clubroyale/features/game/services/card_validation_service.dart';
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 
 /// Widget for bidding phase
 class BidInputWidget extends StatefulWidget {

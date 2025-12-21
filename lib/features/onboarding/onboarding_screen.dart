@@ -236,7 +236,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               size: 80,
               color: page.color,
             ),
-          ).animate().scale(delay: 200.ms).fadeIn(),
+          )
+          .animate()
+          .scale(delay: 200.ms, duration: 400.ms, curve: Curves.easeOutBack)
+          .fadeIn()
+          .animate(onPlay: (c) => c.repeat(reverse: true))
+          .moveY(begin: 0, end: -10, duration: 2.seconds, curve: Curves.easeInOutSine),
           
           const SizedBox(height: 48),
           

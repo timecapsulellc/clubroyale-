@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/game/services/test_game_service.dart';
 import 'package:clubroyale/features/game/game_room.dart';
 import 'package:clubroyale/features/game/models/game_state.dart';
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/widgets/card_widgets.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 

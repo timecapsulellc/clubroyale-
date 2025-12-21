@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 
 part 'game_state.freezed.dart';
 part 'game_state.g.dart';

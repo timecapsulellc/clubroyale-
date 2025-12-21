@@ -463,7 +463,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
             ],
           );
         },
-        loading: () => const SkeletonScreen(title: 'Game Room'),
+        loading: () => const SkeletonGameScreen(),
         error: (error, stack) => ErrorDisplay(
           title: 'Error Loading Game',
           message: error.toString(),

@@ -296,21 +296,14 @@ class LobbyService {
       
       final playerIds = game.players.map((p) => p.id).toList();
       
-      // Require exactly 4 players for Call Break
-      if (playerIds.length != 4) {
-        throw Exception('Call Break requires exactly 4 players');
-      }
-      
-      // Deal cards locally
-      final hands = Deck.dealHands(playerIds);
-      
       // Update game state
       _TestModeStorage.updateGame(
         gameId,
         game.copyWith(
           status: GameStatus.playing,
-          gamePhase: GamePhase.bidding,
-          playerHands: hands,
+          // Only init Call Break specific fields if needed
+          gamePhase: game.gameType == 'call_break' ? GamePhase.bidding : null,
+          playerHands: game.gameType == 'call_break' ? Deck.dealHands(playerIds) : {},
           bids: <String, Bid>{},
           tricksWon: {for (var id in playerIds) id: 0},
           currentTrick: null,
@@ -332,14 +325,17 @@ class LobbyService {
       final game = doc.data()!.copyWith(id: doc.id);
       final playerIds = game.players.map((p) => p.id).toList();
       
-      // Require exactly 4 players for Call Break
-      if (playerIds.length != 4) {
-        throw Exception('Call Break requires exactly 4 players');
+      // Game-specific initialization
+      if (game.gameType == 'call_break' || game.gameType == null) {
+        // Require exactly 4 players for Call Break
+        if (playerIds.length != 4) {
+          throw Exception('Call Break requires exactly 4 players');
+        }
+        
+        // Use CallBreakService to initialize the game with dealt cards
+        final callBreakService = _ref.read(callBreakServiceProvider);
+        await callBreakService.startNewRound(gameId, playerIds);
       }
-      
-      // Use CallBreakService to initialize the game with dealt cards
-      final callBreakService = _ref.read(callBreakServiceProvider);
-      await callBreakService.startNewRound(gameId, playerIds);
       
       // Update status to playing
       await _db.collection('games').doc(gameId).update({

@@ -1,12 +1,22 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:clubroyale/features/lobby/lobby_service.dart';
+import 'package:clubroyale/features/game/game_room.dart';
+import 'package:clubroyale/features/game/game_config.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
+import 'package:clubroyale/games/teen_patti/teen_patti_service.dart';
+import 'package:clubroyale/games/in_between/in_between_service.dart';
+import 'package:clubroyale/games/marriage/marriage_service.dart';
+import 'package:clubroyale/core/widgets/animated_card_cover.dart';
 
-class GameModesSection extends StatelessWidget {
+class GameModesSection extends ConsumerWidget {
   const GameModesSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -53,7 +63,7 @@ class GameModesSection extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              onTap: () => _showGameSelector(context),
+              onTap: () => _showGameSelector(context, ref),
             ),
             _ModeCard(
               title: 'PUBLIC',
@@ -106,7 +116,7 @@ class GameModesSection extends StatelessWidget {
     );
   }
 
-  void _showGameSelector(BuildContext context) {
+  void _showGameSelector(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -122,18 +132,145 @@ class GameModesSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Select Game',
+              'Select Game (Practice)',
               style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            _GameOption(name: 'Marriage', icon: '♦️', onTap: () { Navigator.pop(context); context.push('/marriage/practice'); }),
-            _GameOption(name: 'Call Break', icon: '♠️', onTap: () { Navigator.pop(context); context.push('/call-break'); }),
-            _GameOption(name: 'Teen Patti', icon: '♥️', onTap: () { Navigator.pop(context); context.push('/teen_patti/practice'); }), // Placeholder route
-            _GameOption(name: 'In-Between', icon: '♣️', onTap: () { Navigator.pop(context); context.push('/in_between/practice'); }), // Placeholder
+            _GameOption(
+              name: 'Marriage', 
+              icon: '♦️', 
+              onTap: () => _startPracticeGame(context, ref, 'marriage'),
+            ),
+            _GameOption(
+              name: 'Call Break', 
+              icon: '♠️', 
+              onTap: () => _startPracticeGame(context, ref, 'call_break'),
+            ),
+            _GameOption(
+              name: 'Teen Patti', 
+              icon: '♥️', 
+              onTap: () => _startPracticeGame(context, ref, 'teen_patti'),
+            ),
+            _GameOption(
+              name: 'In-Between', 
+              icon: '♣️', 
+              onTap: () => _startPracticeGame(context, ref, 'in_between'),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _startPracticeGame(BuildContext context, WidgetRef ref, String gameType) async {
+    Navigator.pop(context); // Close sheet
+    
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
+      ),
+    );
+
+    try {
+      debugPrint('🎮 [Practice] Starting $gameType practice game...');
+      final lobbyService = ref.read(lobbyServiceProvider);
+      final authService = ref.read(authServiceProvider);
+      final userId = authService.currentUser?.uid;
+      
+      if (userId == null) throw Exception('User not logged in');
+      debugPrint('🎮 [Practice] User: $userId');
+
+      // 1. Create Game Room
+      debugPrint('🎮 [Practice] Step 1: Creating game room...');
+      final room = GameRoom(
+        hostId: userId,
+        name: 'Practice Match',
+        gameType: gameType,
+        players: [
+          Player(id: userId, name: 'You', isReady: true),
+        ],
+        scores: {userId: 0},
+        config: const GameConfig(
+          maxPlayers: 4,
+        ),
+      );
+
+      final roomId = await lobbyService.createGame(room);
+      debugPrint('🎮 [Practice] Room created: $roomId');
+
+      // 2. Add Bots based on Game Type
+      debugPrint('🎮 [Practice] Step 2: Adding bots...');
+      int requiredBots = 0;
+      if (gameType == 'marriage') requiredBots = 2; // Total 3
+      if (gameType == 'call_break') requiredBots = 3; // Total 4
+      if (gameType == 'teen_patti') requiredBots = 2; // Total 3
+      if (gameType == 'in_between') requiredBots = 1; // Total 2
+
+      for (int i = 0; i < requiredBots; i++) {
+        debugPrint('🎮 [Practice] Adding bot ${i + 1}/$requiredBots...');
+        await lobbyService.addBot(roomId);
+      }
+      debugPrint('🎮 [Practice] All bots added');
+
+      // 3. Initialize Game Engine
+      debugPrint('🎮 [Practice] Step 3: Initializing game engine...');
+      final fullRoom = await lobbyService.getGame(roomId);
+      if (fullRoom == null) throw Exception('Failed to fetch game room');
+      
+      final playerIds = fullRoom.players.map((p) => p.id).toList();
+      debugPrint('🎮 [Practice] Players: ${playerIds.join(', ')}');
+
+      if (gameType == 'marriage') {
+        debugPrint('🎮 [Practice] Starting Marriage engine...');
+        await ref.read(marriageServiceProvider).startGame(roomId, playerIds);
+      } else if (gameType == 'teen_patti') {
+        debugPrint('🎮 [Practice] Starting Teen Patti engine...');
+        await ref.read(teenPattiServiceProvider).startGame(roomId, playerIds);
+      } else if (gameType == 'in_between') {
+        debugPrint('🎮 [Practice] Starting In-Between engine...');
+        await ref.read(inBetweenServiceProvider).startGame(roomId, playerIds);
+      } else if (gameType == 'call_break') {
+        debugPrint('🎮 [Practice] Call Break engine will init in lobbyService.startGame');
+      }
+      debugPrint('🎮 [Practice] Game engine initialized');
+
+      // 4. Start Game (update status)
+      debugPrint('🎮 [Practice] Step 4: Starting game...');
+      await lobbyService.startGame(roomId);
+      debugPrint('🎮 [Practice] Game started!');
+
+      // 5. Navigate
+      debugPrint('🎮 [Practice] Step 5: Navigating to game screen...');
+      if (context.mounted) {
+        Navigator.pop(context); // Close loading
+        if (gameType == 'marriage') {
+          context.push('/marriage/$roomId');
+        } else if (gameType == 'teen_patti') {
+          context.push('/teen_patti/$roomId');
+        } else if (gameType == 'in_between') {
+          context.push('/in_between/$roomId');
+        } else {
+          context.push('/game/$roomId/play');
+        }
+        debugPrint('🎮 [Practice] Navigation complete!');
+      }
+
+    } catch (e, stackTrace) {
+      debugPrint('❌ [Practice] Error starting practice game: $e');
+      debugPrint('❌ [Practice] Stack trace: $stackTrace');
+      if (context.mounted) {
+        Navigator.pop(context); // Close loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error starting practice game: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _showJoinPrivateDialog(BuildContext context) {
@@ -349,6 +486,15 @@ class _ModeCard extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+              
+              // Animated Shimmer Overlay (Glass Effect)
+              AnimatedCardCover(
+                borderRadius: BorderRadius.circular(24),
+                // Randomize intervals slightly or use standard? 
+                // Using different intervals makes them feel independent and organic.
+                // We can't easily randomize purely inside stateless, but we can base it on title length or hashcode.
+                interval: Duration(milliseconds: 3000 + (title.hashCode % 3000)),
               ),
             ],
           ),

@@ -5,6 +5,7 @@
 library;
 
 import 'package:clubroyale/core/card_engine/pile.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 
 /// Teen Patti hand types (highest to lowest)
 enum TeenPattiHandType {
@@ -18,7 +19,7 @@ enum TeenPattiHandType {
 
 /// A Teen Patti hand (3 cards)
 class TeenPattiHand {
-  final List<Card> cards;
+  final List<PlayingCard> cards;
   late TeenPattiHandType type;
   late int rank;  // Numeric rank for comparison
   
@@ -31,7 +32,7 @@ class TeenPattiHand {
   
   void _evaluateHand() {
     // Sort cards by rank (descending)
-    final sorted = List<Card>.from(cards)
+    final sorted = List<PlayingCard>.from(cards)
       ..sort((a, b) => b.rank.points.compareTo(a.rank.points));
     
     final r1 = sorted[0].rank;
@@ -77,7 +78,7 @@ class TeenPattiHand {
     }
   }
   
-  bool _isSequence(Rank r1, Rank r2, Rank r3) {
+  bool _isSequence(CardRank r1, CardRank r2, CardRank r3) {
     final ranks = [_rankValue(r1), _rankValue(r2), _rankValue(r3)]..sort();
     
     // Check normal sequence
@@ -93,18 +94,18 @@ class TeenPattiHand {
     return false;
   }
   
-  int _rankValue(Rank r) {
+  int _rankValue(CardRank r) {
     // A=14, K=13, Q=12, J=11, 10-2 = 10-2
     switch (r) {
-      case Rank.ace: return 14;
-      case Rank.king: return 13;
-      case Rank.queen: return 12;
-      case Rank.jack: return 11;
+      case CardRank.ace: return 14;
+      case CardRank.king: return 13;
+      case CardRank.queen: return 12;
+      case CardRank.jack: return 11;
       default: return r.points;
     }
   }
   
-  int _sequenceRank(Rank r1, Rank r2, Rank r3) {
+  int _sequenceRank(CardRank r1, CardRank r2, CardRank r3) {
     // A-2-3 is highest (return 15), then A-K-Q (14), K-Q-J (13), etc.
     final ranks = [_rankValue(r1), _rankValue(r2), _rankValue(r3)]..sort();
     
@@ -148,7 +149,7 @@ class TeenPattiHand {
   
   @override
   String toString() {
-    final cardStr = cards.map((c) => c.displayName).join(', ');
+    final cardStr = cards.map((c) => c.displayString).join(', ');
     return '$displayName: $cardStr';
   }
 }

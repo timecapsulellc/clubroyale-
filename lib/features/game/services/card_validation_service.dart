@@ -1,4 +1,4 @@
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/models/game_state.dart';
 
 /// Service for validating card plays according to Call Break rules

@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clubroyale/features/profile/user_profile.dart';
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/engine/models/deck.dart';
 import 'game_config.dart';
 import 'models/game_state.dart';

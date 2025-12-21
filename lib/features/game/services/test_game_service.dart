@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/game/game_room.dart';
 import 'package:clubroyale/features/game/game_config.dart';
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/models/game_state.dart';
 import 'package:clubroyale/features/game/logic/call_break_logic.dart';
 import 'package:clubroyale/features/game/engine/models/deck.dart';

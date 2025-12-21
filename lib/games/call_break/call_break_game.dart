@@ -7,6 +7,7 @@ library;
 import 'package:clubroyale/games/base_game.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 
 /// Call Break game phase
 enum CallBreakPhase {
@@ -18,14 +19,15 @@ enum CallBreakPhase {
 }
 
 /// A single trick in the game
+/// A single trick in the game
 class Trick {
   final List<TrickCard> cards = [];
-  final Suit ledSuit;
+  final CardSuit ledSuit;
   String? winnerId;
   
   Trick({required this.ledSuit});
   
-  void addCard(String playerId, Card card) {
+  void addCard(String playerId, PlayingCard card) {
     cards.add(TrickCard(playerId: playerId, card: card));
   }
   
@@ -35,7 +37,7 @@ class Trick {
 /// A card played in a trick
 class TrickCard {
   final String playerId;
-  final Card card;
+  final PlayingCard card;
   
   TrickCard({required this.playerId, required this.card});
 }
@@ -61,7 +63,7 @@ class CallBreakGame implements BaseGame {
   int get cardsPerPlayer => 13;
   
   // Constants
-  static const Suit trumpSuit = Suit.spades;
+  static const CardSuit trumpSuit = CardSuit.spades;
   static const int minBid = 1;
   static const int maxBid = 13;
   static const int totalRounds = 5;
@@ -212,7 +214,7 @@ class CallBreakGame implements BaseGame {
   bool get biddingComplete => _bids.length == 4;
   
   @override
-  bool isValidMove(String playerId, Card card) {
+  bool isValidMove(String playerId, PlayingCard card) {
     if (_phase != CallBreakPhase.playing) return false;
     if (currentPlayerId != playerId) return false;
     
@@ -237,7 +239,7 @@ class CallBreakGame implements BaseGame {
   }
   
   @override
-  void playCard(String playerId, Card card) {
+  void playCard(String playerId, PlayingCard card) {
     if (!isValidMove(playerId, card)) {
       throw StateError('Invalid move');
     }
@@ -367,7 +369,7 @@ class CallBreakGame implements BaseGame {
   Map<String, int> calculateScores() => Map.unmodifiable(_scores);
   
   @override
-  List<Card> getHand(String playerId) {
+  List<PlayingCard> getHand(String playerId) {
     return _hands[playerId]?.cards ?? [];
   }
   
@@ -377,14 +379,14 @@ class CallBreakGame implements BaseGame {
   }
   
   /// Check if player can follow suit
-  bool canFollowSuit(String playerId, Suit suit) {
+  bool canFollowSuit(String playerId, CardSuit suit) {
     final hand = _hands[playerId];
     if (hand == null) return false;
     return hand.cards.any((c) => c.suit == suit);
   }
   
   /// Get valid cards for current player
-  List<Card> getValidCards(String playerId) {
+  List<PlayingCard> getValidCards(String playerId) {
     if (currentPlayerId != playerId) return [];
     
     final hand = _hands[playerId];
@@ -410,15 +412,15 @@ class CallBreakGame implements BaseGame {
 
 /// Hand class for managing player's cards
 class Hand {
-  final List<Card> _cards = [];
+  final List<PlayingCard> _cards = [];
   
-  List<Card> get cards => List.unmodifiable(_cards);
+  List<PlayingCard> get cards => List.unmodifiable(_cards);
   
-  void addCard(Card card) => _cards.add(card);
+  void addCard(PlayingCard card) => _cards.add(card);
   
-  void addCards(List<Card> cards) => _cards.addAll(cards);
+  void addCards(List<PlayingCard> cards) => _cards.addAll(cards);
   
-  bool removeCard(Card card) => _cards.remove(card);
+  bool removeCard(PlayingCard card) => _cards.remove(card);
   
   void clear() => _cards.clear();
   

@@ -1,4 +1,4 @@
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/models/game_state.dart';
 
 /// Pure logic for Call Break game rules
@@ -12,8 +12,8 @@ class CallBreakLogic {
     for (var playedCard in trick.cards.skip(1)) {
       final comparison = playedCard.card.compareTo(
         winningCard.card,
-        trumpSuit, // Spades are always trump in Call Break
-        trick.ledSuit,
+        trumpSuit: CardSuit.spades,
+        ledSuit: trick.ledSuit,
       );
       if (comparison > 0) {
         winningCard = playedCard;

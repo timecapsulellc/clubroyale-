@@ -308,3 +308,79 @@ class SkeletonProfile extends StatelessWidget {
     );
   }
 }
+
+/// Game Room specific skeleton loading
+class SkeletonGameScreen extends StatelessWidget {
+  const SkeletonGameScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: CasinoColors.deepPurple, // Or theme background
+      appBar: AppBar(
+        title: const Text('Game Room'),
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false, 
+        centerTitle: true,
+        leading: const Icon(Icons.arrow_back, color: Colors.white54),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Game Header Banner
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
+              ),
+              child: Column(
+                children: [
+                  // Game Name + Host Badge
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SkeletonBox(width: 140, height: 24),
+                      const SizedBox(width: 8),
+                      const SkeletonBox(width: 50, height: 20, borderRadius: 12),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Room Code Pill
+                  const SkeletonBox(width: 180, height: 36, borderRadius: 20),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Stats Row (Players, Coins, Rounds)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                       SkeletonBox(width: 60, height: 16),
+                       SizedBox(width: 24),
+                       SkeletonBox(width: 80, height: 16),
+                       SizedBox(width: 24),
+                       SkeletonBox(width: 60, height: 16),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: 6,
+                itemBuilder: (_, i) => const Padding(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: SkeletonPlayerTile(), 
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/engine/widgets/playing_card_widget.dart';
 
 /// Widget to display a player's hand of cards in a fanned layout

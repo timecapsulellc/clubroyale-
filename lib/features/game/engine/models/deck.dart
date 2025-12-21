@@ -1,4 +1,4 @@
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 
 /// Deck of 52 playing cards
 class Deck {
