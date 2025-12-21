@@ -1,7 +1,8 @@
 {
   "projects": {
     "default": "clubroyale-app",
-    "production": "clubroyale-app"
+    "production": "clubroyale-app",
+    "staging": "clubroyale-staging"
   },
   "targets": {},
   "etags": {}
