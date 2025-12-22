@@ -224,10 +224,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                   myHand: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Turn indicator
-                      _buildTurnIndicator(state, currentUser.uid),
-                      // Sort mode toggle
-                      _buildSortToggle(),
+                      // Combined Turn + Sort bar (compact, single line)
+                      _buildCompactStatusBar(state, currentUser.uid),
                       // Hand
                       _buildMyHand(myHand, isMyTurn, tiplu: tiplu),
                       // Action bar
@@ -287,19 +285,19 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     if (melds.isEmpty) return const SizedBox.shrink();
     
     return Container(
-      height: 40,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      height: 28, // Reduced from 40
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: melds.length,
         itemBuilder: (context, index) {
           final meld = melds[index];
           return Container(
-            margin: const EdgeInsets.only(right: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            margin: const EdgeInsets.only(right: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: _getMeldColor(meld.type).withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(6),
               border: Border.all(color: _getMeldColor(meld.type)),
             ),
             child: Row(
@@ -307,16 +305,17 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
               children: [
                 Text(
                   _getMeldTypeName(meld.type),
-                  style: TextStyle(color: _getMeldColor(meld.type), fontSize: 12),
+                  style: TextStyle(color: _getMeldColor(meld.type), fontSize: 10),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 4),
                 ...meld.cards.take(3).map((c) => Padding(
-                  padding: const EdgeInsets.only(right: 2),
+                  padding: const EdgeInsets.only(right: 1),
                   child: Text(
                     c.displayString,
                     style: TextStyle(
                       color: c.suit.isRed ? Colors.red : Colors.white,
                       fontWeight: FontWeight.bold,
+                      fontSize: 10,
                     ),
                   ),
                 )),
@@ -348,23 +347,23 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   }
 
   
-  /// P0 FIX: Phase indicator showing draw/discard phase
+  /// P0 FIX: Phase indicator showing draw/discard phase (compact)
   Widget _buildPhaseIndicator(MarriageGameState state) {
     final isDrawingPhase = state.isDrawingPhase;
     
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       decoration: BoxDecoration(
         color: isDrawingPhase 
             ? Colors.blue.withValues(alpha: 0.85) 
             : Colors.orange.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: (isDrawingPhase ? Colors.blue : Colors.orange).withValues(alpha: 0.4),
-            blurRadius: 12,
-            spreadRadius: 2,
+            color: (isDrawingPhase ? Colors.blue : Colors.orange).withValues(alpha: 0.3),
+            blurRadius: 6,
+            spreadRadius: 1,
           ),
         ],
       ),
@@ -375,21 +374,21 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
           Icon(
             isDrawingPhase ? Icons.download_rounded : Icons.upload_rounded,
             color: Colors.white,
-            size: 24,
+            size: 16,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 6),
           Text(
-            isDrawingPhase ? '📥 DRAW A CARD' : '📤 DISCARD A CARD',
+            isDrawingPhase ? '📥 DRAW' : '📤 DISCARD',
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 16,
-              letterSpacing: 0.5,
+              fontSize: 12,
+              letterSpacing: 0.3,
             ),
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 300.ms).scale(begin: const Offset(0.9, 0.9));
+    ).animate().fadeIn(duration: 200.ms).scale(begin: const Offset(0.95, 0.95));
   }
 
   
@@ -502,6 +501,62 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             ),
           ),
         ),
+      ),
+    );
+  }
+  
+  /// Compact status bar combining Turn + Timer + Sort in one row
+  Widget _buildCompactStatusBar(MarriageGameState state, String myId) {
+    final isMyTurn = state.currentPlayerId == myId;
+    final marriageService = ref.read(marriageServiceProvider);
+    final remainingTime = marriageService.getRemainingTurnTime(state);
+    final hasTimeout = state.config.turnTimeoutSeconds > 0;
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.5),
+        border: Border(bottom: BorderSide(
+          color: isMyTurn ? Colors.green : Colors.white24,
+        )),
+      ),
+      child: Row(
+        children: [
+          // Turn indicator (left side)
+          Icon(
+            isMyTurn ? Icons.play_arrow : Icons.hourglass_empty,
+            color: isMyTurn ? Colors.green : Colors.white54,
+            size: 16,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            isMyTurn ? 'Your Turn' : 'Waiting...',
+            style: TextStyle(
+              color: isMyTurn ? Colors.green : Colors.white54,
+              fontWeight: isMyTurn ? FontWeight.bold : FontWeight.normal,
+              fontSize: 12,
+            ),
+          ),
+          // Timer (middle, only if applicable)
+          if (hasTimeout && isMyTurn) ...[
+            const SizedBox(width: 8),
+            _buildTimerWidget(remainingTime, state.config.turnTimeoutSeconds),
+          ],
+          // Spacer
+          const Spacer(),
+          // Sort buttons (right side, compact)
+          _buildSortButton(
+            mode: SortMode.bySuit,
+            label: '♦♥ Suit',
+            tooltip: 'Group by suit',
+          ),
+          const SizedBox(width: 6),
+          _buildSortButton(
+            mode: SortMode.byRank,
+            label: 'AKQJ',
+            tooltip: 'Group by rank',
+          ),
+        ],
       ),
     );
   }
