@@ -1,6 +1,6 @@
 # ClubRoyale UI/UX Gap Analysis
 ## Design Improvements - COMPLETED ✅
-### December 21, 2025
+### December 22, 2025
 
 ---
 
@@ -155,6 +155,29 @@ Previous: 75%
 
 ---
 
+## Summary of December 22, 2025 Changes
+
+### UI Overflow Fixes:
+- `lib/features/home/widgets/game_modes_section.dart` - Reduced GameCardGraphic size (80→55) to fix 3px overflow
+- `lib/games/marriage/marriage_game_screen.dart` - Wrapped center area in SingleChildScrollView (98px overflow fix)
+- `lib/games/marriage/screens/marriage_guidebook_screen.dart` - Adjusted Maal cards aspect ratio (1.4→1.2)
+
+### Lobby Enhancements:
+- `lib/features/home_screen.dart` - Quick Match Banner connected to real public rooms
+- `lib/features/social/widgets/live_activity_section.dart` - Game-specific card styling for Teen Patti, Marriage, Call Break
+
+### Voice Room Admin Controls:
+- `lib/features/social/voice_rooms/screens/voice_room_screen.dart` - Host "Mute All" and "Request Unmute" actions
+
+### Build Status:
+```
+flutter build web: ✅ Success
+flutter build apk: ✅ Success (153.5MB)
+firebase deploy: ✅ Live at clubroyale-staging.web.app
+```
+
+---
+
 ## Summary of December 21, 2025 Changes
 
 ### Files Modified:
@@ -172,5 +195,5 @@ flutter analyze: ✅ No errors (3 info-level lints)
 
 ---
 
-**Completion:** December 21, 2025  
-**Next Steps:** Production deployment
+**Completion:** December 22, 2025  
+**Status:** ✅ All UI/UX gaps addressed

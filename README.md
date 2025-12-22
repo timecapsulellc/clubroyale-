@@ -63,7 +63,7 @@ flutter build web
 
 ---
 
-## 📊 Project Status (December 20, 2025)
+## 📊 Project Status (December 22, 2025)
 
 | Metric | Value |
 |--------|-------|
@@ -342,20 +342,22 @@ ClubRoyale/
 
 ---
 
-## 🆕 Recent Updates (December 20, 2025)
+## 🆕 Recent Updates (December 22, 2025)
 
 | Update | Description |
 |--------|-------------|
+| **UI Overflow Fixes** | Fixed game mode cards, Marriage game screen, and guidebook overflows |
+| **Live Activity Section** | Real-time game cards with game-specific styling (Teen Patti, Marriage, Call Break) |
+| **Quick Match Banner** | Connected to real public rooms with dynamic "Join Now" |
+| **Admin Audio Controls** | Host "Mute All" and "Request Unmute" for voice rooms |
 | **AI Gaming Platform** | 5 Cognitive Bot Personalities (TrickMaster, CardShark, etc.) |
 | **Instant Play** | Pre-seeded bot rooms for zero-wait gaming |
 | **Play Now Button** | One-tap join to available AI games |
 | **Bot Room Seeder** | Automated hourly room population |
 | **Tree of Thoughts Bots** | Human-like decision making |
 | **Lobby Badges** | Visual indicators for AI-hosted rooms |
-| **AI Chat Companions** | Tips Bot, News Bot, Club Finder |
-| **Featured Clubs** | Academy, Pro Arena, Casual Lounge |
 
-**Last Updated:** December 20, 2025
+**Last Updated:** December 22, 2025
 
 ---
 
