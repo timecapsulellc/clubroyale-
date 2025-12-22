@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:clubroyale/config/casino_theme.dart';
+import 'package:clubroyale/core/constants/disclaimers.dart';
 
 import 'auth_service.dart';
 
@@ -156,6 +157,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     
                     // Features Grid - Playing Card Style
                     _buildPlayingCardFeatures(),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Compliance Footer
+                    _buildComplianceFooter(),
                     
                     const SizedBox(height: 40),
                   ],
@@ -673,6 +679,47 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       ),
     ).animate()
       .fadeIn(delay: 800.ms, duration: 600.ms);
+  }
+
+  Widget _buildComplianceFooter() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.info_outline, size: 16, color: Colors.white.withValues(alpha: 0.6)),
+              const SizedBox(width: 8),
+              Text(
+                'Skill-Based Entertainment',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            Disclaimers.skillGameDisclaimer,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.5),
+              fontSize: 11,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    ).animate()
+      .fadeIn(delay: 1200.ms, duration: 500.ms);
   }
 }
 

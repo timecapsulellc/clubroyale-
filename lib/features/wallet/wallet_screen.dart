@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:clubroyale/core/utils/error_helper.dart';
 import 'package:clubroyale/core/widgets/contextual_loader.dart';
+import 'package:clubroyale/core/widgets/legal_disclaimer_widget.dart';
 import 'package:clubroyale/core/config/club_royale_theme.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -77,6 +78,9 @@ class WalletScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
+                    // Compliance disclaimer
+                    const LegalDisclaimerBanner(type: DisclaimerType.wallet),
+                    const SizedBox(height: 16),
                     // Balance Card
                     _buildPremiumBalanceCard(context, wallet, userTierAsync.value ?? UserTier.basic, governanceService),
                     

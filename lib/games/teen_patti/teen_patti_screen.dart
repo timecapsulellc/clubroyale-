@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter/material.dart' hide Card;
+import 'package:clubroyale/core/constants/disclaimers.dart';
 import 'package:clubroyale/core/utils/haptic_helper.dart';
 import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -128,6 +129,22 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
                 const SizedBox(width: 12),
                 _buildPotBadge(state.pot),
               ],
+            ),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(24),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                color: Colors.blue.shade50.withValues(alpha: 0.1),
+                child: Text(
+                  Disclaimers.loadingDisclaimer,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.white.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
             ),
             actions: [
               _buildStakeBadge(state.currentStake),

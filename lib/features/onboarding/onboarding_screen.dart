@@ -49,9 +49,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
     OnboardingPage(
       icon: Icons.style,
-      title: 'Premium Card Games',
+      title: 'Skill-Based Card Games',
       subtitle: 'Marriage • Call Break • Teen Patti • In-Between',
-      description: 'Play world-class games with stunning animations. No real money needed – earn free diamonds daily!',
+      description: 'Master classic card games for fun and entertainment. '
+          'Diamonds are virtual tokens with no real-world value. '
+          'This is a skill-based platform – no gambling, no real money.',
       color: Colors.cyanAccent,
     ),
   ];

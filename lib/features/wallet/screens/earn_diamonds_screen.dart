@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:clubroyale/core/config/diamond_config.dart';
+import 'package:clubroyale/core/widgets/legal_disclaimer_widget.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/features/wallet/diamond_rewards_service.dart';
 import 'package:clubroyale/features/wallet/social_diamond_service.dart';
@@ -206,7 +207,9 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Header card
+          // Header card with disclaimer
+          const LegalDisclaimerBanner(type: DisclaimerType.wallet),
+          const SizedBox(height: 16),
           Card(
             color: colorScheme.primaryContainer,
             child: Padding(
