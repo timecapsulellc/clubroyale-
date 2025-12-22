@@ -1,7 +1,5 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { getFirestore } from "firebase-admin/firestore";
-
-const db = getFirestore();
+import { getFirestore, DocumentData } from "firebase-admin/firestore";
 
 interface UserDataExport {
     exportedAt: string;
@@ -21,7 +19,6 @@ interface UserDataExport {
  * GDPR Data Export Function
  * 
  * Exports all user data in a portable JSON format as required by GDPR Article 20.
- * This allows users to download all their personal data from the platform.
  */
 export const gdprExportUserData = onCall<void, Promise<UserDataExport>>(
     {
@@ -30,12 +27,12 @@ export const gdprExportUserData = onCall<void, Promise<UserDataExport>>(
         timeoutSeconds: 120,
     },
     async (request) => {
-        // Verify authentication
         if (!request.auth) {
             throw new HttpsError("unauthenticated", "User must be authenticated");
         }
 
         const userId = request.auth.uid;
+        const db = getFirestore();
         console.log(`[GDPR Export] Starting export for user: ${userId}`);
 
         const exportData: UserDataExport = {
@@ -72,19 +69,19 @@ export const gdprExportUserData = onCall<void, Promise<UserDataExport>>(
                 .orderBy("createdAt", "desc")
                 .limit(1000)
                 .get();
-            exportData.transactions = transactionsSnap.docs.map(doc => ({
+            exportData.transactions = transactionsSnap.docs.map((doc: DocumentData) => ({
                 id: doc.id,
                 ...doc.data(),
             }));
 
-            // 4. Export Games (where user participated)
+            // 4. Export Games
             const gamesSnap = await db
                 .collection("games")
                 .where("playerIds", "array-contains", userId)
                 .orderBy("createdAt", "desc")
                 .limit(500)
                 .get();
-            exportData.games = gamesSnap.docs.map(doc => ({
+            exportData.games = gamesSnap.docs.map((doc: DocumentData) => ({
                 id: doc.id,
                 ...doc.data(),
             }));
@@ -95,7 +92,7 @@ export const gdprExportUserData = onCall<void, Promise<UserDataExport>>(
                 .doc(userId)
                 .collection("friends")
                 .get();
-            exportData.friends = friendsSnap.docs.map(doc => ({
+            exportData.friends = friendsSnap.docs.map((doc: DocumentData) => ({
                 id: doc.id,
                 ...doc.data(),
             }));
@@ -106,7 +103,7 @@ export const gdprExportUserData = onCall<void, Promise<UserDataExport>>(
                 .doc(userId)
                 .collection("achievements")
                 .get();
-            exportData.achievements = achievementsSnap.docs.map(doc => ({
+            exportData.achievements = achievementsSnap.docs.map((doc: DocumentData) => ({
                 id: doc.id,
                 ...doc.data(),
             }));
@@ -118,20 +115,19 @@ export const gdprExportUserData = onCall<void, Promise<UserDataExport>>(
                 .orderBy("createdAt", "desc")
                 .limit(500)
                 .get();
-            exportData.stories = storiesSnap.docs.map(doc => ({
+            exportData.stories = storiesSnap.docs.map((doc: DocumentData) => ({
                 id: doc.id,
                 ...doc.data(),
             }));
 
-            // 8. Export Chat Messages (user's messages only)
-            // Note: We only export messages the user sent, not the full conversations
+            // 8. Export Chat Messages
             const chatsSnap = await db
                 .collectionGroup("messages")
                 .where("senderId", "==", userId)
                 .orderBy("timestamp", "desc")
                 .limit(1000)
                 .get();
-            exportData.chats = chatsSnap.docs.map(doc => ({
+            exportData.chats = chatsSnap.docs.map((doc: DocumentData) => ({
                 id: doc.id,
                 ...doc.data(),
             }));
@@ -143,24 +139,16 @@ export const gdprExportUserData = onCall<void, Promise<UserDataExport>>(
                 .orderBy("createdAt", "desc")
                 .limit(500)
                 .get();
-            exportData.activities = activitiesSnap.docs.map(doc => ({
+            exportData.activities = activitiesSnap.docs.map((doc: DocumentData) => ({
                 id: doc.id,
                 ...doc.data(),
             }));
 
             console.log(`[GDPR Export] Export complete for user: ${userId}`);
-            console.log(`  - Transactions: ${exportData.transactions.length}`);
-            console.log(`  - Games: ${exportData.games.length}`);
-            console.log(`  - Friends: ${exportData.friends.length}`);
-            console.log(`  - Stories: ${exportData.stories.length}`);
-
             return exportData;
         } catch (error) {
-            console.error(`[GDPR Export] Error exporting data for ${userId}:`, error);
-            throw new HttpsError(
-                "internal",
-                "Failed to export user data. Please try again later."
-            );
+            console.error(`[GDPR Export] Error for ${userId}:`, error);
+            throw new HttpsError("internal", "Failed to export user data.");
         }
     }
 );

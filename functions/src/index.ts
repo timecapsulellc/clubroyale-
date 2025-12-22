@@ -9,9 +9,15 @@
 
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
-import { initializeApp } from 'firebase-admin/app';
+import { initializeApp, getApps } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
+
+// Initialize Firebase Admin SDK before any other imports
+if (getApps().length === 0) {
+    initializeApp();
+}
+
 import { withRateLimit } from './middleware/rateLimiter';
 
 // Import Genkit flows

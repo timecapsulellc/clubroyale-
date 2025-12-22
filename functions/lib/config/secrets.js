@@ -1,16 +1,20 @@
+"use strict";
 /**
  * Secret Manager Service
- * 
+ *
  * Provides secure access to secrets using environment variables.
  * In production, use Firebase Functions secrets:
  *   firebase functions:secrets:set SECRET_NAME
  *   Then reference in function: { secrets: ['SECRET_NAME'] }
  */
-
-import { getConfig, isProduction } from './environments';
-
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SecretNames = void 0;
+exports.getSecret = getSecret;
+exports.getSecrets = getSecrets;
+exports.clearSecretCache = clearSecretCache;
+exports.validateRequiredSecrets = validateRequiredSecrets;
 // Secret name constants
-export const SecretNames = {
+exports.SecretNames = {
     GEMINI_API_KEY: 'gemini-api-key',
     LIVEKIT_API_KEY: 'livekit-api-key',
     LIVEKIT_API_SECRET: 'livekit-api-secret',
@@ -18,31 +22,25 @@ export const SecretNames = {
     SENTRY_DSN: 'sentry-dsn',
     SLACK_WEBHOOK_URL: 'slack-webhook-url',
     PAGERDUTY_ROUTING_KEY: 'pagerduty-routing-key',
-} as const;
-
-export type SecretName = typeof SecretNames[keyof typeof SecretNames];
-
+};
 // In-memory cache for secrets (TTL: 5 minutes)
-const secretCache = new Map<string, { value: string; expiresAt: number }>();
+const secretCache = new Map();
 const CACHE_TTL_MS = 5 * 60 * 1000;
-
 /**
  * Get a secret from environment variables
  */
-export async function getSecret(secretName: SecretName): Promise<string> {
+async function getSecret(secretName) {
     // Check cache first
     const cached = secretCache.get(secretName);
     if (cached && cached.expiresAt > Date.now()) {
         return cached.value;
     }
-
     // Convert secret name to env var format (e.g., 'gemini-api-key' -> 'GEMINI_API_KEY')
     const envVarName = secretName.toUpperCase().replace(/-/g, '_');
     let value = process.env[envVarName] || '';
-
     // Fall back to common env var names
     if (!value) {
-        const fallbacks: Record<string, string | undefined> = {
+        const fallbacks = {
             'gemini-api-key': process.env.GOOGLE_GENAI_API_KEY,
             'livekit-api-key': process.env.LIVEKIT_API_KEY,
             'livekit-api-secret': process.env.LIVEKIT_API_SECRET,
@@ -52,7 +50,6 @@ export async function getSecret(secretName: SecretName): Promise<string> {
         };
         value = fallbacks[secretName] || '';
     }
-
     // Cache the result
     if (value) {
         secretCache.set(secretName, {
@@ -60,55 +57,43 @@ export async function getSecret(secretName: SecretName): Promise<string> {
             expiresAt: Date.now() + CACHE_TTL_MS,
         });
     }
-
     return value;
 }
-
 /**
  * Get multiple secrets at once
  */
-export async function getSecrets(names: SecretName[]): Promise<Record<SecretName, string>> {
-    const results = await Promise.all(
-        names.map(async (name) => ({ name, value: await getSecret(name) }))
-    );
-
+async function getSecrets(names) {
+    const results = await Promise.all(names.map(async (name) => ({ name, value: await getSecret(name) })));
     return results.reduce((acc, { name, value }) => {
         acc[name] = value;
         return acc;
-    }, {} as Record<SecretName, string>);
+    }, {});
 }
-
 /**
  * Clear the secrets cache (useful after rotation)
  */
-export function clearSecretCache(): void {
+function clearSecretCache() {
     secretCache.clear();
 }
-
 /**
  * Check if all required secrets are available
  */
-export async function validateRequiredSecrets(): Promise<{
-    valid: boolean;
-    missing: string[];
-}> {
-    const required: SecretName[] = [
-        SecretNames.GEMINI_API_KEY,
-        SecretNames.LIVEKIT_API_KEY,
-        SecretNames.LIVEKIT_API_SECRET,
+async function validateRequiredSecrets() {
+    const required = [
+        exports.SecretNames.GEMINI_API_KEY,
+        exports.SecretNames.LIVEKIT_API_KEY,
+        exports.SecretNames.LIVEKIT_API_SECRET,
     ];
-
-    const missing: string[] = [];
-
+    const missing = [];
     for (const secretName of required) {
         const value = await getSecret(secretName);
         if (!value) {
             missing.push(secretName);
         }
     }
-
     return {
         valid: missing.length === 0,
         missing,
     };
 }
+//# sourceMappingURL=secrets.js.map

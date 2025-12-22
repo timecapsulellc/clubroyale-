@@ -8,11 +8,16 @@
  * - Push notifications (FCM)
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processSettlement = exports.calculateMonthlyMilestones = exports.calculateWeeklyEngagement = exports.processVoiceRoomTip = exports.grantSocialRewardFunction = exports.analyzeTrends = exports.predictEngagement = exports.analyzeBehavior = exports.moderateContent = exports.detectHighlights = exports.enhanceStream = exports.recommendGames = exports.suggestFriends = exports.rankFeed = exports.generateAchievementCelebration = exports.generateCaption = exports.generateReelScript = exports.generateStory = exports.planFeatureImplementation = exports.analyzeBug = exports.getArchitectureGuidance = exports.generateCode = exports.cleanupAllWaitingRooms = exports.seedBotRoomsManual = exports.seedBotRoomsScheduled = exports.dailyCleanup = exports.weeklyTasks = exports.notifyAdminNewChat = exports.executeCooledGrants = exports.onGrantApproved = exports.monitorDiamondSupply = exports.checkTierUpgrade = exports.upgradeToVerified = exports.claimDailyLogin = exports.grantGameplayReward = exports.validateTransfer = exports.healthCheck = exports.validateSpectatorAccess = exports.generateLiveKitToken = exports.onVoiceRoomCreated = exports.onFriendshipUpdated = exports.onFriendRequestCreated = exports.onStoryCreated = exports.onSocialMessageSent = exports.auditGameUpdate = void 0;
+exports.predictEngagement = exports.analyzeBehavior = exports.moderateContent = exports.detectHighlights = exports.enhanceStream = exports.recommendGames = exports.suggestFriends = exports.rankFeed = exports.generateAchievementCelebration = exports.generateCaption = exports.generateReelScript = exports.generateStory = exports.planFeatureImplementation = exports.analyzeBug = exports.getArchitectureGuidance = exports.generateCode = exports.calculateMrr = exports.getRevenueDashboard = exports.onPurchaseCompleted = exports.trackRevenueEvent = exports.getRecentAgentErrors = exports.getAgentMetricsSummary = exports.recordAgentMetric = exports.getKpiDashboard = exports.calculateDailyKpis = exports.gdprDeleteUserData = exports.gdprExportUserData = exports.cleanupAllWaitingRooms = exports.seedBotRoomsManual = exports.seedBotRoomsScheduled = exports.dailyCleanup = exports.weeklyTasks = exports.notifyAdminNewChat = exports.executeCooledGrants = exports.onGrantApproved = exports.monitorDiamondSupply = exports.checkTierUpgrade = exports.upgradeToVerified = exports.claimDailyLogin = exports.grantGameplayReward = exports.validateTransfer = exports.healthCheck = exports.validateSpectatorAccess = exports.generateLiveKitToken = exports.onVoiceRoomCreated = exports.onFriendshipUpdated = exports.onFriendRequestCreated = exports.onStoryCreated = exports.onSocialMessageSent = exports.auditGameUpdate = void 0;
+exports.processSettlement = exports.calculateMonthlyMilestones = exports.calculateWeeklyEngagement = exports.processVoiceRoomTip = exports.grantSocialRewardFunction = exports.analyzeTrends = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const app_1 = require("firebase-admin/app");
 const firestore_1 = require("firebase-admin/firestore");
 const messaging_1 = require("firebase-admin/messaging");
+// Initialize Firebase Admin SDK before any other imports
+if ((0, app_1.getApps)().length === 0) {
+    (0, app_1.initializeApp)();
+}
 const rateLimiter_1 = require("./middleware/rateLimiter");
 // Import Triggers
 var auditTriggers_1 = require("./triggers/auditTriggers");
@@ -56,6 +61,26 @@ var botRoomSeeder_1 = require("./scheduled/botRoomSeeder");
 Object.defineProperty(exports, "seedBotRoomsScheduled", { enumerable: true, get: function () { return botRoomSeeder_1.seedBotRoomsScheduled; } });
 Object.defineProperty(exports, "seedBotRoomsManual", { enumerable: true, get: function () { return botRoomSeeder_1.seedBotRoomsManual; } });
 Object.defineProperty(exports, "cleanupAllWaitingRooms", { enumerable: true, get: function () { return botRoomSeeder_1.cleanupAllWaitingRooms; } });
+// Export GDPR Compliance Functions
+var gdprExport_1 = require("./compliance/gdprExport");
+Object.defineProperty(exports, "gdprExportUserData", { enumerable: true, get: function () { return gdprExport_1.gdprExportUserData; } });
+var gdprDelete_1 = require("./compliance/gdprDelete");
+Object.defineProperty(exports, "gdprDeleteUserData", { enumerable: true, get: function () { return gdprDelete_1.gdprDeleteUserData; } });
+// Export Analytics & KPI Functions
+var calculateKpis_1 = require("./scheduled/calculateKpis");
+Object.defineProperty(exports, "calculateDailyKpis", { enumerable: true, get: function () { return calculateKpis_1.calculateDailyKpis; } });
+Object.defineProperty(exports, "getKpiDashboard", { enumerable: true, get: function () { return calculateKpis_1.getKpiDashboard; } });
+// Export Agent Metrics Functions
+var agentMetrics_1 = require("./agents/metrics/agentMetrics");
+Object.defineProperty(exports, "recordAgentMetric", { enumerable: true, get: function () { return agentMetrics_1.recordAgentMetric; } });
+Object.defineProperty(exports, "getAgentMetricsSummary", { enumerable: true, get: function () { return agentMetrics_1.getAgentMetricsSummary; } });
+Object.defineProperty(exports, "getRecentAgentErrors", { enumerable: true, get: function () { return agentMetrics_1.getRecentAgentErrors; } });
+// Export Revenue Tracking Functions
+var revenueTracking_1 = require("./analytics/revenueTracking");
+Object.defineProperty(exports, "trackRevenueEvent", { enumerable: true, get: function () { return revenueTracking_1.trackRevenueEvent; } });
+Object.defineProperty(exports, "onPurchaseCompleted", { enumerable: true, get: function () { return revenueTracking_1.onPurchaseCompleted; } });
+Object.defineProperty(exports, "getRevenueDashboard", { enumerable: true, get: function () { return revenueTracking_1.getRevenueDashboard; } });
+Object.defineProperty(exports, "calculateMrr", { enumerable: true, get: function () { return revenueTracking_1.calculateMrr; } });
 // Export AI Agents (12 Total)
 var agents_1 = require("./agents");
 // IDE Guide Agent

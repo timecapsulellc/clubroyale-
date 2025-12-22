@@ -1,0 +1,129 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.gdprExportUserData = void 0;
+const https_1 = require("firebase-functions/v2/https");
+const firestore_1 = require("firebase-admin/firestore");
+/**
+ * GDPR Data Export Function
+ *
+ * Exports all user data in a portable JSON format as required by GDPR Article 20.
+ */
+exports.gdprExportUserData = (0, https_1.onCall)({
+    region: "us-central1",
+    memory: "512MiB",
+    timeoutSeconds: 120,
+}, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "User must be authenticated");
+    }
+    const userId = request.auth.uid;
+    const db = (0, firestore_1.getFirestore)();
+    console.log(`[GDPR Export] Starting export for user: ${userId}`);
+    const exportData = {
+        exportedAt: new Date().toISOString(),
+        userId: userId,
+        profile: null,
+        wallet: null,
+        transactions: [],
+        games: [],
+        friends: [],
+        achievements: [],
+        stories: [],
+        chats: [],
+        activities: [],
+    };
+    try {
+        // 1. Export User Profile
+        const profileDoc = await db.collection("profiles").doc(userId).get();
+        if (profileDoc.exists) {
+            exportData.profile = profileDoc.data() || null;
+        }
+        // 2. Export Wallet Data
+        const walletDoc = await db.collection("wallets").doc(userId).get();
+        if (walletDoc.exists) {
+            exportData.wallet = walletDoc.data() || null;
+        }
+        // 3. Export Transactions
+        const transactionsSnap = await db
+            .collection("transactions")
+            .where("userId", "==", userId)
+            .orderBy("createdAt", "desc")
+            .limit(1000)
+            .get();
+        exportData.transactions = transactionsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+        // 4. Export Games
+        const gamesSnap = await db
+            .collection("games")
+            .where("playerIds", "array-contains", userId)
+            .orderBy("createdAt", "desc")
+            .limit(500)
+            .get();
+        exportData.games = gamesSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+        // 5. Export Friends
+        const friendsSnap = await db
+            .collection("users")
+            .doc(userId)
+            .collection("friends")
+            .get();
+        exportData.friends = friendsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+        // 6. Export Achievements
+        const achievementsSnap = await db
+            .collection("users")
+            .doc(userId)
+            .collection("achievements")
+            .get();
+        exportData.achievements = achievementsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+        // 7. Export Stories
+        const storiesSnap = await db
+            .collection("stories")
+            .where("userId", "==", userId)
+            .orderBy("createdAt", "desc")
+            .limit(500)
+            .get();
+        exportData.stories = storiesSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+        // 8. Export Chat Messages
+        const chatsSnap = await db
+            .collectionGroup("messages")
+            .where("senderId", "==", userId)
+            .orderBy("timestamp", "desc")
+            .limit(1000)
+            .get();
+        exportData.chats = chatsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+        // 9. Export Activities
+        const activitiesSnap = await db
+            .collection("activities")
+            .where("userId", "==", userId)
+            .orderBy("createdAt", "desc")
+            .limit(500)
+            .get();
+        exportData.activities = activitiesSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+        console.log(`[GDPR Export] Export complete for user: ${userId}`);
+        return exportData;
+    }
+    catch (error) {
+        console.error(`[GDPR Export] Error for ${userId}:`, error);
+        throw new https_1.HttpsError("internal", "Failed to export user data.");
+    }
+});
+//# sourceMappingURL=gdprExport.js.map

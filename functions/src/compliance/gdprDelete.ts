@@ -1,9 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { getFirestore, FieldValue, DocumentData } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
-
-const db = getFirestore();
-const auth = getAuth();
 
 interface DeletionResult {
     success: boolean;
@@ -17,9 +14,6 @@ interface DeletionResult {
  * GDPR Data Deletion Function (Right to be Forgotten)
  * 
  * Deletes all user data across all collections as required by GDPR Article 17.
- * This is an irreversible operation that removes all personal data.
- * 
- * The user must confirm deletion by passing confirmDelete: true
  */
 export const gdprDeleteUserData = onCall<
     { confirmDelete: boolean },
@@ -28,10 +22,9 @@ export const gdprDeleteUserData = onCall<
     {
         region: "us-central1",
         memory: "512MiB",
-        timeoutSeconds: 300, // 5 minutes for large accounts
+        timeoutSeconds: 300,
     },
     async (request) => {
-        // Verify authentication
         if (!request.auth) {
             throw new HttpsError("unauthenticated", "User must be authenticated");
         }
@@ -39,7 +32,6 @@ export const gdprDeleteUserData = onCall<
         const userId = request.auth.uid;
         const { confirmDelete } = request.data;
 
-        // Require explicit confirmation
         if (!confirmDelete) {
             throw new HttpsError(
                 "failed-precondition",
@@ -47,6 +39,8 @@ export const gdprDeleteUserData = onCall<
             );
         }
 
+        const db = getFirestore();
+        const auth = getAuth();
         console.log(`[GDPR Delete] Starting deletion for user: ${userId}`);
 
         const result: DeletionResult = {
@@ -59,7 +53,7 @@ export const gdprDeleteUserData = onCall<
 
         const batch = db.batch();
         let operationCount = 0;
-        const MAX_BATCH_SIZE = 400; // Leave room for sub-operations
+        const MAX_BATCH_SIZE = 400;
 
         const commitBatchIfNeeded = async () => {
             if (operationCount > 0) {
@@ -83,32 +77,25 @@ export const gdprDeleteUserData = onCall<
             try {
                 const userRef = db.collection("users").doc(userId);
 
-                // Delete subcollections first
                 const friendsSnap = await userRef.collection("friends").get();
                 for (const doc of friendsSnap.docs) {
                     batch.delete(doc.ref);
                     operationCount++;
-                    if (operationCount >= MAX_BATCH_SIZE) {
-                        await commitBatchIfNeeded();
-                    }
+                    if (operationCount >= MAX_BATCH_SIZE) await commitBatchIfNeeded();
                 }
 
                 const achievementsSnap = await userRef.collection("achievements").get();
                 for (const doc of achievementsSnap.docs) {
                     batch.delete(doc.ref);
                     operationCount++;
-                    if (operationCount >= MAX_BATCH_SIZE) {
-                        await commitBatchIfNeeded();
-                    }
+                    if (operationCount >= MAX_BATCH_SIZE) await commitBatchIfNeeded();
                 }
 
                 const transactionsSnap = await userRef.collection("transactions").get();
                 for (const doc of transactionsSnap.docs) {
                     batch.delete(doc.ref);
                     operationCount++;
-                    if (operationCount >= MAX_BATCH_SIZE) {
-                        await commitBatchIfNeeded();
-                    }
+                    if (operationCount >= MAX_BATCH_SIZE) await commitBatchIfNeeded();
                 }
 
                 batch.delete(userRef);
@@ -137,9 +124,7 @@ export const gdprDeleteUserData = onCall<
                 for (const doc of storiesSnap.docs) {
                     batch.delete(doc.ref);
                     operationCount++;
-                    if (operationCount >= MAX_BATCH_SIZE) {
-                        await commitBatchIfNeeded();
-                    }
+                    if (operationCount >= MAX_BATCH_SIZE) await commitBatchIfNeeded();
                 }
                 result.deletedCollections.push("stories");
             } catch (e) {
@@ -155,9 +140,7 @@ export const gdprDeleteUserData = onCall<
                 for (const doc of activitiesSnap.docs) {
                     batch.delete(doc.ref);
                     operationCount++;
-                    if (operationCount >= MAX_BATCH_SIZE) {
-                        await commitBatchIfNeeded();
-                    }
+                    if (operationCount >= MAX_BATCH_SIZE) await commitBatchIfNeeded();
                 }
                 result.deletedCollections.push("activities");
             } catch (e) {
@@ -174,7 +157,7 @@ export const gdprDeleteUserData = onCall<
                 result.errors.push(`presence: ${e}`);
             }
 
-            // 7. Remove from games (anonymize rather than delete game history)
+            // 7. Anonymize games
             try {
                 const gamesSnap = await db
                     .collection("games")
@@ -186,9 +169,7 @@ export const gdprDeleteUserData = onCall<
                         [`playerData.${userId}`]: FieldValue.delete(),
                     });
                     operationCount++;
-                    if (operationCount >= MAX_BATCH_SIZE) {
-                        await commitBatchIfNeeded();
-                    }
+                    if (operationCount >= MAX_BATCH_SIZE) await commitBatchIfNeeded();
                 }
                 result.deletedCollections.push("games (anonymized)");
             } catch (e) {
@@ -205,9 +186,7 @@ export const gdprDeleteUserData = onCall<
                 for (const doc of feedSnap.docs) {
                     batch.delete(doc.ref);
                     operationCount++;
-                    if (operationCount >= MAX_BATCH_SIZE) {
-                        await commitBatchIfNeeded();
-                    }
+                    if (operationCount >= MAX_BATCH_SIZE) await commitBatchIfNeeded();
                 }
                 const feedRef = db.collection("feeds").doc(userId);
                 batch.delete(feedRef);
@@ -217,10 +196,9 @@ export const gdprDeleteUserData = onCall<
                 result.errors.push(`feeds: ${e}`);
             }
 
-            // Commit any remaining operations
             await commitBatchIfNeeded();
 
-            // 9. Delete Firebase Auth user (must be last)
+            // 9. Delete Firebase Auth user
             try {
                 await auth.deleteUser(userId);
                 result.deletedCollections.push("auth");
@@ -228,23 +206,17 @@ export const gdprDeleteUserData = onCall<
                 result.errors.push(`auth: ${e}`);
             }
 
-            // 10. Create audit log (for compliance - no PII stored)
+            // 10. Create audit log
             await db.collection("audit_logs").add({
                 action: "GDPR_DELETION",
-                userId: userId, // Keep for audit trail
+                userId: userId,
                 timestamp: FieldValue.serverTimestamp(),
                 deletedCollections: result.deletedCollections,
                 errors: result.errors,
             });
 
             result.success = result.errors.length === 0;
-
             console.log(`[GDPR Delete] Deletion complete for user: ${userId}`);
-            console.log(`  - Collections deleted: ${result.deletedCollections.join(", ")}`);
-            if (result.errors.length > 0) {
-                console.log(`  - Errors: ${result.errors.join(", ")}`);
-            }
-
             return result;
         } catch (error) {
             console.error(`[GDPR Delete] Critical error for ${userId}:`, error);

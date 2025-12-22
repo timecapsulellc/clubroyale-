@@ -1,5 +1,5 @@
 import { onCall } from "firebase-functions/v2/https";
-import { getFirestore, FieldValue, Timestamp } from "firebase-admin/firestore";
+import { getFirestore, FieldValue, Timestamp, Transaction } from "firebase-admin/firestore";
 
 const db = getFirestore();
 
