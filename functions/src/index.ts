@@ -68,6 +68,9 @@ export { calculateDailyKpis, getKpiDashboard } from './scheduled/calculateKpis';
 // Export Agent Metrics Functions
 export { recordAgentMetric, getAgentMetricsSummary, getRecentAgentErrors } from './agents/metrics/agentMetrics';
 
+// Export Revenue Tracking Functions
+export { trackRevenueEvent, onPurchaseCompleted, getRevenueDashboard, calculateMrr } from './analytics/revenueTracking';
+
 // Export AI Agents (12 Total)
 export {
     // IDE Guide Agent
