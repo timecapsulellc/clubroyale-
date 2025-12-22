@@ -25,10 +25,10 @@ class MarriageHUDOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // 1. Turn Indicator (Center Table Notification)
+        // 1. Turn Indicator (Center Table Notification - positioned higher)
         if (currentPlayerId == myPlayerId)
           Positioned(
-            top: MediaQuery.of(context).size.height * 0.4,
+            top: MediaQuery.of(context).size.height * 0.28, // Higher position to avoid card overlap
             left: 0, 
             right: 0,
             child: Center(
@@ -43,7 +43,7 @@ class MarriageHUDOverlay extends StatelessWidget {
                   'YOUR TURN',
                   style: TextStyle(
                     fontFamily: 'Oswald',
-                    fontSize: 24,
+                    fontSize: 20, // Slightly smaller
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 4,
@@ -54,7 +54,7 @@ class MarriageHUDOverlay extends StatelessWidget {
                 ),
               ).animate(onPlay: (c) => c.repeat(reverse: true))
                .fadeIn(duration: 300.ms)
-               .shimmer(duration: 1500.ms, color: Colors.white.withOpacity(0.5)),
+               .shimmer(duration: 1500.ms, color: Colors.white.withValues(alpha: 0.5)),
             ),
           ),
           
@@ -65,10 +65,10 @@ class MarriageHUDOverlay extends StatelessWidget {
           child: _MaalCounterChip(points: maalPoints),
         ),
         
-        // 3. Quick Emote Button (Bottom Right, above hand)
+        // 3. Quick Emote Button (Left side to avoid hand overlap)
         Positioned(
-          bottom: 160, // Above hand area
-          right: 16,
+          bottom: 250, // Higher to clear the action bar and hand
+          left: 16, // Moved to left side
           child: FloatingActionButton.small(
             backgroundColor: Colors.black54,
             child: const Icon(Icons.emoji_emotions_outlined, color: Colors.white),
@@ -90,7 +90,7 @@ class _MaalCounterChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
+        color: Colors.black.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: points > 0 ? Colors.amber : Colors.white24,
@@ -98,7 +98,7 @@ class _MaalCounterChip extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: (points > 0 ? Colors.amber : Colors.black).withOpacity(0.3),
+            color: (points > 0 ? Colors.amber : Colors.black).withValues(alpha: 0.3),
             blurRadius: 8,
           ),
         ],

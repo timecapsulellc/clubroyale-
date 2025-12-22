@@ -13,6 +13,8 @@ import 'package:clubroyale/core/widgets/social_bottom_nav.dart' as social_nav;
 import 'package:clubroyale/features/home/widgets/game_modes_section.dart';
 import 'package:clubroyale/features/home/widgets/personal_stats_card.dart';
 import 'package:clubroyale/features/home/widgets/quick_match_banner.dart';
+import 'package:clubroyale/features/lobby/lobby_service.dart'; // Import LobbyService
+import 'package:clubroyale/features/game/game_room.dart'; // Import GameRoom
 
 /// HomeScreen - Nanobanana Dashboard Design
 /// 
@@ -89,12 +91,33 @@ class HomeScreen extends ConsumerWidget {
                                 // Personal Stats (Premium Feature)
                                 const PersonalStatsCard().animate().fadeIn(delay: 150.ms),
                                 
-                                // Quick Match Banner (Mocked data for now, ideally fetched from service)
-                                const QuickMatchBanner(
-                                  gameType: 'Marriage',
-                                  playersWaiting: 3,
-                                  roomId: 'bot_room_001', // Placeholder room
-                                ).animate().fadeIn(delay: 200.ms),
+                                // Quick Match Banner - Real Data
+                                Consumer(
+                                  builder: (context, ref, child) {
+                                    final publicRoomsStream = ref.watch(lobbyServiceProvider).watchPublicRooms();
+                                    
+                                    return StreamBuilder<List<GameRoom>>(
+                                      stream: publicRoomsStream,
+                                      builder: (context, snapshot) {
+                                        final rooms = snapshot.data ?? [];
+                                        
+                                        if (rooms.isEmpty) {
+                                          return const NoQuickMatchBanner().animate().fadeIn(delay: 200.ms);
+                                        }
+
+                                        // Find the best room (e.g., most players but not full)
+                                        final bestRoom = rooms.first; 
+                                        final playersWaiting = bestRoom.players.length;
+                                        
+                                        return QuickMatchBanner(
+                                          gameType: bestRoom.gameType, // Use actual game type
+                                          playersWaiting: playersWaiting,
+                                          roomId: bestRoom.id ?? '',
+                                        ).animate().fadeIn(delay: 200.ms);
+                                      },
+                                    );
+                                  },
+                                ),
                                 
                                 const SizedBox(height: 16),
                                 

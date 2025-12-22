@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/social/providers/dashboard_providers.dart';
 import 'package:clubroyale/features/social/voice_rooms/models/voice_room.dart';
 import 'package:clubroyale/features/game/game_room.dart';
-import 'package:clubroyale/core/demo/demo_data.dart';
+
 
 /// Nanobanana-style Live Activity Section
 /// Shows Voice Room (purple) and Game Match (blue) cards with rich visual design
@@ -14,17 +14,18 @@ class LiveActivitySection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Explicit types to enforce import usage and type safety
+    // Explicit types to enforce import usage and type safety
     final List<VoiceRoom> activeVoiceRoomsAsync = ref.watch(activeVoiceRoomsProvider).value ?? [];
     final List<GameRoom> ongoingGamesAsync = ref.watch(spectatorGamesProvider).value ?? [];
 
-    // Force Demo Data if empty (Visual Fallback)
-    final List<VoiceRoom> activeVoiceRooms = activeVoiceRoomsAsync.isEmpty 
-        ? DemoData.voiceRooms 
-        : activeVoiceRoomsAsync;
+    // Use Real Data Only (User requested backend alignment)
+    final List<VoiceRoom> activeVoiceRooms = activeVoiceRoomsAsync;
+    final List<GameRoom> ongoingGames = ongoingGamesAsync;
 
-    final List<GameRoom> ongoingGames = ongoingGamesAsync.isEmpty 
-        ? DemoData.games 
-        : ongoingGamesAsync;
+    // Display nothing if no activity (or use a placeholder)
+    if (activeVoiceRooms.isEmpty && ongoingGames.isEmpty) {
+      return const SizedBox.shrink(); // Hide section entirely if empty
+    }
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,10 +104,9 @@ class LiveActivitySection extends ConsumerWidget {
               if (activeVoiceRooms.isNotEmpty) const SizedBox(width: 12),
 
               // Game Match Cards with Varied Styles
-              ...ongoingGames.asMap().entries.map((entry) {
-                final index = entry.key;
-                final game = entry.value;
+              ...ongoingGames.map((game) {
 
+                // Default Styles
                 String title = 'GAME\nMATCH';
                 IconData icon = Icons.gamepad_rounded;
                 String status = 'WATCH';
@@ -117,22 +117,50 @@ class LiveActivitySection extends ConsumerWidget {
                     end: Alignment.topRight,
                 );
 
-                if (index == 1 || game.config.bootAmount > 1000) {
-                  title = 'HIGH\nSTAKES';
-                  icon = Icons.casino_rounded;
-                  status = 'VIP';
+                // Specific Styling based on Game Type
+                final gameTypeLower = game.gameType.toLowerCase();
+                
+                if (gameTypeLower.contains('teen') || gameTypeLower.contains('patti')) {
+                  title = 'TEEN\nPATTI';
+                  icon = Icons.style; // Cards
+                  status = 'BLIND';
+                  statusColor = const Color(0xFF9333ea); // Purple
+                  gradient = const LinearGradient(
+                    colors: [Color(0xFF4c1d95), Color(0xFF7c3aed)], // Deep Purple
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  );
+                } else if (gameTypeLower.contains('marriage') || gameTypeLower.contains('royal')) {
+                  title = 'ROYAL\nMELD'; // Marriage
+                  icon = Icons.diamond_outlined;
+                  status = 'MAAL'; // Feature specific
                   statusColor = const Color(0xFFeab308); // Gold
                   gradient = const LinearGradient(
-                    colors: [Color(0xFF1f2937), Color(0xFF4b5563)], // Dark Grey
-                    begin: Alignment.bottomLeft,
-                    end: Alignment.topRight,
+                    colors: [Color(0xFF065f46), Color(0xFF059669)], // Emerald Green
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   );
+                } else if (gameTypeLower.contains('call') || gameTypeLower.contains('break')) {
+                  title = 'CALL\nBREAK';
+                  icon = Icons.filter_vintage_rounded; // Spades
+                  status = 'BIDDING'; // Feature specific
+                  statusColor = const Color(0xFF0ea5e9); // Sky Blue
+                  gradient = const LinearGradient(
+                    colors: [Color(0xFF0f172a), Color(0xFF334155)], // Slate/Dark
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  );
+                } else if (game.config.bootAmount > 1000) {
+                   // High Stakes Fallback
+                   title = 'HIGH\nSTAKES';
+                   status = 'VIP';
                 }
 
                 return _ProLiveCard(
                   type: _CardType.game,
                   title: title,
-                  subtitle: 'Playing: ${game.gameType}',
+                  // Safe ID Display
+                  subtitle: 'Table: ${(game.id ?? "Unknown").length > 4 ? (game.id ?? "Unknown").substring(0, 4) : (game.id ?? "Unknown")}...', // Show Table ID snippet
                   status: status,
                   statusColor: statusColor,
                   icon: icon,
@@ -250,11 +278,18 @@ class _ProLiveCard extends StatelessWidget {
                               ],
                               Text(
                                 status,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 0.5,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black.withValues(alpha: 0.3),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -269,12 +304,19 @@ class _ProLiveCard extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
                             height: 1.0,
                             letterSpacing: 0.5,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 4),

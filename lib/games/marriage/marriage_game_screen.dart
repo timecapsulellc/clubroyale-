@@ -604,8 +604,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
         : null;
 
     return Container(
-      height: 120,
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      height: 140, // Increased height for better card visibility
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8), // Reduced padding
       color: Colors.black.withValues(alpha: 0.6),
       child: Center(
         child: SingleChildScrollView(

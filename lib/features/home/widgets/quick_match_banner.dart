@@ -116,27 +116,34 @@ class QuickMatchBanner extends StatelessWidget {
                   ),
                 ),
                 
-                // Join Arrow
+                // Join Button - Enhanced
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: const [
                       Text(
-                        'JOIN',
+                        'JOIN NOW', // Changed from JOIN to JOIN NOW
                         style: TextStyle(
                           color: Color(0xFF2E7D32),
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w900, // Bolder
                           fontSize: 12,
-                          letterSpacing: 1,
+                          letterSpacing: 0.5,
                         ),
                       ),
                       SizedBox(width: 4),
-                      Icon(Icons.arrow_forward, color: Color(0xFF2E7D32), size: 16),
+                      Icon(Icons.play_arrow_rounded, color: Color(0xFF2E7D32), size: 18), // Arrow to Play icon
                     ],
                   ),
                 ),
