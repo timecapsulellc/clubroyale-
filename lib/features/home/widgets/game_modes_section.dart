@@ -165,11 +165,15 @@ class GameModesSection extends ConsumerWidget {
   Future<void> _startPracticeGame(BuildContext context, WidgetRef ref, String gameType) async {
     Navigator.pop(context); // Close sheet
     
+    // Store navigator before async gaps
+    final navigator = Navigator.of(context);
+    final router = GoRouter.of(context);
+    
     // Show loading indicator
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
+      builder: (_) => const Center(
         child: CircularProgressIndicator(color: Color(0xFFD4AF37)),
       ),
     );
@@ -242,27 +246,28 @@ class GameModesSection extends ConsumerWidget {
       await lobbyService.startGame(roomId);
       debugPrint('🎮 [Practice] Game started!');
 
-      // 5. Navigate
+      // 5. Navigate (use stored references)
       debugPrint('🎮 [Practice] Step 5: Navigating to game screen...');
-      if (context.mounted) {
-        Navigator.pop(context); // Close loading
-        if (gameType == 'marriage') {
-          context.push('/marriage/$roomId');
-        } else if (gameType == 'teen_patti') {
-          context.push('/teen_patti/$roomId');
-        } else if (gameType == 'in_between') {
-          context.push('/in_between/$roomId');
-        } else {
-          context.push('/game/$roomId/play');
-        }
-        debugPrint('🎮 [Practice] Navigation complete!');
+      navigator.pop(); // Close loading dialog
+      
+      if (gameType == 'marriage') {
+        router.push('/marriage/$roomId');
+      } else if (gameType == 'teen_patti') {
+        router.push('/teen_patti/$roomId');
+      } else if (gameType == 'in_between') {
+        router.push('/in_between/$roomId');
+      } else {
+        router.push('/game/$roomId/play');
       }
+      debugPrint('🎮 [Practice] Navigation complete!');
 
     } catch (e, stackTrace) {
       debugPrint('❌ [Practice] Error starting practice game: $e');
       debugPrint('❌ [Practice] Stack trace: $stackTrace');
+      try {
+        navigator.pop(); // Close loading
+      } catch (_) {}
       if (context.mounted) {
-        Navigator.pop(context); // Close loading
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error starting practice game: $e'),
