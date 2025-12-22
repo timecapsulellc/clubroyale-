@@ -233,84 +233,86 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
             children: [
               // Center content - phase indicator and trick area
               Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Phase indicator
-                    if (game.gamePhase != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: _getPhaseColor(game.gamePhase!),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: _getPhaseColor(game.gamePhase!).withValues(alpha: 0.5),
-                              blurRadius: 12,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          _getPhaseText(game.gamePhase!),
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                child: SingleChildScrollView(
+                  child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Phase indicator
+                          if (game.gamePhase != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: _getPhaseColor(game.gamePhase!),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: _getPhaseColor(game.gamePhase!).withValues(alpha: 0.5),
+                                    blurRadius: 12,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                _getPhaseText(game.gamePhase!),
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ).animate().fadeIn().scale(),
+                  
+                          const SizedBox(height: 16),
+                  
+                          // Trick area
+                          TrickAreaWidget(
+                            currentTrick: game.currentTrick,
+                            playerNames: playerNames,
                           ),
-                        ),
-                      ).animate().fadeIn().scale(),
-
-                    const SizedBox(height: 16),
-
-                    // Trick area
-                    TrickAreaWidget(
-                      currentTrick: game.currentTrick,
-                      playerNames: playerNames,
+                  
+                          const SizedBox(height: 12),
+                  
+                          // Turn indicator
+                          if (game.gamePhase == GamePhase.playing)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isMyTurn ? CasinoColors.gold.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: isMyTurn ? CasinoColors.gold : Colors.white.withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: Text(
+                                isMyTurn ? '🎯 Your turn!' : '${playerNames[game.currentTurn]}\'s turn',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: isMyTurn ? CasinoColors.gold : Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            
+                          if (game.currentTrick?.ledSuit != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.5),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  'Must follow: ${game.currentTrick!.ledSuit.symbol}',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: game.currentTrick!.ledSuit.isRed ? Colors.red.shade300 : Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-
-                    const SizedBox(height: 12),
-
-                    // Turn indicator
-                    if (game.gamePhase == GamePhase.playing)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isMyTurn ? CasinoColors.gold.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: isMyTurn ? CasinoColors.gold : Colors.white.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Text(
-                          isMyTurn ? '🎯 Your turn!' : '${playerNames[game.currentTurn]}\'s turn',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: isMyTurn ? CasinoColors.gold : Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      
-                    if (game.currentTrick?.ledSuit != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.5),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            'Must follow: ${game.currentTrick!.ledSuit.symbol}',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: game.currentTrick!.ledSuit.isRed ? Colors.red.shade300 : Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+                  ),
               
               // Top player (opponent across table)
               if (otherPlayers.isNotEmpty)

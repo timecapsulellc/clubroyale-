@@ -525,43 +525,50 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
             ),
           
           // Action buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // Fold button
-              ElevatedButton.icon(
-                onPressed: isMyTurn && !_isProcessing ? _fold : null,
-                icon: const Icon(Icons.close),
-                label: const Text('Fold'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-              
-              // Bet/Chaal button
-              ElevatedButton.icon(
-                onPressed: isMyTurn && !_isProcessing ? _bet : null,
-                icon: const Icon(Icons.attach_money),
-                label: Text('Chaal $_betAmount'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CasinoColors.gold,
-                  foregroundColor: Colors.black,
-                ),
-              ),
-              
-              // Show button (only when 2 players left)
-              if (_getActivePlayerCount(state) == 2)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Fold button
                 ElevatedButton.icon(
-                  onPressed: isMyTurn && !_isProcessing ? _showdown : null,
-                  icon: const Icon(Icons.visibility),
-                  label: const Text('Show'),
+                  onPressed: isMyTurn && !_isProcessing ? _fold : null,
+                  icon: const Icon(Icons.close),
+                  label: const Text('Fold'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.red,
                     foregroundColor: Colors.white,
                   ),
                 ),
-            ],
+                
+                const SizedBox(width: 8),
+
+                // Bet/Chaal button
+                ElevatedButton.icon(
+                  onPressed: isMyTurn && !_isProcessing ? _bet : null,
+                  icon: const Icon(Icons.attach_money),
+                  label: Text(isSeen ? 'Chaal $_betAmount' : 'Blind $_betAmount'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: CasinoColors.gold,
+                    foregroundColor: Colors.black,
+                  ),
+                ),
+                
+                const SizedBox(width: 8),
+
+                // Show button (only when 2 players left)
+                if (_getActivePlayerCount(state) == 2)
+                  ElevatedButton.icon(
+                    onPressed: isMyTurn && !_isProcessing ? _showdown : null,
+                    icon: const Icon(Icons.visibility),
+                    label: const Text('Show'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       ),
