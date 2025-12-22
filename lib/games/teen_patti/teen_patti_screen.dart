@@ -4,6 +4,8 @@
 library;
 
 import 'package:flutter/material.dart' hide Card;
+import 'package:clubroyale/core/utils/haptic_helper.dart';
+import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -81,8 +83,9 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             backgroundColor: CasinoColors.feltGreenDark,
-            body: const Center(
-              child: CircularProgressIndicator(color: CasinoColors.gold),
+            body: const ContextualLoader(
+              message: 'Dealing cards...',
+              icon: Icons.casino,
             ),
           );
         }
@@ -555,6 +558,10 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
   Widget _buildGameOverScreen(TeenPattiGameState state, String myId) {
     final isWinner = state.winnerId == myId;
     
+    if (isWinner) {
+      HapticHelper.winCelebration();
+    }
+    
     return Scaffold(
       backgroundColor: CasinoColors.feltGreenDark,
       body: Center(
@@ -601,6 +608,8 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     setState(() => _isProcessing = true);
     
     try {
+      // Haptic feedback for card reveal
+      HapticHelper.cardMove();
       // Play card flip/slide sound
       await SoundService.playCardSlide();
       
@@ -619,6 +628,8 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     setState(() => _isProcessing = true);
     
     try {
+      // Haptic feedback for betting
+      HapticHelper.chipPlace();
       // Play chip bet sound
       await SoundService.playChipSound(); 
       
@@ -637,6 +648,8 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     setState(() => _isProcessing = true);
     
     try {
+      // Haptic feedback for fold action
+      HapticHelper.lightTap();
       // Play fold sound (using card_slide as placeholder)
       await SoundService.playCardSlide();
       
@@ -655,6 +668,8 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     setState(() => _isProcessing = true);
     
     try {
+      // Haptic feedback for showdown moment
+      HapticHelper.success();
       // Play showdown/win sound
       await SoundService.playRoundEnd();
       

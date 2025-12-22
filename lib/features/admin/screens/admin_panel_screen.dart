@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/core/config/admin_config.dart';
@@ -266,7 +267,7 @@ class _UserLookupDialogState extends ConsumerState<_UserLookupDialog> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e))));
       }
     } finally {
       if (mounted) setState(() => _loading = false);

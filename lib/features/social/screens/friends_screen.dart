@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
@@ -69,25 +71,16 @@ class MyFriendsTab extends ConsumerWidget {
     return StreamBuilder<List<String>>(
       stream: friendIdsStream,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+        if (snapshot.connectionState == ConnectionState.waiting) return const ContextualLoader(message: 'Loading friends...', icon: Icons.people);
         final ids = snapshot.data ?? [];
 
         if (ids.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.people_outline, size: 64, color: Colors.grey),
-                const SizedBox(height: 16),
-                const Text('No friends yet.'),
-                TextButton(
-                  onPressed: () => DefaultTabController.of(context).animateTo(2), 
-                  // Note: DefaultTabController only works if provided above, but we used TabController manually.
-                  // Just show simple text.
-                  child: const Text('Find People'),
-                ),
-              ],
-            ),
+          return EmptyStateWidget(
+            icon: Icons.people_outline,
+            title: 'No friends yet',
+            subtitle: 'Find and add friends to play together!',
+            actionLabel: 'Find People',
+            onAction: () {},
           );
         }
 
@@ -294,7 +287,7 @@ class _FindFriendsTabState extends ConsumerState<FindFriendsTab> {
                       }
                     } catch (e) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e))));
                       }
                     }
                   },

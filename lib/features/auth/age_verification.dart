@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:clubroyale/core/constants/disclaimers.dart';
+import 'package:clubroyale/core/utils/haptic_helper.dart';
+import 'package:clubroyale/core/widgets/contextual_loader.dart';
 
 /// Age verification state management
 class AgeVerificationService {
@@ -161,7 +163,10 @@ class _AgeVerificationDialogState extends State<AgeVerificationDialog> {
                   Expanded(
                     flex: 2,
                     child: FilledButton(
-                      onPressed: _canContinue ? widget.onVerified : null,
+                      onPressed: _canContinue ? () {
+                        HapticHelper.success();
+                        widget.onVerified();
+                      } : null,
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         backgroundColor: Colors.deepPurple,
@@ -291,8 +296,9 @@ class _AgeGateWrapperState extends State<AgeGateWrapper> {
   Widget build(BuildContext context) {
     if (_loading) {
       return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
+        body: ContextualLoader(
+          message: 'Starting ClubRoyale...',
+          icon: Icons.casino,
         ),
       );
     }

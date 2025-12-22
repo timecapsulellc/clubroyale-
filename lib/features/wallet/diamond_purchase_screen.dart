@@ -129,9 +129,10 @@ class DiamondPurchaseScreen extends ConsumerWidget {
                                   }
                                 } catch (e) {
                                   if (context.mounted) {
+                                    final friendlyMessage = _getFriendlyErrorMessage(e.toString());
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Upgrade failed: ${e.toString().replaceAll("Exception:", "")}'), // Clean up error
+                                        content: Text(friendlyMessage),
                                         backgroundColor: Colors.red,
                                       )
                                     );
@@ -528,5 +529,37 @@ class DiamondPurchaseScreen extends ConsumerWidget {
         ),
       ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideX(begin: 0.1),
     );
+  }
+
+  /// Parse Firebase error codes and return user-friendly messages
+  String _getFriendlyErrorMessage(String error) {
+    // Common Firebase error patterns
+    if (error.contains('failed-precondition')) {
+      if (error.contains('Insufficient diamonds')) {
+        return '💎 Not enough diamonds! You need 100 diamonds to upgrade.';
+      }
+      return 'Cannot complete this action right now. Please try again.';
+    }
+    if (error.contains('unauthenticated')) {
+      return 'Please sign in to continue.';
+    }
+    if (error.contains('permission-denied')) {
+      return 'You don\'t have permission for this action.';
+    }
+    if (error.contains('not-found')) {
+      return 'Account data not found. Please try again.';
+    }
+    if (error.contains('unavailable')) {
+      return 'Service temporarily unavailable. Please try again later.';
+    }
+    if (error.contains('network')) {
+      return 'Network error. Check your connection and try again.';
+    }
+    // Generic fallback - extract just the message part
+    final bracketMatch = RegExp(r'\](.*?)(?:\[|$)').firstMatch(error);
+    if (bracketMatch != null) {
+      return bracketMatch.group(1)?.trim() ?? 'Something went wrong. Please try again.';
+    }
+    return 'Something went wrong. Please try again.';
   }
 }

@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 import 'package:clubroyale/features/lobby/lobby_service.dart';
 import 'package:clubroyale/features/game/game_room.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
@@ -116,11 +118,16 @@ class PublicRoomsList extends ConsumerWidget {
                   },
                 );
               },
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
+              loading: () => ListView.builder(
+                itemCount: 3,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemBuilder: (_, __) => const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: SkeletonGameCard(),
+                ),
               ),
               error: (e, _) => Center(
-                child: Text('Error: $e', style: TextStyle(color: Colors.red.shade300)),
+                child: Text(ErrorHelper.getFriendlyMessage(e), style: TextStyle(color: Colors.red.shade300)),
               ),
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/profile/user_profile.dart';
@@ -22,7 +23,7 @@ class FeedWidget extends ConsumerWidget {
         }
 
         if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
+          return Center(child: Text(ErrorHelper.getFriendlyMessage(snapshot.error)));
         }
 
         final posts = snapshot.data ?? [];

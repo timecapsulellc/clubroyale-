@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -42,7 +43,7 @@ class ChatListScreen extends ConsumerWidget {
           }
           
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text(ErrorHelper.getFriendlyMessage(snapshot.error)));
           }
 
           final chats = snapshot.data ?? [];
@@ -204,7 +205,7 @@ class ChatListScreen extends ConsumerWidget {
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e))));
                 }
               }
             },

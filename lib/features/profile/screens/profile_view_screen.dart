@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -30,8 +32,8 @@ class ProfileViewScreen extends ConsumerWidget {
 
     return Scaffold(
       body: profileAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        loading: () => const SkeletonProfile(),
+        error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
         data: (profile) {
           if (profile == null) {
             return const Center(child: Text('Profile not found'));
@@ -562,7 +564,7 @@ class _PostsGrid extends ConsumerWidget {
 
     return postsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
       data: (posts) {
         if (posts.isEmpty) {
           return const Center(

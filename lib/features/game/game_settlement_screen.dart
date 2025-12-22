@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/haptic_helper.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -32,6 +33,7 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
   void initState() {
     super.initState();
     ref.read(soundServiceProvider).playGameWin();
+    HapticHelper.winCelebration();
     
     // Initialize confetti
     _confettiController = AnimationController(

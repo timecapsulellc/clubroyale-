@@ -4,6 +4,9 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/utils/haptic_helper.dart';
+import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/replay/replay_model.dart';
 import 'package:clubroyale/features/replay/replay_service.dart';
@@ -64,14 +67,22 @@ class _MyReplaysTab extends ConsumerWidget {
           );
         }
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: replays.length,
-          itemBuilder: (context, index) => _ReplayCard(replay: replays[index]),
+        return RefreshIndicator(
+          onRefresh: () async {
+            HapticHelper.lightTap();
+            ref.invalidate(userReplaysProvider(userId));
+            await ref.read(userReplaysProvider(userId).future);
+          },
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            itemCount: replays.length,
+            itemBuilder: (context, index) => _ReplayCard(replay: replays[index]),
+          ),
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      loading: () => const ContextualLoader(message: 'Loading replays...', icon: Icons.video_library),
+      error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
     );
   }
 }
@@ -93,15 +104,23 @@ class _PopularReplaysTab extends ConsumerWidget {
           );
         }
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: replays.length,
-          itemBuilder: (context, index) =>
-              _ReplayCard(replay: replays[index], showViews: true),
+        return RefreshIndicator(
+          onRefresh: () async {
+            HapticHelper.lightTap();
+            ref.invalidate(publicReplaysProvider);
+            await ref.read(publicReplaysProvider.future);
+          },
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            itemCount: replays.length,
+            itemBuilder: (context, index) =>
+                _ReplayCard(replay: replays[index], showViews: true),
+          ),
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      loading: () => const ContextualLoader(message: 'Loading replays...', icon: Icons.trending_up),
+      error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
     );
   }
 }

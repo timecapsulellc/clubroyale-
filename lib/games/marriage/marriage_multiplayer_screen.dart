@@ -5,6 +5,8 @@
 library;
 
 import 'package:flutter/material.dart' hide Card;
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -97,15 +99,9 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             backgroundColor: CasinoColors.feltGreenDark,
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(color: CasinoColors.gold),
-                  const SizedBox(height: 16),
-                  const Text('Loading game...', style: TextStyle(color: Colors.white)),
-                ],
-              ),
+            body: const ContextualLoader(
+              message: 'Shuffling cards...',
+              icon: Icons.style,
             ),
           );
         }
@@ -1063,7 +1059,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -1099,7 +1095,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -1162,7 +1158,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -1192,7 +1188,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -1227,7 +1223,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
         );
       }
     } finally {

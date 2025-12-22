@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -118,9 +120,10 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Loading...')),
-            body: const Center(
-              child: CircularProgressIndicator(),
+            appBar: AppBar(title: const Text('Connecting...')),
+            body: const ContextualLoader(
+              message: 'Connecting to room...',
+              icon: Icons.wifi,
             ),
           );
         }
@@ -160,23 +163,72 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
           return Scaffold(
             appBar: AppBar(title: const Text('Room Not Found')),
             body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.search_off, size: 64, color: colorScheme.error),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Room not found',
-                    style: theme.textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  const Text('The room may have been deleted or the game already started.'),
-                  const SizedBox(height: 24),
-                  FilledButton(
-                    onPressed: () => context.go('/lobby'),
-                    child: const Text('Back to Lobby'),
-                  ),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: colorScheme.errorContainer.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.search_off_rounded,
+                        size: 64,
+                        color: colorScheme.error,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Room Not Found',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'This room may have been deleted, the game already started, or the code is incorrect.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 32),
+                    // Retry Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: () {
+                          // Force refresh by re-navigating
+                          context.go('/room/${widget.roomId}');
+                        },
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Try Again'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Back to Lobby
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => context.go('/lobby'),
+                        icon: const Icon(Icons.home_outlined),
+                        label: const Text('Back to Lobby'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Create New Room
+                    TextButton(
+                      onPressed: () => context.go('/lobby'),
+                      child: Text(
+                        'Create a New Room →',
+                        style: TextStyle(color: colorScheme.primary),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -918,7 +970,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error updating ready status: $e'),
+            content: Text(ErrorHelper.getFriendlyMessage(e)),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -1006,7 +1058,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error starting game: $e'),
+            content: Text(ErrorHelper.getFriendlyMessage(e)),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -1077,7 +1129,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error leaving room: $e'),
+            content: Text(ErrorHelper.getFriendlyMessage(e)),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -1092,7 +1144,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error adding bot: $e'),
+            content: Text(ErrorHelper.getFriendlyMessage(e)),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -1133,7 +1185,7 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(ErrorHelper.getFriendlyMessage(e)),
             backgroundColor: Colors.red,
           ),
         );

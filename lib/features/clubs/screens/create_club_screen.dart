@@ -5,6 +5,7 @@ library;
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:clubroyale/features/clubs/club_model.dart';
@@ -217,7 +218,7 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
         );
       }
     } finally {

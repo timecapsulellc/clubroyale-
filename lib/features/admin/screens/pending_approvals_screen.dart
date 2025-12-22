@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/config/admin_config.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
@@ -30,7 +32,10 @@ class PendingApprovalsScreen extends ConsumerWidget {
         stream: adminDiamondService.watchRequestsForAdmin(user.email!),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Padding(
+              padding: EdgeInsets.all(16),
+              child: SkeletonLeaderboard(itemCount: 4),
+            );
           }
 
           final requests = snapshot.data ?? [];
@@ -89,7 +94,7 @@ class PendingApprovalsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(ErrorHelper.getFriendlyMessage(e)),
             backgroundColor: Colors.red,
           ),
         );

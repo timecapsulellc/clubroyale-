@@ -4,6 +4,9 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/utils/haptic_helper.dart';
+import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/tournament/tournament_model.dart';
 import 'package:clubroyale/features/tournament/tournament_service.dart';
@@ -60,8 +63,8 @@ class TournamentLobbyScreen extends ConsumerWidget {
             ],
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        loading: () => const ContextualLoader(message: 'Loading tournaments...', icon: Icons.emoji_events),
+        error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -234,7 +237,10 @@ class _TournamentCard extends ConsumerWidget {
                           label: const Text('Joined'),
                         )
                       : FilledButton(
-                          onPressed: () => _joinTournament(context, ref),
+                          onPressed: () {
+                            HapticHelper.lightTap();
+                            _joinTournament(context, ref);
+                          },
                           child: const Text('Join Tournament'),
                         ),
                 ),

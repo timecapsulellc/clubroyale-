@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
 import 'package:clubroyale/features/social/activity_feed.dart';
 import 'package:clubroyale/features/social/widgets/feed_item_card.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
@@ -73,7 +74,7 @@ class ActivityFeedScreen extends ConsumerWidget {
             children: [
               const Icon(Icons.error_outline, size: 48, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Error loading feed: $error'),
+              Text(ErrorHelper.getFriendlyMessage(error)),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {

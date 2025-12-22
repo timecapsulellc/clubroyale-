@@ -4,6 +4,8 @@
 library;
 
 import 'package:flutter/material.dart' hide Card;
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -91,8 +93,9 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             backgroundColor: CasinoColors.feltGreenDark,
-            body: const Center(
-              child: CircularProgressIndicator(color: CasinoColors.gold),
+            body: const ContextualLoader(
+              message: 'Setting up table...',
+              icon: Icons.casino,
             ),
           );
         }
@@ -636,7 +639,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -660,7 +663,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error placing bet: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -693,7 +696,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error revealing card: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -715,7 +718,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
         );
       }
     } finally {

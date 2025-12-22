@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:clubroyale/core/config/club_royale_theme.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -61,11 +63,11 @@ class WalletScreen extends ConsumerWidget {
             stream: diamondService.watchWallet(userId),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
-                 return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+                 return Center(child: Text(ErrorHelper.getFriendlyMessage(snapshot.error), style: const TextStyle(color: Colors.red)));
               }
 
               if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator(color: ClubRoyaleTheme.gold));
+                return const Center(child: ContextualLoader(message: 'Loading vault...', icon: Icons.diamond));
               }
 
               final wallet = snapshot.data!;

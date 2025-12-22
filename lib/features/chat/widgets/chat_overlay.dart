@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../chat_message.dart';
 import '../chat_service.dart';
@@ -188,7 +189,7 @@ class _ChatOverlayState extends ConsumerState<ChatOverlay> {
                   );
                 },
               ),
-              error: (e, _) => Center(child: Text('Error: $e')),
+              error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
             ),
           ),
 

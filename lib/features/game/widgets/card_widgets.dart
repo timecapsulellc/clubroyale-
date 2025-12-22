@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/haptic_helper.dart';
 import 'package:clubroyale/core/models/playing_card.dart';
 
 /// Helper to get asset path
@@ -45,7 +46,10 @@ class PlayingCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: isPlayable ? onTap : null,
+      onTap: isPlayable ? () {
+        HapticHelper.cardMove();
+        onTap?.call();
+      } : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         width: width,

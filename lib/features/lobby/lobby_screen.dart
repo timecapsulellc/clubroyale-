@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/haptic_helper.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -154,7 +155,10 @@ class LobbyScreen extends ConsumerWidget {
                     width: double.infinity,
                     margin: const EdgeInsets.only(bottom: 12),
                     child: FilledButton.icon(
-                      onPressed: () => _playNow(context, ref),
+                      onPressed: () {
+                        HapticHelper.lightTap();
+                        _playNow(context, ref);
+                      },
                       icon: const Icon(Icons.play_arrow_rounded, size: 28),
                       label: const Text('⚡ PLAY NOW', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       style: FilledButton.styleFrom(

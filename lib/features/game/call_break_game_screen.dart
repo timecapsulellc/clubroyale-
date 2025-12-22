@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/utils/haptic_helper.dart';
+import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
@@ -59,7 +62,10 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: ContextualLoader(
+              message: 'Loading game...',
+              icon: Icons.style,
+            ),
           );
         }
 
@@ -515,12 +521,13 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
     if (bid != null && mounted) {
       setState(() => _isProcessing = true);
       try {
+        HapticHelper.lightTap();
         final callBreakService = ref.read(callBreakServiceProvider);
         await callBreakService.placeBid(game.id!, currentUserId, bid);
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to place bid: $e')),
+            SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e))),
           );
         }
       } finally {
@@ -532,6 +539,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
   Future<void> _playCard(String gameId, PlayingCard card, CallBreakService service) async {
     setState(() => _isProcessing = true);
     try {
+      HapticHelper.cardMove();
       final currentUserId = ref.read(authServiceProvider).currentUser!.uid;
       await service.playCard(gameId, currentUserId, card);
       setState(() => _selectedCard = null);
@@ -549,6 +557,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
   Future<void> _startNextRound(String gameId, List<String> playerIds, CallBreakService service) async {
     setState(() => _isProcessing = true);
     try {
+      HapticHelper.mediumTap();
       await service.startNewRound(gameId, playerIds);
     } catch (e) {
       if (mounted) {

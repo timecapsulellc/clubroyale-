@@ -4,6 +4,8 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/clubs/club_model.dart';
 import 'package:clubroyale/features/clubs/club_service.dart';
@@ -70,8 +72,8 @@ class ClubsListScreen extends ConsumerWidget {
                       itemCount: clubs.length,
                       itemBuilder: (context, index) => _ClubCard(club: clubs[index]),
                     ),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e')),
+              loading: () => const ContextualLoader(message: 'Loading clubs...', icon: Icons.groups),
+              error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
             ),
             // Discover Tab
             const _DiscoverTab(),
@@ -300,7 +302,7 @@ class _DiscoverTabState extends ConsumerState<_DiscoverTab> {
           if (_isSearching)
             const Center(child: Padding(
               padding: EdgeInsets.all(32),
-              child: CircularProgressIndicator(),
+              child: ContextualLoader(message: 'Searching...', icon: Icons.search),
             ))
           else if (_searchResults.isNotEmpty)
             ...(_searchResults.map((club) => Padding(

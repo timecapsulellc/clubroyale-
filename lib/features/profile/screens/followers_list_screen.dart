@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/utils/haptic_helper.dart';
+import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 import 'package:clubroyale/features/profile/user_profile.dart';
 import 'package:clubroyale/features/profile/profile_service.dart';
 
@@ -28,8 +31,11 @@ class FollowersListScreen extends ConsumerWidget {
         title: Text(isFollowers ? 'Followers' : 'Following'),
       ),
       body: listAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(16),
+          child: SkeletonLeaderboard(itemCount: 5),
+        ),
+        error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
         data: (profiles) {
           if (profiles.isEmpty) {
             return Center(
@@ -132,6 +138,7 @@ class _UserTile extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12),
             ),
             onPressed: () async {
+              HapticHelper.lightTap();
               final service = ref.read(profileServiceProvider);
               if (isFollowing) {
                 await service.unfollowUser(profile.id);
