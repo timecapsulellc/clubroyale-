@@ -11,6 +11,7 @@ import 'package:clubroyale/games/teen_patti/teen_patti_service.dart';
 import 'package:clubroyale/games/in_between/in_between_service.dart';
 import 'package:clubroyale/games/marriage/marriage_service.dart';
 import 'package:clubroyale/core/widgets/animated_card_cover.dart';
+import 'package:clubroyale/core/widgets/game_card_graphic.dart';
 
 class GameModesSection extends ConsumerWidget {
   const GameModesSection({super.key});
@@ -120,6 +121,7 @@ class GameModesSection extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (context) => Container(
         padding: const EdgeInsets.all(24),
         decoration: const BoxDecoration(
@@ -135,27 +137,43 @@ class GameModesSection extends ConsumerWidget {
               'Select Game (Practice)',
               style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(height: 24),
+            // Visual Card Grid
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              childAspectRatio: 1.0,
+              children: [
+                _GameCardTile(
+                  gameType: 'marriage',
+                  name: 'Marriage',
+                  accentColor: const Color(0xFFE74C3C),
+                  onTap: () => _startPracticeGame(context, ref, 'marriage'),
+                ),
+                _GameCardTile(
+                  gameType: 'call_break',
+                  name: 'Call Break',
+                  accentColor: const Color(0xFFD4AF37),
+                  onTap: () => _startPracticeGame(context, ref, 'call_break'),
+                ),
+                _GameCardTile(
+                  gameType: 'teen_patti',
+                  name: 'Teen Patti',
+                  accentColor: const Color(0xFFE91E63),
+                  onTap: () => _startPracticeGame(context, ref, 'teen_patti'),
+                ),
+                _GameCardTile(
+                  gameType: 'in_between',
+                  name: 'In-Between',
+                  accentColor: const Color(0xFF9B59B6),
+                  onTap: () => _startPracticeGame(context, ref, 'in_between'),
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
-            _GameOption(
-              name: 'Marriage', 
-              icon: '♦️', 
-              onTap: () => _startPracticeGame(context, ref, 'marriage'),
-            ),
-            _GameOption(
-              name: 'Call Break', 
-              icon: '♠️', 
-              onTap: () => _startPracticeGame(context, ref, 'call_break'),
-            ),
-            _GameOption(
-              name: 'Teen Patti', 
-              icon: '♥️', 
-              onTap: () => _startPracticeGame(context, ref, 'teen_patti'),
-            ),
-            _GameOption(
-              name: 'In-Between', 
-              icon: '♣️', 
-              onTap: () => _startPracticeGame(context, ref, 'in_between'),
-            ),
           ],
         ),
       ),
@@ -349,27 +367,72 @@ class GameModesSection extends ConsumerWidget {
   }
 }
 
-class _GameOption extends StatelessWidget {
+/// Visual game card tile with card graphics
+class _GameCardTile extends StatelessWidget {
+  final String gameType;
   final String name;
-  final String icon;
+  final Color accentColor;
   final VoidCallback onTap;
 
-  const _GameOption({required this.name, required this.icon, required this.onTap});
+  const _GameCardTile({
+    required this.gameType,
+    required this.name,
+    required this.accentColor,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: onTap,
-      leading: Container(
-        width: 40, height: 40,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.1), shape: BoxShape.circle),
-        child: Text(icon, style: const TextStyle(fontSize: 20)),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF2d1b4e).withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: accentColor.withValues(alpha: 0.5), width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: accentColor.withValues(alpha: 0.2),
+                blurRadius: 12,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Card graphic
+              GameCardGraphic(
+                gameType: gameType,
+                size: 80,
+                animate: true,
+              ),
+              const SizedBox(height: 12),
+              // Game name label
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(
+                  color: accentColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      title: Text(name, style: const TextStyle(color: Colors.white)),
-      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
-      contentPadding: EdgeInsets.zero,
-    );
+    ).animate().fadeIn(delay: 100.ms).scale(begin: const Offset(0.9, 0.9));
   }
 }
 

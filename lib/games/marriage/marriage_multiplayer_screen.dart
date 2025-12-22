@@ -762,6 +762,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none, // Allow cards to show outside bounds
         child: Row(
           children: sortedCards.asMap().entries.map((entry) {
             final index = entry.key;
@@ -770,21 +771,26 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             if (card == null) return const SizedBox();
             
             final isSelected = _selectedCardId == cardId;
+            final isLast = index == sortedCards.length - 1;
             
             // Detect Maal type for glow effect
             final maalType = maalCalculator?.getMaalType(card) ?? MaalType.none;
             
-            return GestureDetector(
-              onTap: isMyTurn ? () {
-                setState(() {
-                  _selectedCardId = isSelected ? null : cardId;
-                });
-              } : null,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                transform: Matrix4.translationValues(0, isSelected ? -15 : 0, 0),
-                margin: EdgeInsets.only(right: index < sortedCards.length - 1 ? -25 : 0),
-                child: _buildCardWidget(card, isSelected, maalType: maalType),
+            // Use SizedBox with reduced width to create overlap
+            // Last card gets full width (60px), others get 35px (60 - 25 overlap)
+            return SizedBox(
+              width: isLast ? 60 : 35,
+              child: GestureDetector(
+                onTap: isMyTurn ? () {
+                  setState(() {
+                    _selectedCardId = isSelected ? null : cardId;
+                  });
+                } : null,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  transform: Matrix4.translationValues(0, isSelected ? -15 : 0, 0),
+                  child: _buildCardWidget(card, isSelected, maalType: maalType),
+                ),
               ),
             ).animate().fadeIn(delay: Duration(milliseconds: 30 * index));
           }).toList(),

@@ -258,6 +258,18 @@ service cloud.firestore {
       allow delete: if isAuthenticated();
     }
     
+    // ============ BOTS ============
+    
+    match /bot_wallets/{botId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated(); // Allow clients to fund/deduct for bots in practice
+    }
+    
+    match /bot_transactions/{txId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated();
+    }
+
     // ============ WALLETS ============
     
     match /wallets/{userId} {
