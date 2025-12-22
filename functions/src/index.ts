@@ -58,6 +58,16 @@ export { onGrantApproved, executeCooledGrants, notifyAdminNewChat } from './admi
 export { weeklyTasks, dailyCleanup } from './scheduled/dailyTasks';
 export { seedBotRoomsScheduled, seedBotRoomsManual, cleanupAllWaitingRooms } from './scheduled/botRoomSeeder';
 
+// Export GDPR Compliance Functions
+export { gdprExportUserData } from './compliance/gdprExport';
+export { gdprDeleteUserData } from './compliance/gdprDelete';
+
+// Export Analytics & KPI Functions
+export { calculateDailyKpis, getKpiDashboard } from './scheduled/calculateKpis';
+
+// Export Agent Metrics Functions
+export { recordAgentMetric, getAgentMetricsSummary, getRecentAgentErrors } from './agents/metrics/agentMetrics';
+
 // Export AI Agents (12 Total)
 export {
     // IDE Guide Agent

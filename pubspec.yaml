@@ -65,6 +65,7 @@ dependencies:
   shimmer: ^3.0.0
   firebase_remote_config: ^6.1.3
   package_info_plus: ^8.3.1
+  sentry_flutter: ^8.12.0  # Cross-platform error tracking (including web)
 
 dev_dependencies:
   flutter_test:
