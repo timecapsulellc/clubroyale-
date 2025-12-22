@@ -501,61 +501,64 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     final canDrawFromDeck = isMyTurn && _game.getHand(_playerId).length == 21;
 
     return Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Deck
-          GestureDetector(
-            onTap: canDrawFromDeck ? _drawFromDeck : null,
-            child: CardWidget(
-              card: PlayingCard(rank: CardRank.ace, suit: CardSuit.spades), // Dummy card for back
-              isFaceUp: false,
-              isSelectable: canDrawFromDeck,
-              isSelected: false,
+      child: SingleChildScrollView(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Deck
+            GestureDetector(
+              onTap: canDrawFromDeck ? _drawFromDeck : null,
+              child: CardWidget(
+                card: PlayingCard(rank: CardRank.ace, suit: CardSuit.spades), // Dummy card for back
+                isFaceUp: false,
+                isSelectable: canDrawFromDeck,
+                isSelected: false,
+              ),
             ),
-          ),
-          const SizedBox(width: 20),
-          // Discard Pile
-          GestureDetector(
-            onTap: canDrawFromDiscard ? _drawFromDiscard : null,
-            child: Stack(
-              children: [
-                CardWidget(
-                  card: topDiscard ?? PlayingCard(rank: CardRank.ace, suit: CardSuit.spades), // Show back styled dummy if no discard
-                  isFaceUp: topDiscard != null,
-                  isSelectable: canDrawFromDiscard,
-                  isSelected: false,
-                ),
-                // Lock Overlay (if visit needed)
-                if (topDiscard != null && !visitRequirementMet && isMyTurn)
-                  Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.lock, color: Colors.white70),
+            const SizedBox(width: 20),
+            // Discard Pile
+            GestureDetector(
+              onTap: canDrawFromDiscard ? _drawFromDiscard : null,
+              child: Stack(
+                children: [
+                  CardWidget(
+                    card: topDiscard ?? PlayingCard(rank: CardRank.ace, suit: CardSuit.spades), // Show back styled dummy if no discard
+                    isFaceUp: topDiscard != null,
+                    isSelectable: canDrawFromDiscard,
+                    isSelected: false,
+                  ),
+                  // Lock Overlay (if visit needed)
+                  if (topDiscard != null && !visitRequirementMet && isMyTurn)
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.lock, color: Colors.white70),
+                        ),
                       ),
                     ),
-                  ),
-                // Lock Overlay (if blocked by Joker/Wild)
-                if (topDiscard != null && isDiscardBlocked && isMyTurn)
-                   Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.red.withValues(alpha: 0.3), // Red tint for blocked action
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.block, color: Colors.white70),
+                  // Lock Overlay (if blocked by Joker/Wild)
+                  if (topDiscard != null && isDiscardBlocked && isMyTurn)
+                     Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.3), // Red tint for blocked action
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.block, color: Colors.white70),
+                        ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

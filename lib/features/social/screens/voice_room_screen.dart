@@ -11,7 +11,7 @@ class VoiceRoomScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final service = ref.watch(voiceRoomServiceProvider(chatId));
+    final service = ref.watch(liveKitRoomServiceProvider(chatId));
     
     // Connect on mount if not connected
     // Note: Provider is autoDispose, so it creates fresh service.
@@ -69,14 +69,14 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      final service = ref.read(voiceRoomServiceProvider(widget.chatId));
+      final service = ref.read(liveKitRoomServiceProvider(widget.chatId));
       service.joinRoom(asListener: false); // Default to speaker for testing
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final service = ref.watch(voiceRoomServiceProvider(widget.chatId));
+    final service = ref.watch(liveKitRoomServiceProvider(widget.chatId));
     final participants = service.allParticipants;
 
     return Scaffold(

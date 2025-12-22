@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/social/voice_rooms/models/voice_room.dart';
 import 'package:clubroyale/features/social/voice_rooms/services/voice_room_service.dart';
+import 'package:clubroyale/features/social/services/voice_room_service.dart' as LK;
 import 'package:clubroyale/features/social/services/social_service.dart';
 import 'package:clubroyale/features/social/invite_service.dart';
 import 'package:clubroyale/features/social/services/friend_service.dart';
@@ -33,7 +34,44 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
     // Audio connection will be initialized after we have user info
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initAudio();
+      _listenForUnmuteRequests();
     });
+  }
+
+  void _listenForUnmuteRequests() {
+    final service = ref.read(LK.liveKitRoomServiceProvider(widget.roomId));
+    service.onUnmuteRequested.listen((_) {
+      if (!mounted) return;
+      _showUnmuteRequestDialog();
+    });
+  }
+
+  Future<void> _showUnmuteRequestDialog() async {
+     final doUnmute = await showDialog<bool>(
+       context: context,
+       builder: (context) => AlertDialog(
+         title: const Text('Host Request'),
+         content: const Text('The host would like you to speak. Unmute your microphone?'),
+         actions: [
+           TextButton(
+             onPressed: () => Navigator.pop(context, false),
+             child: const Text('Stay Muted'),
+           ),
+           FilledButton(
+             onPressed: () => Navigator.pop(context, true),
+             child: const Text('Unmute'),
+           ),
+         ],
+       ),
+     );
+     
+      if (doUnmute == true) {
+        // Enable local mic
+        // For LiveKit we need to get the service corresponding to this room
+        await ref.read(LK.liveKitRoomServiceProvider(widget.roomId)).enableMicrophone();
+        // Also toggle WebRTC if used separately
+        _audioService?.toggleMute();
+      }
   }
 
   Future<void> _initAudio() async {
@@ -100,9 +138,19 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
         actions: [
           roomAsync.when(
             data: (room) => room != null 
-              ? IconButton(
-                  icon: const Icon(Icons.settings),
-                  onPressed: () => _showRoomSettings(context, ref, room),
+              ? Row(
+                  children: [
+                    if (ref.watch(authServiceProvider).currentUser?.uid == room.hostId)
+                       IconButton(
+                         icon: const Icon(Icons.volume_off),
+                         tooltip: 'Mute All',
+                         onPressed: () => _confirmMuteAll(context, ref, room.id),
+                       ),
+                    IconButton(
+                      icon: const Icon(Icons.settings),
+                      onPressed: () => _showRoomSettings(context, ref, room),
+                    ),
+                  ],
                 )
               : const SizedBox(),
             loading: () => const SizedBox(),
@@ -239,22 +287,33 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
                     final participant = participants[index];
                     final isHost = participant.id == room.hostId;
 
-                    return _ParticipantTile(
-                      participant: participant,
-                      isHost: isHost,
-                    ).animate().fadeIn(delay: Duration(milliseconds: index * 50));
-                  },
+                      return _ParticipantTile(
+                        participant: participant,
+                        isHost: isHost,
+                        amIHost: ref.watch(authServiceProvider).currentUser?.uid == room.hostId,
+                        isMe: participant.id == ref.watch(authServiceProvider).currentUser?.uid,
+                        onToggleMute: (muted) {
+                           ref.read(LK.liveKitRoomServiceProvider(room.id)).muteRemoteParticipant(participant.id, muted);
+                        },
+                        onRequestUnmute: () {
+                           ref.read(LK.liveKitRoomServiceProvider(room.id)).requestUnmute(participant.id);
+                           ScaffoldMessenger.of(context).showSnackBar(
+                             SnackBar(content: Text('Unmute request sent to ${participant.name}')),
+                           );
+                        },
+                      ).animate().fadeIn(delay: Duration(milliseconds: index * 50));
+                    },
+                  ),
                 ),
-              ),
 
-              // Controls
-              Container(
-                padding: EdgeInsets.only(
-                  left: 24,
-                  right: 24,
-                  top: 16,
-                  bottom: MediaQuery.of(context).padding.bottom + 16,
-                ),
+                // Controls
+                Container(
+                  padding: EdgeInsets.only(
+                    left: 24,
+                    right: 24,
+                    top: 16,
+                    bottom: MediaQuery.of(context).padding.bottom + 16,
+                  ),
                 decoration: BoxDecoration(
                   color: colorScheme.surface,
                   boxShadow: [
@@ -485,6 +544,43 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
     );
   }
 
+  Future<void> _confirmMuteAll(BuildContext context, WidgetRef ref, String roomId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Mute All Participants?'),
+        content: const Text('This will mute everyone in the room except you. Participants can unmute themselves later.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Mute All'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      try {
+        await ref.read(LK.liveKitRoomServiceProvider(roomId)).muteAllRemoteParticipants();
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('All participants muted')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to mute all: $e')),
+          );
+        }
+      }
+    }
+  }
+
   Future<void> _shareRoom(BuildContext context, WidgetRef ref, VoiceRoom room) async {
     try {
       final user = ref.read(authServiceProvider).currentUser;
@@ -513,103 +609,156 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
 class _ParticipantTile extends StatelessWidget {
   final VoiceParticipant participant;
   final bool isHost;
+  final bool amIHost;
+  final bool isMe;
+  final Function(bool) onToggleMute;
+  final VoidCallback onRequestUnmute;
 
   const _ParticipantTile({
     required this.participant,
     this.isHost = false,
+    this.amIHost = false,
+    this.isMe = false,
+    required this.onToggleMute,
+    required this.onRequestUnmute,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final canModerate = amIHost && !isMe;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Stack(
-          children: [
-            // Avatar with speaking ring
-            Container(
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: participant.isSpeaking
-                      ? colorScheme.primary
-                      : Colors.transparent,
-                  width: 3,
+    return GestureDetector(
+      onLongPress: canModerate ? () => _showModerationMenu(context) : null,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Stack(
+            children: [
+              // Avatar with speaking ring
+              Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: participant.isSpeaking
+                        ? colorScheme.primary
+                        : Colors.transparent,
+                    width: 3,
+                  ),
+                ),
+                child: CircleAvatar(
+                  radius: 32,
+                  backgroundColor: colorScheme.primaryContainer,
+                  backgroundImage: participant.photoUrl != null
+                      ? NetworkImage(participant.photoUrl!)
+                      : null,
+                  child: participant.photoUrl == null
+                      ? Text(
+                          participant.name.isNotEmpty
+                              ? participant.name[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : null,
                 ),
               ),
-              child: CircleAvatar(
-                radius: 32,
-                backgroundColor: colorScheme.primaryContainer,
-                backgroundImage: participant.photoUrl != null
-                    ? NetworkImage(participant.photoUrl!)
-                    : null,
-                child: participant.photoUrl == null
-                    ? Text(
-                        participant.name.isNotEmpty
-                            ? participant.name[0].toUpperCase()
-                            : '?',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    : null,
+              // Muted indicator
+              if (participant.isMuted)
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: colorScheme.surface, width: 2),
+                    ),
+                    child: const Icon(
+                      Icons.mic_off,
+                      size: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              // Host badge
+              if (isHost)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.amber,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: colorScheme.surface, width: 2),
+                    ),
+                    child: const Icon(
+                      Icons.star,
+                      size: 10,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            participant.name,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: isHost ? FontWeight.bold : FontWeight.normal,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showModerationMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Manage ${participant.name}',
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
-            // Muted indicator
-            if (participant.isMuted)
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: colorScheme.surface, width: 2),
-                  ),
-                  child: const Icon(
-                    Icons.mic_off,
-                    size: 12,
-                    color: Colors.white,
-                  ),
-                ),
+            const Divider(),
+            if (!participant.isMuted)
+              ListTile(
+                leading: const Icon(Icons.mic_off, color: Colors.red),
+                title: const Text('Mute Player'),
+                onTap: () {
+                  onToggleMute(true);
+                  Navigator.pop(context);
+                },
+              )
+            else
+              ListTile(
+                leading: const Icon(Icons.mic, color: Colors.green),
+                title: const Text('Ask to Unmute'),
+                subtitle: const Text('Sends a request to the user'),
+                onTap: () {
+                  onRequestUnmute();
+                  Navigator.pop(context);
+                },
               ),
-            // Host badge
-            if (isHost)
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.amber,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: colorScheme.surface, width: 2),
-                  ),
-                  child: const Icon(
-                    Icons.star,
-                    size: 10,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+            // We can add "Kick User" here later
           ],
         ),
-        const SizedBox(height: 8),
-        Text(
-          participant.name,
-          style: theme.textTheme.bodySmall?.copyWith(
-            fontWeight: isHost ? FontWeight.bold : FontWeight.normal,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
+      ),
     );
   }
 }

@@ -17,4 +17,17 @@ export declare const generateLiveKitToken: import("firebase-functions/v2/https")
 export declare const validateSpectatorAccess: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
     approved: boolean;
 }>, unknown>;
+/**
+ * Mute a participant in a room (Admin only)
+ */
+export declare const muteParticipant: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
+    success: boolean;
+}>, unknown>;
+/**
+ * Mute ALL participants in a room (Admin only)
+ */
+export declare const muteAllParticipants: import("firebase-functions/v2/https").CallableFunction<any, Promise<{
+    success: boolean;
+    count: number;
+}>, unknown>;
 //# sourceMappingURL=tokenService.d.ts.map

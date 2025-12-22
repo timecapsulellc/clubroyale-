@@ -45,7 +45,8 @@ export {
 } from './triggers/social';
 
 // Export LiveKit token functions
-export { generateLiveKitToken, validateSpectatorAccess } from './livekit/tokenService';
+// Export LiveKit token functions
+export { generateLiveKitToken, validateSpectatorAccess, muteParticipant, muteAllParticipants } from './livekit/tokenService';
 
 // Export Health Check
 export { healthCheck } from './utils/health';

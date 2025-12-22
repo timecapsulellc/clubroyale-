@@ -404,12 +404,11 @@ class _GameCardTile extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Card graphic
-              GameCardGraphic(
-                gameType: gameType,
-                size: 80,
-                animate: true,
-              ),
+                GameCardGraphic(
+                  gameType: gameType,
+                  size: 55, // Reduced from 80 to fix overflow
+                  animate: true,
+                ),
               const SizedBox(height: 12),
               // Game name label
               Container(

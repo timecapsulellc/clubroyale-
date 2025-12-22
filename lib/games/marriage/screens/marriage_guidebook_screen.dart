@@ -389,7 +389,7 @@ class _MaalTab extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           crossAxisCount: 2,
-          childAspectRatio: 1.4,
+          childAspectRatio: 1.2, // Adjusted to prevent overflow on small screens
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
           children: [

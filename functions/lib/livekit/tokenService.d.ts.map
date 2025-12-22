@@ -1,1 +1,1 @@
-{"version":3,"file":"tokenService.d.ts","sourceRoot":"","sources":["../../src/livekit/tokenService.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AAUH;;GAEG;AACH,eAAO,MAAM,oBAAoB;;;YA2C/B,CAAC;AAEH;;;GAGG;AACH,eAAO,MAAM,uBAAuB;;YA6BlC,CAAC"}
+{"version":3,"file":"tokenService.d.ts","sourceRoot":"","sources":["../../src/livekit/tokenService.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AAUH;;GAEG;AACH,eAAO,MAAM,oBAAoB;;;YA2C/B,CAAC;AAEH;;;GAGG;AACH,eAAO,MAAM,uBAAuB;;YA6BlC,CAAC;AAEH;;GAEG;AACH,eAAO,MAAM,eAAe;;YA+B1B,CAAC;AAEH;;GAEG;AACH,eAAO,MAAM,mBAAmB;;;YAoC9B,CAAC"}

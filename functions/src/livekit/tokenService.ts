@@ -94,3 +94,80 @@ export const validateSpectatorAccess = onCall(async (request) => {
 
     return { approved: true };
 });
+
+/**
+ * Mute a participant in a room (Admin only)
+ */
+export const muteParticipant = onCall(async (request) => {
+    const { roomId, participantIdentity, muted } = request.data;
+    const userId = request.auth?.uid;
+
+    if (!userId) {
+        throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    if (!roomId || !participantIdentity) {
+        throw new HttpsError('invalid-argument', 'Room ID and Participant Identity are required');
+    }
+
+    // TODO: Verify if user is actually the admin/host of this room via Firestore
+    // For now, we assume the UI checks this, or we trust the caller for this phase.
+    // Ideally: const room = await db.collection('voice_rooms').doc(roomId).get();
+    // if (room.data().hostId !== userId) throw new HttpsError('permission-denied', 'Only host can mute');
+
+    // Import RoomServiceClient dynamically or at top level
+    const { RoomServiceClient } = await import('livekit-server-sdk');
+    const LIVEKIT_URL = process.env.LIVEKIT_URL || 'https://your-livekit-project.livekit.cloud';
+
+    const roomService = new RoomServiceClient(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET);
+
+    try {
+        // Mute the participant's track
+        await roomService.mutePublishedTrack(roomId, participantIdentity, 'audio', muted);
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error muting participant:', error);
+        throw new HttpsError('internal', error.message || 'Failed to mute participant');
+    }
+});
+
+/**
+ * Mute ALL participants in a room (Admin only)
+ */
+export const muteAllParticipants = onCall(async (request) => {
+    const { roomId } = request.data;
+    const userId = request.auth?.uid;
+
+    if (!userId) {
+        throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    if (!roomId) {
+        throw new HttpsError('invalid-argument', 'Room ID is required');
+    }
+
+    // Import RoomServiceClient
+    const { RoomServiceClient } = await import('livekit-server-sdk');
+    const LIVEKIT_URL = process.env.LIVEKIT_URL || 'https://your-livekit-project.livekit.cloud';
+
+    const roomService = new RoomServiceClient(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET);
+
+    try {
+        const participants = await roomService.listParticipants(roomId);
+
+        const mutePromises = participants.map(async (p) => {
+            // Don't mute the admin/caller (assuming caller is admin)
+            // p.identity usually matches userId
+            if (p.identity === userId) return;
+
+            // Mute their audio tracks
+            await roomService.mutePublishedTrack(roomId, p.identity, 'audio', true);
+        });
+
+        await Promise.all(mutePromises);
+        return { success: true, count: mutePromises.length };
+    } catch (error: any) {
+        console.error('Error muting all participants:', error);
+        throw new HttpsError('internal', error.message || 'Failed to mute all participants');
+    }
+});

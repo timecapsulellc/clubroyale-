@@ -3,9 +3,9 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:livekit_client/livekit_client.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-// Reuse or duplicate config? For independency, duplicating relevant parts.
+import 'package:clubroyale/features/auth/auth_service.dart';
+
 class VoiceRoomConfig {
   static const String serverUrl = 'wss://your-livekit-server.com'; // TODO: Move to Env
   
@@ -16,7 +16,7 @@ class VoiceRoomConfig {
       dtx: true,
     ),
     defaultVideoPublishOptions: VideoPublishOptions(
-      simulcast: false, // No video
+      simulcast: false, 
     ),
   );
 }
@@ -30,16 +30,31 @@ enum VoiceRoomState {
 }
 
 enum VoiceRole {
-  speaker,  // Can speak
-  listener, // Can only listen
+  speaker,  
+  listener, 
 }
+
+// Provider for the LiveKit Voice Room Service
+final liveKitRoomServiceProvider = Provider.autoDispose.family<VoiceRoomService, String>((ref, roomId) {
+  final user = ref.watch(authServiceProvider).currentUser;
+  if (user == null) throw Exception('User must be logged in');
+  
+  final service = VoiceRoomService(
+    roomId: roomId,
+    userId: user.uid,
+    userName: user.displayName ?? 'User',
+    userAvatar: user.photoURL,
+  );
+  ref.onDispose(() => service.dispose());
+  return service;
+});
 
 class VoiceRoomService extends ChangeNotifier {
   final FirebaseFunctions _functions = FirebaseFunctions.instance;
   final String roomId;
   final String userId;
   final String userName;
-  final String? userAvatar; // For display in grid
+  final String? userAvatar; 
 
   Room? _room;
   LocalParticipant? _localParticipant;
@@ -48,6 +63,10 @@ class VoiceRoomService extends ChangeNotifier {
   VoiceRoomState _state = VoiceRoomState.disconnected;
   bool _isMicEnabled = false;
   VoiceRole _role = VoiceRole.listener;
+  
+  // Stream to listen for unmute requests (for the UI)
+  final _unmuteRequestController = StreamController<bool>.broadcast();
+  Stream<bool> get onUnmuteRequested => _unmuteRequestController.stream;
 
   VoiceRoomService({
     required this.roomId,
@@ -62,6 +81,7 @@ class VoiceRoomService extends ChangeNotifier {
   bool get isConnected => _state == VoiceRoomState.connected;
   VoiceRole get role => _role;
   Room? get room => _room;
+  
   List<Participant> get allParticipants {
     final list = <Participant>[];
     if (_localParticipant != null) list.add(_localParticipant!);
@@ -101,8 +121,6 @@ class VoiceRoomService extends ChangeNotifier {
       debugPrint('VoiceRoom Join Error: $e');
       _state = VoiceRoomState.failed;
       notifyListeners();
-      // For Demo/Dev: If server is unreachable, maybe mock connection? 
-      // Nah, let's fail gracefully.
     }
   }
 
@@ -146,7 +164,51 @@ class VoiceRoomService extends ChangeNotifier {
     }
   }
   
-  // Hand raising logic would go here (metadata update)
+  /// Mute/Unmute a remote participant (Admin only)
+  Future<void> muteRemoteParticipant(String participantId, bool muted) async {
+    try {
+      final callable = _functions.httpsCallable('muteParticipant');
+      await callable.call({
+        'roomId': roomId,
+        'participantIdentity': participantId,
+        'muted': muted,
+      });
+    } catch (e) {
+      debugPrint('Error muting participant: $e');
+      rethrow; 
+    }
+  }
+  
+  /// Mute ALL remote participants (Admin only)
+  Future<void> muteAllRemoteParticipants() async {
+    try {
+      final callable = _functions.httpsCallable('muteAllParticipants');
+      await callable.call({
+        'roomId': roomId,
+      });
+    } catch (e) {
+      debugPrint('Error muting all: $e');
+      rethrow; 
+    }
+  }
+
+  /// Request a user to unmute themselves (Admin only)
+  Future<void> requestUnmute(String participantIdentity) async {
+    if (_room == null || _localParticipant == null) return;
+    
+    try {
+      final payload = 'REQUEST_UNMUTE'.codeUnits;
+      
+      await _localParticipant!.publishData(
+         payload,
+         reliable: true,
+         destinationIdentities: [participantIdentity],
+      );
+    } catch (e) {
+      debugPrint('Error requesting unmute: $e');
+      rethrow;
+    }
+  }
 
   Future<String> _getToken({required bool isListener}) async {
     try {
@@ -166,8 +228,6 @@ class VoiceRoomService extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint("VoiceRoom Token Error: $e");
-      // In development, we might still want a fallback if the function fails
-      // But for production, this should rethrow or handle the error gracefully
       rethrow; 
     }
   }
@@ -192,27 +252,24 @@ class VoiceRoomService extends ChangeNotifier {
         notifyListeners();
       })
       ..on<TrackMutedEvent>((event) => notifyListeners())
-      ..on<TrackUnmutedEvent>((event) => notifyListeners());
+      ..on<TrackUnmutedEvent>((event) => notifyListeners())
+      ..on<DataReceivedEvent>((event) {
+        try {
+          // Decoding might be needed depending on how it's sent
+          final dataString = String.fromCharCodes(event.data);
+          if (dataString == 'REQUEST_UNMUTE') {
+             _unmuteRequestController.add(true);
+          }
+        } catch (e) {
+             // ignore
+        }
+      });
   }
 
   @override
   void dispose() {
+    _unmuteRequestController.close();
     leaveRoom();
     super.dispose();
   }
 }
-
-// Provider
-final voiceRoomServiceProvider = Provider.family.autoDispose<VoiceRoomService, String>((ref, roomId) {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) throw Exception("User must be logged in");
-  
-  final service = VoiceRoomService(
-    roomId: roomId,
-    userId: user.uid,
-    userName: user.displayName ?? 'Guest',
-    userAvatar: user.photoURL,
-  );
-  ref.onDispose(() => service.dispose());
-  return service;
-});
