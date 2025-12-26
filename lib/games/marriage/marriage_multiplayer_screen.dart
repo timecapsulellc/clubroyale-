@@ -20,11 +20,12 @@ import 'package:clubroyale/games/marriage/marriage_service.dart';
 import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/core/card_engine/meld.dart';
-import 'package:clubroyale/features/game/widgets/player_avatar.dart';
 import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
 import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_table_layout.dart';
+import 'package:clubroyale/core/widgets/game_mode_banner.dart';
+import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 
 
 /// Sort modes for hand display
@@ -213,6 +214,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                   centerArea: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                       _buildGameModeBanner(state),
                        if (isMyTurn) _buildPhaseIndicator(state),
                        // Center deck/discard
                        _buildCenterArea(state, topDiscard, isMyTurn),
@@ -275,6 +277,22 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     );
   }
   
+  /// Build the game mode banner showing AI/Multiplayer status
+  Widget _buildGameModeBanner(MarriageGameState state) {
+    final allPlayers = state.playerHands.keys.toList();
+    final botCount = allPlayers.where((id) => id.startsWith('bot_')).length;
+    final humanCount = allPlayers.length - botCount;
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: GameModeBanner(
+        botCount: botCount,
+        humanCount: humanCount,
+        compact: true,
+      ),
+    );
+  }
+
   Widget _buildMeldSuggestions(List<String> handIds, Card? tiplu) {
     if (handIds.isEmpty) return const SizedBox.shrink();
     
@@ -620,23 +638,31 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       final isCurrentTurn = state.currentPlayerId == playerId;
       final visited = state.hasVisited(playerId);
       final maalPoints = state.getMaalPoints(playerId);
+      final isBot = playerId.startsWith('bot_');
       
       // Use Stack to overlay lock/unlock icon on avatar
       return Stack(
         clipBehavior: Clip.none,
+        alignment: Alignment.center,
         children: [
-          PlayerAvatar(
-            name: 'Player ${opponents.indexOf(playerId) + 2}', // TODO: Get real name
-            isCurrentTurn: isCurrentTurn,
-            isHost: false, // TODO: Get host status
-            bid: null,
-            tricksWon: cardCount, // Showing card count as "score" for now
+          GameOpponentWidget(
+            opponent: GameOpponent(
+              id: playerId,
+              name: isBot ? 'Bot ${playerId.split('_').last}' : 'Player', // TODO: Real name
+              isBot: isBot,
+              isCurrentTurn: isCurrentTurn,
+              cardCount: cardCount,
+              status: isCurrentTurn ? 'Thinking' : null,
+              score: null, // Don't show score yet mid-game?
+            ),
+            size: 50,
+            showStats: true,
           ),
           
-          // Visited Status Indicator
+          // Visited Status Indicator (lock)
           Positioned(
-            right: -4,
-            top: -4,
+            right: 0,
+            top: 0,
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
@@ -647,7 +673,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
               child: Icon(
                 visited ? Icons.lock_open : Icons.lock,
                 color: Colors.white,
-                size: 12,
+                size: 10,
               ),
             ),
           ),
@@ -655,20 +681,20 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
           // Maal Points Badge (only if visited)
           if (visited && maalPoints > 0)
             Positioned(
-              bottom: -4,
+              bottom: 20, // Adjust to sit near name
               right: -4,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 decoration: BoxDecoration(
                   color: Colors.purple,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.white, width: 1),
                 ),
                 child: Text(
                   '💎$maalPoints',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 10,
+                    fontSize: 9,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

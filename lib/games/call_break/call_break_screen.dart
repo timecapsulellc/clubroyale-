@@ -5,11 +5,13 @@ library;
 
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:clubroyale/core/design_system/game/felt_texture_painter.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/games/call_break/call_break_game.dart';
-import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/config/casino_theme.dart';
+import 'package:clubroyale/core/widgets/game_mode_banner.dart';
+import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 
 class CallBreakGameScreen extends StatefulWidget {
   final String? gameId;
@@ -169,7 +171,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${GameTerminology.callBreakGame} - Round ${_game.currentRound}'),
+        title: Text('Call Break - Round ${_game.currentRound}'),
         backgroundColor: CasinoColors.deepPurple,
         foregroundColor: CasinoColors.gold,
         actions: [
@@ -180,26 +182,23 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
           ),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          color: CasinoColors.deepPurple,
-        ),
-        child: Stack(
-          children: [
-            // Background Image
-            Positioned.fill(
-              child: Opacity(
-                opacity: 0.3,
-                child: Image.asset(
-                  'assets/images/casino_bg_dark.png',
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-
-            SafeArea(
+      body: FeltBackground(
+        primaryColor: CasinoColors.deepPurple,
+        secondaryColor: const Color(0xFF2E1A47),
+        showTexture: true,
+        showAmbientLight: true,
+        child: SafeArea(
           child: Column(
             children: [
+              // Game mode banner (always AI in local mode)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: GameModeBanner(
+                  botCount: 3,
+                  humanCount: 1,
+                  compact: true,
+                ),
+              ),
               // Score board
               _buildScoreBoard(),
               
@@ -215,55 +214,33 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
               _buildActionBar(),
             ],
           ),
-          ),
-          ],
         ),
       ),
     );
   }
   
   Widget _buildScoreBoard() {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.all(8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: _game.playerIds.map((pid) {
+      child: OpponentRow(
+        avatarSize: 40, // Smaller for scoreboard
+        opponents: _game.playerIds.map((pid) {
           final isMe = pid == _currentUserId;
           final isCurrent = pid == _game.currentPlayerId;
           final score = _game.calculateScores()[pid] ?? 0;
           final bid = _game.bids[pid];
           final won = _game.tricksWon[pid] ?? 0;
+          final isBot = pid != _currentUserId;
           
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: isCurrent 
-                ? CasinoColors.gold.withValues(alpha: 0.3)
-                : Colors.black.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(8),
-              border: isMe ? Border.all(color: CasinoColors.gold, width: 2) : null,
-            ),
-            child: Column(
-              children: [
-                Text(
-                  isMe ? 'You' : 'Player ${pid.split('_').last}',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: isMe ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Score: $score',
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
-                ),
-                if (bid != null)
-                  Text(
-                    'Bid: $bid | Won: $won',
-                    style: const TextStyle(color: CasinoColors.gold, fontSize: 11),
-                  ),
-              ],
-            ),
+          return GameOpponent(
+            id: pid,
+            name: isMe ? 'You' : 'Bot ${pid.split('_').last}',
+            isBot: isBot,
+            isCurrentTurn: isCurrent,
+            score: score,
+            bid: bid,
+            tricksWon: won,
+            status: isCurrent ? 'thinking' : null,
           );
         }).toList(),
       ),

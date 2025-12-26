@@ -8,66 +8,54 @@
 library;
 
 import 'package:flutter/widgets.dart';
+import 'dart:ui' as ui;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/services/game_audio_service.dart';
 
 /// Provider for app lifecycle state
-final appLifecycleProvider = StateNotifierProvider<AppLifecycleNotifier, AppLifecycleState>((ref) {
-  return AppLifecycleNotifier(ref);
+final appLifecycleProvider = NotifierProvider<AppLifecycleNotifier, ui.AppLifecycleState>(() {
+  return AppLifecycleNotifier();
 });
 
-/// App lifecycle states
-enum AppLifecycleState {
-  active,
-  inactive,
-  paused,
-  detached,
-  hidden,
-}
-
 /// Notifier that tracks app lifecycle and manages audio accordingly
-class AppLifecycleNotifier extends StateNotifier<AppLifecycleState> with WidgetsBindingObserver {
-  final Ref _ref;
+class AppLifecycleNotifier extends Notifier<ui.AppLifecycleState> with WidgetsBindingObserver {
   bool _wasAudioEnabled = true;
+  bool _initialized = false;
 
-  AppLifecycleNotifier(this._ref) : super(AppLifecycleState.active) {
-    WidgetsBinding.instance.addObserver(this);
+  @override
+  ui.AppLifecycleState build() {
+    // Set up observer on first build
+    if (!_initialized) {
+      WidgetsBinding.instance.addObserver(this);
+      _initialized = true;
+    }
+    return ui.AppLifecycleState.resumed;
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState appState) {
-    // Map Flutter's AppLifecycleState to our enum
-    switch (appState.name) {
-      case 'resumed':
+  void didChangeAppLifecycleState(ui.AppLifecycleState appState) {
+    state = appState;
+    
+    switch (appState) {
+      case ui.AppLifecycleState.resumed:
         _onResumed();
-        state = AppLifecycleState.active;
         break;
-      case 'inactive':
-        state = AppLifecycleState.inactive;
+      case ui.AppLifecycleState.inactive:
         break;
-      case 'paused':
+      case ui.AppLifecycleState.paused:
         _onPaused();
-        state = AppLifecycleState.paused;
         break;
-      case 'detached':
+      case ui.AppLifecycleState.detached:
         _onDetached();
-        state = AppLifecycleState.detached;
         break;
-      case 'hidden':
-        state = AppLifecycleState.hidden;
+      case ui.AppLifecycleState.hidden:
         break;
     }
   }
 
   void _onResumed() {
     debugPrint('🔄 App resumed - restoring audio state');
-    final audioService = _ref.read(gameAudioServiceProvider);
+    final audioService = ref.read(gameAudioServiceProvider);
     
     // Restore audio if it was enabled before pausing
     if (_wasAudioEnabled) {
@@ -77,7 +65,7 @@ class AppLifecycleNotifier extends StateNotifier<AppLifecycleState> with Widgets
 
   void _onPaused() {
     debugPrint('⏸️ App paused - saving state and pausing audio');
-    final audioService = _ref.read(gameAudioServiceProvider);
+    final audioService = ref.read(gameAudioServiceProvider);
     
     // Remember audio state and pause
     _wasAudioEnabled = audioService.isSoundEnabled;
@@ -88,8 +76,9 @@ class AppLifecycleNotifier extends StateNotifier<AppLifecycleState> with Widgets
 
   void _onDetached() {
     debugPrint('🛑 App detached - cleaning up');
-    final audioService = _ref.read(gameAudioServiceProvider);
+    final audioService = ref.read(gameAudioServiceProvider);
     audioService.dispose();
+    WidgetsBinding.instance.removeObserver(this);
   }
 }
 

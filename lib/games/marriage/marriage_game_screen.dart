@@ -5,7 +5,6 @@
 library;
 
 import 'package:flutter/material.dart' hide Card;
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/theme/app_theme.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
@@ -15,19 +14,21 @@ import 'package:clubroyale/core/card_engine/meld.dart' as meld_engine;
 import 'package:clubroyale/core/card_engine/pile.dart'; // For Card class
 import 'package:clubroyale/games/marriage/marriage_game.dart';
 import 'package:clubroyale/features/game/ui/components/table_layout.dart';
-import 'package:clubroyale/features/game/ui/components/player_avatar.dart';
 import 'package:clubroyale/features/game/ui/components/game_log_overlay.dart';
 import 'package:clubroyale/features/game/ui/components/casino_button.dart';
 import 'package:clubroyale/features/game/ui/components/card_widget.dart';
 import 'package:clubroyale/features/ai/ai_service.dart';
 import 'package:clubroyale/games/marriage/widgets/visit_button_widget.dart';
-import 'package:clubroyale/games/marriage/widgets/maal_indicator.dart';
 import 'package:clubroyale/games/marriage/widgets/game_timer_widget.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hud_overlay.dart';
+import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/features/game/ui/screens/game_settlement_dialog.dart';
 import 'package:clubroyale/games/marriage/marriage_visit_validator.dart';
 import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart';
+import 'package:clubroyale/core/design_system/game/flying_card_animation.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
+import 'package:clubroyale/core/widgets/game_mode_banner.dart';
+import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 import 'dart:async';
 
 /// Marriage game screen with test mode
@@ -41,7 +42,8 @@ class MarriageGameScreen extends ConsumerStatefulWidget {
 class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   late MarriageGame _game;
   final String _playerId = 'player_1';
-  final List<String> _botIds = ['bot_1', 'bot_2', 'bot_3'];
+  // Support up to 7 bots (Total 8 players). Defaulting to 5 bots for a busy table test.
+  final List<String> _botIds = List.generate(5, (i) => 'bot_${i + 1}');
   String? _selectedCardId;
   bool _isProcessing = false;
   
@@ -56,6 +58,11 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   int _maalPoints = 0;
   bool _hasMarriageBonus = false;
 
+  // Animations
+  final List<Widget> _animations = [];
+  final GlobalKey _centerDeckKey = GlobalKey();
+  final GlobalKey _myHandKey = GlobalKey();
+  
   // Timer state
   Timer? _turnTimer;
   int _remainingSeconds = 30;
@@ -82,6 +89,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkVisitStatus();
       _playBotTurns();
+      _playDealAnimation();
     });
     
     // Start timer if it's my turn
@@ -226,6 +234,49 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           backgroundColor: Colors.red,
         ),
       );
+    }
+  }
+
+  void _playDealAnimation() {
+    // Determine positions
+    // Ideally we use RenderBox from keys, but for simplicity let's use screen logic
+    // Center of screen (Deck)
+    final size = MediaQuery.of(context).size;
+    final center = Offset(size.width / 2, size.height / 2 - 50);
+    
+    // My Hand (Bottom Center)
+    final myHandPos = Offset(size.width / 2 - 50, size.height - 150);
+    
+    // Create animation for "My" cards
+    // 21 cards is too many to animate individually, let's animate a few batches
+    int cardsToAnimate = 5;
+    
+    for (int i = 0; i < cardsToAnimate; i++) {
+      Future.delayed(Duration(milliseconds: i * 150), () {
+        if (!mounted) return;
+        
+        setState(() {
+          _animations.add(
+            FlyingCardAnimation(
+              card: _game.getHand(_playerId).isNotEmpty ? _game.getHand(_playerId).first : PlayingCard(suit: Suit.spades, rank: Rank.ace), // Dummy card if empty
+              startOffset: center,
+              endOffset: myHandPos,
+              startScale: 0.5,
+              endScale: 0.8,
+              duration: const Duration(milliseconds: 600),
+              onComplete: () {
+                if (mounted) {
+                   setState(() {
+                      if (_animations.isNotEmpty) _animations.removeAt(0); // Cleanup older
+                   });
+                }
+              },
+            ),
+          );
+          
+          SoundService.playCardSlide();
+        });
+      });
     }
   }
 
@@ -397,6 +448,16 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
               
               Column(
                 children: [
+                  // Game mode banner (Local/Practice)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8, bottom: 4),
+                    child: GameModeBanner(
+                      botCount: 3,
+                      humanCount: 1,
+                      compact: true,
+                    ),
+                  ),
+
                   // Top Opponents
                   const SizedBox(height: 10),
                   Expanded(
@@ -434,6 +495,9 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                   );
                 },
               ),
+              
+              // Flying Card Animations
+              ..._animations,
             ],
           ),
         ),
@@ -460,20 +524,21 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   Widget _buildOpponentsArea() {
     return Padding(
       padding: const EdgeInsets.all(8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: _botIds.map((botId) {
+      child: OpponentRow(
+        opponents: _botIds.map((botId) {
           final isCurrentTurn = _game.currentPlayerId == botId;
-          return PlayerAvatar(
+          return GameOpponent(
+            id: botId,
             name: _getBotName(botId),
+            isBot: true,
             isCurrentTurn: isCurrentTurn,
-            statusLabel: isCurrentTurn ? "Thinking..." : "Waiting", // Dynamic status
-            statusColor: isCurrentTurn ? AppTheme.goldDark : AppTheme.orange,
-          ).animate().fadeIn(delay: 200.ms);
+            status: isCurrentTurn ? 'Thinking...' : null,
+          );
         }).toList(),
       ),
     );
   }
+
 
   Widget _buildCenterArea() {
     final topDiscard = _game.topDiscard;

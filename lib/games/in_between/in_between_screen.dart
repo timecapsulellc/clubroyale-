@@ -6,11 +6,14 @@ library;
 import 'package:flutter/material.dart' hide Card;
 import 'package:clubroyale/core/utils/error_helper.dart';
 import 'package:clubroyale/core/widgets/contextual_loader.dart';
+import 'package:clubroyale/core/widgets/game_mode_banner.dart';
+import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
+import 'package:clubroyale/core/widgets/turn_timer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/config/casino_theme.dart';
-import 'package:clubroyale/config/visual_effects.dart';
+import 'package:clubroyale/core/design_system/game/felt_texture_painter.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
 import 'package:clubroyale/games/in_between/in_between_service.dart';
@@ -147,14 +150,21 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
               const SizedBox(width: 8),
             ],
           ),
-          body: ParticleBackground(
-            primaryColor: CasinoColors.gold,
-            secondaryColor: Colors.green,
-            particleCount: 15,
+          body: FeltBackground(
+            primaryColor: const Color(0xFF1a4d2e),
+            secondaryColor: const Color(0xFF0a2814),
+            showTexture: true,
+            showAmbientLight: true,
             child: Stack(
               children: [
                 Column(
               children: [
+                // Game mode indicator
+                _buildGameModeBanner(state),
+                
+                // Opponents area
+                _buildOpponentsArea(state, currentUser.uid),
+                
                 // Turn indicator
                 _buildTurnIndicator(isMyTurn, state.phase),
                 
@@ -259,6 +269,32 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       ),
     );
   }
+
+  Widget _buildOpponentsArea(InBetweenGameState state, String myId) {
+    // Other players
+    final opponents = state.playerChips.keys.where((id) => id != myId).toList();
+    if (opponents.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: OpponentRow(
+        opponents: opponents.map((pid) {
+          final chips = state.playerChips[pid] ?? 0;
+          final isCurrent = state.currentPlayerId == pid;
+          final isBot = pid.startsWith('bot_');
+          
+          return GameOpponent(
+            id: pid,
+            name: isBot ? 'Bot ${pid.split('_').last}' : 'Player',
+            isBot: isBot,
+            isCurrentTurn: isCurrent,
+            score: chips, // Use chips as "score" display
+            status: isCurrent ? 'Thinking' : null,
+          );
+        }).toList(),
+      ),
+    );
+  }
   
   Widget _buildTurnIndicator(bool isMyTurn, String phase) {
     String message;
@@ -281,14 +317,38 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
         color: color.withValues(alpha: 0.2),
         border: Border(bottom: BorderSide(color: color)),
       ),
-      child: Text(
-        message,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-        ),
-        textAlign: TextAlign.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            message,
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          if (isMyTurn) ...[
+            const SizedBox(width: 12),
+            const TurnTimerBadge(remainingSeconds: 30, totalSeconds: 30),
+          ],
+        ],
+      ),
+    );
+  }
+  
+  /// Build the game mode banner showing AI/Multiplayer status
+  Widget _buildGameModeBanner(InBetweenGameState state) {
+    final allPlayers = state.playerChips.keys.toList();
+    final botCount = allPlayers.where((id) => id.startsWith('bot_')).length;
+    final humanCount = allPlayers.length - botCount;
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: GameModeBanner(
+        botCount: botCount,
+        humanCount: humanCount,
+        compact: true,
       ),
     );
   }

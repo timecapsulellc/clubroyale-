@@ -4,21 +4,23 @@
 library;
 
 import 'package:flutter/material.dart' hide Card;
-import 'package:clubroyale/core/constants/disclaimers.dart';
 import 'package:clubroyale/core/utils/haptic_helper.dart';
 import 'package:clubroyale/core/widgets/contextual_loader.dart';
+import 'package:clubroyale/core/widgets/game_mode_banner.dart';
+import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
+import 'package:clubroyale/core/widgets/turn_timer.dart';
+import 'package:clubroyale/core/widgets/dynamic_chip_stack.dart';
+import 'package:clubroyale/core/design_system/game/felt_texture_painter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/config/casino_theme.dart';
-import 'package:clubroyale/config/visual_effects.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
 import 'package:clubroyale/games/teen_patti/teen_patti_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
-import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
 
 class TeenPattiScreen extends ConsumerStatefulWidget {
@@ -115,93 +117,65 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
         final myStatus = state.playerStatus[currentUser.uid] ?? 'blind';
         
         return Scaffold(
-          backgroundColor: CasinoColors.feltGreenDark,
-          appBar: AppBar(
-            backgroundColor: Colors.black.withValues(alpha: 0.7),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.go('/lobby'),
-            ),
-            title: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Teen Patti', style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(width: 12),
-                _buildPotBadge(state.pot),
-              ],
-            ),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(24),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                color: Colors.blue.shade50.withValues(alpha: 0.1),
-                child: Text(
-                  Disclaimers.loadingDisclaimer,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.white.withValues(alpha: 0.6),
-                  ),
-                ),
-              ),
-            ),
-            actions: [
-              _buildStakeBadge(state.currentStake),
-              IconButton( // Toggle Video
-                icon: Icon(_showVideoGrid ? Icons.videocam_off : Icons.videocam),
-                onPressed: () => setState(() => _showVideoGrid = !_showVideoGrid),
-              ),
-              AudioFloatingButton(roomId: widget.roomId, userId: currentUser.uid),
-            ],
-          ),
-          body: ParticleBackground(
-            primaryColor: CasinoColors.gold,
-            secondaryColor: CasinoColors.richPurple,
-            particleCount: 15,
-            child: Stack(
-              children: [
-                Column(
-                  children: [
-                    _buildTurnIndicator(isMyTurn, myStatus),
-                    Expanded(flex: 2, child: _buildOpponentsArea(state, currentUser.uid)),
-                    _buildPotArea(state.pot),
-                    Expanded(flex: 3, child: _buildMyCards(myHand, myStatus)),
-                    _buildActionBar(isMyTurn, myStatus, state),
-                  ],
-                ),
-                // Video Grid Overlay
-                if (_showVideoGrid)
-                  Positioned(
-                    top: 60,
-                    right: 16,
-                    width: 200,
-                    height: 300,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black87,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: VideoGridWidget(
-                        roomId: widget.roomId,
-                        userId: currentUser.uid,
-                        userName: currentUser.displayName ?? 'Player',
-                      ),
+          body: FeltBackground(
+            primaryColor: CasinoColors.feltGreenDark,
+            secondaryColor: const Color(0xFF0a2814),
+            showTexture: true,
+            showAmbientLight: true,
+            child: SafeArea(
+              child: Column(
+                children: [
+                  _buildAppBar(context, state.pot),
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        Column(
+                          children: [
+                            // Game mode indicator
+                            _buildGameModeBanner(state, currentUser.uid),
+                            _buildTurnIndicator(isMyTurn, myStatus),
+                            Expanded(flex: 2, child: _buildOpponentsArea(state, currentUser.uid)),
+                            _buildPotArea(state.pot),
+                            Expanded(flex: 3, child: _buildMyCards(myHand, myStatus)),
+                            _buildActionBar(isMyTurn, myStatus, state),
+                          ],
+                        ),
+                        // Video Grid Overlay
+                        if (_showVideoGrid)
+                          Positioned(
+                            top: 60,
+                            right: 16,
+                            width: 200,
+                            height: 300,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black87,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: VideoGridWidget(
+                                roomId: widget.roomId,
+                                userId: currentUser.uid,
+                                userName: currentUser.displayName ?? 'Player',
+                              ),
+                            ),
+                          ),
+                        // Chat Overlay
+                        Positioned(
+                          bottom: 140, // Above hand
+                          left: 16,
+                          child: ChatOverlay(
+                            roomId: widget.roomId,
+                            userId: currentUser.uid,
+                            userName: currentUser.displayName ?? 'Player',
+                            isExpanded: _isChatExpanded,
+                            onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                // Chat Overlay
-                Positioned(
-                  bottom: 140, // Above hand
-                  left: 16,
-                  child: ChatOverlay(
-                    roomId: widget.roomId,
-                    userId: currentUser.uid,
-                    userName: currentUser.displayName ?? 'Player',
-                    isExpanded: _isChatExpanded,
-                    onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -209,6 +183,25 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     );
   }
   
+  Widget _buildAppBar(BuildContext context, int pot) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: Colors.black.withValues(alpha: 0.3),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => context.go('/lobby'),
+          ),
+          const SizedBox(width: 8),
+          const Text('Teen Patti', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+          const Spacer(),
+          _buildPotBadge(pot),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPotBadge(int pot) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -259,12 +252,20 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            isMyTurn ? '🎯 Your Turn' : '⏳ Waiting...',
-            style: TextStyle(
-              color: isMyTurn ? Colors.green : Colors.white54,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            children: [
+              Text(
+                isMyTurn ? '🎯 Your Turn' : '⏳ Waiting...',
+                style: TextStyle(
+                  color: isMyTurn ? Colors.green : Colors.white54,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (isMyTurn) ...[
+                const SizedBox(width: 12),
+                const TurnTimerBadge(remainingSeconds: 30, totalSeconds: 30),
+              ],
+            ],
           ),
           Text(
             statusText,
@@ -275,120 +276,70 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     );
   }
   
+  /// Build the game mode banner showing AI/Multiplayer status
+  Widget _buildGameModeBanner(TeenPattiGameState state, String myId) {
+    final allPlayers = state.playerHands.keys.toList();
+    final botCount = allPlayers.where((id) => id.startsWith('bot_')).length;
+    final humanCount = allPlayers.length - botCount;
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: GameModeBanner(
+        botCount: botCount,
+        humanCount: humanCount,
+        compact: true,
+      ),
+    );
+  }
+
   Widget _buildOpponentsArea(TeenPattiGameState state, String myId) {
     final opponents = state.playerHands.keys.where((id) => id != myId).toList();
     
+    // Convert to GameOpponent objects for the new widget
+    final opponentWidgets = opponents.map((playerId) {
+      final status = state.playerStatus[playerId] ?? 'blind';
+      final bet = state.playerBets[playerId] ?? 0;
+      final isCurrentTurn = state.currentPlayerId == playerId;
+      final isFolded = status == 'folded';
+      final isBot = playerId.startsWith('bot_');
+      
+      return GameOpponent(
+        id: playerId,
+        name: isBot ? _getBotDisplayName(playerId) : 'Player',
+        isBot: isBot,
+        isCurrentTurn: isCurrentTurn,
+        isFolded: isFolded,
+        status: status,
+        bet: bet,
+        cardCount: state.playerHands[playerId]?.length ?? 0,
+      );
+    }).toList();
+    
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: opponents.map((playerId) {
-          final status = state.playerStatus[playerId] ?? 'blind';
-          final bet = state.playerBets[playerId] ?? 0;
-          final isCurrentTurn = state.currentPlayerId == playerId;
-          final isFolded = status == 'folded';
-          
-          return Opacity(
-            opacity: isFolded ? 0.4 : 1.0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Avatar
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: isCurrentTurn ? Colors.green : CasinoColors.cardBackground,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isCurrentTurn ? Colors.green : CasinoColors.gold.withValues(alpha: 0.5),
-                      width: isCurrentTurn ? 3 : 1,
-                    ),
-                  ),
-                  child: Icon(
-                    isFolded ? Icons.block : Icons.person,
-                    color: isFolded ? Colors.grey : Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                // Status badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(status).withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    _getStatusEmoji(status),
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Bet: $bet',
-                  style: const TextStyle(color: Colors.white70, fontSize: 10),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
+      child: OpponentRow(
+        opponents: opponentWidgets,
+        avatarSize: 50,
       ),
     );
   }
   
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'blind': return Colors.blue;
-      case 'seen': return Colors.orange;
-      case 'folded': return Colors.grey;
-      default: return Colors.white;
-    }
+  /// Get a display name for bot players
+  String _getBotDisplayName(String botId) {
+    final botNames = ['TrickMaster', 'CardShark', 'LuckyDice', 'DeepThink', 'RoyalAce'];
+    final index = botId.hashCode.abs() % botNames.length;
+    return botNames[index];
   }
   
-  String _getStatusEmoji(String status) {
-    switch (status) {
-      case 'blind': return '🙈';
-      case 'seen': return '👀';
-      case 'folded': return '🏳️';
-      default: return '❓';
-    }
-  }
+
   
   Widget _buildPotArea(int pot) {
     return Container(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          const Text(
-            '💰 POT',
-            style: TextStyle(color: Colors.white70, fontSize: 14),
-          ),
-          const SizedBox(height: 8),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Image.asset('assets/images/chips/chip_stack.png', width: 80),
-              Container(
-                margin: const EdgeInsets.only(top: 40),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.7),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: CasinoColors.gold),
-                ),
-                child: Text(
-                  '$pot',
-                  style: const TextStyle(
-                    color: CasinoColors.gold,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ).animate(onPlay: (c) => c.repeat(reverse: true))
-           .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.3)),
-        ],
+      padding: const EdgeInsets.all(16),
+      child: PotDisplay(
+        potAmount: pot,
+        label: '💰 POT',
+        size: 70,
       ),
     );
   }

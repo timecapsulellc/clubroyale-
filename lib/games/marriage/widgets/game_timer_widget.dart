@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:clubroyale/core/theme/app_theme.dart';
 
 class GameTimerWidget extends StatelessWidget {
   final int totalSeconds;
