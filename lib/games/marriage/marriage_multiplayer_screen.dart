@@ -86,6 +86,16 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   
   Card? _getCard(String id) => _cardCache[id];
   
+  String _getBotName(String botId) {
+    final id = botId.toLowerCase();
+    if (id.contains('trickmaster')) return 'TrickMaster';
+    if (id.contains('cardshark')) return 'CardShark';
+    if (id.contains('luckydice')) return 'LuckyDice';
+    if (id.contains('deepthink')) return 'DeepThink';
+    if (id.contains('royalace')) return 'RoyalAce';
+    return 'Bot ${botId.split('_').last}';
+  }
+  
   @override
   Widget build(BuildContext context) {
     final marriageService = ref.watch(marriageServiceProvider);
@@ -158,13 +168,30 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                       ],
                     ),
                     opponents: _buildOpponentWidgets(state, currentUser.uid),
-                    myHand: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildCompactStatusBar(state, currentUser.uid),
-                        _buildMyHand(myHand, isMyTurn, tiplu: tiplu),
-                        _buildActionBar(isMyTurn, state, currentUser.uid),
-                      ],
+                    myHand: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            const Color(0xFF1A1A2E).withValues(alpha: 0.95),
+                            const Color(0xFF0F0F1A),
+                          ],
+                        ),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                        border: Border(
+                          top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3), width: 1),
+                        ),
+                      ),
+                      padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildCompactStatusBar(state, currentUser.uid),
+                          _buildMyHand(myHand, isMyTurn, tiplu: tiplu),
+                          _buildActionBar(isMyTurn, state, currentUser.uid),
+                        ],
+                      ),
                     ),
                   ),
   
@@ -632,7 +659,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
           GameOpponentWidget(
             opponent: GameOpponent(
               id: playerId,
-              name: isBot ? 'Bot ${playerId.split('_').last}' : 'Player', // TODO: Real name
+              name: isBot ? _getBotName(playerId) : 'Player', // Validated mapping
               isBot: isBot,
               isCurrentTurn: isCurrentTurn,
               cardCount: cardCount,
@@ -692,23 +719,79 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   Widget _buildCenterArea(MarriageGameState state, Card? topDiscard, bool isMyTurn) {
     // P0 FIX: Use state.isDrawingPhase instead of local _hasDrawn
     final canDraw = isMyTurn && state.isDrawingPhase;
+    final labelStyle = TextStyle(
+      color: Colors.white.withValues(alpha: 0.8),
+      fontSize: 10,
+      fontWeight: FontWeight.bold,
+      letterSpacing: 1.2,
+    );
     
-    return Center(
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // Deck
-          GestureDetector(
-            onTap: canDraw ? _drawFromDeck : null,
-            child: _buildDeckPile(state.deckCards.length, canDraw),
+          // CLOSED DECK (Draw pile)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: canDraw ? _drawFromDeck : null,
+                child: _buildDeckPile(state.deckCards.length, canDraw),
+              ),
+              const SizedBox(height: 6),
+              Text('CLOSED DECK', style: labelStyle),
+            ],
           ),
           
-          const SizedBox(width: 20),
+          const SizedBox(width: 16),
           
-          // Discard pile
-          GestureDetector(
-            onTap: canDraw && topDiscard != null ? _drawFromDiscard : null,
-            child: _buildDiscardPile(topDiscard, canDraw),
+          // FINISH SLOT (Declare button area)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 60,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: CasinoColors.feltGreenDark.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: CasinoColors.gold.withValues(alpha: 0.4),
+                    width: 1,
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.flag_outlined, color: CasinoColors.gold.withValues(alpha: 0.6), size: 24),
+                      const SizedBox(height: 4),
+                      Text('FINISH', style: TextStyle(color: CasinoColors.gold.withValues(alpha: 0.6), fontSize: 8, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text('FINISH SLOT', style: labelStyle),
+            ],
+          ),
+          
+          const SizedBox(width: 16),
+          
+          // OPEN DECK (Discard pile)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: canDraw && topDiscard != null ? _drawFromDiscard : null,
+                child: _buildDiscardPile(topDiscard, canDraw),
+              ),
+              const SizedBox(height: 6),
+              Text('OPEN DECK', style: labelStyle),
+            ],
           ),
         ],
       ),
