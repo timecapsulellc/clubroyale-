@@ -10,10 +10,12 @@ import 'package:clubroyale/core/widgets/game_mode_banner.dart';
 import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 import 'package:clubroyale/core/widgets/turn_timer.dart';
 import 'package:clubroyale/core/widgets/dynamic_chip_stack.dart';
+import 'package:clubroyale/core/widgets/tutorial_overlay.dart'; // Tutorial
 import 'package:clubroyale/core/design_system/game/felt_texture_painter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:clubroyale/features/game/ui/components/table_layout.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
@@ -42,11 +44,46 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
   bool _isChatExpanded = false;
   bool _showVideoGrid = false;
   
-  // Card lookup cache
+  // Tutorial state
+  bool _showTutorial = true;
+  final GlobalKey _cardsKey = GlobalKey();
+  final GlobalKey _potKey = GlobalKey();
+  final GlobalKey _actionBarKey = GlobalKey();
+  final GlobalKey _rulesKey = GlobalKey();
+  
+  List<TutorialStep> get _tutorialSteps => [
+    TutorialStep(
+      title: 'Welcome to Teen Patti! 🃏',
+      description: 'The goal is to have the best 3-card hand. Trail (3-of-a-kind) beats all!',
+    ),
+    TutorialStep(
+      title: 'Your Cards',
+      description: 'Tap here to see your cards (Seen mode). Playing Blind costs fewer chips!',
+      targetKey: _cardsKey,
+      tooltipAlignment: Alignment.topCenter,
+    ),
+    TutorialStep(
+      title: 'The Pot',
+      description: 'All bets go here. The winner takes it all!',
+      targetKey: _potKey,
+      tooltipAlignment: Alignment.bottomCenter,
+    ),
+    TutorialStep(
+      title: 'Actions',
+      description: 'Fold to give up, Bet to stay in, or Show when only 2 players remain.',
+      targetKey: _actionBarKey,
+      tooltipAlignment: Alignment.topCenter,
+    ),
+    TutorialStep(
+      title: 'Need Help?',
+      description: 'Tap here anytime to see hand rankings and rules.',
+      targetKey: _rulesKey,
+      tooltipAlignment: Alignment.bottomLeft,
+    ),
+  ];
+  
   // Card lookup cache
   final Map<String, Card> _cardCache = {};
-  
-  // Audio players removed - using global SoundService
   
   @override
   void initState() {
@@ -116,91 +153,134 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
         final isMyTurn = state.currentPlayerId == currentUser.uid;
         final myStatus = state.playerStatus[currentUser.uid] ?? 'blind';
         
-        return Scaffold(
-          body: FeltBackground(
-            primaryColor: CasinoColors.feltGreenDark,
-            secondaryColor: const Color(0xFF0a2814),
-            showTexture: true,
-            showAmbientLight: true,
-            child: SafeArea(
-              child: Column(
-                children: [
-                  _buildAppBar(context, state.pot),
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        Column(
-                          children: [
-                            // Game mode indicator
-                            _buildGameModeBanner(state, currentUser.uid),
-                            _buildTurnIndicator(isMyTurn, myStatus),
-                            Expanded(flex: 2, child: _buildOpponentsArea(state, currentUser.uid)),
-                            _buildPotArea(state.pot),
-                            Expanded(flex: 3, child: _buildMyCards(myHand, myStatus)),
-                            _buildActionBar(isMyTurn, myStatus, state),
-                          ],
-                        ),
-                        // Video Grid Overlay
-                        if (_showVideoGrid)
-                          Positioned(
-                            top: 60,
-                            right: 16,
-                            width: 200,
-                            height: 300,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black87,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: VideoGridWidget(
-                                roomId: widget.roomId,
-                                userId: currentUser.uid,
-                                userName: currentUser.displayName ?? 'Player',
+          return Scaffold(
+            extendBodyBehindAppBar: true, // Allow table to show behind app bar
+            appBar: AppBar(
+              backgroundColor: Colors.transparent, // Let table show through
+              elevation: 0,
+              leading: Container(
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black26,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => context.go('/lobby'),
+                ),
+              ),
+              title: const Text('Teen Patti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              centerTitle: true,
+              actions: [
+                // Help/Menu Button for consistency
+                Container(
+                  key: _rulesKey,
+                  margin: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
+                  child: IconButton(
+                    icon: const Icon(Icons.help_outline, color: Colors.white),
+                    onPressed: () {
+                       showDialog(
+                         context: context,
+                         builder: (c) => AlertDialog(
+                           backgroundColor: CasinoColors.cardBackground,
+                           title: const Text('Teen Patti Rules (Flash)', style: TextStyle(color: CasinoColors.gold)),
+                           content: const SingleChildScrollView(
+                             child: Text(
+                               '1. Highest to Lowest Rankings:\n'
+                               '   • TRAIL (Set): 3 cards of same rank (AAA is highest)\n'
+                               '   • PURE SEQUENCE: 3 consecutive cards of same suit\n'
+                               '   • SEQUENCE: 3 consecutive cards\n'
+                               '   • COLOR: 3 cards of same suit\n'
+                               '   • PAIR: 2 cards of same rank\n'
+                               '   • HIGH CARD: Highest individual card\n\n'
+                               '2. Blind vs Seen:\n'
+                               '   • Blind player bets 1x.\n'
+                               '   • Seen player must bet 2x current stake.\n\n'
+                               '3. Show:\n'
+                               '   • Only possible when 2 players remain.',
+                               style: TextStyle(color: Colors.white70),
+                             ),
+                           ),
+                           actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('Got it'))],
+                         ),
+                       );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            body: TableLayout(
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    // _buildAppBar removed from body as we moved it to Scaffold.appBar
+                    SizedBox(height: kToolbarHeight), 
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          Column(
+                            children: [
+                              // Game mode indicator
+                              _buildGameModeBanner(state, currentUser.uid),
+                              _buildTurnIndicator(isMyTurn, myStatus),
+                              Expanded(flex: 2, child: _buildOpponentsArea(state, currentUser.uid)),
+                              Container(key: _potKey, child: _buildPotArea(state.pot)),
+                              Expanded(flex: 3, child: Container(key: _cardsKey, child: _buildMyCards(myHand, myStatus))),
+                              Container(key: _actionBarKey, child: _buildActionBar(isMyTurn, myStatus, state)),
+                            ],
+                          ),
+                          // Video Grid Overlay
+                          if (_showVideoGrid)
+                            Positioned(
+                              top: 60,
+                              right: 16,
+                              width: 200,
+                              height: 300,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black87,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: VideoGridWidget(
+                                  roomId: widget.roomId,
+                                  userId: currentUser.uid,
+                                  userName: currentUser.displayName ?? 'Player',
+                                ),
                               ),
                             ),
+                          // Chat Overlay
+                          Positioned(
+                            bottom: 140, // Above hand
+                            left: 16,
+                            child: ChatOverlay(
+                              roomId: widget.roomId,
+                              userId: currentUser.uid,
+                              userName: currentUser.displayName ?? 'Player',
+                              isExpanded: _isChatExpanded,
+                              onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
+                            ),
                           ),
-                        // Chat Overlay
-                        Positioned(
-                          bottom: 140, // Above hand
-                          left: 16,
-                          child: ChatOverlay(
-                            roomId: widget.roomId,
-                            userId: currentUser.uid,
-                            userName: currentUser.displayName ?? 'Player',
-                            isExpanded: _isChatExpanded,
-                            onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
-                          ),
-                        ),
-                      ],
+                          // Tutorial Overlay
+                          if (_showTutorial)
+                            TutorialOverlay(
+                              steps: _tutorialSteps,
+                              onComplete: () => setState(() => _showTutorial = false),
+                              onSkip: () => setState(() => _showTutorial = false),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        );
+          );
       },
     );
   }
   
-  Widget _buildAppBar(BuildContext context, int pot) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.black.withValues(alpha: 0.3),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => context.go('/lobby'),
-          ),
-          const SizedBox(width: 8),
-          const Text('Teen Patti', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-          const Spacer(),
-          _buildPotBadge(pot),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildPotBadge(int pot) {
     return Container(

@@ -12,6 +12,9 @@ import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/widgets/game_mode_banner.dart';
 import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
+import 'package:clubroyale/core/widgets/tutorial_overlay.dart'; // Tutorial
+import 'package:clubroyale/features/game/ui/components/table_layout.dart';
+import 'package:go_router/go_router.dart';
 
 class CallBreakGameScreen extends StatefulWidget {
   final String? gameId;
@@ -28,6 +31,44 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
   int _selectedBid = 1;
   final String _currentUserId = 'player_0';
   
+  // Tutorial state
+  bool _showTutorial = true;
+  final GlobalKey _handKey = GlobalKey();
+  final GlobalKey _trickKey = GlobalKey();
+  final GlobalKey _biddingKey = GlobalKey();
+  final GlobalKey _rulesKey = GlobalKey();
+  
+  List<TutorialStep> get _tutorialSteps => [
+    TutorialStep(
+      title: 'Welcome to Call Break! ♠️',
+      description: 'Win tricks by playing the highest card. Spades are always Trump!',
+    ),
+    TutorialStep(
+      title: 'Bidding Phase',
+      description: 'Bid how many tricks you think you can win (1-13). You must make your bid!',
+      targetKey: _biddingKey,
+      tooltipAlignment: Alignment.bottomCenter,
+    ),
+    TutorialStep(
+      title: 'The Trick',
+      description: 'Cards played in this round appear here. Highest card of the lead suit wins, unless trumped.',
+      targetKey: _trickKey,
+      tooltipAlignment: Alignment.bottomCenter,
+    ),
+    TutorialStep(
+      title: 'Your Hand',
+      description: 'Select a valid card and tap Play. You must follow suit if you can!',
+      targetKey: _handKey,
+      tooltipAlignment: Alignment.topCenter,
+    ),
+    TutorialStep(
+      title: 'Rules',
+      description: 'Tap here for detailed rules on bidding and scoring.',
+      targetKey: _rulesKey,
+      tooltipAlignment: Alignment.bottomLeft,
+    ),
+  ];
+  
   @override
   void initState() {
     super.initState();
@@ -38,6 +79,9 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
     _game = CallBreakGame();
     _game.initialize(['player_0', 'player_1', 'player_2', 'player_3']);
     _game.startRound();
+    
+    // Play shuffle sound on deal
+    SoundService.playShuffleSound();
     
     // Simulate AI bids for other players
     _simulateAiBids();
@@ -170,51 +214,92 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text('Call Break - Round ${_game.currentRound}'),
-        backgroundColor: CasinoColors.deepPurple,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         foregroundColor: CasinoColors.gold,
+        centerTitle: true,
         actions: [
+          Container(
+            key: _rulesKey,
+            child: IconButton(
+              icon: const Icon(Icons.help_outline),
+            onPressed: () {
+               // Detailed rules dialog
+               showDialog(
+                 context: context,
+                 builder: (c) => AlertDialog(
+                   backgroundColor: CasinoColors.cardBackground,
+                   title: const Text('Call Break Rules', style: TextStyle(color: CasinoColors.gold)),
+                   content: const Text(
+                     '1. 4 Players, 13 cards each.\n'
+                     '2. Spades ♠️ are always Trump.\n'
+                     '3. Must follow suit. If unable, must play Trump. If unable, play any.\n'
+                     '4. Bid tricks at start. Must win at least bid amount.\n'
+                     '5. 5 Rounds total.',
+                     style: TextStyle(color: Colors.white70),
+                   ),
+                   actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('Got it'))],
+                 ),
+               );
+            },
+            tooltip: 'Rules',
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _startNewGame,
             tooltip: 'New Game',
           ),
         ],
-      ),
-      body: FeltBackground(
-        primaryColor: CasinoColors.deepPurple,
-        secondaryColor: const Color(0xFF2E1A47),
-        showTexture: true,
-        showAmbientLight: true,
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Game mode banner (always AI in local mode)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: GameModeBanner(
-                  botCount: 3,
-                  humanCount: 1,
-                  compact: true,
-                ),
-              ),
-              // Score board
-              _buildScoreBoard(),
-              
-              // Game area
-              Expanded(
-                child: _buildGameArea(),
-              ),
-              
-              // Player's hand
-              _buildMyHand(),
-              
-              // Action buttons
-              _buildActionBar(),
-            ],
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/lobby'),
         ),
+      ),
+      body: Stack(
+        children: [
+          TableLayout(
+            child: SafeArea(
+              child: Column(
+                children: [
+                   SizedBox(height: kToolbarHeight), // Spacer for AppBar
+                   // Game mode banner (always AI in local mode)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: GameModeBanner(
+                      botCount: 3,
+                      humanCount: 1,
+                      compact: true,
+                    ),
+                  ),
+                  // Score board
+                  _buildScoreBoard(),
+                  
+                  // Game area (Bidding UI, Playing Area, or Results)
+                  Expanded(
+                    child: Container(key: _game.phase == CallBreakPhase.bidding ? _biddingKey : _trickKey, child: _buildGameArea()),
+                  ),
+                  
+                  // Player's hand
+                  Container(key: _handKey, child: _buildMyHand()),
+                  
+                  // Action buttons
+                  _buildActionBar(),
+                ],
+              ),
+            ),
+          ),
+          // Tutorial Overlay
+          if (_showTutorial)
+            TutorialOverlay(
+              steps: _tutorialSteps,
+              onComplete: () => setState(() => _showTutorial = false),
+              onSkip: () => setState(() => _showTutorial = false),
+            ),
+        ],
       ),
     );
   }

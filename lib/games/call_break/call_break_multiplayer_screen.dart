@@ -151,25 +151,60 @@ class _CallBreakMultiplayerScreenState extends ConsumerState<CallBreakMultiplaye
           return a.suit.index.compareTo(b.suit.index);
         });
 
+import 'package:clubroyale/features/game/ui/components/table_layout.dart';
+
+// ... (other imports retained)
+
         return Scaffold(
           extendBodyBehindAppBar: true,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: Text('Call Break - Round ${state.currentRound}'),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.go('/lobby'),
+            centerTitle: true,
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: const BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => context.go('/lobby'),
+                ),
+              ),
             ),
+            actions: [
+              Container(
+                margin: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
+                child: IconButton(
+                  icon: const Icon(Icons.help_outline),
+                  onPressed: () {
+                     showDialog(
+                       context: context,
+                       builder: (c) => AlertDialog(
+                         backgroundColor: CasinoColors.cardBackground,
+                         title: const Text('Call Break Rules', style: TextStyle(color: CasinoColors.gold)),
+                         content: const Text(
+                           '1. 4 Players, 13 cards each.\n'
+                           '2. Spades ♠️ are always Trump.\n'
+                           '3. Must follow suit. If unable, must play Trump. If unable, play any.\n'
+                           '4. Bid tricks at start. Must win at least bid amount.\n'
+                           '5. 5 Rounds total.',
+                           style: TextStyle(color: Colors.white70),
+                         ),
+                         actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('Got it'))],
+                       ),
+                     );
+                  },
+                ),
+              ),
+            ],
           ),
-          body: FeltBackground(
-             primaryColor: CasinoColors.feltGreenDark,
-             secondaryColor: const Color(0xFF0a2814),
-             showTexture: true,
-             showAmbientLight: true,
+          body: TableLayout(
              child: SafeArea(
                child: Column(
                  children: [
+                   SizedBox(height: kToolbarHeight),
                    // Game Mode Banner
                    _buildGameModeBanner(state),
                    

@@ -13,7 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 /// Provider for connectivity state
-final connectivityProvider = StateNotifierProvider<ConnectivityNotifier, ConnectivityStatus>((ref) {
+final connectivityProvider = NotifierProvider<ConnectivityNotifier, ConnectivityStatus>(() {
   return ConnectivityNotifier();
 });
 
@@ -30,13 +30,22 @@ extension ConnectivityStatusX on ConnectivityStatus {
   bool get isOffline => this == ConnectivityStatus.offline;
 }
 
-/// Notifier that tracks network connectivity
-class ConnectivityNotifier extends StateNotifier<ConnectivityStatus> {
-  late StreamSubscription<List<ConnectivityResult>> _subscription;
+/// Notifier that tracks network connectivity (Riverpod 3.x Notifier pattern)
+class ConnectivityNotifier extends Notifier<ConnectivityStatus> {
+  StreamSubscription<List<ConnectivityResult>>? _subscription;
   final List<Future<void> Function()> _pendingActions = [];
 
-  ConnectivityNotifier() : super(ConnectivityStatus.checking) {
+  @override
+  ConnectivityStatus build() {
+    // Initialize subscription on first build
     _init();
+    
+    // Clean up on dispose
+    ref.onDispose(() {
+      _subscription?.cancel();
+    });
+    
+    return ConnectivityStatus.checking;
   }
 
   void _init() async {
@@ -94,12 +103,6 @@ class ConnectivityNotifier extends StateNotifier<ConnectivityStatus> {
     }
     
     debugPrint('✅ Finished processing pending actions');
-  }
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
   }
 }
 

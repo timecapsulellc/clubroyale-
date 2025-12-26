@@ -8,6 +8,7 @@ class ParticleBackground extends StatefulWidget {
   final Color primaryColor;
   final Color secondaryColor;
   final int particleCount;
+  final bool hasBackground;
   
   const ParticleBackground({
     super.key,
@@ -15,8 +16,9 @@ class ParticleBackground extends StatefulWidget {
     this.primaryColor = CasinoColors.gold,
     this.secondaryColor = CasinoColors.richPurple,
     this.particleCount = 40,
+    this.hasBackground = true,
   });
-
+  
   @override
   State<ParticleBackground> createState() => _ParticleBackgroundState();
 }
@@ -69,7 +71,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: widget.hasBackground ? BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -80,7 +82,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
           ],
           stops: const [0.0, 0.5, 1.0],
         ),
-      ),
+      ) : null,
       child: Stack(
         children: [
           // Particle layer

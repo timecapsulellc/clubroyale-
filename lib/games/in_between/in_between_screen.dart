@@ -9,6 +9,7 @@ import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:clubroyale/core/widgets/game_mode_banner.dart';
 import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 import 'package:clubroyale/core/widgets/turn_timer.dart';
+import 'package:clubroyale/core/widgets/tutorial_overlay.dart'; // Tutorial
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -23,6 +24,7 @@ import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
 import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
+import 'package:clubroyale/features/game/ui/components/table_layout.dart';
 
 class InBetweenScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -43,7 +45,43 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
   bool _isChatExpanded = false;
   bool _showVideoGrid = false;
   
-  // Audio player removed - using global SoundService
+  // Tutorial state
+  bool _showTutorial = true;
+  final GlobalKey _cardsKey = GlobalKey();
+  final GlobalKey _bettingKey = GlobalKey();
+  final GlobalKey _actionsKey = GlobalKey();
+  final GlobalKey _rulesKey = GlobalKey();
+  
+  List<TutorialStep> get _tutorialSteps => [
+    TutorialStep(
+      title: 'Welcome to In-Between! 🎰',
+      description: 'The goal is to guess if the third card falls between the first two cards.',
+    ),
+    TutorialStep(
+      title: 'The Cards',
+      description: 'The first two cards are "Low" and "High" - your third card needs to fall in between!',
+      targetKey: _cardsKey,
+      tooltipAlignment: Alignment.bottomCenter,
+    ),
+    TutorialStep(
+      title: 'Place Your Bet',
+      description: 'Use the slider to choose how much you want to bet. Higher probability = safer bet.',
+      targetKey: _bettingKey,
+      tooltipAlignment: Alignment.topCenter,
+    ),
+    TutorialStep(
+      title: 'Actions',
+      description: 'Pass to skip your turn, or Bet to reveal the middle card. Reveal to see your fate!',
+      targetKey: _actionsKey,
+      tooltipAlignment: Alignment.topCenter,
+    ),
+    TutorialStep(
+      title: 'Rules',
+      description: 'Tap here to learn about "Hitting the Post" and other rules.',
+      targetKey: _rulesKey,
+      tooltipAlignment: Alignment.bottomLeft,
+    ),
+  ];
   
   // Card lookup cache
   final Map<String, Card> _cardCache = {};
@@ -122,12 +160,22 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
         final maxBet = myChips < state.pot ? myChips : state.pot;
         
         return Scaffold(
-          backgroundColor: CasinoColors.feltGreenDark,
+          extendBodyBehindAppBar: true,
           appBar: AppBar(
-            backgroundColor: Colors.black.withValues(alpha: 0.7),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.go('/lobby'),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.black26, 
+                  shape: BoxShape.circle
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => context.go('/lobby'),
+                ),
+              ),
             ),
             title: Row(
               mainAxisSize: MainAxisSize.min,
@@ -137,7 +185,35 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
                 _buildChipsBadge(myChips),
               ],
             ),
+            centerTitle: true,
             actions: [
+              // Help Button
+              Container(
+                key: _rulesKey,
+                child: IconButton(
+                  icon: const Icon(Icons.help_outline),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (c) => AlertDialog(
+                      backgroundColor: CasinoColors.cardBackground,
+                      title: Text('${GameTerminology.inBetweenGame} Rules', style: const TextStyle(color: CasinoColors.gold)),
+                      content: const Text(
+                        '1. Place a bet based on the probability.\n'
+                        '2. A "Low" and "High" card are dealt.\n'
+                        '3. A third "Middle" card is dealt.\n'
+                        '4. WIN if the Middle card is literally in-between.\n'
+                        '5. LOSE if outside the range.\n'
+                        '6. POST (Hit the Post): If Middle card matches High or Low, you lose 2x the bet!',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('Got it'))],
+                    ),
+                  );
+                },
+                tooltip: 'Rules',
+                ),
+              ),
               _buildPotBadge(state.pot),
               // Video Toggle
               IconButton(
@@ -150,42 +226,41 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
               const SizedBox(width: 8),
             ],
           ),
-          body: FeltBackground(
-            primaryColor: const Color(0xFF1a4d2e),
-            secondaryColor: const Color(0xFF0a2814),
-            showTexture: true,
-            showAmbientLight: true,
+          body: TableLayout(
             child: Stack(
               children: [
-                Column(
-              children: [
-                // Game mode indicator
-                _buildGameModeBanner(state),
-                
-                // Opponents area
-                _buildOpponentsArea(state, currentUser.uid),
-                
-                // Turn indicator
-                _buildTurnIndicator(isMyTurn, state.phase),
-                
-                const Spacer(),
-                
-                // Cards area
-                _buildCardsArea(state),
-                
-                // Result display
-                if (_lastResult != null)
-                  _buildResultBanner(_lastResult!),
-                
-                const Spacer(),
-                
-                // Betting area
-                if (isMyTurn && state.phase == 'betting')
-                  _buildBettingArea(state.pot, myChips, maxBet),
-                
-                // Action buttons
-                  _buildActionBar(isMyTurn, state),
-                  ],
+                SafeArea(
+                  child: Column(
+                    children: [
+                      SizedBox(height: kToolbarHeight + 10),
+                      // Game mode indicator
+                      _buildGameModeBanner(state),
+                      
+                      // Opponents area
+                      _buildOpponentsArea(state, currentUser.uid),
+                      
+                      // Turn indicator
+                      _buildTurnIndicator(isMyTurn, state.phase),
+                      
+                      const Spacer(),
+                      
+                      // Cards area
+                      Container(key: _cardsKey, child: _buildCardsArea(state)),
+                      
+                      // Result display
+                      if (_lastResult != null)
+                        _buildResultBanner(_lastResult!),
+                      
+                      const Spacer(),
+                      
+                      // Betting area
+                      if (isMyTurn && state.phase == 'betting')
+                        Container(key: _bettingKey, child: _buildBettingArea(state.pot, myChips, maxBet)),
+                      
+                      // Action buttons
+                        Container(key: _actionsKey, child: _buildActionBar(isMyTurn, state)),
+                    ],
+                  ),
                 ),
                 // Video Grid Overlay
                 if (_showVideoGrid)
@@ -218,6 +293,13 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
                     onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
                   ),
                 ),
+                // Tutorial Overlay
+                if (_showTutorial)
+                  TutorialOverlay(
+                    steps: _tutorialSteps,
+                    onComplete: () => setState(() => _showTutorial = false),
+                    onSkip: () => setState(() => _showTutorial = false),
+                  ),
               ],
             ),
           ),

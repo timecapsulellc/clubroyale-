@@ -19,6 +19,7 @@ import 'package:clubroyale/features/game/ui/components/casino_button.dart';
 import 'package:clubroyale/features/game/ui/components/card_widget.dart';
 import 'package:clubroyale/features/ai/ai_service.dart';
 import 'package:clubroyale/games/marriage/widgets/visit_button_widget.dart';
+import 'package:clubroyale/games/marriage/widgets/marriage_table_layout.dart';
 import 'package:clubroyale/games/marriage/widgets/game_timer_widget.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hud_overlay.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
@@ -31,7 +32,11 @@ import 'package:clubroyale/core/widgets/game_mode_banner.dart';
 import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 import 'dart:async';
 
-/// Marriage game screen with test mode
+import 'package:clubroyale/core/widgets/tutorial_overlay.dart'; // Import TutorialOverlay
+import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
+
+// ... (existing imports)
+
 class MarriageGameScreen extends ConsumerStatefulWidget {
   const MarriageGameScreen({super.key});
 
@@ -40,9 +45,58 @@ class MarriageGameScreen extends ConsumerStatefulWidget {
 }
 
 class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
+  // ... (existing vars)
+  
+  // Tutorial Keys
+  final GlobalKey _menuKey = GlobalKey();
+  final GlobalKey _deckKey = GlobalKey(); // Renamed from centerDeckKey to avoid confusion
+  final GlobalKey _handKey = GlobalKey(); // Renamed from myHandKey
+  final GlobalKey _sortKey = GlobalKey();
+  final GlobalKey _visitKey = GlobalKey();
+  
+  bool _showTutorial = true; // Auto-show for demo
+  
+  List<TutorialStep> get _tutorialSteps => [
+    TutorialStep(
+      title: 'Welcome to Marriage! 👑',
+      description: 'The goal is to arrange your 21 cards into Sets (AAA) and Sequences (678).',
+      targetKey: null, // Center modal
+    ),
+    TutorialStep(
+      title: 'Your Hand',
+      description: 'Your cards are here. Drag to rearrange or tap to select.',
+      targetKey: _handKey,
+      tooltipAlignment: Alignment.topCenter,
+    ),
+    TutorialStep(
+      title: 'Draw & Discard',
+      description: 'Tap the Deck to draw a card, or pick from the Discard pile if you have a pair.',
+      targetKey: _deckKey,
+      tooltipAlignment: Alignment.bottomCenter,
+    ),
+    TutorialStep(
+      title: 'Sort Your Cards',
+      description: 'Use Sort to automatically group cards by Suit or Rank.',
+      targetKey: _sortKey,
+      tooltipAlignment: Alignment.topCenter,
+    ),
+    TutorialStep(
+      title: 'Visit / Maal',
+      description: 'Once you have 3 Pure Sequences, tap here to "Visit" and unlock Bonus Points (Maal).',
+      targetKey: _visitKey,
+      tooltipAlignment: Alignment.topCenter,
+    ),
+    TutorialStep(
+      title: 'Guidebook',
+      description: 'Check the detailed rules anytime here.',
+      targetKey: _menuKey,
+      tooltipAlignment: Alignment.bottomLeft,
+    ),
+  ];
+  
+  // Core game state
   late MarriageGame _game;
   final String _playerId = 'player_1';
-  // Support up to 7 bots (Total 8 players). Defaulting to 5 bots for a busy table test.
   final List<String> _botIds = List.generate(5, (i) => 'bot_${i + 1}');
   String? _selectedCardId;
   bool _isProcessing = false;
@@ -60,13 +114,11 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
 
   // Animations
   final List<Widget> _animations = [];
-  final GlobalKey _centerDeckKey = GlobalKey();
-  final GlobalKey _myHandKey = GlobalKey();
   
   // Timer state
   Timer? _turnTimer;
   int _remainingSeconds = 30;
-  
+
   @override
   void initState() {
     super.initState();
@@ -84,6 +136,9 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     _game = MarriageGame();
     _game.initialize(<String>[_playerId, ..._botIds]);
     _game.startRound();
+    
+    // Play shuffle sound on deal
+    SoundService.playShuffleSound();
     
     // Check if bots need to play (if user doesn't start)
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -103,6 +158,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     setState(() => _remainingSeconds = _config.turnTimeoutSeconds);
     
     _turnTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_showTutorial) return; // Pause timer during tutorial
       if (!mounted) {
         timer.cancel();
         return;
@@ -416,7 +472,12 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                 left: 16,
                 child: Row(
                   children: [
-                    _buildHeaderButton(Icons.menu, () { /* TODO: Menu */ }),
+                    _buildHeaderButton(Icons.menu, () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MarriageGuidebookScreen()),
+                      );
+                    }, key: _menuKey),
                     const SizedBox(width: 8),
                     _buildHeaderButton(Icons.volume_up, () { /* TODO: Sound */ }),
                     const SizedBox(width: 8),
@@ -442,46 +503,32 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                     "Bot 1 picked card from deck",
                     "Bot 2 threw card 4♥",
                     "Bot 3 showed tunella",
-                  ], // Placeholder data, hook up to real game logs later
+                  ], 
                 ),
               ),
               
-              Column(
-                children: [
-                  // Game mode banner (Local/Practice)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 8, bottom: 4),
-                    child: GameModeBanner(
-                      botCount: 3,
-                      humanCount: 1,
-                      compact: true,
-                    ),
-                  ),
-
-                  // Top Opponents
-                  const SizedBox(height: 10),
-                  Expanded(
-                    flex: 2,
-                    child: _buildOpponentsArea(),
-                  ),
-                  
-                  // Center Table (Deck/Discard/Pot)
-                  Expanded(
-                    flex: 4,
+              // New Elliptical Layout for 8 Players
+              Padding(
+                padding: const EdgeInsets.only(top: 80), // Increased top padding to avoid header overlap
+                child: MarriageTableLayout(
+                  centerArea: Padding(
+                    padding: const EdgeInsets.only(bottom: 20), // Push deck up slightly from hand
                     child: _buildCenterArea(),
                   ),
-                  
-                  // Bottom Player Area
-                  // Meld suggestions
-                  if (melds.isNotEmpty)
-                    _buildMeldSuggestions(melds),
-                  
-                  // My hand
-                  _buildMyHand(myHand),
-                  
-                  // Action bar
-                  _buildActionBar(),
-                ],
+                  opponents: _buildOpponentsList(),
+                  myHand: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Meld suggestions
+                      if (melds.isNotEmpty) _buildMeldSuggestions(melds),
+                      const SizedBox(height: 10), // Spacing between suggestions and hand
+                      // Hand
+                      _buildMyHand(myHand),
+                      // Actions
+                      _buildActionBar(),
+                    ],
+                  ),
+                ),
               ),
               
               // Polished HUD Overlay (Turn Indicator, Maal, Emotes)
@@ -496,8 +543,27 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                 },
               ),
               
+              // Game Mode Banner
+              const Positioned(
+                top: 50,
+                right: 16,
+                child: GameModeBanner(
+                  botCount: 3, // Update dynamically if needed
+                  humanCount: 1,
+                  compact: true,
+                ),
+              ),
+              
               // Flying Card Animations
               ..._animations,
+              
+              // Interactive Tutorial Overlay
+              if (_showTutorial)
+                 TutorialOverlay(
+                   steps: _tutorialSteps,
+                   onComplete: () => setState(() => _showTutorial = false),
+                   onSkip: () => setState(() => _showTutorial = false),
+                 ),
             ],
           ),
         ),
@@ -505,7 +571,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     );
   }
 
-  Widget _buildHeaderButton(IconData icon, VoidCallback onPressed) {
+  Widget _buildHeaderButton(IconData icon, VoidCallback onPressed, {Key? key}) {
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.teal.withValues(alpha: 0.8),
@@ -513,6 +579,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
         border: Border.all(color: AppTheme.gold, width: 1.5),
       ),
       child: IconButton(
+        key: key,
         icon: Icon(icon, color: Colors.white, size: 20),
         onPressed: onPressed,
         constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
@@ -521,22 +588,20 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     );
   }
 
-  Widget _buildOpponentsArea() {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: OpponentRow(
-        opponents: _botIds.map((botId) {
-          final isCurrentTurn = _game.currentPlayerId == botId;
-          return GameOpponent(
+  List<Widget> _buildOpponentsList() {
+    return _botIds.map((botId) {
+      final isCurrentTurn = _game.currentPlayerId == botId;
+      return GameOpponentWidget( // Use widget directly, not OpponentRow
+        opponent: GameOpponent(
             id: botId,
             name: _getBotName(botId),
             isBot: true,
             isCurrentTurn: isCurrentTurn,
             status: isCurrentTurn ? 'Thinking...' : null,
-          );
-        }).toList(),
-      ),
-    );
+        ),
+        size: 50, // Slightly smaller for 8 players
+      );
+    }).toList();
   }
 
 
@@ -574,11 +639,14 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
             // Deck
             GestureDetector(
               onTap: canDrawFromDeck ? _drawFromDeck : null,
-              child: CardWidget(
-                card: PlayingCard(rank: CardRank.ace, suit: CardSuit.spades), // Dummy card for back
-                isFaceUp: false,
-                isSelectable: canDrawFromDeck,
-                isSelected: false,
+              child: Container(
+                key: _deckKey,
+                child: CardWidget(
+                  card: PlayingCard(rank: CardRank.ace, suit: CardSuit.spades), 
+                  isFaceUp: false,
+                  isSelectable: canDrawFromDeck,
+                  isSelected: false,
+                ),
               ),
             ),
             const SizedBox(width: 20),
@@ -676,6 +744,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8), // Reduced padding
       color: Colors.black.withValues(alpha: 0.6),
       child: Center(
+        key: _handKey,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -761,6 +830,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           
           // Visit Button (New)
           VisitButtonWidget(
+            key: _visitKey,
             state: _visitStatus,
             onPressed: (_visitStatus == VisitButtonState.ready) ? _handleVisit : null,
             label: _visitLabel,
@@ -769,6 +839,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           
           // Sort button
            CasinoButton(
+            key: _sortKey,
             label: 'Sort',
             onPressed: () {
               setState(() {});

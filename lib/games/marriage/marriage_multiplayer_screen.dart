@@ -24,8 +24,12 @@ import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
 import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_table_layout.dart';
+import 'package:clubroyale/core/widgets/game_top_bar.dart';
+import 'package:clubroyale/features/wallet/diamond_service.dart'; // Import DiamondService
 import 'package:clubroyale/core/widgets/game_mode_banner.dart';
 import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
+import 'package:clubroyale/features/game/ui/components/table_layout.dart';
+import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
 
 
 /// Sort modes for hand display
@@ -130,149 +134,129 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             : null;
         
         return Scaffold(
-
-          backgroundColor: CasinoColors.feltGreenDark,
-          appBar: AppBar(
-            backgroundColor: Colors.black.withValues(alpha: 0.5),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.go('/lobby'),
-            ),
-            title: Row(
-              mainAxisSize: MainAxisSize.min,
+          body: TableLayout(
+            child: Stack(
               children: [
-                // Use GameTerminology for multi-region support
-                Text(GameTerminology.royalMeldGame, style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: CasinoColors.gold.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: CasinoColors.gold),
-                  ),
-                  child: Text(
-                    'Round ${state.currentRound}',
-                    style: const TextStyle(color: CasinoColors.gold, fontSize: 12),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              // P1 FIX: Enhanced Tiplu indicator with Jhiplu/Poplu info
-              if (tiplu != null)
-                GestureDetector(
-                  onTap: () => _showTipluDialog(tiplu),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.25),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.red),
-                    ),
-                    child: Row(
+                // 1. Content Layer (Particles + Game Board)
+                ParticleBackground(
+                  primaryColor: CasinoColors.gold,
+                  secondaryColor: CasinoColors.feltGreenMid,
+                  particleCount: 15,
+                  hasBackground: false,
+                  child: Stack(
+                    children: [
+                   // ... existing children
+                  // Main Game Layer
+                  MarriageTableLayout(
+                    centerArea: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('👑 ', style: TextStyle(fontSize: 12)),
-                        Text(
-                          tiplu.displayString,
-                          style: TextStyle(
-                            color: tiplu.suit.isRed ? Colors.red.shade300 : Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(Icons.info_outline, color: Colors.white54, size: 14),
+                         _buildGameModeBanner(state),
+                         if (isMyTurn) _buildPhaseIndicator(state),
+                         _buildCenterArea(state, topDiscard, isMyTurn),
+                         _buildMeldSuggestions(myHand, tiplu),
+                      ],
+                    ),
+                    opponents: _buildOpponentWidgets(state, currentUser.uid),
+                    myHand: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildCompactStatusBar(state, currentUser.uid),
+                        _buildMyHand(myHand, isMyTurn, tiplu: tiplu),
+                        _buildActionBar(isMyTurn, state, currentUser.uid),
                       ],
                     ),
                   ),
-                ),
-
-                
-              // Video Toggle
-              IconButton(
-                icon: Icon(_showVideoGrid ? Icons.videocam_off : Icons.videocam),
-                onPressed: () => setState(() => _showVideoGrid = !_showVideoGrid),
-                tooltip: _showVideoGrid ? 'Hide Video' : 'Show Video',
-              ),
-              
-              // Audio Mute/Unmute (Mini implementation)
-              AudioFloatingButton(roomId: widget.roomId, userId: currentUser.uid),
-            ],
-          ),
-          body: ParticleBackground(
-            primaryColor: CasinoColors.gold,
-            secondaryColor: CasinoColors.feltGreenMid,
-            particleCount: 15,
-            child: Stack(
-              children: [
-                // Main Game Layer
-                // Main Game Layer
-                MarriageTableLayout(
-                  centerArea: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                       _buildGameModeBanner(state),
-                       if (isMyTurn) _buildPhaseIndicator(state),
-                       // Center deck/discard
-                       _buildCenterArea(state, topDiscard, isMyTurn),
-                       // Meld suggestions
-                       _buildMeldSuggestions(myHand, tiplu),
-                    ],
-                  ),
-                  opponents: _buildOpponentWidgets(state, currentUser.uid),
-                  myHand: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Combined Turn + Sort bar (compact, single line)
-                      _buildCompactStatusBar(state, currentUser.uid),
-                      // Hand
-                      _buildMyHand(myHand, isMyTurn, tiplu: tiplu),
-                      // Action bar
-                      _buildActionBar(isMyTurn, state, currentUser.uid),
-                    ],
-                  ),
-                ),
-
-                
-                // Video Grid Overlay
-                if (_showVideoGrid)
-                  Positioned(
-                    top: 60,
-                    right: 16,
-                    width: 200,
-                    height: 300,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black87,
-                        borderRadius: BorderRadius.circular(8),
+  
+                  
+                  // Video Grid Overlay
+                  if (_showVideoGrid)
+                    Positioned(
+                      top: 60,
+                      right: 16,
+                      width: 200,
+                      height: 300,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black87,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: VideoGridWidget(
+                          roomId: widget.roomId,
+                          userId: currentUser.uid,
+                          userName: currentUser.displayName ?? 'Player',
+                        ),
                       ),
-                      child: VideoGridWidget(
+                    ),
+                    
+                  // Chat Overlay moved to top right
+                ],
+              ),
+            ),
+            
+            // Custom Top Bar (Floating)
+            Positioned(
+              top: 0, left: 0, right: 0,
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final diamondService = ref.watch(diamondServiceProvider);
+                  return StreamBuilder(
+                    stream: diamondService.watchWallet(currentUser.uid),
+                    builder: (context, walletSnapshot) {
+                      final balance = walletSnapshot.data?.balance ?? 0;
+                      final maalPoints = state.getMaalPoints(currentUser.uid);
+                      
+                      return GameTopBar(
+                        roomName: GameTerminology.royalMeldGame,
+                        roomId: widget.roomId.substring(0, widget.roomId.length > 6 ? 6 : widget.roomId.length),
+                        points: 'Maal: $maalPoints',
+                        balance: '💎 $balance', 
+                        onExit: () => context.go('/lobby'),
+                        onSettings: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MarriageGuidebookScreen())),
+                      );
+                    }
+                  );
+                },
+              ),
+            ),
+
+            // Video/Audio Controls (Floating Top Right, below TopBar)
+            Positioned(
+               top: 70, right: 16,
+               child: Column(
+                 mainAxisSize: MainAxisSize.min,
+                 children: [
+                   // Chat Button (Top)
+                   Container(
+                     margin: const EdgeInsets.only(bottom: 8),
+                     child: ChatOverlay(
                         roomId: widget.roomId,
                         userId: currentUser.uid,
                         userName: currentUser.displayName ?? 'Player',
-                      ),
-                    ),
-                  ),
-                  
-                // Chat Overlay
-                Positioned(
-                  bottom: 140, // Above hand
-                  left: 16,
-                  child: ChatOverlay(
-                    roomId: widget.roomId,
-                    userId: currentUser.uid,
-                    userName: currentUser.displayName ?? 'Player',
-                    isExpanded: _isChatExpanded,
-                    onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
-                  ),
-                ),
-              ],
+                        isExpanded: _isChatExpanded,
+                        onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
+                     ),
+                   ),
+                   Container(
+                     margin: const EdgeInsets.only(bottom: 8),
+                     decoration: BoxDecoration(
+                       color: Colors.black.withValues(alpha: 0.3),
+                       shape: BoxShape.circle,
+                       border: Border.all(color: Colors.white24),
+                     ),
+                     child: IconButton(
+                       icon: Icon(_showVideoGrid ? Icons.videocam : Icons.videocam_off, color: Colors.white, size: 20),
+                       onPressed: () => setState(() => _showVideoGrid = !_showVideoGrid),
+                     ),
+                   ),
+                   AudioFloatingButton(roomId: widget.roomId, userId: currentUser.uid),
+                 ],
+               ),
             ),
-          ),
-        );
+          ],
+        ),
+      ),
+    );
       },
     );
   }
@@ -803,27 +787,57 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   }
   
   Widget _buildDiscardPile(Card? topCard, bool canDraw) {
-    return Container(
-      width: 80,
-      height: 110,
-      decoration: BoxDecoration(
-        color: topCard != null ? Colors.white : CasinoColors.cardBackground.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: canDraw && topCard != null ? CasinoColors.gold : CasinoColors.gold.withValues(alpha: 0.3),
-          width: canDraw && topCard != null ? 2 : 1,
-        ),
-      ),
-      child: topCard != null
-          ? _buildCardWidget(topCard, false, isLarge: true)
-          : Center(
-              child: Text(
-                'Discard',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 10),
-              ),
+    // P0 FIX: Validation logic for drag target
+    final state = ref.read(marriageServiceProvider).watchGameState(widget.roomId).last; 
+    // Note: Stream logic is complex here, relying on parent rebuilding calls.
+    // Simplifying: The _discardCard function checks state anyway.
+    
+    return DragTarget<String>(
+      onWillAccept: (cardId) {
+         // Basic check: is it non-null? Deep validation happens in onAccept logic via _discardCard
+         return cardId != null;
+      },
+      onAccept: (cardId) {
+        setState(() => _selectedCardId = cardId);
+        _discardCard();
+      },
+      builder: (context, candidateData, rejectedData) {
+        final isHovering = candidateData.isNotEmpty;
+        
+        return Container(
+          width: 80,
+          height: 110,
+          decoration: BoxDecoration(
+            color: isHovering 
+                ? Colors.red.withValues(alpha: 0.3) 
+                : (topCard != null ? Colors.white : CasinoColors.cardBackground.withValues(alpha: 0.5)),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isHovering ? Colors.redAccent : (canDraw && topCard != null ? CasinoColors.gold : CasinoColors.gold.withValues(alpha: 0.3)),
+              width: isHovering ? 2 : (canDraw && topCard != null ? 2 : 1),
             ),
+          ),
+          child: topCard != null
+              ? _buildCardWidget(topCard, false, isLarge: true)
+              : Center(
+                  child: isHovering 
+                      ? const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                             Icon(Icons.delete_outline, color: Colors.white, size: 24),
+                             Text('Drop', style: TextStyle(color: Colors.white, fontSize: 10)),
+                          ],
+                        )
+                      : Text(
+                          'Discard',
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 10),
+                        ),
+                ),
+        );
+      },
     );
   }
+
   
   Widget _buildMyHand(List<String> cardIds, bool isMyTurn, {Card? tiplu}) {
     // Sort cards based on current sort mode
@@ -857,12 +871,33 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             // Last card gets full width (60px), others get 35px (60 - 25 overlap)
             return SizedBox(
               width: isLast ? 60 : 35,
-              child: GestureDetector(
-                onTap: isMyTurn ? () {
-                  setState(() {
-                    _selectedCardId = isSelected ? null : cardId;
-                  });
-                } : null,
+              child: isMyTurn ? Draggable<String>(
+                data: cardId,
+                feedback: Material(
+                  type: MaterialType.transparency,
+                  child: Transform.rotate(
+                    angle: -0.1,
+                    child: _buildCardWidget(card, true, isLarge: true),
+                  ),
+                ),
+                childWhenDragging: Opacity(
+                  opacity: 0.5,
+                  child: _buildCardWidget(card, isSelected, maalType: maalType),
+                ),
+                onDragStarted: () {
+                   if (isMyTurn) {
+                      setState(() => _selectedCardId = cardId);
+                      SoundService.playCardSlide();
+                   }
+                },
+                maxSimultaneousDrags: 1,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  transform: Matrix4.translationValues(0, isSelected ? -15 : 0, 0),
+                  child: _buildCardWidget(card, isSelected, maalType: maalType),
+                ),
+              ) : GestureDetector(
+                onTap: null,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
                   transform: Matrix4.translationValues(0, isSelected ? -15 : 0, 0),
@@ -1029,68 +1064,106 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     final canVisit = isMyTurn && !hasVisited;
     
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.5),
-        border: Border(top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3))),
+        color: Colors.black.withValues(alpha: 0.8),
+        border: Border(top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3), width: 1)),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          // Discard button
-          ElevatedButton.icon(
-            onPressed: canDiscard ? _discardCard : null,
-            icon: const Icon(Icons.arrow_upward),
-            label: const Text('Discard'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: CasinoColors.gold,
-              foregroundColor: Colors.black,
-              disabledBackgroundColor: Colors.grey.shade700,
+      child: SafeArea(
+        top: false,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Discard Button (Left)
+            _buildGameActionButton(
+              label: '↑ Discard',
+              color: Colors.grey.shade800,
+              icon: Icons.arrow_upward,
+              isEnabled: canDiscard,
+              onPressed: _discardCard,
             ),
-          ),
-          
-          // Visit Button / Status
-          if (!hasVisited)
-            ElevatedButton.icon(
-              onPressed: canVisit ? _attemptVisit : null,
-              icon: const Icon(Icons.lock_open),
-              label: const Text('Visit'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: Colors.grey.shade700,
-              ),
-            )
-          else
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.purple.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.purple),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.check_circle, color: Colors.purple, size: 16),
-                  const SizedBox(width: 4),
-                  Text('Visited (💎${state.getMaalPoints(myId)})', 
-                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-                ],
-              ),
+            
+            // Visit (Center - Main Action)
+            if (!hasVisited)
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _buildGameActionButton(
+                    label: '🔒 VISIT (Unlock Maal)',
+                    color: Colors.purple, // Matching the user's reference Guide color
+                    icon: Icons.lock_open,
+                    isEnabled: canVisit,
+                    onPressed: _attemptVisit,
+                    isPrimary: true,
+                  ),
+                ),
+              )
+            else
+               Expanded(
+                 child: Container(
+                   margin: const EdgeInsets.symmetric(horizontal: 16),
+                   padding: const EdgeInsets.symmetric(vertical: 12),
+                   decoration: BoxDecoration(
+                     color: Colors.purple.withValues(alpha: 0.2),
+                     borderRadius: BorderRadius.circular(12),
+                     border: Border.all(color: Colors.purple.withValues(alpha: 0.5)),
+                   ),
+                   child: Column(
+                     mainAxisSize: MainAxisSize.min,
+                     children: [
+                        const Text('🔓 VISITED', style: TextStyle(color: Colors.purpleAccent, fontWeight: FontWeight.bold, fontSize: 12)),
+                        Text('💎 Maal: ${state.getMaalPoints(myId)}', style: const TextStyle(color: Colors.white, fontSize: 11)),
+                     ],
+                   )
+                 ),
+               ),
+            
+            // Declare/Go Royale (Right)
+            _buildGameActionButton(
+              label: '✓ Go Royale',
+              color: Colors.green,
+              icon: Icons.check_circle,
+              isEnabled: canDeclare,
+              onPressed: _declare,
             ),
-          
-          // Declare button (Go Royale in global mode)
-          ElevatedButton.icon(
-            onPressed: canDeclare ? _declare : null,
-            icon: const Icon(Icons.check_circle),
-            label: Text(GameTerminology.declare),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.grey.shade700,
-            ),
-          ),
+          ],
+        ),
+      ),
+    );
+  }
 
+  Widget _buildGameActionButton({
+    required String label,
+    required Color color,
+    required IconData icon,
+    required bool isEnabled,
+    required VoidCallback onPressed,
+    bool isPrimary = false,
+  }) {
+    return ElevatedButton(
+      onPressed: isEnabled ? onPressed : null,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: Colors.grey.shade900,
+        disabledForegroundColor: Colors.grey.shade600,
+        elevation: isEnabled ? 4 : 0,
+        padding: EdgeInsets.symmetric(horizontal: isPrimary ? 20 : 16, vertical: isPrimary ? 16 : 12),
+        shape: RoundedRectangleBorder(
+           borderRadius: BorderRadius.circular(12),
+           side: BorderSide(color: isEnabled ? Colors.white24 : Colors.transparent),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: isPrimary ? 24 : 20),
+          const SizedBox(height: 4),
+          Text(label, style: TextStyle(
+            fontSize: isPrimary ? 13 : 11, 
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          )),
         ],
       ),
     );
