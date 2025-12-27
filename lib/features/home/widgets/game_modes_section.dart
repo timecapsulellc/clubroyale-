@@ -145,7 +145,8 @@ class GameModesSection extends ConsumerWidget {
               crossAxisCount: 2,
               mainAxisSpacing: 16,
               crossAxisSpacing: 16,
-              childAspectRatio: 1.0,
+
+              childAspectRatio: 0.85,
               children: [
                 _GameCardTile(
                   gameType: 'marriage',
@@ -406,7 +407,7 @@ class _GameCardTile extends StatelessWidget {
             children: [
                 GameCardGraphic(
                   gameType: gameType,
-                  size: 55, // Reduced from 80 to fix overflow
+                  size: 40, // Reduced further to 40 to ensure no overflow
                   animate: true,
                 ),
               const SizedBox(height: 12),

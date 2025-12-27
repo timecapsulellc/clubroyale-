@@ -3,6 +3,7 @@
 /// Real-time multiplayer Teen Patti game UI
 library;
 
+import 'dart:math' as math;
 import 'package:flutter/material.dart' hide Card;
 import 'package:clubroyale/core/utils/haptic_helper.dart';
 import 'package:clubroyale/core/widgets/contextual_loader.dart';
@@ -541,7 +542,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
                   Text('Bet: $_betAmount', style: const TextStyle(color: Colors.white)),
                   Expanded(
                     child: Slider(
-                      value: _betAmount.toDouble(),
+                      value: _betAmount.toDouble().clamp(minBet.toDouble(), maxBet.toDouble()),
                       min: minBet.toDouble(),
                       max: maxBet.toDouble(),
                       divisions: maxBet - minBet > 0 ? maxBet - minBet : 1,
@@ -576,9 +577,10 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
 
                 // Bet/Chaal button
                 ElevatedButton.icon(
-                  onPressed: isMyTurn && !_isProcessing ? _bet : null,
+                  onPressed: isMyTurn && !_isProcessing ? () => _bet(minBet, maxBet) : null,
                   icon: const Icon(Icons.attach_money),
-                  label: Text(isSeen ? 'Chaal $_betAmount' : 'Blind $_betAmount'),
+                  // P0 FIX: Display valid amount matching the slider
+                  label: Text(isSeen ? 'Chaal ${math.max(_betAmount, minBet)}' : 'Blind ${math.max(_betAmount, minBet)}'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CasinoColors.gold,
                     foregroundColor: Colors.black,
@@ -678,7 +680,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     }
   }
   
-  Future<void> _bet() async {
+  Future<void> _bet(int minBet, int maxBet) async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
     
@@ -691,7 +693,9 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       final service = ref.read(teenPattiServiceProvider);
       final userId = ref.read(authServiceProvider).currentUser?.uid;
       if (userId != null) {
-        await service.bet(widget.roomId, userId, _betAmount);
+        // Ensure bet amount is valid
+        final validAmount = _betAmount.clamp(minBet, maxBet);
+        await service.bet(widget.roomId, userId, validAmount);
       }
     } finally {
       if (mounted) setState(() => _isProcessing = false);

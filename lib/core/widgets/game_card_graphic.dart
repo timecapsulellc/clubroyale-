@@ -130,39 +130,12 @@ class PlayingCardWidget extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Top-left corner
-          Positioned(
-            top: 4,
-            left: 4,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _valueString,
-                  style: TextStyle(
-                    color: _suitColor,
-                    fontSize: width * 0.22,
-                    fontWeight: FontWeight.bold,
-                    height: 1,
-                  ),
-                ),
-                Text(
-                  _suitSymbol,
-                  style: TextStyle(
-                    color: _suitColor,
-                    fontSize: width * 0.18,
-                    height: 1,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Bottom-right corner (rotated)
-          Positioned(
-            bottom: 4,
-            right: 4,
-            child: Transform.rotate(
-              angle: math.pi,
+          // Only show corner labels on cards large enough to read them
+          if (width >= 30) ...[
+            // Top-left corner
+            Positioned(
+              top: 4,
+              left: 4,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -186,8 +159,38 @@ class PlayingCardWidget extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-          // Center design
+            // Bottom-right corner (rotated)
+            Positioned(
+              bottom: 4,
+              right: 4,
+              child: Transform.rotate(
+                angle: math.pi,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _valueString,
+                      style: TextStyle(
+                        color: _suitColor,
+                        fontSize: width * 0.22,
+                        fontWeight: FontWeight.bold,
+                        height: 1,
+                      ),
+                    ),
+                    Text(
+                      _suitSymbol,
+                      style: TextStyle(
+                        color: _suitColor,
+                        fontSize: width * 0.18,
+                        height: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          // Center design (always shown)
           Center(
             child: _isFaceCard
                 ? _buildFaceCardCenter()
@@ -213,25 +216,30 @@ class PlayingCardWidget extends StatelessWidget {
         color: _suitColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            _valueString,
-            style: TextStyle(
-              color: _suitColor,
-              fontSize: width * 0.35,
-              fontWeight: FontWeight.bold,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              _valueString,
+              style: TextStyle(
+                color: _suitColor,
+                fontSize: width * 0.35,
+                fontWeight: FontWeight.bold,
+                height: 1.0,
+              ),
             ),
-          ),
-          Text(
-            _suitSymbol,
-            style: TextStyle(
-              color: _suitColor,
-              fontSize: width * 0.2,
+            Text(
+              _suitSymbol,
+              style: TextStyle(
+                color: _suitColor,
+                fontSize: width * 0.2,
+                height: 1.0,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
