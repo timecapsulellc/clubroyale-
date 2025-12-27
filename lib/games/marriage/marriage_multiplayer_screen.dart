@@ -158,14 +158,17 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                    // ... existing children
                   // Main Game Layer
                   MarriageTableLayout(
-                    centerArea: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                         _buildGameModeBanner(state),
-                         if (isMyTurn) _buildPhaseIndicator(state),
-                         _buildCenterArea(state, topDiscard, isMyTurn),
-                         _buildMeldSuggestions(myHand, tiplu),
-                      ],
+                    centerArea: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                           _buildGameModeBanner(state),
+                           if (isMyTurn) _buildPhaseIndicator(state),
+                           _buildCenterArea(state, topDiscard, isMyTurn),
+                           _buildMeldSuggestions(myHand, tiplu),
+                        ],
+                      ),
                     ),
                     opponents: _buildOpponentWidgets(state, currentUser.uid),
                     myHand: Container(
@@ -721,79 +724,83 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     final canDraw = isMyTurn && state.isDrawingPhase;
     final labelStyle = TextStyle(
       color: Colors.white.withValues(alpha: 0.8),
-      fontSize: 10,
+      fontSize: 9,
       fontWeight: FontWeight.bold,
-      letterSpacing: 1.2,
+      letterSpacing: 1.0,
     );
     
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          // CLOSED DECK (Draw pile)
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              GestureDetector(
-                onTap: canDraw ? _drawFromDeck : null,
-                child: _buildDeckPile(state.deckCards.length, canDraw),
-              ),
-              const SizedBox(height: 6),
-              Text('CLOSED DECK', style: labelStyle),
-            ],
-          ),
-          
-          const SizedBox(width: 16),
-          
-          // FINISH SLOT (Declare button area)
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 60,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: CasinoColors.feltGreenDark.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: CasinoColors.gold.withValues(alpha: 0.4),
-                    width: 1,
-                    style: BorderStyle.solid,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            // CLOSED DECK (Draw pile)
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: canDraw ? _drawFromDeck : null,
+                  child: _buildDeckPile(state.deckCards.length, canDraw),
+                ),
+                const SizedBox(height: 4),
+                Text('CLOSED DECK', style: labelStyle),
+              ],
+            ),
+            
+            const SizedBox(width: 12),
+            
+            // FINISH SLOT (Declare button area)
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 50,
+                  height: 65,
+                  decoration: BoxDecoration(
+                    color: CasinoColors.feltGreenDark.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: CasinoColors.gold.withValues(alpha: 0.4),
+                      width: 1,
+                      style: BorderStyle.solid,
+                    ),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.flag_outlined, color: CasinoColors.gold.withValues(alpha: 0.6), size: 20),
+                        const SizedBox(height: 2),
+                        Text('FINISH', style: TextStyle(color: CasinoColors.gold.withValues(alpha: 0.6), fontSize: 7, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
                   ),
                 ),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.flag_outlined, color: CasinoColors.gold.withValues(alpha: 0.6), size: 24),
-                      const SizedBox(height: 4),
-                      Text('FINISH', style: TextStyle(color: CasinoColors.gold.withValues(alpha: 0.6), fontSize: 8, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
+                const SizedBox(height: 4),
+                Text('FINISH SLOT', style: labelStyle),
+              ],
+            ),
+            
+            const SizedBox(width: 12),
+            
+            // OPEN DECK (Discard pile)
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: canDraw && topDiscard != null ? _drawFromDiscard : null,
+                  child: _buildDiscardPile(topDiscard, canDraw),
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text('FINISH SLOT', style: labelStyle),
-            ],
-          ),
-          
-          const SizedBox(width: 16),
-          
-          // OPEN DECK (Discard pile)
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              GestureDetector(
-                onTap: canDraw && topDiscard != null ? _drawFromDiscard : null,
-                child: _buildDiscardPile(topDiscard, canDraw),
-              ),
-              const SizedBox(height: 6),
-              Text('OPEN DECK', style: labelStyle),
-            ],
-          ),
-        ],
+                const SizedBox(height: 4),
+                Text('OPEN DECK', style: labelStyle),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -801,8 +808,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   
   Widget _buildDeckPile(int count, bool canDraw) {
     return Container(
-      width: 80,
-      height: 110,
+      width: 65,
+      height: 90,
       decoration: BoxDecoration(
         color: CasinoColors.cardBackground,
         borderRadius: BorderRadius.circular(8),
@@ -888,8 +895,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
         final isHovering = candidateData.isNotEmpty;
         
         return Container(
-          width: 80,
-          height: 110,
+          width: 65,
+          height: 90,
           decoration: BoxDecoration(
             color: isHovering 
                 ? Colors.red.withValues(alpha: 0.3) 

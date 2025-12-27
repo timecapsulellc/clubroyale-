@@ -290,7 +290,7 @@ class GameCardGraphic extends StatelessWidget {
   Widget _buildMarriageCards(double cardWidth, double cardHeight) {
     return SizedBox(
       width: size * 1.1,
-      height: size,
+      height: size * 1.1, // Extra height for rotated cards
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -345,7 +345,7 @@ class GameCardGraphic extends StatelessWidget {
   Widget _buildTeenPattiCards(double cardWidth, double cardHeight) {
     return SizedBox(
       width: size * 1.4,
-      height: size,
+      height: size * 1.1, // Extra height for rotated cards
       child: Stack(
         alignment: Alignment.center,
         children: [

@@ -72,37 +72,40 @@ class GameModeBanner extends StatelessWidget {
           width: 1,
         ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Icon with animation for AI games
-          if (gameMode == GameMode.practiceWithAI)
-            Icon(
-              Icons.smart_toy_rounded,
-              size: 16,
-              color: config.color,
-            ).animate(onPlay: (c) => c.repeat())
-              .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.3))
-          else
-            Icon(
-              config.icon,
-              size: 16,
-              color: config.color,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Icon with animation for AI games
+            if (gameMode == GameMode.practiceWithAI)
+              Icon(
+                Icons.smart_toy_rounded,
+                size: 16,
+                color: config.color,
+              ).animate(onPlay: (c) => c.repeat())
+                .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.3))
+            else
+              Icon(
+                config.icon,
+                size: 16,
+                color: config.color,
+              ),
+            const SizedBox(width: 6),
+            Text(
+              config.label,
+              style: TextStyle(
+                color: config.color,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          const SizedBox(width: 6),
-          Text(
-            config.label,
-            style: TextStyle(
-              color: config.color,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          if (!compact) ...[
-            const SizedBox(width: 8),
-            _buildPlayerCounts(config.color),
+            if (!compact) ...[
+              const SizedBox(width: 8),
+              _buildPlayerCounts(config.color),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
