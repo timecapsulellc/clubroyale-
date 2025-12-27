@@ -30,16 +30,11 @@ import 'package:clubroyale/core/widgets/game_mode_banner.dart';
 import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 import 'package:clubroyale/features/game/ui/components/table_layout.dart';
 import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
+import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
+import 'package:clubroyale/games/marriage/marriage_config.dart';
 
 
-/// Sort modes for hand display
-enum SortMode {
-  /// Sort by suit first, then rank (good for sequences)
-  bySuit,
-  
-  /// Sort by rank first, then suit (good for pairs/dublee)
-  byRank,
-}
+
 
 /// Multiplayer Marriage game screen
 class MarriageMultiplayerScreen extends ConsumerStatefulWidget {
@@ -62,8 +57,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   bool _showVideoGrid = false;
   final Set<String> _highlightedCardIds = {};  // P2: Cards to highlight in meld suggestions
   
-  // Sort mode: 'suit' for sequences, 'rank' for dublee pairs
-  SortMode _sortMode = SortMode.bySuit;
+
   
   // Card lookup cache
   final Map<String, Card> _cardCache = {};
@@ -191,7 +185,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           _buildCompactStatusBar(state, currentUser.uid),
-                          _buildMyHand(myHand, isMyTurn, tiplu: tiplu),
+                          _buildMyHand(myHand, isMyTurn, tiplu: tiplu, config: state.config),
                           _buildActionBar(isMyTurn, state, currentUser.uid),
                         ],
                       ),
@@ -365,6 +359,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       case MeldType.run: return Colors.green;
       case MeldType.tunnel: return Colors.orange;
       case MeldType.marriage: return Colors.pink;
+      case MeldType.impureRun: return Colors.orange.shade300;
+      case MeldType.impureSet: return Colors.teal;
     }
   }
   
@@ -375,6 +371,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       case MeldType.run: return GameTerminology.sequence;
       case MeldType.tunnel: return GameTerminology.triple;
       case MeldType.marriage: return GameTerminology.royalSequenceShort;
+      case MeldType.impureRun: return 'Impure Sequence';
+      case MeldType.impureSet: return 'Impure Trial';
     }
   }
 
@@ -463,81 +461,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       ),
     ).animate().fadeIn();
   }
-  
-  /// Build sort mode toggle bar
-  Widget _buildSortToggle() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('Sort: ', style: TextStyle(color: Colors.white70, fontSize: 12)),
-          const SizedBox(width: 4),
-          
-          // By Suit button (for sequences)
-          _buildSortButton(
-            mode: SortMode.bySuit,
-            label: '♠♥♦♣ Suit',
-            tooltip: 'Group by suit (for sequences)',
-          ),
-          
-          const SizedBox(width: 8),
-          
-          // By Rank button (for dublee/pairs)
-          _buildSortButton(
-            mode: SortMode.byRank,
-            label: 'AKQJ Rank',
-            tooltip: 'Group by rank (for pairs/dublee)',
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildSortButton({
-    required SortMode mode,
-    required String label,
-    required String tooltip,
-  }) {
-    final isSelected = _sortMode == mode;
-    
-    return Tooltip(
-      message: tooltip,
-      child: GestureDetector(
-        onTap: () {
-          if (!isSelected) {
-            setState(() => _sortMode = mode);
-            // Play subtle sound
-            SoundService.playCardSlide();
-          }
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: isSelected 
-                ? CasinoColors.gold.withValues(alpha: 0.3) 
-                : Colors.black.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isSelected ? CasinoColors.gold : Colors.white24,
-              width: isSelected ? 1.5 : 1,
-            ),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? CasinoColors.gold : Colors.white54,
-              fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-  
-  /// Compact status bar combining Turn + Timer + Sort in one row
+
+    /// Compact status bar combining Turn + Timer + Sort in one row
   Widget _buildCompactStatusBar(MarriageGameState state, String myId) {
     final isMyTurn = state.currentPlayerId == myId;
     final marriageService = ref.read(marriageServiceProvider);
@@ -574,20 +499,6 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             const SizedBox(width: 8),
             _buildTimerWidget(remainingTime, state.config.turnTimeoutSeconds),
           ],
-          // Spacer
-          const Spacer(),
-          // Sort buttons (right side, compact)
-          _buildSortButton(
-            mode: SortMode.bySuit,
-            label: '♦♥ Suit',
-            tooltip: 'Group by suit',
-          ),
-          const SizedBox(width: 6),
-          _buildSortButton(
-            mode: SortMode.byRank,
-            label: 'AKQJ',
-            tooltip: 'Group by rank',
-          ),
         ],
       ),
     );
@@ -882,13 +793,12 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     // Note: Stream logic is complex here, relying on parent rebuilding calls.
     // Simplifying: The _discardCard function checks state anyway.
     
-    return DragTarget<String>(
-      onWillAccept: (cardId) {
-         // Basic check: is it non-null? Deep validation happens in onAccept logic via _discardCard
-         return cardId != null;
+    return DragTarget<PlayingCard>(
+      onWillAccept: (card) {
+         return card != null;
       },
-      onAccept: (cardId) {
-        setState(() => _selectedCardId = cardId);
+      onAccept: (card) {
+        setState(() => _selectedCardId = card.id);
         _discardCard();
       },
       builder: (context, candidateData, rejectedData) {
@@ -929,105 +839,24 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   }
 
   
-  Widget _buildMyHand(List<String> cardIds, bool isMyTurn, {Card? tiplu}) {
-    // Sort cards based on current sort mode
-    final sortedCards = _sortCardIds(cardIds);
-    
-    // Create Maal calculator if tiplu is available
-    final maalCalculator = tiplu != null 
-        ? MarriageMaalCalculator(tiplu: tiplu)
-        : null;
-    
-    return Container(
-      height: 130,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        clipBehavior: Clip.none, // Allow cards to show outside bounds
-        child: Row(
-          children: sortedCards.asMap().entries.map((entry) {
-            final index = entry.key;
-            final cardId = entry.value;
-            final card = _getCard(cardId);
-            if (card == null) return const SizedBox();
-            
-            final isSelected = _selectedCardId == cardId;
-            final isLast = index == sortedCards.length - 1;
-            
-            // Detect Maal type for glow effect
-            final maalType = maalCalculator?.getMaalType(card) ?? MaalType.none;
-            
-            // Use SizedBox with reduced width to create overlap
-            // Last card gets full width (60px), others get 35px (60 - 25 overlap)
-            return SizedBox(
-              width: isLast ? 60 : 35,
-              child: isMyTurn ? Draggable<String>(
-                data: cardId,
-                feedback: Material(
-                  type: MaterialType.transparency,
-                  child: Transform.rotate(
-                    angle: -0.1,
-                    child: _buildCardWidget(card, true, isLarge: true),
-                  ),
-                ),
-                childWhenDragging: Opacity(
-                  opacity: 0.5,
-                  child: _buildCardWidget(card, isSelected, maalType: maalType),
-                ),
-                onDragStarted: () {
-                   if (isMyTurn) {
-                      setState(() => _selectedCardId = cardId);
-                      SoundService.playCardSlide();
-                   }
-                },
-                maxSimultaneousDrags: 1,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  transform: Matrix4.translationValues(0, isSelected ? -15 : 0, 0),
-                  child: _buildCardWidget(card, isSelected, maalType: maalType),
-                ),
-              ) : GestureDetector(
-                onTap: null,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  transform: Matrix4.translationValues(0, isSelected ? -15 : 0, 0),
-                  child: _buildCardWidget(card, isSelected, maalType: maalType),
-                ),
-              ),
-            ).animate().fadeIn(delay: Duration(milliseconds: 30 * index));
-          }).toList(),
-        ),
-      ),
+  Widget _buildMyHand(List<String> cardIds, bool isMyTurn, {Card? tiplu, required MarriageGameConfig config}) {
+    // Convert IDs to Cards
+    final cards = cardIds
+        .map((id) => _getCard(id))
+        .where((c) => c != null)
+        .cast<PlayingCard>()
+        .toList();
+
+    return MarriageHandWidget(
+      cards: cards,
+      selectedCardId: _selectedCardId,
+      onCardSelected: (id) => setState(() => _selectedCardId = id == _selectedCardId ? null : id),
+      tiplu: tiplu,
+      config: config,
     );
   }
   
-  /// Sort card IDs based on current sort mode
-  List<String> _sortCardIds(List<String> cardIds) {
-    // Convert to cards, sort, return IDs
-    final cards = cardIds
-        .map((id) => (id, _getCard(id)))
-        .where((pair) => pair.$2 != null)
-        .toList();
-    
-    cards.sort((a, b) {
-      final cardA = a.$2!;
-      final cardB = b.$2!;
-      
-      if (_sortMode == SortMode.bySuit) {
-        // Primary: Suit, Secondary: Rank
-        final suitCompare = cardA.suit.index.compareTo(cardB.suit.index);
-        if (suitCompare != 0) return suitCompare;
-        return cardA.rank.value.compareTo(cardB.rank.value);
-      } else {
-        // Primary: Rank, Secondary: Suit (for Dublee/pairs)
-        final rankCompare = cardA.rank.value.compareTo(cardB.rank.value);
-        if (rankCompare != 0) return rankCompare;
-        return cardA.suit.index.compareTo(cardB.suit.index);
-      }
-    });
-    
-    return cards.map((pair) => pair.$1).toList();
-  }
+
   
   Widget _buildCardWidget(Card card, bool isSelected, {bool isLarge = false, MaalType maalType = MaalType.none}) {
     final size = isLarge ? const Size(70, 100) : const Size(60, 85);

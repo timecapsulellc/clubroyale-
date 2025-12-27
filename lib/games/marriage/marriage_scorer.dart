@@ -155,14 +155,16 @@ class MarriageScorer {
 
   /// Check if a meld is a pure sequence (no wildcards used as substitutes)
   bool isPureSequence(Meld meld) {
-    if (meld is! RunMeld) return false;
-    // In a pure sequence, cards must form a sequence without relying on wildcard properties
-    // However, existing Meld logic might treat wildcards as wild.
-    // For "Pure", we check if the actual cards form a natural sequence.
-    // Simplifying: Just assume RunMeld without 'wild' property or check cards.
-    // Since Meld structure isn't fully visible, we assume if it's a RunMeld and doesn't rely on wild substitution.
-    // TODO: proper check. For now, we trust the Game Engine's pure classification or simple check:
-    return true; // Placeholder for logic
+    // Pure sequences are RunMeld type (not ImpureRunMeld)
+    // RunMeld validation already ensures strict consecutiveness
+    if (meld.type == MeldType.run) {
+      return meld is RunMeld && meld.isValid;
+    }
+    // Tunnels are also considered "pure" for visit purposes
+    if (meld.type == MeldType.tunnel) {
+      return meld is TunnelMeld && meld.isValid;
+    }
+    return false;
   }
 
   bool hasPureSequence(List<Meld> melds) {

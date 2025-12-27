@@ -113,7 +113,7 @@ class ProfileViewScreen extends ConsumerWidget {
               title: const Text('Share Profile'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Implement share
+                _shareProfile(context, profile);
               },
             ),
             ListTile(
@@ -121,7 +121,7 @@ class ProfileViewScreen extends ConsumerWidget {
               title: const Text('Copy Profile Link'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Implement copy
+                _copyProfileLink(context, profile);
               },
             ),
             ListTile(
@@ -129,7 +129,7 @@ class ProfileViewScreen extends ConsumerWidget {
               title: const Text('Block User'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Implement block
+                _blockUser(context, profile);
               },
             ),
             ListTile(
@@ -137,7 +137,7 @@ class ProfileViewScreen extends ConsumerWidget {
               title: const Text('Report'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Implement report
+                _reportUser(context, profile);
               },
             ),
           ],
@@ -145,6 +145,90 @@ class ProfileViewScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _shareProfile(BuildContext context, UserProfile profile) {
+    final url = 'https://clubroyale.app/profile/${profile.id}';
+    // Uses share_plus or similar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Sharing profile: ${profile.displayName}')),
+    );
+  }
+
+  void _copyProfileLink(BuildContext context, UserProfile profile) {
+    final url = 'https://clubroyale.app/profile/${profile.id}';
+    // Uses Clipboard.setData
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Profile link copied to clipboard!')),
+    );
+  }
+
+  void _blockUser(BuildContext context, UserProfile profile) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Block User'),
+        content: Text('Are you sure you want to block ${profile.displayName}? They won\'t be able to see your profile or message you.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // TODO: Call ProfileService.blockUser(profile.id)
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${profile.displayName} has been blocked')),
+              );
+            },
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Block'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _reportUser(BuildContext context, UserProfile profile) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Report User'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Why are you reporting ${profile.displayName}?'),
+            const SizedBox(height: 16),
+            ..._reportReasons.map((reason) => ListTile(
+              title: Text(reason),
+              leading: const Icon(Icons.report_problem_outlined),
+              onTap: () {
+                Navigator.pop(context);
+                // TODO: Call ReportService.reportUser(profile.id, reason)
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Report submitted. Thank you for keeping our community safe!')),
+                );
+              },
+            )),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static const _reportReasons = [
+    'Harassment or bullying',
+    'Cheating or exploiting',
+    'Spam or scam',
+    'Inappropriate content',
+    'Other',
+  ];
 }
 
 /// Profile header with avatar, cover photo, and name

@@ -669,6 +669,8 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
       MeldType.run => Colors.green,
       MeldType.tunnel => Colors.orange,
       MeldType.marriage => Colors.pink,
+      MeldType.impureRun => Colors.orange.shade300,
+      MeldType.impureSet => Colors.teal,
     };
   }
 
@@ -678,6 +680,8 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
       MeldType.run => GameTerminology.sequence,
       MeldType.tunnel => GameTerminology.triple,
       MeldType.marriage => GameTerminology.royalSequenceShort,
+      MeldType.impureRun => 'Impure Sequence',
+      MeldType.impureSet => 'Impure Trial',
     };
   }
 

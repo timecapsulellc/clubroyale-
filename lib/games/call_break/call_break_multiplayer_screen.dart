@@ -14,6 +14,7 @@ import 'package:clubroyale/core/widgets/game_mode_banner.dart';
 import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 import 'package:clubroyale/core/widgets/turn_timer.dart';
 import 'package:clubroyale/features/game/ui/components/card_widget.dart';
+import 'package:clubroyale/features/game/ui/components/table_layout.dart';
 
 class CallBreakMultiplayerScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -150,11 +151,6 @@ class _CallBreakMultiplayerScreenState extends ConsumerState<CallBreakMultiplaye
           if (a.suit == b.suit) return b.rank.value.compareTo(a.rank.value);
           return a.suit.index.compareTo(b.suit.index);
         });
-
-import 'package:clubroyale/features/game/ui/components/table_layout.dart';
-
-// ... (other imports retained)
-
         return Scaffold(
           extendBodyBehindAppBar: true,
           appBar: AppBar(

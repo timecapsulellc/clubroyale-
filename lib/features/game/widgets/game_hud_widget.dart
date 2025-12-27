@@ -13,6 +13,7 @@ class GameHUDWidget extends StatelessWidget {
   final List<Player> players;
   final String? currentTurnPlayerId;
   final String currentUserId;
+  final CardSuit? trumpSuit;
 
   const GameHUDWidget({
     super.key,
@@ -24,6 +25,7 @@ class GameHUDWidget extends StatelessWidget {
     required this.players,
     this.currentTurnPlayerId,
     required this.currentUserId,
+    this.trumpSuit,
   });
 
   @override
@@ -56,15 +58,16 @@ class GameHUDWidget extends StatelessWidget {
           const SizedBox(width: 8),
           
           // Trump suit indicator
-          Expanded(
-            child: _buildInfoChip(
-              context,
-              icon: Icons.workspace_premium,
-              label: 'Trump',
-              value: trumpSuit.symbol,
-              valueColor: trumpSuit.isRed ? Colors.red : Colors.black,
+          if (trumpSuit != null)
+            Expanded(
+              child: _buildInfoChip(
+                context,
+                icon: Icons.workspace_premium,
+                label: 'Trump',
+                value: trumpSuit!.symbol,
+                valueColor: trumpSuit!.isRed ? Colors.red : Colors.black,
+              ),
             ),
-          ),
           const SizedBox(width: 8),
           
           // Phase indicator

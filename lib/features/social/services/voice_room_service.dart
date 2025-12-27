@@ -7,7 +7,15 @@ import 'package:livekit_client/livekit_client.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 
 class VoiceRoomConfig {
-  static const String serverUrl = 'wss://your-livekit-server.com'; // TODO: Move to Env
+  /// LiveKit server URL - set via --dart-define=LIVEKIT_URL=wss://your-server.com
+  /// If not configured, voice rooms will be disabled
+  static const String serverUrl = String.fromEnvironment(
+    'LIVEKIT_URL',
+    defaultValue: '',
+  );
+  
+  /// Check if LiveKit is properly configured
+  static bool get isEnabled => serverUrl.isNotEmpty && serverUrl.startsWith('wss://');
   
   static RoomOptions get roomOptions => const RoomOptions(
     adaptiveStream: true,
@@ -91,6 +99,14 @@ class VoiceRoomService extends ChangeNotifier {
 
   /// Join the voice room
   Future<void> joinRoom({bool asListener = true}) async {
+    // Check if LiveKit is configured
+    if (!VoiceRoomConfig.isEnabled) {
+      debugPrint('VoiceRoom: LiveKit not configured. Set LIVEKIT_URL env var.');
+      _state = VoiceRoomState.failed;
+      notifyListeners();
+      return;
+    }
+    
     if (_state == VoiceRoomState.connecting || _state == VoiceRoomState.connected) return;
 
     _state = VoiceRoomState.connecting;

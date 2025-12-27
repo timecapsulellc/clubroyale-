@@ -28,12 +28,14 @@ import 'package:clubroyale/games/marriage/marriage_visit_validator.dart';
 import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart';
 import 'package:clubroyale/core/design_system/game/flying_card_animation.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
+import 'package:clubroyale/games/marriage/marriage_scorer.dart';
 import 'package:clubroyale/core/widgets/game_mode_banner.dart';
 import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 import 'dart:async';
 
 import 'package:clubroyale/core/widgets/tutorial_overlay.dart'; // Import TutorialOverlay
 import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
+import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
 
 // ... (existing imports)
 
@@ -337,19 +339,43 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   }
 
   void _showWinDialog({required String winnerName}) {
+    // Calculate actual scores using game scorer
+    final winnerId = winnerName.contains('You') ? _playerId : '_bot_1';
+    final hands = <String, List<PlayingCard>>{};
+    final melds = <String, List<meld_engine.Meld>>{};
+    
+    // Get hands for all players
+    for (final id in [_playerId, '_bot_1', '_bot_2', '_bot_3']) {
+      hands[id] = _game.getHand(id);
+      melds[id] = _game.findMelds(id);
+    }
+    
+    final scorer = MarriageScorer(tiplu: _game.tiplu, config: _game.config);
+    final settlement = scorer.calculateFinalSettlement(
+      hands: hands,
+      melds: melds,
+      winnerId: winnerId,
+    );
+    
+    // Convert to display names
+    final displayScores = <String, int>{
+      'You': settlement[_playerId] ?? 0,
+      'Bot 1': settlement['_bot_1'] ?? 0,
+      'Bot 2': settlement['_bot_2'] ?? 0,
+      'Bot 3': settlement['_bot_3'] ?? 0,
+    };
+    
+    // Winner amount is their net score
+    final winAmount = (settlement[winnerId] ?? 0).abs();
+    
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => GameSettlementDialog(
         winnerName: winnerName,
-        winAmount: 1500, // Placeholder
+        winAmount: winAmount,
         isWinner: winnerName.contains('You'),
-        scores: const {
-          'You': 150, 
-          'Bot 1': -45,
-          'Bot 2': -30,
-          'Bot 3': -75
-        }, // Placeholder scores
+        scores: displayScores,
         onNextRound: () {
           Navigator.pop(context);
           setState(() => _initGame());
@@ -734,79 +760,25 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   }
 
   Widget _buildMyHand(List<PlayingCard> hand) {
-    // Calculator for rendering badges
-    final calculator = _game.tiplu != null 
-        ? MarriageMaalCalculator(tiplu: _game.tiplu!, config: _config) 
-        : null;
-
-    return Container(
-      height: 140, // Increased height for better card visibility
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8), // Reduced padding
-      color: Colors.black.withValues(alpha: 0.6),
-      child: Center(
-        key: _handKey,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: hand.map((card) {
-              final isSelected = _selectedCardId == card.id;
-              
-              // Determine Maal visuals
-              Color? glowColor;
-              Widget? badgeIcon;
-              
-              if (calculator != null) {
-                final type = calculator.getMaalType(card);
-                switch (type) {
-                  case MaalType.tiplu:
-                    glowColor = Colors.purpleAccent;
-                    badgeIcon = const Icon(Icons.star, color: Colors.purpleAccent, size: 14);
-                    break;
-                  case MaalType.poplu:
-                    glowColor = Colors.blueAccent;
-                    badgeIcon = const Icon(Icons.arrow_upward, color: Colors.blueAccent, size: 14);
-                    break;
-                  case MaalType.jhiplu:
-                    glowColor = Colors.cyanAccent;
-                    badgeIcon = const Icon(Icons.arrow_downward, color: Colors.cyanAccent, size: 14);
-                    break;
-                  case MaalType.alter:
-                    glowColor = Colors.orangeAccent;
-                    badgeIcon = const Icon(Icons.generating_tokens, color: Colors.orangeAccent, size: 14);
-                    break;
-                  case MaalType.man:
-                    glowColor = Colors.greenAccent;
-                    badgeIcon = const Icon(Icons.face, color: Colors.greenAccent, size: 14);
-                    break;
-                  case MaalType.none:
-                    break;
-                }
-              }
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedCardId = isSelected ? null : card.id;
-                    });
-                  },
-                  child: CardWidget(
-                    card: card,
-                    isFaceUp: true,
-                    isSelected: isSelected,
-                    glowColor: glowColor,
-                    cornerBadge: badgeIcon,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-      ),
+    return MarriageHandWidget(
+      key: _handKey,
+      cards: hand,
+      selectedCardId: _selectedCardId,
+      onCardSelected: (id) {
+        setState(() {
+          // Toggle selection
+          if (_selectedCardId == id) {
+            _selectedCardId = null;
+          } else {
+            _selectedCardId = id;
+          }
+        });
+      },
+      tiplu: _game.tiplu,
+      config: _config,
     );
   }
+
 
   Widget _buildActionBar() {
     final isMyTurn = _game.currentPlayerId == _playerId;
@@ -817,47 +789,38 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
         color: Colors.black.withValues(alpha: 0.5),
         border: Border(top: BorderSide(color: AppTheme.gold.withValues(alpha: 0.3))),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          // Discard button
-          CasinoButton(
-            label: 'Discard',
-            onPressed: isMyTurn && _selectedCardId != null ? _discardCard : null,
-            backgroundColor: AppTheme.gold,
-            borderColor: AppTheme.goldDark,
-          ),
-          
-          // Visit Button (New)
-          VisitButtonWidget(
-            key: _visitKey,
-            state: _visitStatus,
-            onPressed: (_visitStatus == VisitButtonState.ready) ? _handleVisit : null,
-            label: _visitLabel,
-            subLabel: _visitSubLabel,
-          ),
-          
-          // Sort button
-           CasinoButton(
-            key: _sortKey,
-            label: 'Sort',
-            onPressed: () {
-              setState(() {});
-              _checkVisitStatus(); // Re-check after sort
-            },
-            backgroundColor: AppTheme.teal,
-            borderColor: Colors.white.withValues(alpha: 0.5),
-          ),
-          
-          // Declare button (Go Royale in global mode)
-          CasinoButton(
-            label: GameTerminology.declare,
-            onPressed: isMyTurn ? _tryDeclare : null,
-            backgroundColor: Colors.green,
-            borderColor: Colors.lightGreen,
-            isLarge: true,
-          ),
-        ],
+      child: SafeArea(
+        top: false,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // Discard button
+            CasinoButton(
+              label: 'Discard',
+              onPressed: isMyTurn && _selectedCardId != null ? _discardCard : null,
+              backgroundColor: AppTheme.gold,
+              borderColor: AppTheme.goldDark,
+            ),
+            
+            // Visit Button (New)
+            VisitButtonWidget(
+              key: _visitKey,
+              state: _visitStatus,
+              onPressed: (_visitStatus == VisitButtonState.ready) ? _handleVisit : null,
+              label: _visitLabel,
+              subLabel: _visitSubLabel,
+            ),
+            
+            // Declare button (Go Royale in global mode)
+            CasinoButton(
+              label: GameTerminology.declare,
+              onPressed: isMyTurn ? _tryDeclare : null,
+              backgroundColor: Colors.green,
+              borderColor: Colors.lightGreen,
+              isLarge: true,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1065,6 +1028,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       case meld_engine.MeldType.run: return Colors.green;
       case meld_engine.MeldType.tunnel: return Colors.orange;
       case meld_engine.MeldType.marriage: return Colors.pink;
+      case meld_engine.MeldType.impureRun: return Colors.orange.shade300;
+      case meld_engine.MeldType.impureSet: return Colors.teal;
     }
   }
   
@@ -1075,6 +1040,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       case meld_engine.MeldType.run: return GameTerminology.sequence;
       case meld_engine.MeldType.tunnel: return GameTerminology.triple;
       case meld_engine.MeldType.marriage: return GameTerminology.royalSequenceShort;
+      case meld_engine.MeldType.impureRun: return 'Impure Sequence';
+      case meld_engine.MeldType.impureSet: return 'Impure Trial';
     }
   }
 }

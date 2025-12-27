@@ -7,8 +7,9 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Sound service provider - using Provider since SoundService is a ChangeNotifier
-final soundServiceProvider = ChangeNotifierProvider<SoundService>((ref) => SoundService());
+/// Sound service provider - singleton instance
+/// Note: Using Provider instead of deprecated ChangeNotifierProvider (Riverpod 3)
+final soundServiceProvider = Provider<SoundService>((ref) => SoundService());
 
 /// Sound types available in the game
 enum GameSound {

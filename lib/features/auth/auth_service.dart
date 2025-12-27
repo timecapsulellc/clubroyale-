@@ -213,9 +213,14 @@ class AuthService {
     } catch (e) {
       debugPrint('Error signing in anonymously: $e');
       
-      // Auto-enable test mode if Firebase auth fails
-      debugPrint('💡 Firebase Auth failed. Enabling Test Mode...');
-      return await enableTestMode();
+      // Only enable test mode in debug builds - production should fail clearly
+      if (kDebugMode) {
+        debugPrint('💡 Firebase Auth failed. Enabling Test Mode...');
+        return await enableTestMode();
+      }
+      
+      // In release mode, return null to show proper error to user
+      return null;
     }
   }
 

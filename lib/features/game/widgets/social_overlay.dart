@@ -423,7 +423,7 @@ class _VoiceControlPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final voiceService = ref.watch(voiceRoomServiceProvider(gameId));
+    final voiceService = ref.watch(liveKitRoomServiceProvider(gameId));
     final isMuted = !voiceService.isMicEnabled;
     final isConnected = voiceService.isConnected;
     final participants = voiceService.allParticipants;

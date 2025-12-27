@@ -7,9 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 /// Provides comprehensive error tracking across all platforms
 /// including web (which Crashlytics doesn't support).
 class SentryService {
+  /// Sentry DSN - set via build: flutter build --dart-define=SENTRY_DSN=your_dsn
   static const String _dsn = String.fromEnvironment(
     'SENTRY_DSN',
-    // TODO: Replace with your actual Sentry DSN from sentry.io
     defaultValue: '',
   );
 

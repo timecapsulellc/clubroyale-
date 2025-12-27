@@ -47,11 +47,30 @@ class _VoiceRoomContentState extends ConsumerState<_VoiceRoomContent> {
 
   @override
   Widget build(BuildContext context) {
-    // Redesign: Passed chatId to View
-    // Rethink: The parent wrapper `VoiceRoomScreen` has `chatId`. 
-    // It should pass it to `_VoiceRoomContent` or `_VoiceRoomContent` should take it.
-    // Let's refactor the Screen to be StatefulWidget itself.
-    return const SizedBox(); // Placeholder to fix compile error for now
+    // Note: This widget is deprecated. Use VoiceRoomPage instead.
+    // Showing a proper message instead of empty SizedBox.
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.mic_off, size: 64, color: Colors.white38),
+            SizedBox(height: 16),
+            Text(
+              'Voice Room',
+              style: TextStyle(color: Colors.white70, fontSize: 18),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Voice chat is not available in this context.\nPlease access voice rooms from the chat screen.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white38, fontSize: 14),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

@@ -6,24 +6,23 @@ part of 'agent.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_AgentRequest _$AgentRequestFromJson(Map<String, dynamic> json) =>
-    _AgentRequest(
-      id: json['id'] as String,
-      targetAgent: $enumDecode(_$AgentTypeEnumMap, json['targetAgent']),
-      action: json['action'] as String,
-      payload: json['payload'] as Map<String, dynamic>,
-      userId: json['userId'] as String?,
-      sessionId: json['sessionId'] as String?,
-      priority:
-          $enumDecodeNullable(_$AgentPriorityEnumMap, json['priority']) ??
-          AgentPriority.normal,
-      createdAt: json['createdAt'] == null
-          ? null
-          : DateTime.parse(json['createdAt'] as String),
-      maxRetries: (json['maxRetries'] as num?)?.toInt() ?? 3,
-    );
+AgentRequest _$AgentRequestFromJson(Map<String, dynamic> json) => AgentRequest(
+  id: json['id'] as String,
+  targetAgent: $enumDecode(_$AgentTypeEnumMap, json['targetAgent']),
+  action: json['action'] as String,
+  payload: json['payload'] as Map<String, dynamic>,
+  userId: json['userId'] as String?,
+  sessionId: json['sessionId'] as String?,
+  priority:
+      $enumDecodeNullable(_$AgentPriorityEnumMap, json['priority']) ??
+      AgentPriority.normal,
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  maxRetries: (json['maxRetries'] as num?)?.toInt() ?? 3,
+);
 
-Map<String, dynamic> _$AgentRequestToJson(_AgentRequest instance) =>
+Map<String, dynamic> _$AgentRequestToJson(AgentRequest instance) =>
     <String, dynamic>{
       'id': instance.id,
       'targetAgent': _$AgentTypeEnumMap[instance.targetAgent]!,
@@ -52,8 +51,8 @@ const _$AgentPriorityEnumMap = {
   AgentPriority.critical: 'critical',
 };
 
-_AgentResponse _$AgentResponseFromJson(Map<String, dynamic> json) =>
-    _AgentResponse(
+AgentResponse _$AgentResponseFromJson(Map<String, dynamic> json) =>
+    AgentResponse(
       requestId: json['requestId'] as String,
       agent: $enumDecode(_$AgentTypeEnumMap, json['agent']),
       success: json['success'] as bool,
@@ -66,7 +65,7 @@ _AgentResponse _$AgentResponseFromJson(Map<String, dynamic> json) =>
       delegatedTo: $enumDecodeNullable(_$AgentTypeEnumMap, json['delegatedTo']),
     );
 
-Map<String, dynamic> _$AgentResponseToJson(_AgentResponse instance) =>
+Map<String, dynamic> _$AgentResponseToJson(AgentResponse instance) =>
     <String, dynamic>{
       'requestId': instance.requestId,
       'agent': _$AgentTypeEnumMap[instance.agent]!,
@@ -78,7 +77,7 @@ Map<String, dynamic> _$AgentResponseToJson(_AgentResponse instance) =>
       'delegatedTo': _$AgentTypeEnumMap[instance.delegatedTo],
     };
 
-_AgentConfig _$AgentConfigFromJson(Map<String, dynamic> json) => _AgentConfig(
+AgentConfig _$AgentConfigFromJson(Map<String, dynamic> json) => AgentConfig(
   type: $enumDecode(_$AgentTypeEnumMap, json['type']),
   name: json['name'] as String,
   description: json['description'] as String,
@@ -94,7 +93,7 @@ _AgentConfig _$AgentConfigFromJson(Map<String, dynamic> json) => _AgentConfig(
   customConfig: json['customConfig'] as Map<String, dynamic>?,
 );
 
-Map<String, dynamic> _$AgentConfigToJson(_AgentConfig instance) =>
+Map<String, dynamic> _$AgentConfigToJson(AgentConfig instance) =>
     <String, dynamic>{
       'type': _$AgentTypeEnumMap[instance.type]!,
       'name': instance.name,
@@ -119,23 +118,22 @@ const _$AgentCapabilityEnumMap = {
   AgentCapability.orchestration: 'orchestration',
 };
 
-_AgentMetrics _$AgentMetricsFromJson(Map<String, dynamic> json) =>
-    _AgentMetrics(
-      agent: $enumDecode(_$AgentTypeEnumMap, json['agent']),
-      totalRequests: (json['totalRequests'] as num?)?.toInt() ?? 0,
-      successfulRequests: (json['successfulRequests'] as num?)?.toInt() ?? 0,
-      failedRequests: (json['failedRequests'] as num?)?.toInt() ?? 0,
-      avgResponseTimeMs: (json['avgResponseTimeMs'] as num?)?.toDouble() ?? 0,
-      lastRequestAt: json['lastRequestAt'] == null
-          ? null
-          : DateTime.parse(json['lastRequestAt'] as String),
-      lastErrorAt: json['lastErrorAt'] == null
-          ? null
-          : DateTime.parse(json['lastErrorAt'] as String),
-      lastError: json['lastError'] as String?,
-    );
+AgentMetrics _$AgentMetricsFromJson(Map<String, dynamic> json) => AgentMetrics(
+  agent: $enumDecode(_$AgentTypeEnumMap, json['agent']),
+  totalRequests: (json['totalRequests'] as num?)?.toInt() ?? 0,
+  successfulRequests: (json['successfulRequests'] as num?)?.toInt() ?? 0,
+  failedRequests: (json['failedRequests'] as num?)?.toInt() ?? 0,
+  avgResponseTimeMs: (json['avgResponseTimeMs'] as num?)?.toDouble() ?? 0,
+  lastRequestAt: json['lastRequestAt'] == null
+      ? null
+      : DateTime.parse(json['lastRequestAt'] as String),
+  lastErrorAt: json['lastErrorAt'] == null
+      ? null
+      : DateTime.parse(json['lastErrorAt'] as String),
+  lastError: json['lastError'] as String?,
+);
 
-Map<String, dynamic> _$AgentMetricsToJson(_AgentMetrics instance) =>
+Map<String, dynamic> _$AgentMetricsToJson(AgentMetrics instance) =>
     <String, dynamic>{
       'agent': _$AgentTypeEnumMap[instance.agent]!,
       'totalRequests': instance.totalRequests,

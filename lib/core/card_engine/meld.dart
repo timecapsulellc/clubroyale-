@@ -8,10 +8,12 @@ import 'pile.dart';
 
 /// Types of melds possible in card games
 enum MeldType {
-  set,       // 3+ cards of same rank, different suits (Trial in Marriage)
-  run,       // 3+ consecutive cards, same suit (Sequence)
-  tunnel,    // 3 identical cards (same rank + suit from different decks)
-  marriage,  // Tiplu + Poplu + Jhiplu combination
+  set,        // 3+ cards of same rank, different suits (Trial in Marriage)
+  run,        // 3+ consecutive cards, same suit (Sequence)
+  tunnel,     // 3 identical cards (same rank + suit from different decks)
+  marriage,   // Tiplu + Poplu + Jhiplu combination
+  impureRun,  // Sequence with wildcard substitution
+  impureSet,  // Set with wildcard substitution
 }
 
 /// Abstract base class for all meld types
@@ -50,6 +52,10 @@ abstract class Meld {
       case MeldType.marriage:
         if (tiplu == null) throw ArgumentError('Tiplu required for MarriageMeld');
         return MarriageMeld(cards, tiplu: tiplu);
+      case MeldType.impureRun:
+        return ImpureRunMeld(cards, tiplu: tiplu);
+      case MeldType.impureSet:
+        return ImpureSetMeld(cards, tiplu: tiplu);
     }
   }
 }
@@ -155,6 +161,132 @@ class MarriageMeld extends Meld {
   int get points => -100; // Big bonus for marriage (negative = very good)
 }
 
+/// Utility class for wildcard detection in Marriage game
+class WildcardHelper {
+  final PlayingCard tiplu;
+  
+  WildcardHelper(this.tiplu);
+  
+  /// Check if a card is a wildcard (Joker, Tiplu, or Joker-equivalent)
+  bool isWildcard(PlayingCard card) {
+    if (card.isJoker) return true;
+    
+    // Tiplu is wild
+    if (card.rank == tiplu.rank && card.suit == tiplu.suit) return true;
+    
+    return false;
+  }
+  
+  /// Check if card can substitute for a given rank in a sequence
+  bool canSubstituteInRun(PlayingCard card, CardRank targetRank, CardSuit targetSuit) {
+    // Wildcards can substitute for any card
+    if (isWildcard(card)) return true;
+    // Natural match
+    return card.rank == targetRank && card.suit == targetSuit;
+  }
+  
+  /// Check if card can substitute in a set (same rank, any suit)
+  bool canSubstituteInSet(PlayingCard card, CardRank targetRank) {
+    if (isWildcard(card)) return true;
+    return card.rank == targetRank;
+  }
+}
+
+/// ImpureRunMeld - Sequence with wildcard substitution
+class ImpureRunMeld extends Meld {
+  final PlayingCard? tiplu;
+  final int wildcardCount;
+  
+  ImpureRunMeld(List<PlayingCard> cards, {this.tiplu}) 
+      : wildcardCount = _countWildcards(cards, tiplu),
+        super(type: MeldType.impureRun, cards: cards);
+  
+  static int _countWildcards(List<PlayingCard> cards, PlayingCard? tiplu) {
+    if (tiplu == null) return cards.where((c) => c.isJoker).length;
+    final helper = WildcardHelper(tiplu);
+    return cards.where((c) => helper.isWildcard(c)).length;
+  }
+  
+  @override
+  bool get isValid {
+    if (cards.length < 3) return false;
+    if (wildcardCount == 0) return false; // Must have at least 1 wildcard for impure
+    if (wildcardCount >= cards.length) return false; // Can't be all wildcards
+    
+    // Get non-wildcard cards to determine suit and expected sequence
+    final helper = tiplu != null ? WildcardHelper(tiplu!) : null;
+    final naturalCards = cards.where((c) => 
+        !c.isJoker && (helper == null || !helper.isWildcard(c))).toList();
+    
+    if (naturalCards.isEmpty) return false;
+    
+    // All natural cards must have same suit
+    final suit = naturalCards.first.suit;
+    if (!naturalCards.every((c) => c.suit == suit)) return false;
+    
+    // Sort all cards, placing wildcards after natural cards of same "slot"
+    final sorted = List<PlayingCard>.from(cards);
+    sorted.sort((a, b) {
+      final aWild = a.isJoker || (helper?.isWildcard(a) ?? false);
+      final bWild = b.isJoker || (helper?.isWildcard(b) ?? false);
+      if (aWild && !bWild) return 1;
+      if (!aWild && bWild) return -1;
+      return a.rank.value.compareTo(b.rank.value);
+    });
+    
+    // Check if natural cards can form a sequence with gaps filled by wildcards
+    naturalCards.sort((a, b) => a.rank.value.compareTo(b.rank.value));
+    final minRank = naturalCards.first.rank.value;
+    final maxRank = naturalCards.last.rank.value;
+    final neededLength = maxRank - minRank + 1;
+    
+    // Cards length must match sequence length
+    if (cards.length < neededLength) return false;
+    
+    return true;
+  }
+  
+  @override
+  int get points => 0;
+}
+
+/// ImpureSetMeld - Set with wildcard substitution
+class ImpureSetMeld extends Meld {
+  final PlayingCard? tiplu;
+  final int wildcardCount;
+  
+  ImpureSetMeld(List<PlayingCard> cards, {this.tiplu})
+      : wildcardCount = _countWildcards(cards, tiplu),
+        super(type: MeldType.impureSet, cards: cards);
+  
+  static int _countWildcards(List<PlayingCard> cards, PlayingCard? tiplu) {
+    if (tiplu == null) return cards.where((c) => c.isJoker).length;
+    final helper = WildcardHelper(tiplu);
+    return cards.where((c) => helper.isWildcard(c)).length;
+  }
+  
+  @override
+  bool get isValid {
+    if (cards.length < 3) return false;
+    if (wildcardCount == 0) return false; // Must have wildcard for impure
+    if (wildcardCount >= cards.length) return false; // Can't be all wildcards
+    
+    // Get non-wildcard cards
+    final helper = tiplu != null ? WildcardHelper(tiplu!) : null;
+    final naturalCards = cards.where((c) => 
+        !c.isJoker && (helper == null || !helper.isWildcard(c))).toList();
+    
+    if (naturalCards.isEmpty) return false;
+    
+    // All natural cards must have same rank
+    final rank = naturalCards.first.rank;
+    return naturalCards.every((c) => c.rank == rank);
+  }
+  
+  @override
+  int get points => 0;
+}
+
 /// Utility class for detecting melds in a hand
 class MeldDetector {
   /// Find all possible set melds in a hand
@@ -248,6 +380,12 @@ class MeldDetector {
     melds.addAll(findRuns(hand));
     melds.addAll(findTunnels(hand));
     
+    // Find impure melds (with wildcards)
+    if (tiplu != null) {
+      melds.addAll(findImpureRuns(hand, tiplu));
+      melds.addAll(findImpureSets(hand, tiplu));
+    }
+    
     // Check for marriage if tiplu is provided
     if (tiplu != null) {
       final jhipluRank = tiplu.rank.value - 1;
@@ -267,6 +405,104 @@ class MeldDetector {
              c.rank == tiplu.rank || 
              c.rank.value == popluRank)).take(3).toList();
         melds.add(MarriageMeld(marriageCards, tiplu: tiplu));
+      }
+    }
+    
+    return melds;
+  }
+  
+  /// Find impure runs (sequences with wildcards)
+  static List<ImpureRunMeld> findImpureRuns(List<PlayingCard> hand, PlayingCard tiplu) {
+    final melds = <ImpureRunMeld>[];
+    final helper = WildcardHelper(tiplu);
+    
+    // Get wildcards and natural cards
+    final wildcards = hand.where((c) => helper.isWildcard(c)).toList();
+    final naturalCards = hand.where((c) => !helper.isWildcard(c)).toList();
+    
+    if (wildcards.isEmpty) return melds; // No wildcards, no impure melds
+    
+    // Group natural cards by suit
+    final bySuit = <CardSuit, List<PlayingCard>>{};
+    for (final card in naturalCards) {
+      bySuit.putIfAbsent(card.suit, () => []).add(card);
+    }
+    
+    // For each suit, try to form sequences using wildcards
+    for (final entry in bySuit.entries) {
+      final suitCards = entry.value;
+      if (suitCards.isEmpty) continue;
+      
+      suitCards.sort((a, b) => a.rank.value.compareTo(b.rank.value));
+      
+      // Try sequences starting from each card
+      for (int start = 0; start < suitCards.length; start++) {
+        final startRank = suitCards[start].rank.value;
+        
+        // Try different sequence lengths (3 to 7)
+        for (int length = 3; length <= 7 && startRank + length - 1 <= 14; length++) {
+          final sequenceCards = <PlayingCard>[];
+          int wildcardsNeeded = 0;
+          bool valid = true;
+          
+          for (int rank = startRank; rank < startRank + length; rank++) {
+            final matching = suitCards.where((c) => c.rank.value == rank).toList();
+            if (matching.isNotEmpty) {
+              sequenceCards.add(matching.first);
+            } else {
+              wildcardsNeeded++;
+              if (wildcardsNeeded > wildcards.length) {
+                valid = false;
+                break;
+              }
+            }
+          }
+          
+          if (valid && wildcardsNeeded > 0 && wildcardsNeeded <= wildcards.length) {
+            // Add wildcards to fill gaps
+            sequenceCards.addAll(wildcards.take(wildcardsNeeded));
+            final meld = ImpureRunMeld(sequenceCards, tiplu: tiplu);
+            if (meld.isValid) melds.add(meld);
+          }
+        }
+      }
+    }
+    
+    return melds;
+  }
+  
+  /// Find impure sets (sets with wildcards)
+  static List<ImpureSetMeld> findImpureSets(List<PlayingCard> hand, PlayingCard tiplu) {
+    final melds = <ImpureSetMeld>[];
+    final helper = WildcardHelper(tiplu);
+    
+    final wildcards = hand.where((c) => helper.isWildcard(c)).toList();
+    final naturalCards = hand.where((c) => !helper.isWildcard(c)).toList();
+    
+    if (wildcards.isEmpty) return melds;
+    
+    // Group by rank
+    final byRank = <CardRank, List<PlayingCard>>{};
+    for (final card in naturalCards) {
+      byRank.putIfAbsent(card.rank, () => []).add(card);
+    }
+    
+    // For each rank with 2 cards, try to form set with 1 wildcard
+    for (final entry in byRank.entries) {
+      final rankCards = entry.value;
+      
+      if (rankCards.length == 2 && wildcards.isNotEmpty) {
+        // 2 natural + 1 wild = impure set
+        final setCards = [...rankCards, wildcards.first];
+        final meld = ImpureSetMeld(setCards, tiplu: tiplu);
+        if (meld.isValid) melds.add(meld);
+      }
+      
+      if (rankCards.length == 1 && wildcards.length >= 2) {
+        // 1 natural + 2 wild = impure set
+        final setCards = [rankCards.first, ...wildcards.take(2)];
+        final meld = ImpureSetMeld(setCards, tiplu: tiplu);
+        if (meld.isValid) melds.add(meld);
       }
     }
     
