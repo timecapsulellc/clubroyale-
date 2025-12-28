@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:clubroyale/core/services/app_logger.dart';
 
 /// MCP (Model Context Protocol) service provider
 final mcpServiceProvider = Provider<MCPService>((ref) {
@@ -133,7 +134,7 @@ class MCPService {
       }
       return false;
     } catch (e) {
-      print('MCP connect error: $e');
+      AppLogger.error('MCP connect error', error: e, tag: 'MCP');
       return false;
     }
   }
@@ -152,7 +153,7 @@ class MCPService {
         }
       }
     } catch (e) {
-      print('Load resources error: $e');
+      AppLogger.error('Load resources error', error: e, tag: 'MCP');
     }
   }
 
@@ -170,7 +171,7 @@ class MCPService {
         }
       }
     } catch (e) {
-      print('Load tools error: $e');
+      AppLogger.error('Load tools error', error: e, tag: 'MCP');
     }
   }
 
@@ -188,7 +189,7 @@ class MCPService {
         }
       }
     } catch (e) {
-      print('Load prompts error: $e');
+      AppLogger.error('Load prompts error', error: e, tag: 'MCP');
     }
   }
 
@@ -216,7 +217,7 @@ class MCPService {
       }
       return null;
     } catch (e) {
-      print('Read resource error: $e');
+      AppLogger.error('Read resource error', error: e, tag: 'MCP');
       return null;
     }
   }
@@ -241,7 +242,7 @@ class MCPService {
       }
       return null;
     } catch (e) {
-      print('Call tool error: $e');
+      AppLogger.error('Call tool error', error: e, tag: 'MCP');
       return null;
     }
   }
@@ -267,7 +268,7 @@ class MCPService {
       }
       return null;
     } catch (e) {
-      print('Get prompt error: $e');
+      AppLogger.error('Get prompt error', error: e, tag: 'MCP');
       return null;
     }
   }

@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:clubroyale/core/services/app_logger.dart';
 
 final soundServiceProvider = Provider((ref) => SoundService());
 
@@ -22,7 +23,7 @@ class SoundService {
       await _player.play(AssetSource('sounds/card_slide.mp3'), mode: PlayerMode.lowLatency);
     } catch (e) {
       // Ignore errors (e.g. if asset not found or audio disabled)
-      print('Error playing sound: $e');
+      AppLogger.error('Error playing sound', error: e, tag: 'Sound');
     }
   }
 
@@ -30,7 +31,7 @@ class SoundService {
     try {
       await _player.play(AssetSource('sounds/ding.mp3'));
     } catch (e) {
-      print('Error playing sound: $e');
+      AppLogger.error('Error playing sound', error: e, tag: 'Sound');
     }
   }
 
@@ -38,7 +39,7 @@ class SoundService {
     try {
       await _player.play(AssetSource('sounds/tada.mp3'));
     } catch (e) {
-      print('Error playing sound: $e');
+      AppLogger.error('Error playing sound', error: e, tag: 'Sound');
     }
   }
 }

@@ -6,6 +6,7 @@ library;
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:clubroyale/core/services/app_logger.dart';
 
 /// Sound service provider - singleton instance
 /// Note: Using Provider instead of deprecated ChangeNotifierProvider (Riverpod 3)
@@ -113,11 +114,11 @@ class SoundService extends ChangeNotifier {
       player.onPlayerComplete.listen((_) => player.dispose());
       
       if (kDebugMode) {
-        print('🔊 Playing sound: $soundFile');
+        AppLogger.debug('Playing sound: $soundFile', tag: 'Sound');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Sound error: $e');
+        AppLogger.error('Sound error', error: e, tag: 'Sound');
       }
     }
   }

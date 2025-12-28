@@ -1,6 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/ai/hybrid_ai_service.dart';
+import 'package:clubroyale/core/services/app_logger.dart';
 
 /// AI Service for interacting with Genkit-powered Cloud Functions
 class AiService {
@@ -141,7 +142,7 @@ class AiService {
       );
     } catch (e) {
       // If local AI fails, try cloud (or just return fallback)
-      print('Local AI failed, falling back to cloud (which might fail with CORS): $e');
+      AppLogger.warning('Local AI failed, falling back to cloud', tag: 'AI');
       
       final callable = _functions.httpsCallable('marriageBotPlay');
       final result = await callable.call<Map<String, dynamic>>({

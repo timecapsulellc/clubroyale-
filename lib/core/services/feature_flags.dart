@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:clubroyale/core/services/app_logger.dart';
 
 /// Feature flag keys
 enum Feature {
@@ -70,17 +71,13 @@ class FeatureFlags {
   /// Enable a feature
   Future<void> enable(Feature feature) async {
     await _prefs?.setBool(feature.name, true);
-    if (kDebugMode) {
-      print('🏴 Feature ENABLED: ${feature.name}');
-    }
+    AppLogger.debug('Feature ENABLED: ${feature.name}', tag: 'Flags');
   }
 
   /// Disable a feature
   Future<void> disable(Feature feature) async {
     await _prefs?.setBool(feature.name, false);
-    if (kDebugMode) {
-      print('🏴 Feature DISABLED: ${feature.name}');
-    }
+    AppLogger.debug('Feature DISABLED: ${feature.name}', tag: 'Flags');
   }
 
   /// Reset feature to default

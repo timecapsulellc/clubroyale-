@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:clubroyale/core/services/app_logger.dart';
 
 /// A2A (Agent-to-Agent) Protocol service provider
 final a2aProtocolProvider = Provider<A2AProtocolService>((ref) {
@@ -139,7 +140,7 @@ class A2AProtocolService {
       }
       return [];
     } catch (e) {
-      print('Agent discovery error: $e');
+      AppLogger.error('Agent discovery error', error: e, tag: 'A2A');
       return [];
     }
   }

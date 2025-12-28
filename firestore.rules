@@ -289,10 +289,14 @@ service cloud.firestore {
     }
     
     // ============ LEDGER ============
+    // SECURITY: Ledger is READ-ONLY from client
+    // All writes MUST go through Cloud Functions
     
     match /ledger/{gameId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow create: if false; // Only Cloud Functions
+      allow update: if false; // Only Cloud Functions
+      allow delete: if false;
     }
     
     // ============ AUDIT LOGS (Server-side only) ============

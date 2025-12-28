@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:clubroyale/core/services/app_logger.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
@@ -62,7 +63,7 @@ class ScreenShareService {
       ref.read(isScreenSharingProvider.notifier).setSharing(true);
       return true;
     } catch (e) {
-      print('Screen share error: $e');
+      AppLogger.error('Screen share error', error: e, tag: 'RTC');
       return false;
     }
   }
@@ -81,7 +82,7 @@ class ScreenShareService {
 
       ref.read(isScreenSharingProvider.notifier).setSharing(false);
     } catch (e) {
-      print('Stop screen share error: $e');
+      AppLogger.error('Stop screen share error', error: e, tag: 'RTC');
     }
   }
 
@@ -99,7 +100,7 @@ class ScreenShareService {
 
       return result.data['token'] as String?;
     } catch (e) {
-      print('Error getting token: $e');
+      AppLogger.error('Error getting token', error: e, tag: 'RTC');
       return null;
     }
   }
