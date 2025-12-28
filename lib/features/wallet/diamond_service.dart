@@ -68,6 +68,12 @@ class DiamondService {
   /// but for V5 Phase A we keep it client-side with 'users' collection update.
   Future<bool> deductDiamonds(String userId, int amount, {String? description, String? gameId}) async {
     try {
+      // Validate amount is positive (prevent exploits)
+      if (amount <= 0) {
+        debugPrint('Invalid deduction amount: $amount (must be positive)');
+        return false;
+      }
+      
       final wallet = await getWallet(userId);
       
       if (wallet.balance < amount) {

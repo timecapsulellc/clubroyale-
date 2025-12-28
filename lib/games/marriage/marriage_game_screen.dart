@@ -120,6 +120,12 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   // Timer state
   Timer? _turnTimer;
   int _remainingSeconds = 30;
+  
+  // Sound state
+  bool _isSoundMuted = false;
+  
+  // Game log for real-time events
+  final List<String> _gameLogs = [];
 
   @override
   void initState() {
@@ -505,7 +511,15 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                       );
                     }, key: _menuKey),
                     const SizedBox(width: 8),
-                    _buildHeaderButton(Icons.volume_up, () { /* TODO: Sound */ }),
+                    _buildHeaderButton(
+                      _isSoundMuted ? Icons.volume_off : Icons.volume_up, 
+                      () {
+                        setState(() {
+                          _isSoundMuted = !_isSoundMuted;
+                          SoundService.setMuted(_isSoundMuted);
+                        });
+                      }
+                    ),
                     const SizedBox(width: 8),
                     // Timer if my turn
                     if (_game.currentPlayerId == _playerId)
@@ -525,11 +539,9 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                 top: 80,
                 left: 16,
                 child: GameLogOverlay(
-                  logs: const [
-                    "Bot 1 picked card from deck",
-                    "Bot 2 threw card 4♥",
-                    "Bot 3 showed tunella",
-                  ], 
+                  logs: _gameLogs.isEmpty 
+                    ? const ['Game started...'] 
+                    : _gameLogs.take(5).toList(), // Show last 5 logs
                 ),
               ),
               
@@ -830,6 +842,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     setState(() {
       _isProcessing = true;
       _game.drawFromDeck(_playerId);
+      _addGameLog('You drew from deck');
       _checkVisitStatus(); // Update visit status after drawing
       _isProcessing = false;
     });
@@ -837,9 +850,11 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   
   void _drawFromDiscard() {
     if (_isProcessing || _game.topDiscard == null) return;
+    final cardPicked = _game.topDiscard!;
     setState(() {
       _isProcessing = true;
       _game.drawFromDiscard(_playerId);
+      _addGameLog('You picked ${cardPicked.displayString} from discard');
       _checkVisitStatus(); // Update visit status after drawing
       _isProcessing = false;
     });
@@ -853,6 +868,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     
     setState(() {
       _game.playCard(_playerId, card);
+      _addGameLog('You discarded ${card.displayString}');
       _selectedCardId = null;
       _stopTimer(); // specific stop timer for human turn end
       
@@ -941,9 +957,12 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       setState(() {
         if (isDrawing) {
           if (decision.action == 'drawDiscard' && _game.topDiscard != null) {
+            final pickedCard = _game.topDiscard!;
             _game.drawFromDiscard(botId);
+            _addGameLog('${_getBotName(botId)} picked ${pickedCard.displayString}');
           } else {
             _game.drawFromDeck(botId);
+            _addGameLog('${_getBotName(botId)} drew from deck');
           }
           // Recursively call for discard phase
            WidgetsBinding.instance.addPostFrameCallback((_) => _playBotTurns());
@@ -958,6 +977,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                orElse: () => currentHand.last, // Fallback
              );
              _game.playCard(botId, cardToDiscard);
+             _addGameLog('${_getBotName(botId)} discarded ${cardToDiscard.displayString}');
           } else if (decision.action == 'declare') {
              _tryBotDeclare(botId);
           }
@@ -978,14 +998,59 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     } catch (e) {
       debugPrint('AI Error: $e');
       setState(() {
-         // Fallback logic
-         if (_game.getHand(botId).length == 21) {
+         // Smart fallback logic - don't discard valuable cards
+         final hand = _game.getHand(botId);
+         
+         if (hand.length == 21) {
            _game.drawFromDeck(botId);
+           _addGameLog('${_getBotName(botId)} drew from deck');
          } else {
-           _game.playCard(botId, _game.getHand(botId).last);
+           // Find safest card to discard (not wild, not part of sequence)
+           final cardToDiscard = _findSafeDiscard(hand);
+           _game.playCard(botId, cardToDiscard);
+           _addGameLog('${_getBotName(botId)} discarded ${cardToDiscard.displayString}');
          }
       });
     }
+  }
+  
+  /// Find the safest card to discard (not wild, not valuable)
+  PlayingCard _findSafeDiscard(List<PlayingCard> hand) {
+    // Priority: avoid discarding wild cards, jokers, and potential meld cards
+    
+    // Filter out wild cards and jokers
+    final nonWild = hand.where((c) => !_isWildCard(c) && !c.isJoker).toList();
+    if (nonWild.isEmpty) return hand.last;
+    
+    // Find isolated cards (not part of potential runs or sets)
+    for (final card in nonWild) {
+      // Check if card is isolated (no cards nearby in same suit)
+      final sameSuit = nonWild.where((c) => c.suit == card.suit).toList();
+      bool hasNeighbor = sameSuit.any((c) => 
+        (c.rank.value - card.rank.value).abs() == 1);
+      
+      // Check if part of set
+      final sameRank = nonWild.where((c) => c.rank == card.rank).length;
+      
+      // Isolated card: no neighbors and less than 2 same rank
+      if (!hasNeighbor && sameRank < 2) {
+        return card;
+      }
+    }
+    
+    // If no isolated card found, return lowest value non-wild
+    nonWild.sort((a, b) => a.rank.value.compareTo(b.rank.value));
+    return nonWild.first;
+  }
+  
+  /// Add a log entry
+  void _addGameLog(String message) {
+    setState(() {
+      _gameLogs.insert(0, message); // Add at beginning
+      if (_gameLogs.length > 20) {
+        _gameLogs.removeLast(); // Keep max 20 logs
+      }
+    });
   }
   
   void _tryBotDeclare(String botId) {

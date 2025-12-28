@@ -9,6 +9,12 @@ class SoundService {
   static void toggleMute() {
     _muted = !_muted;
   }
+  
+  static void setMuted(bool muted) {
+    _muted = muted;
+  }
+  
+  static bool get isMuted => _muted;
 
   static Future<void> playCardSlide() async {
     // Haptics should play even if audio is muted (optional design choice, usually better)

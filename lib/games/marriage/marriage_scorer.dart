@@ -7,15 +7,13 @@ import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart';
 class MarriageScorer {
   final PlayingCard? tiplu;
   final MarriageGameConfig config;
-  late final MarriageMaalCalculator _maalCalculator;
+  MarriageMaalCalculator? _maalCalculator;
   
   MarriageScorer({
     this.tiplu,
     this.config = const MarriageGameConfig(),
   }) {
     // Initialize calculator with tiplu (if null, Maal = 0)
-    // We create a dummy card for calculator if tiplu is null to avoid crashes,
-    // but calculation methods handle null tiplu checks.
     if (tiplu != null) {
       _maalCalculator = MarriageMaalCalculator(tiplu: tiplu!, config: config);
     }
@@ -27,7 +25,9 @@ class MarriageScorer {
     required Map<String, List<Meld>> melds,   // PlayerId -> Melds (for Tunella/Validation)
     required String? winnerId,
   }) {
-    if (tiplu == null) return {for (var k in hands.keys) k: 0};
+    if (tiplu == null || _maalCalculator == null) {
+      return {for (var k in hands.keys) k: 0};
+    }
 
     final playerIds = hands.keys.toList();
     final netScores = {for (var pid in playerIds) pid: 0};
@@ -36,8 +36,8 @@ class MarriageScorer {
 
     // 1. Calculate Maal Points & Game Points for everyone
     for (final pid in playerIds) {
-      // Maal
-      maalPoints[pid] = _maalCalculator.calculateMaalPoints(hands[pid]!);
+      // Maal - use null-safe access
+      maalPoints[pid] = _maalCalculator!.calculateMaalPoints(hands[pid]!);
       
       // Game Points (Deadwood)
       if (pid == winnerId) {
@@ -155,15 +155,22 @@ class MarriageScorer {
 
   /// Check if a meld is a pure sequence (no wildcards used as substitutes)
   bool isPureSequence(Meld meld) {
-    // Pure sequences are RunMeld type (not ImpureRunMeld)
-    // RunMeld validation already ensures strict consecutiveness
-    if (meld.type == MeldType.run) {
-      return meld is RunMeld && meld.isValid;
+    // Impure melds are explicitly not pure (they use wildcards)
+    if (meld.type == MeldType.impureRun || meld.type == MeldType.impureSet) {
+      return false;
     }
+    
+    // Pure sequences are RunMeld type (strict consecutiveness, no wildcards)
+    if (meld.type == MeldType.run && meld is RunMeld && meld.isValid) {
+      return true;
+    }
+    
     // Tunnels are also considered "pure" for visit purposes
-    if (meld.type == MeldType.tunnel) {
-      return meld is TunnelMeld && meld.isValid;
+    if (meld.type == MeldType.tunnel && meld is TunnelMeld && meld.isValid) {
+      return true;
     }
+    
+    // Sets are valid melds but not "pure sequences" for visit requirement
     return false;
   }
 

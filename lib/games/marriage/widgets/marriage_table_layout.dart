@@ -53,12 +53,15 @@ class MarriageTableLayout extends StatelessWidget {
         final radiusX = width * 0.40; // Horizontal radius
         final radiusY = height * 0.35; // Vertical radius
         
+        // Calculate max height for the hand area to prevent overflow
+        final maxHandHeight = height * 0.40;
+        
         return Stack(
           children: [
             // 1. Center Area (Deck/Discard)
             Positioned(
               left: centerX - 100, // Approx half width of center area
-              top: centerY - 60,   // Approx half height of center area
+              top: centerY - 80,   // Adjusted to avoid overlap with hand
               width: 200,
               height: 120,
               child: Center(child: centerArea),
@@ -67,12 +70,20 @@ class MarriageTableLayout extends StatelessWidget {
             // 2. Opponents
             ..._buildOpponentPositions(centerX, centerY, radiusX, radiusY),
 
-            // 3. My Hand (Fixed at bottom)
+            // 3. My Hand (Fixed at bottom with constrained height)
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
-              child: myHand,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: maxHandHeight,
+                ),
+                child: SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  child: myHand,
+                ),
+              ),
             ),
           ],
         );

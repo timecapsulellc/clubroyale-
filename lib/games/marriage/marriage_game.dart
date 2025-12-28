@@ -219,12 +219,42 @@ class MarriageGame implements BaseGame {
   }
   
   /// Draw a card from deck
+  /// Handles deck exhaustion by reshuffling discard pile
   void drawFromDeck(String playerId) {
     if (currentPlayerId != playerId) return;
+    
+    // Handle deck exhaustion
+    if (_deck.isEmpty) {
+      _refreshDeckFromDiscard();
+    }
     
     final card = _deck.drawCard();
     if (card != null) {
       _hands[playerId]!.addCard(card);
+    }
+  }
+  
+  /// Refresh the deck by shuffling the discard pile back
+  void _refreshDeckFromDiscard() {
+    if (_discardPile.length <= 1) return; // Keep at least the top card
+    
+    // Save the top card
+    final topCard = _discardPile.drawCard();
+    
+    // Move all remaining cards from discard to deck
+    while (_discardPile.isNotEmpty) {
+      final card = _discardPile.drawCard();
+      if (card != null) {
+        _deck.addCard(card);
+      }
+    }
+    
+    // Shuffle the deck
+    _deck.shuffle();
+    
+    // Put the top card back on discard
+    if (topCard != null) {
+      _discardPile.addCard(topCard);
     }
   }
   
@@ -293,12 +323,11 @@ class MarriageGame implements BaseGame {
     final pureCount = melds.where((m) => scorer.isPureSequence(m)).length;
     final tunnelCount = melds.where((m) => m.type == MeldType.tunnel).length;
     
-    // Default requirement: 3 Pure Sequences (Tunnels count as Pure Sequences)
-    // Note: scorer.isPureSequence returns true for Pure Runs.
-    // Tunnels are also valid "Pure" sets for visiting.
+    // Use config for visit requirement instead of hardcoded value
+    // Tunnels count as Pure Sequences for visiting purposes
     final totalValid = pureCount + tunnelCount;
     
-    if (totalValid >= 3) {
+    if (totalValid >= config.sequencesRequiredToVisit) {
       _visitedPlayers.add(playerId);
       return true;
     }
@@ -357,4 +386,23 @@ class MarriageGame implements BaseGame {
     if (hand == null) return [];
     return MeldDetector.findAllMelds(hand.cards, tiplu: _tiplu);
   }
+  
+  /// Check for Tunnel Win condition (7+ tunnels = instant win)
+  /// Returns true if player can claim an instant tunnel win
+  bool checkTunnelWin(String playerId) {
+    final melds = findMelds(playerId);
+    final tunnelCount = melds.where((m) => m.type == MeldType.tunnel).length;
+    
+    // Standard rule: 7 tunnels = instant win (21 cards / 3 per tunnel = 7 tunnels max)
+    if (tunnelCount >= 7) {
+      _roundWinner = playerId;
+      endRound();
+      return true;
+    }
+    
+    return false;
+  }
+  
+  /// Quick check if deck is empty
+  bool get isDeckEmpty => _deck.isEmpty;
 }

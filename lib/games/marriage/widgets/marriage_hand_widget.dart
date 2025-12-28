@@ -223,9 +223,9 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
               
               // New Group Drop Target (Empty Area)
               DragTarget<PlayingCard>(
-                onWillAccept: (card) => true,
-                onAccept: (card) {
-                  _moveCardToNewGroup(card);
+                onWillAcceptWithDetails: (details) => true,
+                onAcceptWithDetails: (details) {
+                  _moveCardToNewGroup(details.data);
                 },
                 builder: (context, candidates, rejects) {
                   return Container(
@@ -355,8 +355,9 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
               // Drop Target for this group
               Positioned.fill(
                 child: DragTarget<PlayingCard>(
-                  onWillAccept: (card) => card != null && !group.contains(card),
-                  onAccept: (card) {
+                  onWillAcceptWithDetails: (details) => !group.contains(details.data),
+                  onAcceptWithDetails: (details) {
+                    final card = details.data;
                     setState(() {
                          // Remove from old
                          for (var g in _groups) { g.remove(card); }
@@ -381,18 +382,28 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                 Positioned(
                   left: i * 35.0,
                   top: 0,
-                  child: Draggable<PlayingCard>(
+                  child: LongPressDraggable<PlayingCard>(
                     data: group[i],
-                    feedback: Transform.scale(
-                      scale: 1.1,
-                      child: CardWidget(card: group[i], isFaceUp: true),
+                    delay: const Duration(milliseconds: 150),
+                    hapticFeedbackOnStart: true,
+                    feedback: Material(
+                      elevation: 8,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Transform.scale(
+                        scale: 1.15,
+                        child: CardWidget(card: group[i], isFaceUp: true),
+                      ),
                     ),
                     childWhenDragging: Opacity(
                       opacity: 0.3, 
                       child: CardWidget(card: group[i], isFaceUp: true)
                     ),
+                    onDragStarted: () {
+                      // Provide haptic feedback
+                    },
                     child: GestureDetector(
                        onTap: () => widget.onCardSelected(group[i].id),
+                       behavior: HitTestBehavior.opaque,
                        child: _buildCardWithBadges(group[i]),
                     ),
                   ),

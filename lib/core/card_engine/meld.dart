@@ -72,8 +72,20 @@ class SetMeld extends Meld {
     final rank = cards.first.rank;
     if (!cards.every((c) => c.rank == rank)) return false;
     
-    // All suits must be different (for single deck games)
-    // For multi-deck, we allow same suit from different decks
+    // For multi-deck games: validate same-suit cards are from different decks
+    // Group cards by suit and check deck indices
+    final bySuit = <CardSuit, List<int>>{};
+    for (final card in cards) {
+      bySuit.putIfAbsent(card.suit, () => []).add(card.deckIndex);
+    }
+    
+    // Each suit group should have unique deck indices
+    for (final deckIndices in bySuit.values) {
+      if (deckIndices.length != deckIndices.toSet().length) {
+        return false; // Duplicate deck index for same suit = invalid
+      }
+    }
+    
     return true;
   }
   
@@ -97,13 +109,43 @@ class RunMeld extends Meld {
     final sorted = List<PlayingCard>.from(cards)
       ..sort((a, b) => a.rank.value.compareTo(b.rank.value));
     
+    // Check standard consecutive sequence
+    bool isConsecutive = true;
     for (int i = 1; i < sorted.length; i++) {
       if (sorted[i].rank.value != sorted[i - 1].rank.value + 1) {
-        return false;
+        isConsecutive = false;
+        break;
       }
     }
     
-    return true;
+    if (isConsecutive) return true;
+    
+    // Handle Ace-wrap sequences (Q-K-A where Ace is high)
+    // Check if it's a high-ace sequence
+    if (sorted.first.rank == CardRank.ace && sorted.length >= 3) {
+      // Re-sort treating Ace as 14
+      final sortedHighAce = List<PlayingCard>.from(cards)
+        ..sort((a, b) {
+          final aVal = a.rank == CardRank.ace ? 14 : a.rank.value;
+          final bVal = b.rank == CardRank.ace ? 14 : b.rank.value;
+          return aVal.compareTo(bVal);
+        });
+      
+      // Check consecutive with high ace
+      isConsecutive = true;
+      for (int i = 1; i < sortedHighAce.length; i++) {
+        final prevVal = sortedHighAce[i - 1].rank == CardRank.ace ? 14 : sortedHighAce[i - 1].rank.value;
+        final currVal = sortedHighAce[i].rank == CardRank.ace ? 14 : sortedHighAce[i].rank.value;
+        if (currVal != prevVal + 1) {
+          isConsecutive = false;
+          break;
+        }
+      }
+      
+      if (isConsecutive) return true;
+    }
+    
+    return false;
   }
   
   @override
@@ -146,13 +188,19 @@ class MarriageMeld extends Meld {
   bool get isValid {
     if (cards.length != 3) return false;
     
+    // Calculate Jhiplu and Poplu values with wrap-around
+    // Jhiplu: rank below tiplu (Ace wraps to King)
+    final jhipluValue = tiplu.rank.value == 1 ? 13 : tiplu.rank.value - 1;
+    // Poplu: rank above tiplu (King wraps to Ace)
+    final popluValue = tiplu.rank.value == 13 ? 1 : tiplu.rank.value + 1;
+    
     // Must contain tiplu, poplu, and jhiplu
     final hasJhiplu = cards.any((c) => 
-        c.suit == tiplu.suit && c.rank.value == tiplu.rank.value - 1);
+        c.suit == tiplu.suit && c.rank.value == jhipluValue);
     final hasTiplu = cards.any((c) => 
         c.suit == tiplu.suit && c.rank == tiplu.rank);
     final hasPoplu = cards.any((c) => 
-        c.suit == tiplu.suit && c.rank.value == tiplu.rank.value + 1);
+        c.suit == tiplu.suit && c.rank.value == popluValue);
     
     return hasJhiplu && hasTiplu && hasPoplu;
   }
@@ -388,8 +436,9 @@ class MeldDetector {
     
     // Check for marriage if tiplu is provided
     if (tiplu != null) {
-      final jhipluRank = tiplu.rank.value - 1;
-      final popluRank = tiplu.rank.value + 1;
+      // Use wrap-around logic for edge cases (Ace tiplu)
+      final jhipluRank = tiplu.rank.value == 1 ? 13 : tiplu.rank.value - 1;
+      final popluRank = tiplu.rank.value == 13 ? 1 : tiplu.rank.value + 1;
       
       final hasJhiplu = hand.any((c) => 
           c.suit == tiplu.suit && c.rank.value == jhipluRank);
@@ -550,6 +599,18 @@ class MeldDetector {
       for (final meld in marriages) {
         if (_tryMeld(meld, remaining, tiplu)) return true;
       }
+      
+      // 5. Impure Runs containing pivot (wildcards fill gaps)
+      final impureRuns = _findImpureRunsWithCard(pivot, remaining, tiplu);
+      for (final meld in impureRuns) {
+        if (_tryMeld(meld, remaining, tiplu)) return true;
+      }
+      
+      // 6. Impure Sets containing pivot (wildcards substitute)
+      final impureSets = _findImpureSetsWithCard(pivot, remaining, tiplu);
+      for (final meld in impureSets) {
+        if (_tryMeld(meld, remaining, tiplu)) return true;
+      }
     }
     
     return false;
@@ -631,10 +692,13 @@ class MeldDetector {
      
      final val = target.rank.value;
      final tVal = tiplu.rank.value;
-     if ((val - tVal).abs() > 1 && val != tVal) return [];
      
-     final jhipluRank = tVal - 1;
-     final popluRank = tVal + 1;
+     // Use wrap-around logic for edge cases (Ace tiplu)
+     final jhipluRank = tVal == 1 ? 13 : tVal - 1;
+     final popluRank = tVal == 13 ? 1 : tVal + 1;
+     
+     // Check if target could be part of a marriage
+     if (val != jhipluRank && val != tVal && val != popluRank) return [];
      
      try {
        final hasJhiplu = pool.firstWhere((c) => c.suit == tiplu.suit && c.rank.value == jhipluRank);
@@ -649,5 +713,148 @@ class MeldDetector {
        // missing card
      }
      return marriages;
+  }
+  
+  /// Find impure runs containing target card (sequences with wildcards filling gaps)
+  static List<ImpureRunMeld> _findImpureRunsWithCard(PlayingCard target, List<PlayingCard> pool, PlayingCard tiplu) {
+    final melds = <ImpureRunMeld>[];
+    final helper = WildcardHelper(tiplu);
+    
+    // Separate wildcards and natural cards
+    final wildcards = pool.where((c) => helper.isWildcard(c)).toList();
+    final naturalCards = pool.where((c) => !helper.isWildcard(c)).toList();
+    
+    if (wildcards.isEmpty) return melds; // No wildcards means no impure melds
+    
+    // If target is a wildcard, it can be part of any impure run
+    final isTargetWild = helper.isWildcard(target);
+    
+    if (isTargetWild) {
+      // Wildcard can join any partial sequence
+      // Group natural cards by suit
+      final bySuit = <CardSuit, List<PlayingCard>>{};
+      for (final card in naturalCards) {
+        bySuit.putIfAbsent(card.suit, () => []).add(card);
+      }
+      
+      for (final entry in bySuit.entries) {
+        final suitCards = entry.value..sort((a, b) => a.rank.value.compareTo(b.rank.value));
+        if (suitCards.length < 2) continue; // Need at least 2 natural cards
+        
+        // Try forming runs with wildcards
+        for (int i = 0; i < suitCards.length - 1; i++) {
+          final gap = suitCards[i + 1].rank.value - suitCards[i].rank.value;
+          if (gap == 2 && wildcards.isNotEmpty) {
+            // One card gap - fill with wildcard
+            final meld = ImpureRunMeld(
+              [suitCards[i], target, suitCards[i + 1]],
+              tiplu: tiplu,
+            );
+            if (meld.isValid) melds.add(meld);
+          }
+        }
+      }
+    } else {
+      // Target is natural - find sequences where wildcards fill gaps
+      final sameSuit = naturalCards.where((c) => c.suit == target.suit).toList()
+        ..sort((a, b) => a.rank.value.compareTo(b.rank.value));
+      
+      final targetRank = target.rank.value;
+      
+      // Look for adjacent natural cards with gaps that wildcards can fill
+      for (int length = 3; length <= 5; length++) {
+        // Try target at different positions in the sequence
+        for (int offset = 0; offset < length; offset++) {
+          final startRank = targetRank - offset;
+          if (startRank < 1 || startRank + length - 1 > 14) continue;
+          
+          final sequenceCards = <PlayingCard>[];
+          int wildcardsNeeded = 0;
+          bool containsTarget = false;
+          
+          for (int rank = startRank; rank < startRank + length; rank++) {
+            final card = sameSuit.where((c) => c.rank.value == rank).firstOrNull;
+            if (card != null) {
+              sequenceCards.add(card);
+              if (card.id == target.id) containsTarget = true;
+            } else {
+              wildcardsNeeded++;
+            }
+          }
+          
+          // Valid impure run: contains target, has wildcards, has natural cards
+          if (containsTarget && 
+              wildcardsNeeded > 0 && 
+              wildcardsNeeded <= wildcards.length &&
+              sequenceCards.isNotEmpty) {
+            final allCards = [...sequenceCards, ...wildcards.take(wildcardsNeeded)];
+            final meld = ImpureRunMeld(allCards, tiplu: tiplu);
+            if (meld.isValid && meld.cards.any((c) => c.id == target.id)) {
+              melds.add(meld);
+            }
+          }
+        }
+      }
+    }
+    
+    return melds;
+  }
+  
+  /// Find impure sets containing target card (sets with wildcards substituting)
+  static List<ImpureSetMeld> _findImpureSetsWithCard(PlayingCard target, List<PlayingCard> pool, PlayingCard tiplu) {
+    final melds = <ImpureSetMeld>[];
+    final helper = WildcardHelper(tiplu);
+    
+    final wildcards = pool.where((c) => helper.isWildcard(c)).toList();
+    final naturalCards = pool.where((c) => !helper.isWildcard(c)).toList();
+    
+    if (wildcards.isEmpty) return melds;
+    
+    final isTargetWild = helper.isWildcard(target);
+    
+    if (isTargetWild) {
+      // Wildcard can join any partial set (2 natural cards of same rank)
+      final byRank = <CardRank, List<PlayingCard>>{};
+      for (final card in naturalCards) {
+        byRank.putIfAbsent(card.rank, () => []).add(card);
+      }
+      
+      for (final entry in byRank.entries) {
+        if (entry.value.length >= 2) {
+          // 2 natural + 1 wild (target) = impure set
+          final meld = ImpureSetMeld(
+            [entry.value[0], entry.value[1], target],
+            tiplu: tiplu,
+          );
+          if (meld.isValid) melds.add(meld);
+        }
+      }
+    } else {
+      // Target is natural - find same-rank cards and add wildcard
+      final sameRank = naturalCards.where((c) => c.rank == target.rank).toList();
+      
+      if (sameRank.length >= 2 && wildcards.isNotEmpty) {
+        // 2 natural (including target) + 1 wild
+        final others = sameRank.where((c) => c.id != target.id).take(1).toList();
+        if (others.isNotEmpty) {
+          final meld = ImpureSetMeld(
+            [target, others.first, wildcards.first],
+            tiplu: tiplu,
+          );
+          if (meld.isValid) melds.add(meld);
+        }
+      }
+      
+      if (sameRank.length == 1 && wildcards.length >= 2) {
+        // 1 natural (target) + 2 wilds
+        final meld = ImpureSetMeld(
+          [target, wildcards[0], wildcards[1]],
+          tiplu: tiplu,
+        );
+        if (meld.isValid) melds.add(meld);
+      }
+    }
+    
+    return melds;
   }
 }
