@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/card_engine/card_engine.dart';
 import 'package:clubroyale/features/game/engine/widgets/playing_card_widget.dart';
 
 void main() {

@@ -42,11 +42,24 @@ class AnalyticsService {
   factory AnalyticsService() => _instance;
   AnalyticsService._internal();
 
-  final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
+  /// Set to true in tests to skip Firebase initialization
+  static bool isTestMode = false;
+
+  FirebaseAnalytics? _analyticsInstance;
+  FirebaseAnalytics get _analytics {
+    if (isTestMode) {
+      throw StateError('AnalyticsService used in test mode');
+    }
+    return _analyticsInstance ??= FirebaseAnalytics.instance;
+  }
 
   /// Get analytics observer for navigation
-  FirebaseAnalyticsObserver get observer => 
-      FirebaseAnalyticsObserver(analytics: _analytics);
+  FirebaseAnalyticsObserver get observer {
+    if (isTestMode) {
+      return FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance);
+    }
+    return FirebaseAnalyticsObserver(analytics: _analytics);
+  }
 
   // ============ AUTH EVENTS ============
 

@@ -11,18 +11,26 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 import 'package:clubroyale/features/wallet/diamond_service.dart';
 import 'package:clubroyale/features/wallet/diamond_wallet.dart';
+import 'package:clubroyale/features/rtc/audio_service.dart';
+import 'package:clubroyale/features/rtc/signaling_service.dart';
+import 'package:clubroyale/features/chat/chat_service.dart';
+import 'package:clubroyale/features/chat/chat_message.dart';
 
 // Mocks
 class MockMarriageService extends Mock implements MarriageService {}
 class MockAuthService extends Mock implements AuthService {}
 class MockUser extends Mock implements firebase_auth.User {}
 class MockDiamondService extends Mock implements DiamondService {}
+class MockAudioService extends Mock implements AudioService {}
+class MockChatService extends Mock implements ChatService {}
 
 void main() {
   late MockMarriageService mockMarriageService;
   late MockAuthService mockAuthService;
   late MockDiamondService mockDiamondService;
   late MockUser mockUser;
+  late MockAudioService mockAudioService;
+  late MockChatService mockChatService;
 
   setUp(() {
     registerFallbackValue(MarriageGameState(
@@ -39,7 +47,21 @@ void main() {
     mockMarriageService = MockMarriageService();
     mockAuthService = MockAuthService();
     mockDiamondService = MockDiamondService();
+    mockAudioService = MockAudioService();
+    mockChatService = MockChatService();
     mockUser = MockUser();
+
+    // Stub AudioService
+    when(() => mockAudioService.isEnabled).thenReturn(false);
+    when(() => mockAudioService.state).thenReturn(AudioConnectionState.disconnected);
+    when(() => mockAudioService.isMuted).thenReturn(false);
+    when(() => mockAudioService.connectedPeers).thenReturn([]);
+    when(() => mockAudioService.joinAudioRoom()).thenAnswer((_) async {});
+    when(() => mockAudioService.toggleMute()).thenReturn(null);
+
+    // Stub ChatService
+    when(() => mockChatService.messagesStream).thenAnswer((_) => Stream.value([]));
+    when(() => mockChatService.typingUsersStream).thenAnswer((_) => Stream.value([]));
 
     // Default mock behavior
     when(() => mockUser.uid).thenReturn('test_user_id');
@@ -87,6 +109,8 @@ void main() {
           marriageServiceProvider.overrideWithValue(mockMarriageService),
           authServiceProvider.overrideWithValue(mockAuthService),
           diamondServiceProvider.overrideWithValue(mockDiamondService),
+          audioServiceProvider.overrideWith((ref, params) => mockAudioService),
+          chatServiceProvider.overrideWith((ref, params) => mockChatService),
         ],
         child: const MaterialApp(
           home: MarriageMultiplayerScreen(roomId: 'test_room'),
@@ -150,6 +174,8 @@ void main() {
           marriageServiceProvider.overrideWithValue(mockMarriageService),
           authServiceProvider.overrideWithValue(mockAuthService),
           diamondServiceProvider.overrideWithValue(mockDiamondService),
+          audioServiceProvider.overrideWith((ref, params) => mockAudioService),
+          chatServiceProvider.overrideWith((ref, params) => mockChatService),
         ],
         child: const MaterialApp(
           home: MarriageMultiplayerScreen(roomId: 'multiplayer_room'),
@@ -192,8 +218,8 @@ void main() {
         'bot_luckydice_3': ['ace_diamonds_0', 'king_diamonds_0'],
         'bot_deepthink_4': ['2_spades_0', '3_spades_0'],
         'bot_royalace_5': ['2_hearts_0', '3_hearts_0'],
-        'bot_trickmaster_6': ['2_clubs_0', '3_clubs_0'],
-        'bot_cardshark_7': ['2_diamonds_0', '3_diamonds_0'],
+        'bot_speedy_6': ['2_clubs_0', '3_clubs_0'],
+        'bot_smart_7': ['2_diamonds_0', '3_diamonds_0'],
       },
       deckCards: ['4_clubs_0', '5_clubs_0', '6_clubs_0'],
       discardPile: ['queen_hearts_0'],
@@ -213,6 +239,8 @@ void main() {
           marriageServiceProvider.overrideWithValue(mockMarriageService),
           authServiceProvider.overrideWithValue(mockAuthService),
           diamondServiceProvider.overrideWithValue(mockDiamondService),
+          audioServiceProvider.overrideWith((ref, params) => mockAudioService),
+          chatServiceProvider.overrideWith((ref, params) => mockChatService),
         ],
         child: const MaterialApp(
           home: MarriageMultiplayerScreen(roomId: 'eight_player_room'),
@@ -229,11 +257,14 @@ void main() {
     expect(find.text('FINISH SLOT'), findsOneWidget);
 
     // Verify all 7 opponent bot names are displayed
-    expect(find.text('TrickMaster'), findsNWidgets(2), reason: 'TrickMaster appears twice');
-    expect(find.text('CardShark'), findsNWidgets(2), reason: 'CardShark appears twice');
-    expect(find.text('LuckyDice'), findsOneWidget, reason: 'LuckyDice bot name missing');
-    expect(find.text('DeepThink'), findsOneWidget, reason: 'DeepThink bot name missing');
-    expect(find.text('RoyalAce'), findsOneWidget, reason: 'RoyalAce bot name missing');
+    // Verify all 7 opponent bot names are displayed
+    expect(find.text('TrickMaster'), findsOneWidget);
+    expect(find.text('CardShark'), findsOneWidget);
+    expect(find.text('LuckyDice'), findsOneWidget);
+    expect(find.text('DeepThink'), findsOneWidget);
+    expect(find.text('RoyalAce'), findsOneWidget);
+    expect(find.text('Speedy'), findsOneWidget);
+    expect(find.text('Smart'), findsOneWidget);
 
     // Verify it's my turn with discard phase
     expect(find.text('📤 DISCARD'), findsOneWidget, reason: 'Discard phase indicator should show');

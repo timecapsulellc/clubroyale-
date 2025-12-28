@@ -69,7 +69,7 @@ void main() {
     
     setUp(() {
       game = InBetweenGame();
-      game.initialize(['p1']);
+      game.initialize(['p1', 'p2']);
       game.startRound();
     });
 

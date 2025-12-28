@@ -10,8 +10,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/games/marriage/marriage_game.dart';
-import 'package:clubroyale/core/card_engine/pile.dart';
-import 'package:clubroyale/core/card_engine/meld.dart';
+import 'package:clubroyale/core/card_engine/card_engine.dart'; // Unified import
 
 void main() {
   group('Marriage Game - Multi-Player Tests', () {
@@ -189,10 +188,10 @@ void main() {
     
     group('Meld Detection', () {
       test('Detects valid Set (3 of same rank)', () {
-        final cards = <Card>[
-          Card(suit: Suit.hearts, rank: Rank.queen, deckIndex: 0),
-          Card(suit: Suit.diamonds, rank: Rank.queen, deckIndex: 0),
-          Card(suit: Suit.spades, rank: Rank.queen, deckIndex: 0),
+        final cards = <PlayingCard>[
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.queen, deckIndex: 0),
+          PlayingCard(suit: CardSuit.diamonds, rank: CardRank.queen, deckIndex: 0),
+          PlayingCard(suit: CardSuit.spades, rank: CardRank.queen, deckIndex: 0),
         ];
         
         final sets = MeldDetector.findSets(cards);
@@ -201,10 +200,10 @@ void main() {
       });
       
       test('Detects valid Run (3 consecutive same suit)', () {
-        final cards = <Card>[
-          Card(suit: Suit.hearts, rank: Rank.four, deckIndex: 0),
-          Card(suit: Suit.hearts, rank: Rank.five, deckIndex: 0),
-          Card(suit: Suit.hearts, rank: Rank.six, deckIndex: 0),
+        final cards = <PlayingCard>[
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.four, deckIndex: 0),
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.five, deckIndex: 0),
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.six, deckIndex: 0),
         ];
         
         final runs = MeldDetector.findRuns(cards);
@@ -213,10 +212,10 @@ void main() {
       });
       
       test('Detects valid Tunnel (3 identical from different decks)', () {
-        final cards = <Card>[
-          Card(suit: Suit.hearts, rank: Rank.king, deckIndex: 0), // Deck 0
-          Card(suit: Suit.hearts, rank: Rank.king, deckIndex: 1), // Deck 1
-          Card(suit: Suit.hearts, rank: Rank.king, deckIndex: 2), // Deck 2
+        final cards = <PlayingCard>[
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.king, deckIndex: 0), // Deck 0
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.king, deckIndex: 1), // Deck 1
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.king, deckIndex: 2), // Deck 2
         ];
         
         final tunnels = MeldDetector.findTunnels(cards);
@@ -225,15 +224,15 @@ void main() {
       });
       
       test('findAllMelds finds multiple meld types', () {
-        final cards = <Card>[
+        final cards = <PlayingCard>[
           // A set of Jacks
-          Card(suit: Suit.hearts, rank: Rank.jack, deckIndex: 0),
-          Card(suit: Suit.diamonds, rank: Rank.jack, deckIndex: 0),
-          Card(suit: Suit.spades, rank: Rank.jack, deckIndex: 0),
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.jack, deckIndex: 0),
+          PlayingCard(suit: CardSuit.diamonds, rank: CardRank.jack, deckIndex: 0),
+          PlayingCard(suit: CardSuit.spades, rank: CardRank.jack, deckIndex: 0),
           // A run in clubs
-          Card(suit: Suit.clubs, rank: Rank.seven, deckIndex: 0),
-          Card(suit: Suit.clubs, rank: Rank.eight, deckIndex: 0),
-          Card(suit: Suit.clubs, rank: Rank.nine, deckIndex: 0),
+          PlayingCard(suit: CardSuit.clubs, rank: CardRank.seven, deckIndex: 0),
+          PlayingCard(suit: CardSuit.clubs, rank: CardRank.eight, deckIndex: 0),
+          PlayingCard(suit: CardSuit.clubs, rank: CardRank.nine, deckIndex: 0),
         ];
         
         final melds = MeldDetector.findAllMelds(cards);
@@ -273,15 +272,15 @@ void main() {
       
       test('validateHand rejects incomplete partition', () {
         // Hand that has some melds but not complete partition
-        final partialHand = <Card>[
+        final partialHand = <PlayingCard>[
           // One valid set
-          Card(suit: Suit.hearts, rank: Rank.ace, deckIndex: 0),
-          Card(suit: Suit.diamonds, rank: Rank.ace, deckIndex: 0),
-          Card(suit: Suit.spades, rank: Rank.ace, deckIndex: 0),
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace, deckIndex: 0),
+          PlayingCard(suit: CardSuit.diamonds, rank: CardRank.ace, deckIndex: 0),
+          PlayingCard(suit: CardSuit.spades, rank: CardRank.ace, deckIndex: 0),
           // Some random cards that don't form melds
-          Card(suit: Suit.hearts, rank: Rank.two, deckIndex: 0),
-          Card(suit: Suit.clubs, rank: Rank.seven, deckIndex: 0),
-          Card(suit: Suit.diamonds, rank: Rank.ten, deckIndex: 0),
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.two, deckIndex: 0),
+          PlayingCard(suit: CardSuit.clubs, rank: CardRank.seven, deckIndex: 0),
+          PlayingCard(suit: CardSuit.diamonds, rank: CardRank.ten, deckIndex: 0),
         ];
         
         final isValid = MeldDetector.validateHand(partialHand);
@@ -290,15 +289,15 @@ void main() {
       
       test('validateHand accepts perfect 6-card partition (2 melds)', () {
         // Perfect hand with exactly 2 melds covering 6 cards
-        final perfectHand = <Card>[
+        final perfectHand = <PlayingCard>[
           // Set 1: Three 5s
-          Card(suit: Suit.hearts, rank: Rank.five, deckIndex: 0),
-          Card(suit: Suit.diamonds, rank: Rank.five, deckIndex: 0),
-          Card(suit: Suit.spades, rank: Rank.five, deckIndex: 0),
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.five, deckIndex: 0),
+          PlayingCard(suit: CardSuit.diamonds, rank: CardRank.five, deckIndex: 0),
+          PlayingCard(suit: CardSuit.spades, rank: CardRank.five, deckIndex: 0),
           // Set 2: Three 9s  
-          Card(suit: Suit.hearts, rank: Rank.nine, deckIndex: 0),
-          Card(suit: Suit.diamonds, rank: Rank.nine, deckIndex: 0),
-          Card(suit: Suit.clubs, rank: Rank.nine, deckIndex: 0),
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.nine, deckIndex: 0),
+          PlayingCard(suit: CardSuit.diamonds, rank: CardRank.nine, deckIndex: 0),
+          PlayingCard(suit: CardSuit.clubs, rank: CardRank.nine, deckIndex: 0),
         ];
         
         final isValid = MeldDetector.validateHand(perfectHand);
@@ -306,19 +305,19 @@ void main() {
       });
       
       test('validateHand accepts perfect 9-card partition (3 melds)', () {
-        final perfectHand = <Card>[
+        final perfectHand = <PlayingCard>[
           // Run 1: 2-3-4 of hearts
-          Card(suit: Suit.hearts, rank: Rank.two, deckIndex: 0),
-          Card(suit: Suit.hearts, rank: Rank.three, deckIndex: 0),
-          Card(suit: Suit.hearts, rank: Rank.four, deckIndex: 0),
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.two, deckIndex: 0),
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.three, deckIndex: 0),
+          PlayingCard(suit: CardSuit.hearts, rank: CardRank.four, deckIndex: 0),
           // Set: Three Kings
-          Card(suit: Suit.diamonds, rank: Rank.king, deckIndex: 0),
-          Card(suit: Suit.spades, rank: Rank.king, deckIndex: 0),
-          Card(suit: Suit.clubs, rank: Rank.king, deckIndex: 0),
+          PlayingCard(suit: CardSuit.diamonds, rank: CardRank.king, deckIndex: 0),
+          PlayingCard(suit: CardSuit.spades, rank: CardRank.king, deckIndex: 0),
+          PlayingCard(suit: CardSuit.clubs, rank: CardRank.king, deckIndex: 0),
           // Run 2: 7-8-9 of spades
-          Card(suit: Suit.spades, rank: Rank.seven, deckIndex: 0),
-          Card(suit: Suit.spades, rank: Rank.eight, deckIndex: 0),
-          Card(suit: Suit.spades, rank: Rank.nine, deckIndex: 0),
+          PlayingCard(suit: CardSuit.spades, rank: CardRank.seven, deckIndex: 0),
+          PlayingCard(suit: CardSuit.spades, rank: CardRank.eight, deckIndex: 0),
+          PlayingCard(suit: CardSuit.spades, rank: CardRank.nine, deckIndex: 0),
         ];
         
         final isValid = MeldDetector.validateHand(perfectHand);

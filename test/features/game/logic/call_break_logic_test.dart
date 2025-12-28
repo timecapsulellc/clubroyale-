@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/card_engine/card_engine.dart';
 import 'package:clubroyale/features/game/logic/call_break_logic.dart';
 import 'package:clubroyale/features/game/models/game_state.dart';
 

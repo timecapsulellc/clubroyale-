@@ -3,46 +3,58 @@ import 'package:clubroyale/core/services/feature_flags.dart';
 
 /// Feature Flags Service Tests
 void main() {
+  late FeatureFlags flags;
+
+  setUp(() {
+    flags = FeatureFlags();
+  });
+
   group('FeatureFlags', () {
     test('singleton instance is same', () {
-      expect(featureFlags, same(featureFlags));
+      expect(flags, same(FeatureFlags()));
     });
 
     test('socialEnabled has boolean value', () {
-      expect(featureFlags.socialEnabled, isA<bool>());
+      expect(flags.socialEnabled, isA<bool>());
     });
 
     test('storiesEnabled has boolean value', () {
-      expect(featureFlags.storiesEnabled, isA<bool>());
+      expect(flags.storiesEnabled, isA<bool>());
     });
 
-    test('voiceRoomsEnabled has boolean value', () {
-      expect(featureFlags.voiceRoomsEnabled, isA<bool>());
+    test('liveMediaEnabled has boolean value', () {
+      expect(flags.liveMediaEnabled, isA<bool>());
     });
 
-    test('liveVideoEnabled has boolean value', () {
-      expect(featureFlags.liveVideoEnabled, isA<bool>());
+    test('spectatorEnabled has boolean value', () {
+      expect(flags.spectatorEnabled, isA<bool>());
     });
   });
 
   group('FeatureFlags.isEnabled', () {
-    test('returns false for unknown feature', () {
-      expect(featureFlags.isEnabled('unknown_feature'), isFalse);
+    test('returns false for social features by default (Gaming-First)', () {
+      expect(flags.isEnabled(Feature.stories), isFalse);
+      expect(flags.isEnabled(Feature.socialFeed), isFalse);
+      expect(flags.isEnabled(Feature.contentCreation), isFalse);
     });
 
-    test('returns boolean for known features', () {
-      expect(featureFlags.isEnabled('social'), isA<bool>());
+    test('returns true for gaming features by default', () {
+      expect(flags.isEnabled(Feature.liveAudioVideo), isTrue);
+      expect(flags.isEnabled(Feature.spectatorMode), isTrue);
+      expect(flags.isEnabled(Feature.inGameChat), isTrue);
+      expect(flags.isEnabled(Feature.gameRooms), isTrue);
     });
   });
 
-  group('FeatureFlags initialization', () {
-    test('init completes without error', () async {
-      await expectLater(featureFlags.init(), completes);
+  group('Feature Enum', () {
+    test('has expected values', () {
+      expect(Feature.values, contains(Feature.stories));
+      expect(Feature.values, contains(Feature.liveAudioVideo));
+      expect(Feature.values, contains(Feature.tournaments));
     });
 
-    test('multiple init calls are safe', () async {
-      await featureFlags.init();
-      await expectLater(featureFlags.init(), completes);
+    test('has correct count', () {
+      expect(Feature.values.length, 11);
     });
   });
 }

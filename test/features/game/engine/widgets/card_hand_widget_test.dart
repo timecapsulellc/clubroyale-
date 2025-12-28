@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clubroyale/features/game/engine/models/card.dart';
+import 'package:clubroyale/core/card_engine/card_engine.dart';
 // Note: CardHandWidget has a known issue with negative margins in test environment.
 // These tests verify only the basic instantiation without rendering the actual widget.
 
@@ -37,7 +37,7 @@ void main() {
       const heartKing = PlayingCard(suit: CardSuit.hearts, rank: CardRank.king);
       
       // Spades are trump, led with hearts
-      final result = spadeAce.compareTo(heartKing, CardSuit.spades, CardSuit.hearts);
+      final result = spadeAce.compareTo(heartKing, trumpSuit: CardSuit.spades, ledSuit: CardSuit.hearts);
       expect(result, 1); // Trump wins
     });
 

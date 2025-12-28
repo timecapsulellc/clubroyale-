@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart' hide Card;
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/core/utils/error_helper.dart';
 import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,8 +60,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   
 
   
-  // Card lookup cache
-  final Map<String, Card> _cardCache = {};
+  // PlayingCard lookup cache
+  final Map<String, PlayingCard> _cardCache = {};
 
   
   @override
@@ -78,7 +79,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     }
   }
   
-  Card? _getCard(String id) => _cardCache[id];
+  PlayingCard? _getCard(String id) => _cardCache[id];
   
   String _getBotName(String botId) {
     final id = botId.toLowerCase();
@@ -87,6 +88,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     if (id.contains('luckydice')) return 'LuckyDice';
     if (id.contains('deepthink')) return 'DeepThink';
     if (id.contains('royalace')) return 'RoyalAce';
+    if (id.contains('speedy')) return 'Speedy';
+    if (id.contains('smart')) return 'Smart';
     return 'Bot ${botId.split('_').last}';
   }
   
@@ -301,11 +304,11 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     );
   }
 
-  Widget _buildMeldSuggestions(List<String> handIds, Card? tiplu) {
+  Widget _buildMeldSuggestions(List<String> handIds, PlayingCard? tiplu) {
     if (handIds.isEmpty) return const SizedBox.shrink();
     
-    // Convert IDs to Cards
-    final cards = handIds.map((id) => _getCard(id)).whereType<Card>().toList();
+    // Convert IDs to PlayingCards
+    final cards = handIds.map((id) => _getCard(id)).whereType<PlayingCard>().toList();
     final melds = MeldDetector.findAllMelds(cards, tiplu: tiplu);
     
     if (melds.isEmpty) return const SizedBox.shrink();
@@ -315,6 +318,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
+        shrinkWrap: true,
         itemCount: melds.length,
         itemBuilder: (context, index) {
           final meld = melds[index];
@@ -789,7 +793,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   
   Widget _buildDiscardPile(Card? topCard, bool canDraw) {
     // P0 FIX: Validation logic for drag target
-    final state = ref.read(marriageServiceProvider).watchGameState(widget.roomId).last; 
+    // final state = ref.read(marriageServiceProvider).watchGameState(widget.roomId).last; 
     // Note: Stream logic is complex here, relying on parent rebuilding calls.
     // Simplifying: The _discardCard function checks state anyway.
     

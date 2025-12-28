@@ -10,8 +10,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/games/marriage/marriage_game.dart';
-import 'package:clubroyale/core/card_engine/pile.dart';
-import 'package:clubroyale/core/card_engine/meld.dart';
+import 'package:clubroyale/core/card_engine/card_engine.dart';
 
 /// Simulates multiplayer room behavior
 class MockMultiplayerRoom {
@@ -68,7 +67,7 @@ class MockMultiplayerRoom {
     turnCount++;
     return {
       'success': true, 
-      'cardPlayed': card.displayName,
+      'cardPlayed': card.displayString,
       'nextPlayer': game.currentPlayerId,
     };
   }
@@ -100,7 +99,7 @@ class MockMultiplayerRoom {
       'currentTurn': game.currentPlayerId,
       'round': game.currentRound,
       'cardsRemaining': game.cardsRemaining,
-      'topDiscard': game.topDiscard?.displayName,
+      'topDiscard': game.topDiscard?.displayString,
       'turnCount': turnCount,
       'hands': {
         for (final pid in playerIds)
@@ -244,7 +243,7 @@ void main() {
       // Draw from discard
       final result = room.playerDrawsFromDiscard(player);
       expect(result['success'], true);
-      expect(result['cardDrawn'], topDiscard.displayName);
+      expect(result['cardDrawn'], topDiscard.displayString);
       
       // Player now has 22 cards
       expect(room.game.getHand(player).length, 22);
