@@ -126,6 +126,13 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   
   // Game log for real-time events
   final List<String> _gameLogs = [];
+  
+  // Meld caching for performance
+  List<meld_engine.Meld> _cachedMelds = [];
+  String? _lastHandHash;  // Track hand changes
+  
+  // Animation state
+  bool _isAnimating = false;  // Pause timer during animations
 
   @override
   void initState() {
@@ -166,7 +173,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     setState(() => _remainingSeconds = _config.turnTimeoutSeconds);
     
     _turnTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_showTutorial) return; // Pause timer during tutorial
+      if (_showTutorial || _isAnimating) return; // Pause timer during tutorial and animations
       if (!mounted) {
         timer.cancel();
         return;
@@ -302,6 +309,9 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   }
 
   void _playDealAnimation() {
+    // Set animation flag to pause timer
+    setState(() => _isAnimating = true);
+    
     // Determine positions
     // Ideally we use RenderBox from keys, but for simplicity let's use screen logic
     // Center of screen (Deck)
@@ -342,6 +352,13 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
         });
       });
     }
+    
+    // End animation after all cards dealt
+    Future.delayed(Duration(milliseconds: cardsToAnimate * 150 + 700), () {
+      if (mounted) {
+        setState(() => _isAnimating = false);
+      }
+    });
   }
 
   void _showWinDialog({required String winnerName}) {
@@ -398,7 +415,14 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final myHand = _game.getHand(_playerId);
-    final melds = _game.findMelds(_playerId);
+    
+    // Meld caching: only recalculate when hand changes
+    final handHash = myHand.map((c) => c.id).join(',');
+    if (handHash != _lastHandHash) {
+      _cachedMelds = _game.findMelds(_playerId);
+      _lastHandHash = handHash;
+    }
+    final melds = _cachedMelds;
     
     return Scaffold(
       backgroundColor: AppTheme.tableGreen,
@@ -574,11 +598,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                 currentPlayerId: _game.currentPlayerId,
                 myPlayerId: _playerId,
                 maalPoints: _maalPoints,
-                onEmoteTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Emotes coming soon!')),
-                  );
-                },
+                onEmoteTap: () => _showEmotePicker(),
               ),
               
               // Game Mode Banner
@@ -1051,6 +1071,104 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
         _gameLogs.removeLast(); // Keep max 20 logs
       }
     });
+  }
+  
+  /// Show emote picker for social gameplay
+  void _showEmotePicker() {
+    const emotes = [
+      {'emoji': '👍', 'label': 'Good Play'},
+      {'emoji': '🔥', 'label': 'On Fire'},
+      {'emoji': '😂', 'label': 'LOL'},
+      {'emoji': '😮', 'label': 'Wow'},
+      {'emoji': '🥳', 'label': 'Celebrate'},
+      {'emoji': '😎', 'label': 'Cool'},
+      {'emoji': '🤔', 'label': 'Thinking'},
+      {'emoji': '😤', 'label': 'Frustrated'},
+    ];
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[900],
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Send Emote',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: emotes.map((emote) => GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  _sendEmote(emote['emoji']!, emote['label']!);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white24),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        emote['emoji']!,
+                        style: const TextStyle(fontSize: 32),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        emote['label']!,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )).toList(),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  /// Send an emote and show feedback
+  void _sendEmote(String emoji, String label) {
+    _addGameLog('You: $emoji');
+    
+    // Show floating emote animation
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 24)),
+            const SizedBox(width: 8),
+            Text(label),
+          ],
+        ),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.black87,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
   
   void _tryBotDeclare(String botId) {
