@@ -51,8 +51,13 @@ class GamingAgent {
         return _marriageBotMove(hand, gameState, difficulty);
       case 'teenpatti':
         return _teenPattiBotMove(hand, gameState, difficulty);
+      case 'inbetween':
+        return _inBetweenBotMove(gameState, difficulty);
       default:
         // Generic: play random card
+        if (hand.isEmpty) {
+          return {'action': 'pass', 'confidence': 0.5};
+        }
         return {
           'action': 'play',
           'card': hand[_random.nextInt(hand.length)],
@@ -121,23 +126,140 @@ class GamingAgent {
     Map<String, dynamic> gameState,
     String difficulty,
   ) {
-    final phase = gameState['phase'] as String? ?? 'play';
+    final phase = gameState['turnPhase'] as String? ?? 'drawing';
+    final topDiscard = gameState['topDiscard'] as String?;
 
-    if (phase == 'discard') {
-      // Discard lowest value card
-      final lowestCard = _getLowestCard(hand);
+    if (phase == 'drawing') {
+      // Decide whether to draw from deck or discard
+      bool drawFromDeck = true;
+      
+      if (topDiscard != null) {
+        // Simple heuristic: check if discard helps a meld
+        final wouldHelp = _wouldHelpMeld(hand, topDiscard);
+        if (wouldHelp && difficulty != 'easy') {
+          drawFromDeck = false;
+        }
+      }
+      
+      return {
+        'action': drawFromDeck ? 'drawDeck' : 'drawDiscard',
+        'confidence': difficulty == 'hard' ? 0.8 : 0.6,
+      };
+    }
+
+    if (phase == 'discarding') {
+      // Find least valuable card to discard
+      final discardCard = _findBestDiscard(hand, difficulty);
       return {
         'action': 'discard',
-        'card': lowestCard,
+        'card': discardCard,
         'confidence': 0.7,
       };
     }
 
-    // Play phase
+    // Default play phase
     return {
       'action': 'play',
       'card': _getLowestCard(hand),
       'confidence': 0.6,
+    };
+  }
+  
+  /// Check if a card would help form a meld
+  bool _wouldHelpMeld(List<String> hand, String card) {
+    // Simple check: look for same rank or adjacent in same suit
+    final cardRank = card.length > 1 ? card.substring(1) : '';
+    final cardSuit = card.isNotEmpty ? card[0] : '';
+    
+    for (final h in hand) {
+      final hRank = h.length > 1 ? h.substring(1) : '';
+      final hSuit = h.isNotEmpty ? h[0] : '';
+      
+      // Same rank = potential tunnel
+      if (hRank == cardRank) return true;
+      
+      // Same suit = potential run
+      if (hSuit == cardSuit) return true;
+    }
+    return false;
+  }
+  
+  /// Find best card to discard
+  String _findBestDiscard(List<String> hand, String difficulty) {
+    if (hand.isEmpty) return '';
+    
+    // Easy: random discard
+    if (difficulty == 'easy') {
+      return hand[_random.nextInt(hand.length)];
+    }
+    
+    // Medium/Hard: discard lowest card
+    return _getLowestCard(hand);
+  }
+
+  /// In-Between bot logic
+  Map<String, dynamic> _inBetweenBotMove(
+    Map<String, dynamic> gameState,
+    String difficulty,
+  ) {
+    final lowCardValue = gameState['lowCardValue'] as int? ?? 2;
+    final highCardValue = gameState['highCardValue'] as int? ?? 14;
+    final pot = gameState['pot'] as int? ?? 100;
+    final chips = gameState['chips'] as int? ?? 100;
+    
+    // Calculate spread and winning probability
+    final spread = highCardValue - lowCardValue;
+    final winProbability = spread > 2 ? (spread - 2) / 12.0 : 0.0;
+    
+    // Max bet is min of pot and chips
+    final maxBet = pot < chips ? pot : chips;
+    
+    int betAmount = 0;
+    double confidence = winProbability;
+    
+    switch (difficulty) {
+      case 'easy':
+        // Random betting regardless of probability
+        if (_random.nextDouble() < 0.5) {
+          betAmount = (maxBet * 0.1 * _random.nextDouble()).round();
+        }
+        confidence = 0.3;
+        break;
+        
+      case 'hard':
+        // Optimal betting based on expected value
+        if (winProbability > 0.6) {
+          betAmount = (maxBet * 0.5).round();
+        } else if (winProbability > 0.4) {
+          betAmount = (maxBet * 0.25).round();
+        } else if (winProbability > 0.2) {
+          betAmount = (maxBet * 0.1).round();
+        }
+        // Otherwise pass (bet 0)
+        confidence = winProbability * 0.9;
+        break;
+        
+      default: // medium
+        if (winProbability > 0.5) {
+          betAmount = (maxBet * 0.3).round();
+        } else if (winProbability > 0.3) {
+          betAmount = (maxBet * 0.15).round();
+        }
+        confidence = winProbability * 0.7;
+    }
+    
+    if (betAmount <= 0) {
+      return {
+        'action': 'pass',
+        'confidence': 1.0 - winProbability,
+      };
+    }
+    
+    return {
+      'action': 'bet',
+      'amount': betAmount,
+      'confidence': confidence,
+      'winProbability': winProbability,
     };
   }
 
