@@ -32,6 +32,9 @@ gen/
 **/app/build/
 **/app/generated/
 local.properties
+key.properties
+*.jks
+*.keystore
 
 # iOS
 .ios/
