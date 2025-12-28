@@ -2,8 +2,8 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
-import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/games/call_break/call_break_service.dart';
+import 'package:clubroyale/features/agents/models/bot_personality.dart';
 
 /// Controller for Bot behavior in Call Break Multiplayer
 class CallBreakBotController {
@@ -11,6 +11,7 @@ class CallBreakBotController {
   final String roomId;
   final String botId;
   final String botName;
+  final BotPersonality? personality;
   
   StreamSubscription<CallBreakGameState?>? _subscription;
   bool _isDisposed = false;
@@ -19,11 +20,16 @@ class CallBreakBotController {
   final int _thinkingTimeMs = 1500;
   final int _varianceMs = 1000;
   
+  /// Callback for bot reactions (e.g., to display in chat)
+  void Function(String reaction)? onReaction;
+  
   CallBreakBotController({
     required CallBreakService service, 
     required this.roomId, 
     required this.botId,
     required this.botName,
+    this.personality,
+    this.onReaction,
   }) : _service = service {
     _init();
   }
@@ -66,24 +72,33 @@ class CallBreakBotController {
     int spades = 0;
     int highCards = 0;
     
-    // We don't have direct access to Card objects in state (only IDs), 
-    // but the ID format is usually suit_rank or strict.
-    // Ideally we'd use the service's cache or logic, but let's estimate.
-    // Actually CallBreakService has _getCard/public cache? No, private.
-    // But card IDs are typically descriptive or we can infer.
-    // Wait, the Service uses random IDs or standard IDs?
-    // Deck.standard() usually produces IDs like 'spades_ace', 'hearts_10'.
-    
     for (final cardId in handIds) {
       if (cardId.contains('spades')) spades++;
       if (cardId.contains('ace') || cardId.contains('king')) highCards++;
     }
     
-    // Conservative bid formula
+    // Base bid formula
     int bid = max(1, (spades / 2).floor() + (highCards / 2).floor());
-    bid = min(bid, 8); // Cap at 8 to be safe
     
-    debugPrint('Bot $botId bidding $bid');
+    // Apply personality modifiers
+    if (personality != null) {
+      // Aggressive bots bid higher
+      if (personality!.aggression > 0.6) {
+        bid += 1;
+      }
+      // Cautious bots bid lower
+      if (personality!.aggression < 0.3 && bid > 1) {
+        bid -= 1;
+      }
+      // High risk tolerance = more aggressive bidding
+      if (personality!.riskTolerance > 0.7) {
+        bid = min(bid + 1, 8);
+      }
+    }
+    
+    bid = bid.clamp(1, 8); // Keep within valid range
+    
+    debugPrint('Bot $botId bidding $bid (personality: ${personality?.name ?? "none"})');
     await _service.submitBid(roomId, botId, bid);
   }
   
