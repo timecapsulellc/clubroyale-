@@ -279,6 +279,10 @@ class BotPersonality {
   }
 
   /// Get a reaction message for game events
+  /// 
+  /// Supported events: win, lose, big_win, bluff_caught, bluff_success,
+  /// good_hand, bad_hand, opponent_mistake, opponent_win, thinking,
+  /// taunt, greeting, goodbye, lucky, unlucky
   String getReaction(String event) {
     switch (event) {
       case 'win':
@@ -311,8 +315,123 @@ class BotPersonality {
           '$avatarEmoji Fooled ya!',
           '$avatarEmoji All in the game!',
         ]);
+      
+      // ===== NEW REACTION TYPES =====
+      case 'good_hand':
+        return _pickRandom([
+          '$avatarEmoji Feeling good about this one!',
+          '$avatarEmoji 👀',
+          '$avatarEmoji Interesting...',
+        ]);
+      case 'bad_hand':
+        return _pickRandom([
+          '$avatarEmoji Well...let\'s see what happens.',
+          '$avatarEmoji 😬',
+          '$avatarEmoji Every hand is a chance!',
+        ]);
+      case 'opponent_mistake':
+        return _pickRandom([
+          '$avatarEmoji Did you mean to do that? 😄',
+          '$avatarEmoji Thank you!',
+          '$avatarEmoji I\'ll take it!',
+        ]);
+      case 'opponent_win':
+        return _pickRandom([
+          '$avatarEmoji Nice play!',
+          '$avatarEmoji Well done 👏',
+          '$avatarEmoji You got me there.',
+        ]);
+      case 'thinking':
+        return _pickRandom([
+          '$avatarEmoji Hmm...',
+          '$avatarEmoji 🤔',
+          '$avatarEmoji Let me think...',
+        ]);
+      
+      // ===== TAUNTS (personality-based) =====
+      case 'taunt':
+        return _getTaunt();
+      case 'greeting':
+        return _pickRandom([
+          '$avatarEmoji Hey there! Ready to play?',
+          '$avatarEmoji Let\'s go! 🎮',
+          '$avatarEmoji $name is in the house!',
+        ]);
+      case 'goodbye':
+        return _pickRandom([
+          '$avatarEmoji GG! See you next time!',
+          '$avatarEmoji Until next time! 👋',
+          '$avatarEmoji That was fun!',
+        ]);
+      case 'lucky':
+        return _pickRandom([
+          '$avatarEmoji 🍀 Feeling lucky!',
+          '$avatarEmoji The cards are with me today!',
+          '$avatarEmoji Fortune smiles upon me!',
+        ]);
+      case 'unlucky':
+        return _pickRandom([
+          '$avatarEmoji Not my day... 😔',
+          '$avatarEmoji The cards are against me!',
+          '$avatarEmoji Can\'t catch a break!',
+        ]);
+        
       default:
         return '$avatarEmoji ...';
+    }
+  }
+  
+  /// Get a personality-based taunt
+  String _getTaunt() {
+    switch (type) {
+      case BotPersonalityType.aggressive:
+        return _pickRandom([
+          '$avatarEmoji Is that all you\'ve got? 😏',
+          '$avatarEmoji Come at me!',
+          '$avatarEmoji You\'re going down!',
+        ]);
+      case BotPersonalityType.cautious:
+        return _pickRandom([
+          '$avatarEmoji Slow and steady wins...',
+          '$avatarEmoji Patience is a virtue.',
+          '$avatarEmoji Think before you act!',
+        ]);
+      case BotPersonalityType.chaotic:
+        return _pickRandom([
+          '$avatarEmoji CHAOS! 🌀',
+          '$avatarEmoji Expect the unexpected!',
+          '$avatarEmoji Wild card baby!',
+        ]);
+      case BotPersonalityType.analytical:
+        return _pickRandom([
+          '$avatarEmoji Probability: not in your favor.',
+          '$avatarEmoji The math says I win.',
+          '$avatarEmoji Calculating your defeat...',
+        ]);
+      case BotPersonalityType.highRoller:
+        return _pickRandom([
+          '$avatarEmoji Go big or go home! 💎',
+          '$avatarEmoji All in energy!',
+          '$avatarEmoji Risk it for the biscuit!',
+        ]);
+      case BotPersonalityType.patient:
+        return _pickRandom([
+          '$avatarEmoji Good things come to those who wait...',
+          '$avatarEmoji I\'ve got all day.',
+          '$avatarEmoji Tick tock... 🕐',
+        ]);
+      case BotPersonalityType.adaptive:
+        return _pickRandom([
+          '$avatarEmoji I\'ve got your number now.',
+          '$avatarEmoji Learning your moves...',
+          '$avatarEmoji Adapting... Evolving...',
+        ]);
+      default:
+        return _pickRandom([
+          '$avatarEmoji Let\'s see what you\'ve got!',
+          '$avatarEmoji Game on!',
+          '$avatarEmoji May the best player win!',
+        ]);
     }
   }
 

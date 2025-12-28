@@ -54,9 +54,13 @@ class Pile {
   /// Remove a specific card from the pile
   bool removeCard(PlayingCard card) => _cards.remove(card);
   
-  /// Shuffle the pile
+  /// Shuffle the pile using cryptographically secure RNG
+  /// 
+  /// Uses Fisher-Yates algorithm with Random.secure() to ensure 
+  /// unpredictable card sequences. Essential for fair gambling games.
   void shuffle() {
-    final random = math.Random();
+    // IMPORTANT: Use secure random for gambling games
+    final random = math.Random.secure();
     for (int i = _cards.length - 1; i > 0; i--) {
       final j = random.nextInt(i + 1);
       final temp = _cards[i];
