@@ -90,6 +90,14 @@ class TeenPattiGame implements BaseGame {
   String? _gameWinner;
   List<String> _tiedWinnerIds = []; // For pot split on tie
   
+  // Game tracking
+  int _roundNumber = 0;  // Current round counter
+  final List<String> _bettingLog = [];  // Track betting actions
+  
+  // Getters for new state
+  int get roundNumber => _roundNumber;
+  List<String> get bettingLog => List.unmodifiable(_bettingLog);
+  
   @override
   GamePhase get currentPhase => _currentPhase;
   
@@ -194,6 +202,10 @@ class TeenPattiGame implements BaseGame {
     player.totalBet += amount;
     _pot += amount;
     
+    // Log the bet
+    final statusLabel = player.status == PlayerStatus.blind ? 'Blind' : 'Chaal';
+    _bettingLog.add('${player.name} ($statusLabel): ₹$amount');
+    
     // Update stake for next player
     // Seen players bet 2x stake, so their bet represents current stake
     // Blind players bet 1x stake directly
@@ -222,6 +234,9 @@ class TeenPattiGame implements BaseGame {
     if (player == null) return;
     
     player.hasFolded = true;
+    
+    // Log the fold
+    _bettingLog.add('${player.name} folded');
     
     if (currentPlayerId == playerId) {
       nextTurn();

@@ -139,15 +139,36 @@ class InBetweenGame implements BaseGame {
   
   @override
   void startRound() {
-    // Collect ante from all players
+    // Collect ante from all players who have chips
     for (final pid in _playerIds) {
-      if (_chips[pid]! >= anteCost) {
-        _chips[pid] = _chips[pid]! - anteCost;
+      final playerChips = _chips[pid] ?? 0;
+      if (playerChips >= anteCost) {
+        _chips[pid] = playerChips - anteCost;
         _pot += anteCost;
+      } else if (playerChips > 0) {
+        // Player can't afford full ante - take what they have
+        _pot += playerChips;
+        _chips[pid] = 0;
       }
+      // Bankrupt players (0 chips) don't contribute
     }
     
+    // Skip bankrupt players when starting
+    _skipBankruptPlayers();
+    
     dealCards();
+  }
+  
+  /// Check if a player is bankrupt (no chips left)
+  bool isBankrupt(String playerId) => (_chips[playerId] ?? 0) <= 0;
+  
+  /// Skip to next non-bankrupt player
+  void _skipBankruptPlayers() {
+    int attempts = 0;
+    while (isBankrupt(currentPlayerId!) && attempts < _playerIds.length) {
+      _currentPlayerIndex = (_currentPlayerIndex + 1) % _playerIds.length;
+      attempts++;
+    }
   }
   
   @override
@@ -291,6 +312,7 @@ class InBetweenGame implements BaseGame {
   @override
   void nextTurn() {
     _currentPlayerIndex = (_currentPlayerIndex + 1) % _playerIds.length;
+    _skipBankruptPlayers();  // Skip players with no chips
     dealCards();
   }
   

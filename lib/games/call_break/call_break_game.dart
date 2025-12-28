@@ -85,10 +85,16 @@ class CallBreakGame implements BaseGame {
   Trick? _currentTrick;
   final Map<String, int> _tricksWon = {};
   int _tricksPlayed = 0;
+  bool _spadesBroken = false;  // Track if spades have been played
+  final List<Trick> _trickHistory = [];  // Store previous tricks
   
   // Scoring
   final Map<String, int> _scores = {};
   int _currentRound = 0;
+  
+  // Getters for new state
+  bool get spadesBroken => _spadesBroken;
+  List<Trick> get trickHistory => List.unmodifiable(_trickHistory);
   
   @override
   GamePhase get currentPhase {
@@ -182,6 +188,10 @@ class CallBreakGame implements BaseGame {
     for (final pid in _playerIds) {
       _tricksWon[pid] = 0;
     }
+    
+    // Reset round state
+    _spadesBroken = false;
+    _trickHistory.clear();
     
     // Rotate dealer - first player after dealer starts
     _currentPlayerIndex = _currentRound % _playerIds.length;
@@ -278,9 +288,17 @@ class CallBreakGame implements BaseGame {
     final trick = _currentTrick!;
     final winnerId = _findTrickWinner(trick);
     
+    // Check if spades were broken
+    if (!_spadesBroken) {
+      _spadesBroken = trick.cards.any((tc) => tc.card.suit == trumpSuit);
+    }
+    
     trick.winnerId = winnerId;
     _tricksWon[winnerId] = (_tricksWon[winnerId] ?? 0) + 1;
     _tricksPlayed++;
+    
+    // Store trick in history
+    _trickHistory.add(trick);
     
     // Winner leads next trick
     _currentPlayerIndex = _playerIds.indexOf(winnerId);
