@@ -88,6 +88,7 @@ class TeenPattiGame implements BaseGame {
   int _currentStake = 1;  // Current betting unit
   final int _maxStake = 128;    // Maximum stake limit
   String? _gameWinner;
+  List<String> _tiedWinnerIds = []; // For pot split on tie
   
   @override
   GamePhase get currentPhase => _currentPhase;
@@ -194,10 +195,19 @@ class TeenPattiGame implements BaseGame {
     _pot += amount;
     
     // Update stake for next player
+    // Seen players bet 2x stake, so their bet represents current stake
+    // Blind players bet 1x stake directly
     if (player.status == PlayerStatus.seen) {
-      _currentStake = amount ~/ 2;  // Seen bets half as effective
+      // Seen bet is 2x-4x stake, so new stake = amount / 2 (rounded up for consistency)
+      _currentStake = (amount + 1) ~/ 2;
     } else {
+      // Blind bet is 1x-2x stake
       _currentStake = amount;
+    }
+    
+    // Enforce max stake limit
+    if (_currentStake > _maxStake) {
+      _currentStake = _maxStake;
     }
     
     nextTurn();
@@ -221,11 +231,15 @@ class TeenPattiGame implements BaseGame {
   }
   
   /// Request side show with previous player
+  /// Both players must be 'seen' to request a side show
   bool requestSideShow(String playerId) {
     if (currentPlayerId != playerId) return false;
     
     final player = _players[playerId];
-    if (player == null || player.status == PlayerStatus.blind) return false;
+    if (player == null || player.hasFolded) return false;
+    
+    // Requester must be seen
+    if (player.status != PlayerStatus.seen) return false;
     
     // Find previous active player
     int prevIndex = (_currentPlayerIndex - 1 + _playerIds.length) % _playerIds.length;
@@ -233,7 +247,9 @@ class TeenPattiGame implements BaseGame {
     final prevPlayer = _players[prevPlayerId];
     
     if (prevPlayer == null || prevPlayer.hasFolded) return false;
-    if (prevPlayer.status == PlayerStatus.blind) return false;
+    
+    // Previous player must also be seen for side show
+    if (prevPlayer.status != PlayerStatus.seen) return false;
     
     // Side show - compare hands, loser folds
     final myHand = player.hand;
@@ -268,8 +284,10 @@ class TeenPattiGame implements BaseGame {
     if (winners.length == 1) {
       _gameWinner = activePlayers[winners[0]].id;
     } else {
-      // Tie - pot split (for simplicity, first player wins)
-      _gameWinner = activePlayers[0].id;
+      // Tie - split pot among tied players
+      // Store first winner but save tied IDs for pot calculation
+      _gameWinner = activePlayers[winners[0]].id;
+      _tiedWinnerIds = winners.map((i) => activePlayers[i].id).toList();
     }
     
     _teenPattiPhase = TeenPattiPhase.finished;
@@ -321,11 +339,21 @@ class TeenPattiGame implements BaseGame {
   @override
   Map<String, int> calculateScores() {
     final scores = <String, int>{};
+    
+    // Determine pot share per winner
+    final winnerCount = _tiedWinnerIds.isEmpty ? 1 : _tiedWinnerIds.length;
+    final potShare = _pot ~/ winnerCount;
+    
     for (final pid in _playerIds) {
-      if (pid == _gameWinner) {
-        scores[pid] = _pot;  // Winner gets pot
+      if (_tiedWinnerIds.isNotEmpty && _tiedWinnerIds.contains(pid)) {
+        // Tied winner gets equal share
+        scores[pid] = potShare;
+      } else if (pid == _gameWinner && _tiedWinnerIds.isEmpty) {
+        // Single winner gets full pot
+        scores[pid] = _pot;
       } else {
-        scores[pid] = -_players[pid]!.totalBet;  // Others lose their bets
+        // Others lose their bets
+        scores[pid] = -_players[pid]!.totalBet;
       }
     }
     return scores;

@@ -156,6 +156,22 @@ class InBetweenGame implements BaseGame {
     _currentPhase = GamePhase.finished;
   }
   
+  /// Check if game should end
+  bool checkGameEnd() {
+    // Game ends if pot is empty
+    if (_pot <= 0) return true;
+    
+    // Game ends if only one player has chips
+    final playersWithChips = _chips.entries.where((e) => e.value > 0).length;
+    if (playersWithChips <= 1) return true;
+    
+    // Game ends if a player has all the chips
+    final totalChips = startingChips * _playerIds.length;
+    if (_chips.values.any((c) => c >= totalChips)) return true;
+    
+    return false;
+  }
+  
   /// Place a bet (max is pot amount)
   bool placeBet(String playerId, int amount) {
     if (currentPlayerId != playerId) return false;
@@ -184,26 +200,30 @@ class InBetweenGame implements BaseGame {
     final lowValue = _cardValue(_lowCard!);
     final highValue = _cardValue(_highCard!);
     final middleValue = _cardValue(_middleCard!);
+    final playerChips = _chips[currentPlayerId!] ?? 0;
     
     // Check for post (hitting boundary)
     if (middleValue == lowValue || middleValue == highValue) {
-      // Post - lose double
-      _chips[currentPlayerId!] = (_chips[currentPlayerId!] ?? 0) - _currentBet;
-      _pot += _currentBet * 2;
+      // Post - lose double, but cap at available chips
+      final doubleBet = _currentBet * 2;
+      final actualLoss = doubleBet > playerChips ? playerChips : doubleBet;
+      _chips[currentPlayerId!] = playerChips - actualLoss;
+      _pot += actualLoss;
       return RoundResult.post;
     }
     
     // Check if between
     if (middleValue > lowValue && middleValue < highValue) {
-      // Win - double bet from pot
-      _chips[currentPlayerId!] = (_chips[currentPlayerId!] ?? 0) + _currentBet;
+      // Win - get bet amount from pot
+      _chips[currentPlayerId!] = playerChips + _currentBet;
       _pot -= _currentBet;
       return RoundResult.win;
     }
     
-    // Lose - bet goes to pot
-    _chips[currentPlayerId!] = (_chips[currentPlayerId!] ?? 0) - _currentBet;
-    _pot += _currentBet;
+    // Lose - bet goes to pot (already deducted implicitly, just update pot)
+    final actualLoss = _currentBet > playerChips ? playerChips : _currentBet;
+    _chips[currentPlayerId!] = playerChips - actualLoss;
+    _pot += actualLoss;
     return RoundResult.lose;
   }
   

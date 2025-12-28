@@ -68,6 +68,9 @@ class CallBreakGame implements BaseGame {
   static const int maxBid = 13;
   static const int totalRounds = 5;
   
+  // Config options
+  bool mustCutWithTrump = false; // When true, must play trump if can't follow suit
+  
   // Game state
   late Deck _deck;
   final Map<String, Hand> _hands = {};
@@ -234,7 +237,16 @@ class CallBreakGame implements BaseGame {
       return card.suit == ledSuit;
     }
     
-    // Can't follow suit - any card is valid
+    // Can't follow suit - check trump cutting rule
+    if (mustCutWithTrump) {
+      final hasTrump = hand.cards.any((c) => c.suit == trumpSuit);
+      if (hasTrump) {
+        // Must play trump if we have one
+        return card.suit == trumpSuit;
+      }
+    }
+    
+    // No trump or rule disabled - any card is valid
     return true;
   }
   
@@ -319,19 +331,20 @@ class CallBreakGame implements BaseGame {
     _phase = CallBreakPhase.scoring;
     
     // Calculate scores
+    // Scores are stored as x10 to handle 0.1-point overtricks
+    // Display should divide by 10 for proper decimal display
     for (final pid in _playerIds) {
       final bid = _bids[pid] ?? 0;
       final won = _tricksWon[pid] ?? 0;
       
       if (won >= bid) {
         // Made bid: score = bid + 0.1 per overtrick
-        _scores[pid] = (_scores[pid] ?? 0) + bid;
-        // Overtricks (stored as decimals * 10 to avoid floating point)
-        // For simplicity, just add tricks won
-        _scores[pid] = (_scores[pid] ?? 0) + (won > bid ? 1 : 0);
+        // Store as: bid*10 + overtricks (to avoid floating point)
+        final overtricks = won - bid;
+        _scores[pid] = (_scores[pid] ?? 0) + (bid * 10) + overtricks;
       } else {
-        // Failed bid: score = -bid
-        _scores[pid] = (_scores[pid] ?? 0) - bid;
+        // Failed bid: score = -bid (stored as x10)
+        _scores[pid] = (_scores[pid] ?? 0) - (bid * 10);
       }
     }
     
