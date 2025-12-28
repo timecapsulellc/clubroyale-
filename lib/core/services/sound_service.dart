@@ -67,4 +67,52 @@ class SoundService {
     HapticFeedback.mediumImpact();
     await playCardSlide();
   }
+  
+  // Betting sounds
+  static Future<void> playBetSound() async {
+    HapticFeedback.selectionClick();
+    if (_muted) return;
+    try {
+      await _player.play(AssetSource('sounds/card_slide.mp3')); // Placeholder
+      debugPrint('Playing sound: bet');
+    } catch (e) { debugPrint('Error playing sound: $e'); }
+  }
+  
+  static Future<void> playFoldSound() async {
+    HapticFeedback.lightImpact();
+    if (_muted) return;
+    try {
+      await _player.play(AssetSource('sounds/card_slide.mp3')); // Placeholder
+      debugPrint('Playing sound: fold');
+    } catch (e) { debugPrint('Error playing sound: $e'); }
+  }
+  
+  static Future<void> playWinSound() async {
+    HapticFeedback.heavyImpact();
+    if (_muted) return;
+    try {
+      await _player.play(AssetSource('sounds/tada.mp3'));
+      debugPrint('Playing sound: win');
+    } catch (e) { debugPrint('Error playing sound: $e'); }
+  }
+  
+  static Future<void> playLoseSound() async {
+    HapticFeedback.mediumImpact();
+    if (_muted) return;
+    try {
+      await _player.play(AssetSource('sounds/ding.mp3')); // Placeholder
+      debugPrint('Playing sound: lose');
+    } catch (e) { debugPrint('Error playing sound: $e'); }
+  }
+  
+  // In-Between specific: post sound (hit boundary)
+  static Future<void> playPostSound() async {
+    HapticFeedback.heavyImpact();
+    if (_muted) return;
+    try {
+      await _player.play(AssetSource('sounds/ding.mp3')); // Dramatic loss
+      debugPrint('Playing sound: post');
+    } catch (e) { debugPrint('Error playing sound: $e'); }
+  }
 }
+

@@ -9,6 +9,7 @@ import 'package:clubroyale/core/design_system/game/felt_texture_painter.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/games/call_break/call_break_game.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
+import 'package:clubroyale/core/services/game_score_persistence.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/widgets/game_mode_banner.dart';
 import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
@@ -75,9 +76,14 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
     _initGame();
   }
   
-  void _initGame() {
+  void _initGame() async {
     _game = CallBreakGame();
     _game.initialize(['player_0', 'player_1', 'player_2', 'player_3']);
+    
+    // Load previous scores from persistence
+    final savedScores = await GameScorePersistence.loadCallBreakScores();
+    // Note: Could restore scores here if implementing multi-session games
+    
     _game.startRound();
     
     // Play shuffle sound on deal
@@ -200,6 +206,10 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
   }
   
   void _startNewRound() {
+    // Save scores before starting new round
+    GameScorePersistence.saveCallBreakScores(_game.calculateScores());
+    SoundService.playRoundEnd();
+    
     setState(() {
       _game.startRound();
     });
