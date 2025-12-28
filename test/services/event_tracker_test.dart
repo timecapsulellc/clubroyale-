@@ -5,6 +5,10 @@ import 'package:clubroyale/core/services/event_tracker.dart';
 void main() {
   late EventTracker eventTracker;
 
+  setUpAll(() {
+    EventTracker.isTestMode = true;
+  });
+
   setUp(() {
     eventTracker = EventTracker();
   });

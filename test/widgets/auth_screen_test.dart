@@ -28,13 +28,13 @@ void main() {
 
     testWidgets('should display subtitle', (WidgetTester tester) async {
       await buildAuthScreen(tester);
-      // Current subtitle in auth_screen.dart line 295
-      expect(find.textContaining('The Ultimate Call Break'), findsOneWidget);
+      // Current subtitle in auth_screen.dart
+      expect(find.textContaining('Ultimate Card Game'), findsOneWidget);
     });
 
-    testWidgets('should display Start Playing button', (WidgetTester tester) async {
+    testWidgets('should display Enter the Club button', (WidgetTester tester) async {
       await buildAuthScreen(tester);
-      expect(find.text('Start Playing'), findsOneWidget);
+      expect(find.textContaining('Enter the Club'), findsOneWidget);
     });
 
     testWidgets('should display feature cards', (WidgetTester tester) async {
@@ -47,10 +47,10 @@ void main() {
       expect(find.text('Leaderboard'), findsOneWidget);
     });
 
-    testWidgets('should display style icon in logo', (WidgetTester tester) async {
+    testWidgets('should display chip logo with CR text', (WidgetTester tester) async {
       await buildAuthScreen(tester);
-      // Current icon is Icons.style_rounded (line 254)
-      expect(find.byIcon(Icons.style_rounded), findsOneWidget);
+      // Current chip logo has 'CR' text in center
+      expect(find.text('CR'), findsOneWidget);
     });
 
     testWidgets('should have test mode button', (WidgetTester tester) async {

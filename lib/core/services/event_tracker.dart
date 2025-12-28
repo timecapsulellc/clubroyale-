@@ -10,7 +10,23 @@ class EventTracker {
   factory EventTracker() => _instance;
   EventTracker._internal();
 
-  final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
+  /// Set to true in tests to skip Firebase calls
+  static bool isTestMode = false;
+
+  FirebaseAnalytics? _analyticsInstance;
+  FirebaseAnalytics get _analytics {
+    if (isTestMode) {
+      // Return a lazy instance that won't be called
+      return _analyticsInstance ??= FirebaseAnalytics.instance;
+    }
+    return _analyticsInstance ??= FirebaseAnalytics.instance;
+  }
+
+  /// Helper to log events, skipping in test mode
+  Future<void> _logEvent(String name, Map<String, Object>? parameters) async {
+    if (isTestMode) return;
+    await _analytics.logEvent(name: name, parameters: parameters);
+  }
 
   // ==================== Game Events ====================
 
@@ -22,16 +38,13 @@ class EventTracker {
     required bool hasBots,
     int? betAmount,
   }) async {
-    await _analytics.logEvent(
-      name: 'game_started',
-      parameters: {
-        'game_type': gameType,
-        'room_id': roomId,
-        'player_count': playerCount,
-        'has_bots': hasBots,
-        if (betAmount != null) 'bet_amount': betAmount,
-      },
-    );
+    await _logEvent('game_started', {
+      'game_type': gameType,
+      'room_id': roomId,
+      'player_count': playerCount,
+      'has_bots': hasBots,
+      if (betAmount != null) 'bet_amount': betAmount,
+    });
   }
 
   /// Track when a game ends
@@ -43,17 +56,14 @@ class EventTracker {
     int? scoreChange,
     int? diamondsWon,
   }) async {
-    await _analytics.logEvent(
-      name: 'game_completed',
-      parameters: {
-        'game_type': gameType,
-        'room_id': roomId,
-        'duration_seconds': durationSeconds,
-        'result': result,
-        if (scoreChange != null) 'score_change': scoreChange,
-        if (diamondsWon != null) 'diamonds_won': diamondsWon,
-      },
-    );
+    await _logEvent('game_completed', {
+      'game_type': gameType,
+      'room_id': roomId,
+      'duration_seconds': durationSeconds,
+      'result': result,
+      if (scoreChange != null) 'score_change': scoreChange,
+      if (diamondsWon != null) 'diamonds_won': diamondsWon,
+    });
   }
 
   /// Track instant play (bot room) usage
@@ -61,13 +71,10 @@ class EventTracker {
     required String gameType,
     required int waitTimeMs,
   }) async {
-    await _analytics.logEvent(
-      name: 'instant_play_used',
-      parameters: {
-        'game_type': gameType,
-        'wait_time_ms': waitTimeMs,
-      },
-    );
+    await _logEvent('instant_play_used', {
+      'game_type': gameType,
+      'wait_time_ms': waitTimeMs,
+    });
   }
 
   // ==================== Diamond Economy Events ====================
@@ -78,16 +85,12 @@ class EventTracker {
     required String category, // 'game_entry', 'tip', 'gift', 'unlock'
     String? itemId,
   }) async {
-    await _analytics.logEvent(
-      name: 'diamonds_spent',
-      parameters: {
-        'amount': amount,
-        'category': category,
-        if (itemId != null) 'item_id': itemId,
-      },
-    );
-    
-    // Also log as Firebase ecommerce event
+    if (isTestMode) return;
+    await _logEvent('diamonds_spent', {
+      'amount': amount,
+      'category': category,
+      if (itemId != null) 'item_id': itemId,
+    });
     await _analytics.logSpendVirtualCurrency(
       itemName: category,
       virtualCurrencyName: 'diamonds',
@@ -100,14 +103,11 @@ class EventTracker {
     required int amount,
     required String source, // 'game_win', 'daily_bonus', 'achievement', 'referral'
   }) async {
-    await _analytics.logEvent(
-      name: 'diamonds_earned',
-      parameters: {
-        'amount': amount,
-        'source': source,
-      },
-    );
-    
+    if (isTestMode) return;
+    await _logEvent('diamonds_earned', {
+      'amount': amount,
+      'source': source,
+    });
     await _analytics.logEarnVirtualCurrency(
       virtualCurrencyName: 'diamonds',
       value: amount.toDouble(),
@@ -121,6 +121,7 @@ class EventTracker {
     required double price,
     required String currency,
   }) async {
+    if (isTestMode) return;
     await _analytics.logPurchase(
       currency: currency,
       value: price,
@@ -141,10 +142,7 @@ class EventTracker {
   Future<void> trackFriendAdded({
     required String source, // 'search', 'game', 'invite', 'contact_sync'
   }) async {
-    await _analytics.logEvent(
-      name: 'friend_added',
-      parameters: {'source': source},
-    );
+    await _logEvent('friend_added', {'source': source});
   }
 
   /// Track message sent
@@ -152,23 +150,17 @@ class EventTracker {
     required String chatType, // 'dm', 'game', 'club'
     bool hasMedia = false,
   }) async {
-    await _analytics.logEvent(
-      name: 'message_sent',
-      parameters: {
-        'chat_type': chatType,
-        'has_media': hasMedia,
-      },
-    );
+    await _logEvent('message_sent', {
+      'chat_type': chatType,
+      'has_media': hasMedia,
+    });
   }
 
   /// Track story posted
   Future<void> trackStoryPosted({
     required String storyType, // 'photo', 'text', 'game_result'
   }) async {
-    await _analytics.logEvent(
-      name: 'story_posted',
-      parameters: {'story_type': storyType},
-    );
+    await _logEvent('story_posted', {'story_type': storyType});
   }
 
   /// Track club joined
@@ -176,13 +168,10 @@ class EventTracker {
     required String clubId,
     required int memberCount,
   }) async {
-    await _analytics.logEvent(
-      name: 'club_joined',
-      parameters: {
-        'club_id': clubId,
-        'member_count': memberCount,
-      },
-    );
+    await _logEvent('club_joined', {
+      'club_id': clubId,
+      'member_count': memberCount,
+    });
   }
 
   // ==================== Engagement Events ====================
@@ -192,13 +181,10 @@ class EventTracker {
     required bool isReturningUser,
     int? daysSinceLastVisit,
   }) async {
-    await _analytics.logEvent(
-      name: 'session_start_detailed',
-      parameters: {
-        'is_returning_user': isReturningUser,
-        if (daysSinceLastVisit != null) 'days_since_last_visit': daysSinceLastVisit,
-      },
-    );
+    await _logEvent('session_start_detailed', {
+      'is_returning_user': isReturningUser,
+      if (daysSinceLastVisit != null) 'days_since_last_visit': daysSinceLastVisit,
+    });
   }
 
   /// Track feature discovery
@@ -206,13 +192,10 @@ class EventTracker {
     required String featureName,
     required String context,
   }) async {
-    await _analytics.logEvent(
-      name: 'feature_discovered',
-      parameters: {
-        'feature_name': featureName,
-        'context': context,
-      },
-    );
+    await _logEvent('feature_discovered', {
+      'feature_name': featureName,
+      'context': context,
+    });
   }
 
   /// Track tutorial completion
@@ -221,15 +204,13 @@ class EventTracker {
     required int durationSeconds,
     bool skipped = false,
   }) async {
+    if (isTestMode) return;
     await _analytics.logTutorialComplete();
-    await _analytics.logEvent(
-      name: 'tutorial_completed_detailed',
-      parameters: {
-        'tutorial_name': tutorialName,
-        'duration_seconds': durationSeconds,
-        'skipped': skipped,
-      },
-    );
+    await _logEvent('tutorial_completed_detailed', {
+      'tutorial_name': tutorialName,
+      'duration_seconds': durationSeconds,
+      'skipped': skipped,
+    });
   }
 
   // ==================== Error Events ====================
@@ -241,15 +222,12 @@ class EventTracker {
     String? screen,
     String? action,
   }) async {
-    await _analytics.logEvent(
-      name: 'app_error',
-      parameters: {
-        'error_type': errorType,
-        'error_message': errorMessage.substring(0, errorMessage.length.clamp(0, 100)),
-        if (screen != null) 'screen': screen,
-        if (action != null) 'action': action,
-      },
-    );
+    await _logEvent('app_error', {
+      'error_type': errorType,
+      'error_message': errorMessage.substring(0, errorMessage.length.clamp(0, 100)),
+      if (screen != null) 'screen': screen,
+      if (action != null) 'action': action,
+    });
   }
 
   // ==================== User Properties ====================
@@ -262,6 +240,7 @@ class EventTracker {
     String? preferredGameType,
     int? friendCount,
   }) async {
+    if (isTestMode) return;
     if (tier != null) {
       await _analytics.setUserProperty(name: 'user_tier', value: tier);
     }

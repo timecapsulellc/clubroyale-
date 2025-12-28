@@ -16,8 +16,16 @@ class ABTestingService {
   factory ABTestingService() => _instance;
   ABTestingService._internal();
 
-  late final FirebaseRemoteConfig _remoteConfig;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  /// Set to true in tests to skip Firebase initialization
+  static bool isTestMode = false;
+
+  FirebaseRemoteConfig? _remoteConfig;
+  FirebaseFirestore? _firestoreInstance;
+  
+  FirebaseFirestore get _firestore {
+    if (isTestMode) throw StateError('ABTestingService used in test mode without proper setup');
+    return _firestoreInstance ??= FirebaseFirestore.instance;
+  }
   
   // Cache for experiment assignments
   final Map<String, String> _assignments = {};
@@ -25,12 +33,12 @@ class ABTestingService {
 
   /// Initialize the A/B testing service
   Future<void> init() async {
-    if (_initialized) return;
+    if (_initialized || isTestMode) return;
     
     try {
       _remoteConfig = FirebaseRemoteConfig.instance;
       
-      await _remoteConfig.setConfigSettings(RemoteConfigSettings(
+      await _remoteConfig!.setConfigSettings(RemoteConfigSettings(
         fetchTimeout: const Duration(minutes: 1),
         minimumFetchInterval: kReleaseMode 
             ? const Duration(hours: 1) 
@@ -38,7 +46,7 @@ class ABTestingService {
       ));
       
       // Set defaults for experiments
-      await _remoteConfig.setDefaults({
+      await _remoteConfig!.setDefaults({
         'exp_onboarding_flow': 'control',
         'exp_game_lobby_layout': 'control',
         'exp_diamond_pricing': 'control',
@@ -46,7 +54,7 @@ class ABTestingService {
         'exp_social_features': 'control',
       });
       
-      await _remoteConfig.fetchAndActivate();
+      await _remoteConfig!.fetchAndActivate();
       _initialized = true;
       
       debugPrint('✅ A/B Testing Service initialized');
@@ -66,8 +74,14 @@ class ABTestingService {
       return _assignments[experimentName]!;
     }
     
+    // In test mode, return default control
+    if (isTestMode || _remoteConfig == null) {
+      _assignments[experimentName] = 'control';
+      return 'control';
+    }
+    
     // Get from Remote Config
-    final configValue = _remoteConfig.getString('exp_$experimentName');
+    final configValue = _remoteConfig!.getString('exp_$experimentName');
     
     // If config specifies a distribution (e.g., "control:50,variant_a:50")
     if (configValue.contains(':') && configValue.contains(',')) {

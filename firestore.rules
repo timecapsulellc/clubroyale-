@@ -271,10 +271,14 @@ service cloud.firestore {
     }
 
     // ============ WALLETS ============
+    // SECURITY: Wallets are READ-ONLY from client
+    // All balance changes MUST go through Cloud Functions
     
     match /wallets/{userId} {
       allow read: if isOwner(userId);
-      allow write: if isOwner(userId);
+      allow create: if false; // Only Cloud Functions
+      allow update: if false; // Only Cloud Functions  
+      allow delete: if false;
     }
     
     // ============ PROFILES ============

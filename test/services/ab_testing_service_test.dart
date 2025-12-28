@@ -5,8 +5,13 @@ import 'package:clubroyale/core/services/ab_testing_service.dart';
 void main() {
   late ABTestingService abTestingService;
 
+  setUpAll(() {
+    ABTestingService.isTestMode = true;
+  });
+
   setUp(() {
     abTestingService = ABTestingService();
+    abTestingService.clearAssignments(); // Clear between tests
   });
 
   group('Variant Assignment', () {
