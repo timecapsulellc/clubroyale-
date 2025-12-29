@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/constants/disclaimers.dart';
+import 'package:clubroyale/core/utils/error_helper.dart';
 
 import 'auth_service.dart';
 
@@ -84,7 +85,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'An error occurred. Please try again.';
+        // Use ErrorHelper to show friendly message
+        _errorMessage = ErrorHelper.getFriendlyMessage(e);
       });
     } finally {
       if (mounted) {

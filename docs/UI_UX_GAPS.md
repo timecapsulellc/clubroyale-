@@ -1,4 +1,33 @@
 # ClubRoyale UI/UX Gap Analysis
+### December 29, 2025
+
+---
+
+## Overview
+
+**UI/UX Completion: 96%** ✅  
+Previous: 93%
+
+---
+
+## Recent Fixes (December 29)
+
+### 1. Marriage Game Layout ✅
+**Location:** `lib/games/marriage/`
+- **Table Overlap**: Shifted table center up (`height * 0.40`) to prevent overlap with player hand.
+- **Card Visibility**: Increased size of Center Deck and Discard Pile cards to `90x130` for better visibility on mobile.
+
+### 2. Auth Error Handling ✅
+**Location:** `lib/features/auth/`
+- **Specific Errors**: Replaced generic "Failed to sign in" with specific messages (Network, Credentials, etc.) using `ErrorHelper`.
+
+### Build Status:
+```
+flutter build apk: ✅ Success (ClubRoyale_release_v4.apk)
+```
+
+---
+
 ## Design Improvements - COMPLETED ✅
 ### December 22, 2025
 

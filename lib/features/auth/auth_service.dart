@@ -219,8 +219,8 @@ class AuthService {
         return await enableTestMode();
       }
       
-      // In release mode, return null to show proper error to user
-      return null;
+      // In release mode, rethrow to show proper error to user
+      throw e;
     }
   }
 

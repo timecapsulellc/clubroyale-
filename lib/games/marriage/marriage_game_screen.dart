@@ -704,6 +704,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                   isFaceUp: false,
                   isSelectable: canDrawFromDeck,
                   isSelected: false,
+                  width: 90, 
+                  height: 130,
                 ),
               ),
             ),
@@ -718,6 +720,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                     isFaceUp: topDiscard != null,
                     isSelectable: canDrawFromDiscard,
                     isSelected: false,
+                    width: 90,
+                    height: 130,
                   ),
                   // Lock Overlay (if visit needed)
                   if (topDiscard != null && !visitRequirementMet && isMyTurn)

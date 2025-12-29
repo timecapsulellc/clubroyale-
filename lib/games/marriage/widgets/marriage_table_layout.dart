@@ -48,7 +48,7 @@ class MarriageTableLayout extends StatelessWidget {
         // So Loop from PI (Left) -> -PI/2 (Top) -> 0 (Right).
         
         final centerX = width / 2;
-        final centerY = height / 2; // Center of the table (where deck is)
+        final centerY = height * 0.40; // Shift table up (was 0.5) to give space for hand
         
         final radiusX = width * 0.40; // Horizontal radius
         final radiusY = height * 0.35; // Vertical radius
@@ -60,10 +60,10 @@ class MarriageTableLayout extends StatelessWidget {
           children: [
             // 1. Center Area (Deck/Discard)
             Positioned(
-              left: centerX - 160, // Half width of center area (320/2)
-              top: centerY - 130,  // Adjusted for larger area (260/2)
+              left: centerX - 160, // Half width of center area
+              top: centerY - 90,  // Centered on new centerY (180/2)
               width: 320,
-              height: 260,
+              height: 180,
               child: Center(child: centerArea),
             ),
             
