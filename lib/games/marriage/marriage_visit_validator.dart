@@ -93,17 +93,18 @@ class MarriageVisitValidator {
       return VisitValidationResult.fail('Dublee visit not enabled');
     }
     
-    final pairs = _findPairs(hand);
+    // Find ACTUAL Dublee melds (Pairs)
+    final dublees = MeldDetector.findDublees(hand);
     
-    if (pairs.length >= config.dubleeCountRequired) {
+    if (dublees.length >= config.dubleeCountRequired) {
       return VisitValidationResult.success(
-        melds: pairs,
+        melds: dublees,
         type: VisitType.dublee,
       );
     }
     
     return VisitValidationResult.fail(
-      'Need ${config.dubleeCountRequired} pairs, have ${pairs.length}',
+      'Need ${config.dubleeCountRequired} pairs, have ${dublees.length}',
     );
   }
   
@@ -164,29 +165,9 @@ class MarriageVisitValidator {
     return pureRuns;
   }
   
-  /// Find all pairs in hand
-  List<Meld> _findPairs(List<Card> hand) {
-    final pairs = <Meld>[];
-    final used = <int>{};
-    
-    for (int i = 0; i < hand.length; i++) {
-      if (used.contains(i)) continue;
-      
-      for (int j = i + 1; j < hand.length; j++) {
-        if (used.contains(j)) continue;
-        
-        // Check if cards form a pair (same rank AND suit for Dublee)
-        if (hand[i].rank == hand[j].rank && hand[i].suit == hand[j].suit) {
-          pairs.add(SetMeld([hand[i], hand[j]]));
-          used.add(i);
-          used.add(j);
-          break;
-        }
-      }
-    }
-    
-    return pairs;
-  }
+  /// Find all pairs in hand (Deprecated internal - use MeldDetector)
+  // Logic moved to MeldDetector.findDublees
+  // Keeping fallback or removing entirely? Removing to avoid confusion.
   
   /// Check if card is a wild card (Joker or Tiplu)
   bool _isWildCard(Card card) {

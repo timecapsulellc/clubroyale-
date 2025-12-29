@@ -175,6 +175,7 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
       case MeldType.set: return 60;
       case MeldType.impureRun: return 50;
       case MeldType.impureSet: return 40;
+      case MeldType.dublee: return 70; // Priority for Dublee
     }
   }
 
@@ -319,6 +320,9 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
         } else if (meld is ImpureSetMeld) {
            labelText = 'IMPURE SET';
            labelColor = Colors.teal;
+        } else if (meld is DubleeMeld) {
+           labelText = 'DUBLEE';
+           labelColor = Colors.indigo;
         }
       } else {
         labelText = 'INVALID';

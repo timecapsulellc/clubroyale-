@@ -152,8 +152,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     
                     const SizedBox(height: 16),
                     
-                    // Test Mode Button
-                    _buildTestModeButton(),
+                    // Test Mode Button - Removed for Production
+                    // _buildTestModeButton(),
                     
                     const SizedBox(height: 40),
                     
@@ -453,24 +453,27 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }
 
   Widget _buildSubtitle() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text('♠', style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 14)),
-        const SizedBox(width: 8),
-        Text(
-          'The Ultimate Card Game Experience',
-          style: TextStyle(
-            fontSize: 15,
-            color: Colors.white.withValues(alpha: 0.8),
-            fontWeight: FontWeight.w500,
-            letterSpacing: 1,
-            fontStyle: FontStyle.italic,
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('♠', style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 14)),
+          const SizedBox(width: 8),
+          Text(
+            'The Ultimate Card Game Experience',
+            style: TextStyle(
+              fontSize: 15,
+              color: Colors.white.withValues(alpha: 0.8),
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1,
+              fontStyle: FontStyle.italic,
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Text('♥', style: TextStyle(color: Colors.red.withValues(alpha: 0.6), fontSize: 14)),
-      ],
+          const SizedBox(width: 8),
+          Text('♥', style: TextStyle(color: Colors.red.withValues(alpha: 0.6), fontSize: 14)),
+        ],
+      ),
     ).animate()
       .fadeIn(delay: 400.ms, duration: 500.ms);
   }

@@ -376,14 +376,21 @@ class OpponentRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: opponents.map((opponent) {
-        return GameOpponentWidget(
-          opponent: opponent,
-          size: avatarSize,
-        );
-      }).toList(),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisSize: MainAxisSize.min, // Changed to min to work inside scroll
+        mainAxisAlignment: MainAxisAlignment.center, // Center contents
+        children: opponents.map((opponent) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: GameOpponentWidget(
+              opponent: opponent,
+              size: avatarSize,
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 }

@@ -230,36 +230,41 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
             child: Stack(
               children: [
                 SafeArea(
-                  child: Column(
-                    children: [
-                      SizedBox(height: kToolbarHeight + 10),
-                      // Game mode indicator
-                      _buildGameModeBanner(state),
-                      
-                      // Opponents area
-                      _buildOpponentsArea(state, currentUser.uid),
-                      
-                      // Turn indicator
-                      _buildTurnIndicator(isMyTurn, state.phase),
-                      
-                      const Spacer(),
-                      
-                      // Cards area
-                      Container(key: _cardsKey, child: _buildCardsArea(state)),
-                      
-                      // Result display
-                      if (_lastResult != null)
-                        _buildResultBanner(_lastResult!),
-                      
-                      const Spacer(),
-                      
-                      // Betting area
-                      if (isMyTurn && state.phase == 'betting')
-                        Container(key: _bettingKey, child: _buildBettingArea(state.pot, myChips, maxBet)),
-                      
-                      // Action buttons
-                        Container(key: _actionsKey, child: _buildActionBar(isMyTurn, state)),
-                    ],
+                  child: SingleChildScrollView(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height - kToolbarHeight - 20, // Ensure min height for layout
+                      child: Column(
+                        children: [
+                          SizedBox(height: kToolbarHeight + 10),
+                          // Game mode indicator
+                          _buildGameModeBanner(state),
+                          
+                          // Opponents area
+                          _buildOpponentsArea(state, currentUser.uid),
+                          
+                          // Turn indicator
+                          _buildTurnIndicator(isMyTurn, state.phase),
+                          
+                          const Spacer(),
+                          
+                          // Cards area
+                          Container(key: _cardsKey, child: _buildCardsArea(state)),
+                          
+                          // Result display
+                          if (_lastResult != null)
+                            _buildResultBanner(_lastResult!),
+                          
+                          const Spacer(),
+                          
+                          // Betting area
+                          if (isMyTurn && state.phase == 'betting')
+                            Container(key: _bettingKey, child: _buildBettingArea(state.pot, myChips, maxBet)),
+                          
+                          // Action buttons
+                            Container(key: _actionsKey, child: _buildActionBar(isMyTurn, state)),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 // Video Grid Overlay

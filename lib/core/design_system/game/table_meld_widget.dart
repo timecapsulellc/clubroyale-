@@ -135,6 +135,8 @@ class _MeldLabel extends StatelessWidget {
         return Colors.orange.shade300;
       case MeldType.impureSet:
         return Colors.teal;
+      case MeldType.dublee:
+        return Colors.indigo;
     }
   }
 }

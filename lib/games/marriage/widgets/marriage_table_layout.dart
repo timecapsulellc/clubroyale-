@@ -60,10 +60,10 @@ class MarriageTableLayout extends StatelessWidget {
           children: [
             // 1. Center Area (Deck/Discard)
             Positioned(
-              left: centerX - 160, // Half width of center area
-              top: centerY - 90,  // Centered on new centerY (180/2)
+              left: centerX - 160, 
+              top: centerY - 100,  // Centered (200/2)
               width: 320,
-              height: 180,
+              height: 200, // Increased from 180 to prevent overflow
               child: Center(child: centerArea),
             ),
             

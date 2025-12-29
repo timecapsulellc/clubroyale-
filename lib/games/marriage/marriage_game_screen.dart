@@ -1217,6 +1217,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       case meld_engine.MeldType.marriage: return Colors.pink;
       case meld_engine.MeldType.impureRun: return Colors.orange.shade300;
       case meld_engine.MeldType.impureSet: return Colors.teal;
+      case meld_engine.MeldType.dublee: return Colors.indigo;
     }
   }
   
@@ -1229,6 +1230,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       case meld_engine.MeldType.marriage: return GameTerminology.royalSequenceShort;
       case meld_engine.MeldType.impureRun: return 'Impure Sequence';
       case meld_engine.MeldType.impureSet: return 'Impure Trial';
+      case meld_engine.MeldType.dublee: return 'Dublee';
     }
   }
 }

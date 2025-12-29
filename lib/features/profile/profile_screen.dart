@@ -472,11 +472,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    Expanded(child: _StatCard(label: 'Games', value: '0', icon: Icons.sports_esports)), // TODO: Connect to real stats
+                    Expanded(child: _StatCard(label: 'Games', value: '${user.gamesPlayed}', icon: Icons.sports_esports)),
                     const SizedBox(width: 12),
-                    Expanded(child: _StatCard(label: 'Wins', value: '0', icon: Icons.emoji_events, isHighlight: true)),
+                    Expanded(child: _StatCard(label: 'Wins', value: '${user.gamesWon}', icon: Icons.emoji_events, isHighlight: true)),
                     const SizedBox(width: 12),
-                    Expanded(child: _StatCard(label: 'Win Rate', value: '0%', icon: Icons.pie_chart)),
+                    Expanded(child: _StatCard(label: 'Win Rate', value: '${(user.winRate * 100).toStringAsFixed(1)}%', icon: Icons.pie_chart)),
                   ],
                 ),
               ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1),

@@ -53,21 +53,28 @@ class GameTopBar extends StatelessWidget {
                          children: [
                            const Icon(Icons.wifi, color: Colors.greenAccent, size: 14),
                            const SizedBox(width: 8),
-                           Text(
-                             '#$roomId',
-                             style: const TextStyle(color: Colors.white70, fontSize: 12),
+                           Flexible(
+                             child: Text(
+                               '#$roomId',
+                               style: const TextStyle(color: Colors.white70, fontSize: 12),
+                               overflow: TextOverflow.ellipsis,
+                             ),
                            ),
                            Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 8),
-                              height: 12, width: 1, color: Colors.white24
+                               margin: const EdgeInsets.symmetric(horizontal: 8),
+                               height: 12, width: 1, color: Colors.white24
                            ),
-                           Text(
-                             roomName,
-                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                           Flexible(
+                             flex: 2,
+                             child: Text(
+                               roomName,
+                               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                               overflow: TextOverflow.ellipsis,
+                             ),
                            ),
                            Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 8),
-                              height: 12, width: 1, color: Colors.white24
+                               margin: const EdgeInsets.symmetric(horizontal: 8),
+                               height: 12, width: 1, color: Colors.white24
                            ),
                            // Balance/Points
                             Icon(Icons.monetization_on, color: CasinoColors.gold, size: 14),

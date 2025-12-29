@@ -671,6 +671,7 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
       MeldType.marriage => Colors.pink,
       MeldType.impureRun => Colors.orange.shade300,
       MeldType.impureSet => Colors.teal,
+      MeldType.dublee => Colors.indigo,
     };
   }
 
@@ -682,6 +683,7 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
       MeldType.marriage => GameTerminology.royalSequenceShort,
       MeldType.impureRun => 'Impure Sequence',
       MeldType.impureSet => 'Impure Trial',
+      MeldType.dublee => 'Dublee',
     };
   }
 

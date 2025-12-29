@@ -11,6 +11,7 @@ enum MeldType {
   set,        // 3+ cards of same rank, different suits (Trial in Marriage)
   run,        // 3+ consecutive cards, same suit (Sequence)
   tunnel,     // 3 identical cards (same rank + suit from different decks)
+  dublee,     // 2 identical cards (Pair)
   marriage,   // Tiplu + Poplu + Jhiplu combination
   impureRun,  // Sequence with wildcard substitution
   impureSet,  // Set with wildcard substitution
@@ -49,6 +50,8 @@ abstract class Meld {
         return RunMeld(cards);
       case MeldType.tunnel:
         return TunnelMeld(cards);
+      case MeldType.dublee:
+        return DubleeMeld(cards);
       case MeldType.marriage:
         if (tiplu == null) throw ArgumentError('Tiplu required for MarriageMeld');
         return MarriageMeld(cards, tiplu: tiplu);
@@ -176,6 +179,26 @@ class TunnelMeld extends Meld {
   int get points => -50; // Bonus points for tunnel (negative = good)
 }
 
+/// DubleeMeld - 2 identical cards (Pair)
+/// Two cards of exact same rank and suit
+class DubleeMeld extends Meld {
+  DubleeMeld(List<PlayingCard> cards) : super(type: MeldType.dublee, cards: cards);
+  
+  @override
+  bool get isValid {
+    if (cards.length != 2) return false;
+    final first = cards.first;
+    // Must be same rank and suit
+    if (cards[1].rank != first.rank || cards[1].suit != first.suit) return false;
+    // Must be from different decks (implied, as you can't have duplicate card objects likely)
+    if (cards[1].deckIndex == first.deckIndex) return false; 
+    return true;
+  }
+  
+  @override
+  int get points => 0; 
+}
+
 /// MarriageMeld - Special combination in Marriage game
 /// Tiplu (wild) + Poplu (card above tiplu) + Jhiplu (card below tiplu)
 class MarriageMeld extends Meld {
@@ -216,11 +239,28 @@ class WildcardHelper {
   WildcardHelper(this.tiplu);
   
   /// Check if a card is a wildcard (Joker, Tiplu, or Joker-equivalent)
+  /// Check if a card is a wildcard (Joker, Tiplu, or Joker-equivalent)
   bool isWildcard(PlayingCard card) {
     if (card.isJoker) return true;
     
-    // Tiplu is wild
+    // Tiplu: exact match
     if (card.rank == tiplu.rank && card.suit == tiplu.suit) return true;
+    
+    final tVal = tiplu.rank.value;
+    final cVal = card.rank.value;
+
+    // Poplu: Rank + 1 (same suit)
+    int popluVal = tVal == 13 ? 1 : tVal + 1;
+    if (card.suit == tiplu.suit && cVal == popluVal) return true;
+
+    // Jhiplu: Rank - 1 (same suit)
+    int jhipluVal = tVal == 1 ? 13 : tVal - 1;
+    if (card.suit == tiplu.suit && cVal == jhipluVal) return true;
+    
+    // Alter: Same rank AND color, different suit
+    if (card.rank == tiplu.rank && card.suit.isRed == tiplu.suit.isRed && card.suit != tiplu.suit) {
+      return true;
+    }
     
     return false;
   }
@@ -417,7 +457,45 @@ class MeldDetector {
         }
       }
     }
+
+    return melds;
+  }
     
+  /// Find all Dublee melds (Pairs)
+  static List<DubleeMeld> findDublees(List<PlayingCard> hand) {
+    final melds = <DubleeMeld>[];
+    final byRankSuit = <String, List<PlayingCard>>{};
+    
+    for (final card in hand) {
+      final key = '${card.rank.value}_${card.suit.index}';
+      byRankSuit.putIfAbsent(key, () => []).add(card);
+    }
+    
+    for (final cards in byRankSuit.values) {
+      // Need exactly 2 or more cards of same rank+suit
+      if (cards.length >= 2) {
+         // Create pairs from available cards
+         // Strategy: Just take the first 2. 
+         // Real logic might need to be combinatorial if you have 3 cards (could make Tunnel OR Dublee)
+         // For 'findDublees', we just report all valid distinct pairs?
+         // No, standard flow: Find Tunnels first. If not tunnel, maybe Dublee.
+         // Here we just find all possible independent pairs.
+         // Combinations: With 3 cards A,B,C -> AB, BC, AC?
+         // Simplest: greedy pairs.
+         
+         // Sort by deck index to ensure stable pairs
+         cards.sort((a,b) => a.deckIndex.compareTo(b.deckIndex));
+         
+         for (int i = 0; i < cards.length - 1; i++) {
+           for (int j = i+1; j < cards.length; j++) {
+             // Ensure different decks
+             if (cards[i].deckIndex != cards[j].deckIndex) {
+               melds.add(DubleeMeld([cards[i], cards[j]]));
+             }
+           }
+         }
+      }
+    }
     return melds;
   }
   
@@ -426,7 +504,9 @@ class MeldDetector {
     final melds = <Meld>[];
     melds.addAll(findSets(hand));
     melds.addAll(findRuns(hand));
+    melds.addAll(findRuns(hand));
     melds.addAll(findTunnels(hand));
+    melds.addAll(findDublees(hand));
     
     // Find impure melds (with wildcards)
     if (tiplu != null) {
@@ -592,6 +672,17 @@ class MeldDetector {
     for (final meld in tunnels) {
       if (_tryMeld(meld, remaining, tiplu)) return true;
     }
+
+    // 3b. Dublees containing pivot (Simulate Dublee mode win check?)
+    // Note: validateHand is usually for "Declare".
+    // If player is in Dublee mode, they need 8 dublees?
+    // This generic validateHand usually assumes Standard mode (Seqs+Sets).
+    // But if we want to valid "DUBLEE WIN", we need to support Dublee partitioning.
+    // Let's add Dublee check.
+    final dublees = _findDubleesWithCard(pivot, remaining);
+    for (final meld in dublees) {
+      if (_tryMeld(meld, remaining, tiplu)) return true;
+    }
     
     // 4. Marriage containing pivot
     if (tiplu != null) {
@@ -684,6 +775,19 @@ class MeldDetector {
        }
      }
      return tunnels;
+  }
+  
+  static List<DubleeMeld> _findDubleesWithCard(PlayingCard target, List<PlayingCard> pool) {
+     final matches = pool.where((c) => c.rank == target.rank && c.suit == target.suit).toList();
+     if (matches.length < 2) return [];
+     
+     final dublees = <DubleeMeld>[];
+     for (final other in matches) {
+       if (other.id != target.id && other.deckIndex != target.deckIndex) {
+         dublees.add(DubleeMeld([target, other]));
+       }
+     }
+     return dublees;
   }
   
   static List<MarriageMeld> _findMarriagesWithCard(PlayingCard target, List<PlayingCard> pool, PlayingCard tiplu) {

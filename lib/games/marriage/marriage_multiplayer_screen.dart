@@ -170,15 +170,16 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                     children: [
                    // ... existing children
                   // Main Game Layer
+                  // Main Game Layer
                   MarriageTableLayout(
                     centerArea: Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                         _buildGameModeBanner(state),
+                         // Banner moved to Stack
                          if (isMyTurn) _buildPhaseIndicator(state),
                          _buildCenterArea(state, topDiscard, isMyTurn),
-                         _buildMeldSuggestions(myHand, tiplu),
+                         // Meld Suggestions moved to Hand
                       ],
                     ),
                     opponents: _buildOpponentWidgets(state, currentUser.uid),
@@ -201,6 +202,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          _buildMeldSuggestions(myHand, tiplu), // Moved here
                           _buildCompactStatusBar(state, currentUser.uid),
                           _buildMyHand(myHand, isMyTurn, tiplu: tiplu, config: state.config),
                           _buildActionBar(isMyTurn, state, currentUser.uid),
@@ -231,6 +233,16 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                     ),
                     
                   // Chat Overlay moved to top right
+                  
+                  // Game Mode Banner (Moved from Center Area)
+                  Positioned(
+                    top: 60,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: _buildGameModeBanner(state),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -400,6 +412,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       case MeldType.marriage: return Colors.pink;
       case MeldType.impureRun: return Colors.orange.shade300;
       case MeldType.impureSet: return Colors.teal;
+      case MeldType.dublee: return Colors.indigo;
     }
   }
   
@@ -412,6 +425,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
       case MeldType.marriage: return GameTerminology.royalSequenceShort;
       case MeldType.impureRun: return 'Impure Sequence';
       case MeldType.impureSet: return 'Impure Trial';
+      case MeldType.dublee: return 'Dublee';
     }
   }
 
@@ -680,7 +694,9 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     );
     
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      // Padding removed to prevent overflow in restricted 180px height
+      // padding: const EdgeInsets.symmetric(vertical: 8), 
+      alignment: Alignment.center,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,

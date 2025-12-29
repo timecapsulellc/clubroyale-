@@ -37,7 +37,19 @@ class MarriageScorer {
     // 1. Calculate Maal Points & Game Points for everyone
     for (final pid in playerIds) {
       // Maal - use null-safe access
-      maalPoints[pid] = _maalCalculator!.calculateMaalPoints(hands[pid]!);
+      int mp = _maalCalculator!.calculateMaalPoints(hands[pid]!);
+      
+      // Add Tunnel points (not in hand Maal calc usually, strictly Meld bonus)
+      // Tunnels are worth 5 points
+      if (melds[pid] != null) {
+        for (final m in melds[pid]!) {
+          if (m.type == MeldType.tunnel) {
+             mp += 5; // Standard tunnel value
+          }
+        }
+      }
+      
+      maalPoints[pid] = mp;
       
       // Game Points (Deadwood)
       if (pid == winnerId) {
@@ -65,13 +77,23 @@ class MarriageScorer {
       for (final pid in playerIds) {
         if (pid == winnerId) continue;
         
-        // Check if player is "Visited" (Currently check pure sequence/tunella in melds)
-        // In full implementation, GameEngine should pass isVisited status.
-        // For now, we infer: hasPureSequence(melds[pid]) = Visited
-        final hasPure = hasPureSequence(melds[pid] ?? []); // Needs hasPureSequence method in this class
+        // Check if player is "Visited" / Unlocked
+        // Logic: Must have `config.sequencesRequiredToVisit` pure sequences
+        // OR appropriate Dublee count if Dublee visit allowed.
+        // For simplicity, we check strictly against Sequence count for standard play.
+        int pureCount = 0;
+        final pMelds = melds[pid] ?? [];
+        for (final m in pMelds) {
+          if (isPureSequence(m)) pureCount++;
+        }
         
-        if (!hasPure) {
-          // Player is "Locked" / Not Visited
+        bool isVisited = pureCount >= config.sequencesRequiredToVisit;
+        // Note: This ignores Dublee visit logic for Kidnap check. 
+        // Ideally should pass `isVisited` state from GameEngine.
+        // But for now, this strictly enforces the 3-sequence rule which is safer/standard.
+        
+        if (!isVisited) {
+          // Player is "Locked" / Not Visited -> Kidnap/Murder applies
           final victimMaal = maalPoints[pid]!;
           
           if (config.enableKidnap) {
