@@ -6,6 +6,7 @@ import 'package:clubroyale/core/theme/multi_theme.dart';
 import 'package:clubroyale/core/widgets/theme_selector.dart';
 import 'package:clubroyale/features/settings/widgets/terminology_toggle.dart';
 import 'package:clubroyale/core/services/feature_flags.dart';
+import 'package:clubroyale/core/services/sound_service.dart';
 
 /// Settings Screen - Premium Edition
 /// 
@@ -77,7 +78,46 @@ class SettingsScreen extends ConsumerWidget {
                     const SizedBox(height: 32),
                   ],
                   
-                  // 4. Appearance
+                  const SizedBox(height: 32),
+                  
+                  // 4. Audio Settings
+                  _buildSectionTitle('AUDIO', themeColors),
+                  const SizedBox(height: 16),
+                  StatefulBuilder(
+                    builder: (context, setState) {
+                      return Column(
+                        children: [
+                          _buildSwitchTile(
+                            title: 'Sound Effects',
+                            subtitle: 'Card flips, chips, and wins',
+                            value: SoundService.isSoundEnabled,
+                            onChanged: (val) {
+                              setState(() {
+                                SoundService.toggleSound();
+                              });
+                            },
+                            themeColors: themeColors,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildSwitchTile(
+                            title: 'Background Music',
+                            subtitle: 'Lobby and game ambience',
+                            value: SoundService.isMusicEnabled,
+                            onChanged: (val) {
+                              setState(() {
+                                SoundService.toggleMusic();
+                              });
+                            },
+                            themeColors: themeColors,
+                          ),
+                        ],
+                      );
+                    }
+                  ),
+                  
+                  const SizedBox(height: 32),
+
+                  // 5. Appearance
                   _buildSectionTitle('APPEARANCE', themeColors),
                   const SizedBox(height: 16),
                   const ThemeSelectorWidget(),

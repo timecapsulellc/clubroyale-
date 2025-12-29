@@ -30,27 +30,27 @@ class MarriageTutorialSteps {
     return [
       TutorialStep(
         title: '👋 Welcome to Royal Meld!',
-        description: 'This quick tutorial will teach you the basics. You can always access the full guide from the ⚙️ settings button.',
+        description: 'This quick tutorial will teach you the basics of the Nepali variant. You can always access the full guide from the ⚙️ settings button.',
       ),
       TutorialStep(
         title: '🎴 Your Hand',
-        description: 'Your cards are at the bottom. You have 21 cards to arrange into SETS and SEQUENCES.',
+        description: 'You are dealt 21 cards. Your goal is to arrange them into valid Sets and Sequences.',
       ),
       TutorialStep(
-        title: '📥 Drawing Cards',
-        description: 'On your turn, DRAW a card from:\n• DECK (closed pile) - Always available\n• DISCARD (open pile) - Only after visiting',
-      ),
-      TutorialStep(
-        title: '📤 Discarding Cards',
-        description: 'After drawing, you MUST discard one card. Tap a card to select it, then tap DISCARD or drag it to the discard pile.',
+        title: '🎰 The MAAL (Bonus Points)',
+        description: 'Collect Maal cards for huge points:\n• Tiplu: The main Maal card\n• Poplu: One rank above Tiplu\n• Jhiplu: One rank below Tiplu\n• Alter: Same rank/color as Tiplu',
       ),
       TutorialStep(
         title: '🔓 Visiting',
-        description: 'To unlock MAAL (bonus points), you must VISIT by showing:\n• 3 Pure Sequences, OR\n• 7 Pairs (Dublees), OR\n• 3 Tunnels',
+        description: 'To see Maal and score points, you must "Visit" (unlock) by showing:\n• 3 Pure Sequences\n• OR 7 Dublees (Pairs)\n• OR 3 Tunnels',
+      ),
+      TutorialStep(
+        title: '📥 Gameplay',
+        description: '1. Draw a card (Deck or Discard)\n2. Arrange your hand\n3. Discard one card\n4. Visit as soon as you can!',
       ),
       TutorialStep(
         title: '🏆 Winning',
-        description: 'Arrange ALL cards into valid melds, then tap "GO ROYALE" to declare victory!\n\nGood luck!',
+        description: 'Arrange ALL 21 cards into valid melds to declare victory. Unvisited players pay a penalty!\n\nGood luck!',
       ),
     ];
   }

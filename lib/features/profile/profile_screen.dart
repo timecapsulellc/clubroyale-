@@ -467,16 +467,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
 
               const SizedBox(height: 24),
 
-              // 2. Stats Grid (Mock data for display if service doesn't provide it yet)
+                // 2. Stats Grid
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    Expanded(child: _StatCard(label: 'Games', value: '${user.gamesPlayed}', icon: Icons.sports_esports)),
+                    Expanded(child: _StatCard(label: 'Games', value: '${profileAsync.value?.gamesPlayed ?? 0}', icon: Icons.sports_esports)),
                     const SizedBox(width: 12),
-                    Expanded(child: _StatCard(label: 'Wins', value: '${user.gamesWon}', icon: Icons.emoji_events, isHighlight: true)),
+                    Expanded(child: _StatCard(label: 'Wins', value: '${profileAsync.value?.gamesWon ?? 0}', icon: Icons.emoji_events, isHighlight: true)),
                     const SizedBox(width: 12),
-                    Expanded(child: _StatCard(label: 'Win Rate', value: '${(user.winRate * 100).toStringAsFixed(1)}%', icon: Icons.pie_chart)),
+                    Expanded(child: _StatCard(label: 'Win Rate', value: '${((profileAsync.value?.winRate ?? 0) * 100).toStringAsFixed(1)}%', icon: Icons.pie_chart)),
                   ],
                 ),
               ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1),

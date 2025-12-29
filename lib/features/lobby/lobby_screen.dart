@@ -24,15 +24,28 @@ import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 import 'package:clubroyale/core/error/error_display.dart';
 
 import '../auth/auth_service.dart';
+import 'package:clubroyale/core/services/sound_service.dart';
 
 /// Track if we've already granted dev diamonds this session
 bool _devDiamondsGranted = false;
 
-class LobbyScreen extends ConsumerWidget {
+class LobbyScreen extends ConsumerStatefulWidget {
   const LobbyScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LobbyScreen> createState() => _LobbyScreenState();
+}
+
+class _LobbyScreenState extends ConsumerState<LobbyScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Start lobby music when entering lobby
+    SoundService.playLobbyMusic();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final lobbyService = ref.watch(lobbyServiceProvider);
     final authService = ref.watch(authServiceProvider);
     final gamesStream = lobbyService.getGames();

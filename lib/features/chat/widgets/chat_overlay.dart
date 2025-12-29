@@ -206,9 +206,20 @@ class _ChatOverlayState extends ConsumerState<ChatOverlay> {
   Widget _buildMessagesList(List<ChatMessage> messages, ThemeData theme) {
     if (messages.isEmpty) {
       return Center(
-        child: Text(
-          'No messages',
-          style: theme.textTheme.bodySmall,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.chat_bubble_outline, size: 48, color: theme.colorScheme.outline.withValues(alpha: 0.5)),
+            const SizedBox(height: 8),
+            Text(
+              'No messages yet',
+              style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            ),
+            Text(
+              'Say hello to your friends! 👋',
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline),
+            ),
+          ],
         ),
       );
     }

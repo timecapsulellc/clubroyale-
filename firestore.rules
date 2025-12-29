@@ -80,6 +80,9 @@ service cloud.firestore {
     // Main collection for game rooms - used by lobby_service
     
     match /games/{gameId} {
+      // WARNING: This rule allows any participant to update the game document.
+      // This is a potential security risk ("God Mode" cheating) if client-side validation is bypassed.
+      // TODO: Restrict updates to specific fields or move game logic to Cloud Functions.
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
       // SECURITY: Only host or participants can update/delete

@@ -53,14 +53,36 @@ class MarriageMaalCalculator {
       return MaalType.tiplu;
     }
     
+    final tVal = tiplu.rank.value;
+    
     // Poplu: Rank +1, same suit
-    final popluValue = tiplu.rank.value == 13 ? 1 : tiplu.rank.value + 1; // Wrap K->A
+    // If K(13) -> A(14)
+    // If A(14) -> 2(2) (Round the corner)
+    int popluValue;
+    if (tVal == 13) {
+      popluValue = 14; // K -> A
+    } else if (tVal == 14) {
+      popluValue = 2; // A -> 2
+    } else {
+      popluValue = tVal + 1;
+    }
+    
     if (card.suit == tiplu.suit && card.rank.value == popluValue) {
       return MaalType.poplu;
     }
     
     // Jhiplu: Rank -1, same suit
-    final jhipluValue = tiplu.rank.value == 1 ? 13 : tiplu.rank.value - 1; // Wrap A->K
+    // If A(14) -> K(13)
+    // If 2(2) -> A(14) (Round the corner)
+    int jhipluValue;
+    if (tVal == 14) {
+      jhipluValue = 13; // A -> K
+    } else if (tVal == 2) {
+      jhipluValue = 14; // 2 -> A
+    } else {
+      jhipluValue = tVal - 1;
+    }
+
     if (card.suit == tiplu.suit && card.rank.value == jhipluValue) {
       return MaalType.jhiplu;
     }

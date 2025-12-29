@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:clubroyale/core/utils/error_helper.dart';
 import 'package:clubroyale/core/widgets/contextual_loader.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,6 +20,8 @@ import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:clubroyale/core/services/share_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:clubroyale/games/marriage/widgets/marriage_tutorial_steps.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
 
 class RoomWaitingScreen extends ConsumerStatefulWidget {
@@ -98,6 +101,24 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
     }
 
     _knownPlayerIds = currentIds;
+  }
+
+  Future<void> _checkPermissions() async {
+    if (kIsWeb) return;
+
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.camera,
+      Permission.microphone,
+    ].request();
+
+    if (statuses[Permission.camera]?.isDenied == true || 
+        statuses[Permission.microphone]?.isDenied == true) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Permissions required for video chat')),
+        );
+      }
+    }
   }
 
   @override
@@ -327,7 +348,12 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                                 ),
                                 Switch(
                                   value: _isVideoEnabled,
-                                  onChanged: (value) => setState(() => _isVideoEnabled = value),
+                                  onChanged: (value) async {
+                                    if (value) {
+                                      await _checkPermissions();
+                                    }
+                                    setState(() => _isVideoEnabled = value);
+                                  },
                                   activeThumbColor: Colors.deepPurple,
                                 ),
                               ],
@@ -588,6 +614,72 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
+
+                // How to Play Guide (Marriage Only)
+                if (room.gameType == 'marriage')
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 24),
+                    child: Card(
+                      color: Colors.blue.shade50,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(color: Colors.blue.withValues(alpha: 0.3)),
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => MarriageTutorial(
+                              onComplete: () => Navigator.pop(context),
+                              onSkip: () => Navigator.pop(context),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(16),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: const BoxDecoration(
+                                  color: Colors.blue,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.school, color: Colors.white, size: 20),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'New to Nepali Marriage?',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Learn about Maal, Tunnels, and Scoring',
+                                      style: TextStyle(
+                                        color: Colors.blue.shade700,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.blue),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
 
                 // Players Section
                 Text(
