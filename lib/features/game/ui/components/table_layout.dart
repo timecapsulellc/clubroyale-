@@ -18,7 +18,7 @@ class TableLayout extends ConsumerWidget {
         color: const Color(0xFF121212), // Dark ambient background
         image: DecorationImage(
            image: AssetImage('assets/images/tables/table_oval_premium.png'),
-           fit: BoxFit.contain, // Keep the oval shape visible
+           fit: BoxFit.cover, // Fill the screen for better mobile visibility
            alignment: Alignment.center,
         ),
       ),

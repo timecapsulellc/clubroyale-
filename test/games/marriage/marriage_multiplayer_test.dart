@@ -50,7 +50,7 @@ class MockMultiplayerRoom {
       return {'success': false, 'error': 'Discard pile empty'};
     }
     game.drawFromDiscard(playerId);
-    return {'success': true, 'cardDrawn': card.displayName};
+    return {'success': true, 'cardDrawn': card.displayString};
   }
   
   /// Simulate player action: Discard a card

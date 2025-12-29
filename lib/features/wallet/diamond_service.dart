@@ -104,6 +104,44 @@ class DiamondService {
     }
   }
 
+  /// Grant development diamonds for testing (DEBUG ONLY)
+  /// This sets the user's diamond balance to the specified amount
+  /// IMPORTANT: This should ONLY be used in development/testing environments
+  Future<bool> grantDevDiamonds(String userId, {int amount = 10000}) async {
+    // Safety check - only allow in debug mode
+    if (!kDebugMode) {
+      debugPrint('⚠️ grantDevDiamonds blocked - not in debug mode');
+      return false;
+    }
+    
+    try {
+      debugPrint('💎 Granting $amount dev diamonds to user: $userId');
+      
+      await _db.collection('users').doc(userId).set({
+        'diamondBalance': amount,
+        'diamondsByOrigin': {
+          'signup': amount,
+          'spent': 0,
+        },
+        'lastActive': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      
+      // Record transaction for transparency
+      await _recordTransaction(
+        userId: userId,
+        amount: amount,
+        type: DiamondTransactionType.signup,
+        description: 'Dev Testing Grant',
+      );
+      
+      debugPrint('✅ Successfully granted $amount diamonds to $userId');
+      return true;
+    } catch (e) {
+      debugPrint('❌ Error granting dev diamonds: $e');
+      return false;
+    }
+  }
+
   // ============ CLOUD FUNCTIONS (V5) ============
 
   /// Upgrade to Verified Tier (Calls Cloud Function)

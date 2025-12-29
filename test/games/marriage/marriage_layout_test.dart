@@ -126,9 +126,9 @@ void main() {
     debugPrint('Verifying UI elements...');
     
     // Check Deck Labels
-    expect(find.text('CLOSED DECK'), findsOneWidget, reason: 'CLOSED DECK label missing');
-    expect(find.text('OPEN DECK'), findsOneWidget, reason: 'OPEN DECK label missing');
-    expect(find.text('FINISH SLOT'), findsOneWidget, reason: 'FINISH SLOT label missing');
+    expect(find.text('DECK'), findsOneWidget, reason: 'DECK label missing');
+    expect(find.text('DISCARD'), findsOneWidget, reason: 'DISCARD label missing');
+    expect(find.text('FINISH'), findsWidgets, reason: 'FINISH label missing');
 
     // Check Player Hand Area Gradient Container
     // We can't easily verify gradient color, but we can verify the Container exists
@@ -187,9 +187,9 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
 
     // Verify deck labels still present
-    expect(find.text('CLOSED DECK'), findsOneWidget);
-    expect(find.text('OPEN DECK'), findsOneWidget);
-    expect(find.text('FINISH SLOT'), findsOneWidget);
+    expect(find.text('DECK'), findsOneWidget);
+    expect(find.text('DISCARD'), findsOneWidget);
+    expect(find.text('FINISH'), findsWidgets);
 
     // Verify opponent names are displayed
     expect(find.text('TrickMaster'), findsOneWidget, reason: 'TrickMaster bot name missing');
@@ -252,9 +252,9 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
 
     // Verify deck labels present
-    expect(find.text('CLOSED DECK'), findsOneWidget);
-    expect(find.text('OPEN DECK'), findsOneWidget);
-    expect(find.text('FINISH SLOT'), findsOneWidget);
+    expect(find.text('DECK'), findsOneWidget);
+    expect(find.text('DISCARD'), findsOneWidget);
+    expect(find.text('FINISH'), findsWidgets);
 
     // Verify all 7 opponent bot names are displayed
     // Verify all 7 opponent bot names are displayed

@@ -508,8 +508,8 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     return Column(
       children: [
         Container(
-          width: isMiddle ? 100 : 80,
-          height: isMiddle ? 140 : 110,
+          width: isMiddle ? 120 : 100,
+          height: isMiddle ? 175 : 145,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -530,7 +530,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
                 card.rank.symbol,
                 style: TextStyle(
                   color: card.suit.isRed ? Colors.red : Colors.black,
-                  fontSize: isMiddle ? 36 : 28,
+                  fontSize: isMiddle ? 48 : 36,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -538,7 +538,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
                 card.suit.symbol,
                 style: TextStyle(
                   color: card.suit.isRed ? Colors.red : Colors.black,
-                  fontSize: isMiddle ? 28 : 22,
+                  fontSize: isMiddle ? 36 : 28,
                 ),
               ),
             ],
@@ -549,7 +549,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
           label,
           style: TextStyle(
             color: Colors.white.withValues(alpha: 0.7),
-            fontSize: 12,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -561,8 +561,8 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     return Column(
       children: [
         Container(
-          width: 100,
-          height: 140,
+          width: 120,
+          height: 175,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [CasinoColors.richPurple, CasinoColors.deepPurple],
@@ -577,7 +577,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
               '?',
               style: TextStyle(
                 color: CasinoColors.gold.withValues(alpha: 0.6),
-                fontSize: 48,
+                fontSize: 56,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -589,7 +589,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
           'MIDDLE',
           style: TextStyle(
             color: Colors.white.withValues(alpha: 0.7),
-            fontSize: 12,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),

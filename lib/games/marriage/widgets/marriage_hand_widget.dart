@@ -229,8 +229,8 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                 },
                 builder: (context, candidates, rejects) {
                   return Container(
-                    width: 40,
-                    height: 140,
+                    width: 50,
+                    height: 145,
                     decoration: BoxDecoration(
                       color: candidates.isNotEmpty ? Colors.white.withValues(alpha: 0.1) : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
@@ -347,8 +347,8 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
         // Cards Stack (Fan)
         // Using a custom stack to render overlapping cards
         SizedBox(
-          height: 120, // Card Height + Fan effect
-          width: 30.0 + (group.length * 35.0), // Dynamic width
+          height: 145, // Card Height + Fan effect
+          width: 40.0 + (group.length * 45.0), // Dynamic width for larger cards
           child: Stack(
             clipBehavior: Clip.none,
             children: [
@@ -380,7 +380,7 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
               // Render Cards
               for (int i = 0; i < group.length; i++)
                 Positioned(
-                  left: i * 35.0,
+                  left: i * 45.0,
                   top: 0,
                   child: LongPressDraggable<PlayingCard>(
                     data: group[i],

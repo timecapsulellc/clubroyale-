@@ -33,6 +33,7 @@ import 'package:clubroyale/features/game/ui/components/table_layout.dart';
 import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
+import 'package:clubroyale/games/marriage/widgets/marriage_tutorial_steps.dart';
 
 
 
@@ -56,6 +57,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   // REMOVED: _hasDrawn flag - now using state.turnPhase from Firestore (P0 FIX)
   bool _isChatExpanded = false;
   bool _showVideoGrid = false;
+  bool _showTutorial = false;  // Tutorial overlay state
   final Set<String> _highlightedCardIds = {};  // P2: Cards to highlight in meld suggestions
   
 
@@ -68,6 +70,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   void initState() {
     super.initState();
     _buildCardCache();
+    _checkFirstTimeTutorial();
   }
   
   void _buildCardCache() {
@@ -76,6 +79,19 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     final deck = Deck.forMarriage(deckCount: 4);
     for (final card in deck.cards) {
       _cardCache[card.id] = card;
+    }
+  }
+  
+  /// Check if first-time tutorial should be shown
+  Future<void> _checkFirstTimeTutorial() async {
+    final hasCompleted = await MarriageTutorialSteps.hasCompletedTutorial();
+    if (!hasCompleted && mounted) {
+      // Show tutorial after a brief delay to let the game load
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          setState(() => _showTutorial = true);
+        }
+      });
     }
   }
   
@@ -155,17 +171,15 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                    // ... existing children
                   // Main Game Layer
                   MarriageTableLayout(
-                    centerArea: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                           _buildGameModeBanner(state),
-                           if (isMyTurn) _buildPhaseIndicator(state),
-                           _buildCenterArea(state, topDiscard, isMyTurn),
-                           _buildMeldSuggestions(myHand, tiplu),
-                        ],
-                      ),
+                    centerArea: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                         _buildGameModeBanner(state),
+                         if (isMyTurn) _buildPhaseIndicator(state),
+                         _buildCenterArea(state, topDiscard, isMyTurn),
+                         _buildMeldSuggestions(myHand, tiplu),
+                      ],
                     ),
                     opponents: _buildOpponentWidgets(state, currentUser.uid),
                     myHand: Container(
@@ -277,9 +291,30 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                      ),
                    ),
                    AudioFloatingButton(roomId: widget.roomId, userId: currentUser.uid),
+                   // Help Button
+                   Container(
+                     margin: const EdgeInsets.only(top: 8),
+                     decoration: BoxDecoration(
+                       color: CasinoColors.gold.withValues(alpha: 0.2),
+                       shape: BoxShape.circle,
+                       border: Border.all(color: CasinoColors.gold),
+                     ),
+                     child: IconButton(
+                       icon: const Icon(Icons.help_outline, color: CasinoColors.gold, size: 22),
+                       onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MarriageGuidebookScreen())),
+                       tooltip: 'How to Play',
+                     ),
+                   ),
                  ],
                ),
             ),
+            
+            // Tutorial Overlay (shows for first-time players)
+            if (_showTutorial)
+              MarriageTutorial(
+                onComplete: () => setState(() => _showTutorial = false),
+                onSkip: () => setState(() => _showTutorial = false),
+              ),
           ],
         ),
       ),
@@ -639,83 +674,80 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
     final canDraw = isMyTurn && state.isDrawingPhase;
     final labelStyle = TextStyle(
       color: Colors.white.withValues(alpha: 0.8),
-      fontSize: 9,
+      fontSize: 10,
       fontWeight: FontWeight.bold,
       letterSpacing: 1.0,
     );
     
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            // CLOSED DECK (Draw pile)
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  onTap: canDraw ? _drawFromDeck : null,
-                  child: _buildDeckPile(state.deckCards.length, canDraw),
-                ),
-                const SizedBox(height: 4),
-                Text('CLOSED DECK', style: labelStyle),
-              ],
-            ),
-            
-            const SizedBox(width: 12),
-            
-            // FINISH SLOT (Declare button area)
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 50,
-                  height: 65,
-                  decoration: BoxDecoration(
-                    color: CasinoColors.feltGreenDark.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: CasinoColors.gold.withValues(alpha: 0.4),
-                      width: 1,
-                      style: BorderStyle.solid,
-                    ),
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.flag_outlined, color: CasinoColors.gold.withValues(alpha: 0.6), size: 20),
-                        const SizedBox(height: 2),
-                        Text('FINISH', style: TextStyle(color: CasinoColors.gold.withValues(alpha: 0.6), fontSize: 7, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // CLOSED DECK (Draw pile)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: canDraw ? _drawFromDeck : null,
+                child: _buildDeckPile(state.deckCards.length, canDraw),
+              ),
+              const SizedBox(height: 4),
+              Text('DECK', style: labelStyle),
+            ],
+          ),
+          
+          const SizedBox(width: 16),
+          
+          // FINISH SLOT (Declare button area)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 65,
+                height: 90,
+                decoration: BoxDecoration(
+                  color: CasinoColors.feltGreenDark.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: CasinoColors.gold.withValues(alpha: 0.4),
+                    width: 1,
+                    style: BorderStyle.solid,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text('FINISH SLOT', style: labelStyle),
-              ],
-            ),
-            
-            const SizedBox(width: 12),
-            
-            // OPEN DECK (Discard pile)
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  onTap: canDraw && topDiscard != null ? _drawFromDiscard : null,
-                  child: _buildDiscardPile(topDiscard, canDraw),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.flag_outlined, color: CasinoColors.gold.withValues(alpha: 0.6), size: 26),
+                      const SizedBox(height: 4),
+                      Text('FINISH', style: TextStyle(color: CasinoColors.gold.withValues(alpha: 0.6), fontSize: 9, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 4),
-                Text('OPEN DECK', style: labelStyle),
-              ],
-            ),
-          ],
-        ),
+              ),
+              const SizedBox(height: 4),
+              Text('FINISH', style: labelStyle),
+            ],
+          ),
+          
+          const SizedBox(width: 16),
+          
+          // OPEN DECK (Discard pile)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: canDraw && topDiscard != null ? _drawFromDiscard : null,
+                child: _buildDiscardPile(topDiscard, canDraw),
+              ),
+              const SizedBox(height: 4),
+              Text('DISCARD', style: labelStyle),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -723,8 +755,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
   
   Widget _buildDeckPile(int count, bool canDraw) {
     return Container(
-      width: 65,
-      height: 90,
+      width: 80,
+      height: 115,
       decoration: BoxDecoration(
         color: CasinoColors.cardBackground,
         borderRadius: BorderRadius.circular(8),
@@ -755,21 +787,21 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
             child: Center(
               child: Icon(Icons.style, 
                 color: CasinoColors.gold.withValues(alpha: 0.5), 
-                size: 32,
+                size: 40,
               ),
             ),
           ),
           Positioned(
             bottom: 4,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
                 '$count',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
+                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -778,12 +810,12 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
               top: 4,
               right: 4,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(5),
                 decoration: const BoxDecoration(
                   color: Colors.green,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.add, size: 12, color: Colors.white),
+                child: const Icon(Icons.add, size: 14, color: Colors.white),
               ),
             ),
         ],
@@ -809,8 +841,8 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
         final isHovering = candidateData.isNotEmpty;
         
         return Container(
-          width: 65,
-          height: 90,
+          width: 80,
+          height: 115,
           decoration: BoxDecoration(
             color: isHovering 
                 ? Colors.red.withValues(alpha: 0.3) 
@@ -863,7 +895,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
 
   
   Widget _buildCardWidget(Card card, bool isSelected, {bool isLarge = false, MaalType maalType = MaalType.none}) {
-    final size = isLarge ? const Size(70, 100) : const Size(60, 85);
+    final size = isLarge ? const Size(85, 125) : const Size(75, 110);
     
     // Maal glow colors
     final hasMaalGlow = maalType != MaalType.none;
@@ -905,7 +937,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                 card.rank.symbol,
                 style: TextStyle(
                   color: card.suit.isRed ? Colors.red : Colors.black,
-                  fontSize: isLarge ? 24 : 18,
+                  fontSize: isLarge ? 32 : 26,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -913,7 +945,7 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
                 card.suit.symbol,
                 style: TextStyle(
                   color: card.suit.isRed ? Colors.red : Colors.black,
-                  fontSize: isLarge ? 20 : 16,
+                  fontSize: isLarge ? 26 : 20,
                 ),
               ),
             ],
@@ -999,9 +1031,11 @@ class _MarriageMultiplayerScreenState extends ConsumerState<MarriageMultiplayerS
           children: [
             // Discard Button (Left)
             _buildGameActionButton(
-              label: '↑ Discard',
-              color: Colors.grey.shade800,
-              icon: Icons.arrow_upward,
+              label: _selectedCardId != null 
+                  ? '↑ Discard' 
+                  : (isMyTurn && state.isDiscardingPhase ? '👆 Tap Card' : '↑ Discard'),
+              color: canDiscard ? Colors.orange : Colors.grey.shade800,
+              icon: canDiscard ? Icons.arrow_upward : Icons.touch_app,
               isEnabled: canDiscard,
               onPressed: _discardCard,
             ),

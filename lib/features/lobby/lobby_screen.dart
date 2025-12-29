@@ -16,12 +16,17 @@ import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:clubroyale/core/responsive/responsive_utils.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 import 'package:clubroyale/core/error/error_display.dart';
 
 import '../auth/auth_service.dart';
+
+/// Track if we've already granted dev diamonds this session
+bool _devDiamondsGranted = false;
 
 class LobbyScreen extends ConsumerWidget {
   const LobbyScreen({super.key});
@@ -31,6 +36,20 @@ class LobbyScreen extends ConsumerWidget {
     final lobbyService = ref.watch(lobbyServiceProvider);
     final authService = ref.watch(authServiceProvider);
     final gamesStream = lobbyService.getGames();
+
+    // Auto-grant dev diamonds in debug mode (once per session)
+    if (kDebugMode && !_devDiamondsGranted) {
+      _devDiamondsGranted = true;
+      final userId = authService.currentUser?.uid;
+      if (userId != null) {
+        final diamondService = ref.read(diamondServiceProvider);
+        diamondService.grantDevDiamonds(userId).then((success) {
+          if (success) {
+            debugPrint('💎 Auto-granted dev diamonds to user');
+          }
+        });
+      }
+    }
 
     return Scaffold(
       body: CustomScrollView(
@@ -617,11 +636,12 @@ class LobbyScreen extends ConsumerWidget {
 
     if (user == null) return;
 
-    // Skip diamond check in Test Mode - allow free room creation
+    // Skip diamond check in Test Mode or Debug Mode - allow free room creation for testing
     final isTestMode = TestMode.isEnabled;
+    final bypassDiamondCheck = isTestMode || kDebugMode;
     
-    if (!isTestMode) {
-      // Check diamond balance (only for real users)
+    if (!bypassDiamondCheck) {
+      // Check diamond balance (only for production users)
       final hasEnough = await diamondService.hasEnoughDiamonds(
         user.uid,
         DiamondConfig.roomCreationCost,
@@ -683,8 +703,8 @@ class LobbyScreen extends ConsumerWidget {
     try {
       final newGameId = await lobbyService.createGame(newGameRoom);
 
-      // Deduct diamonds after successful room creation (skip in Test Mode)
-      if (!isTestMode) {
+      // Deduct diamonds after successful room creation (skip in Debug/Test Mode)
+      if (!bypassDiamondCheck) {
         final cost = DiamondConfig.roomCreationCost;
         final success = await diamondService.deductDiamonds(
           user.uid, 
@@ -705,8 +725,8 @@ class LobbyScreen extends ConsumerWidget {
               children: [
                 const Icon(Icons.check_circle, color: Colors.white),
                 const SizedBox(width: 8),
-                Text(isTestMode 
-                  ? 'Room created! (Test Mode - Free)' 
+                Text(bypassDiamondCheck 
+                  ? 'Room created! (Dev Mode - Free)' 
                   : 'Room created! ${DiamondConfig.roomCreationCost} diamonds used.'),
               ],
             ),

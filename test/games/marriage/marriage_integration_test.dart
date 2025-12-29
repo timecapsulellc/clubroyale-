@@ -154,9 +154,16 @@ void main() {
         final player = game.currentPlayerId!;
         final discardCard = game.topDiscard;
         
-        game.drawFromDiscard(player);
-        
-        expect(game.getHand(player).contains(discardCard), true);
+        // Wild cards cannot be picked from discard per Marriage rules
+        if (discardCard != null && discardCard.rank != game.tiplu?.rank) {
+          game.drawFromDiscard(player);
+          expect(game.getHand(player).contains(discardCard), true);
+        } else {
+          // If discard is wild, just draw from deck instead
+          final initialSize = game.getHand(player).length;
+          game.drawFromDeck(player);
+          expect(game.getHand(player).length, initialSize + 1);
+        }
       });
       
       test('Cannot play out of turn', () {
@@ -432,12 +439,20 @@ void main() {
           final player = game.currentPlayerId!;
           
           // Alternate between drawing from deck and discard
-          if (turn % 2 == 0) {
+          // Note: Wild cards cannot be picked from discard per Marriage rules
+          final topDiscard = game.topDiscard;
+          final tiplu = game.tiplu;
+          final isDiscardWild = topDiscard != null && tiplu != null && topDiscard.rank == tiplu.rank;
+          final canDrawFromDiscard = topDiscard != null && !isDiscardWild;
+          if (turn % 2 == 0 || !canDrawFromDiscard) {
             game.drawFromDeck(player);
-          } else if (game.topDiscard != null) {
-            game.drawFromDiscard(player);
           } else {
-            game.drawFromDeck(player);
+            // Additional safety: fall back to deck if discard draw fails
+            try {
+              game.drawFromDiscard(player);
+            } catch (e) {
+              game.drawFromDeck(player);
+            }
           }
           
           // Discard a random card

@@ -15,7 +15,9 @@ class DiamondConfig {
   // ============ EARNING (FREE TIER) ============
 
   /// One-time signup bonus
-  static const int signupBonus = 100;
+  /// TODO: REDUCE TO 100 BEFORE PUBLIC RELEASE!
+  /// Currently set high (10000) for pre-production testing
+  static const int signupBonus = 10000;
 
   /// Daily login reward (Base)
   static const int dailyLogin = 10;

@@ -29,17 +29,17 @@ class CardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Default sizes
-    final w = width ?? 60.0;
-    final h = height ?? 85.0;
-    final isLarge = w > 65;
+    // Default sizes - increased for better mobile visibility
+    final w = width ?? 75.0;
+    final h = height ?? 110.0;
+    final isLarge = w > 80;
 
     if (!isFaceUp) {
       return Container(
         width: w,
         height: h,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
           boxShadow: [
             BoxShadow(
@@ -55,7 +55,7 @@ class CardWidget extends StatelessWidget {
           ),
         ),
         child: Center(
-          child: Icon(Icons.style, color: AppTheme.gold.withValues(alpha: 0.5), size: isLarge ? 32 : 24),
+          child: Icon(Icons.style, color: AppTheme.gold.withValues(alpha: 0.5), size: isLarge ? 36 : 28),
         ),
       );
     }
@@ -65,7 +65,7 @@ class CardWidget extends StatelessWidget {
       height: h,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: glowColor ?? (isSelected ? AppTheme.gold : Colors.grey.shade300),
           width: (isSelected || glowColor != null) ? 2.5 : 1,
@@ -89,7 +89,7 @@ class CardWidget extends StatelessWidget {
                   card.rank.symbol,
                   style: TextStyle(
                     color: card.suit.isRed ? Colors.red : Colors.black,
-                    fontSize: isLarge ? 24 : 18,
+                    fontSize: isLarge ? 32 : 26,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -97,7 +97,7 @@ class CardWidget extends StatelessWidget {
                   card.suit.symbol,
                   style: TextStyle(
                     color: card.suit.isRed ? Colors.red : Colors.black,
-                    fontSize: isLarge ? 20 : 16,
+                    fontSize: isLarge ? 26 : 20,
                   ),
                 ),
               ],

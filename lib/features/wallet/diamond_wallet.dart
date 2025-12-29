@@ -94,4 +94,5 @@ enum DiamondTransactionType {
   adDisable,   // Spent to disable ads
   refund,      // Refund from cancelled room
   bonus,       // Free diamonds (referral, etc.)
+  signup,      // Signup bonus diamonds
 }
