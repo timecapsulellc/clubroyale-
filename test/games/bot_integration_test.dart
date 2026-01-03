@@ -10,7 +10,7 @@ import 'package:clubroyale/features/agents/models/bot_personality.dart';
 void main() {
   group('BotPersonality System', () {
     test('All personality types exist', () {
-      expect(BotPersonalityType.values.length, equals(8));
+      expect(BotPersonalityType.values.length, equals(5));
     });
 
     test('Can get random personality', () {
@@ -38,10 +38,10 @@ void main() {
     });
 
     test('Can filter by personality type', () {
-      final cautious = BotPersonality.all.where((p) => p.type == BotPersonalityType.cautious).toList();
-      expect(cautious.length, greaterThan(0));
-      for (final p in cautious) {
-        expect(p.type, equals(BotPersonalityType.cautious));
+      final conservative = BotPersonality.all.where((p) => p.type == BotPersonalityType.conservative).toList();
+      expect(conservative.length, greaterThan(0));
+      for (final p in conservative) {
+        expect(p.type, equals(BotPersonalityType.conservative));
       }
     });
   });
@@ -73,10 +73,10 @@ void main() {
     test('Bot personality affects betting decisions', () {
       // Aggressive personality should bet more
       final aggressive = BotPersonality.all.firstWhere((p) => p.type == BotPersonalityType.aggressive);
-      final cautious = BotPersonality.all.firstWhere((p) => p.type == BotPersonalityType.cautious);
+      final conservative = BotPersonality.all.firstWhere((p) => p.type == BotPersonalityType.conservative);
       
-      expect(aggressive.aggression, greaterThan(cautious.aggression));
-      expect(aggressive.bluffRate, greaterThan(cautious.bluffRate));
+      expect(aggressive.aggression, greaterThan(conservative.aggression));
+      expect(aggressive.bluffRate, greaterThan(conservative.bluffRate));
     });
   });
 
@@ -88,10 +88,10 @@ void main() {
     });
 
     test('Bot risk tolerance affects betting', () {
-      final highRoller = BotPersonality.all.firstWhere((p) => p.type == BotPersonalityType.highRoller);
+      final aggressive = BotPersonality.all.firstWhere((p) => p.type == BotPersonalityType.aggressive);
       final analytical = BotPersonality.all.firstWhere((p) => p.type == BotPersonalityType.analytical);
       
-      expect(highRoller.riskTolerance, greaterThan(analytical.riskTolerance));
+      expect(aggressive.riskTolerance, greaterThan(analytical.riskTolerance));
     });
 
     test('Win probability calculation is valid', () {

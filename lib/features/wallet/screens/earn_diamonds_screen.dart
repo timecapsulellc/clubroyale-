@@ -96,45 +96,45 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
     final user = ref.read(authServiceProvider).currentUser;
     if (user == null) return;
 
-    final adService = AdService();
+    final localAdService = AdService();
     setState(() => _isLoading = true);
 
     try {
-      final rewardEarned = adService.showRewardedAd();
-
-      if (rewardEarned) {
-        final rewardsService = ref.read(diamondRewardsServiceProvider);
-        final result = await rewardsService.claimAdReward(
-          user.uid,
-          'ad_${DateTime.now().millisecondsSinceEpoch}',
-        );
-
-        if (mounted) {
-          if (result.success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  '🎬 Earned ${result.amount} diamonds! (${result.remaining} ads left today)',
-                ),
-                backgroundColor: Colors.green,
-              ),
-            );
-            _loadStatus();
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(result.reason ?? 'Failed to claim reward'),
-                backgroundColor: Colors.orange,
-              ),
-            );
-          }
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Ad failed to load or was cancelled')),
+      localAdService.showRewardedAd(
+        onUserEarnedReward: (ad, reward) async {
+          final rewardsService = ref.read(diamondRewardsServiceProvider);
+          final result = await rewardsService.claimAdReward(
+            user.uid,
+            'ad_${DateTime.now().millisecondsSinceEpoch}',
           );
-        }
+
+          if (mounted) {
+            if (result.success) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '🎬 Earned ${result.amount} diamonds! (${result.remaining} ads left today)',
+                  ),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              _loadStatus();
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(result.reason ?? 'Failed to claim reward'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            }
+          }
+        },
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Ad failed to load or was cancelled')),
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
