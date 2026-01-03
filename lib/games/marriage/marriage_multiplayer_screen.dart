@@ -32,7 +32,7 @@ import 'package:clubroyale/features/game/ui/components/table_layout.dart';
 import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
-import 'package:clubroyale/games/marriage/widgets/marriage_tutorial_steps.dart';
+import 'package:clubroyale/games/marriage/services/services.dart'; // Import new services
 
 /// Multiplayer Marriage game screen
 class MarriageMultiplayerScreen extends ConsumerStatefulWidget {
@@ -53,8 +53,23 @@ class _MarriageMultiplayerScreenState
   bool _isChatExpanded = false;
   bool _showVideoGrid = false;
   bool _showTutorial = false; // Tutorial overlay state
-  final Set<String> _highlightedCardIds =
-      {}; // P2: Cards to highlight in meld suggestions
+  bool _showHints = true; // Toggle hints
+  GameHint? _currentHint; // Current active hint
+  final Set<String> _highlightedCardIds = {}; 
+
+  // Services
+  late final MarriageHintService _hintService;
+
+  // Keys for tutorial highlighting
+  final Map<String, GlobalKey> _tutorialKeys = {
+    'player_hand': GlobalKey(),
+    'deck_pile': GlobalKey(),
+    'discard_pile': GlobalKey(),
+    'tiplu_indicator': GlobalKey(),
+    'visit_button': GlobalKey(),
+    'finish_button': GlobalKey(),
+    'hint_button': GlobalKey(),
+  };
 
   // PlayingCard lookup cache
   final Map<String, PlayingCard> _cardCache = {};
@@ -62,6 +77,7 @@ class _MarriageMultiplayerScreenState
   @override
   void initState() {
     super.initState();
+    _hintService = MarriageHintService(); // Initialize hint service
     _buildCardCache();
     _checkFirstTimeTutorial();
   }
@@ -77,8 +93,8 @@ class _MarriageMultiplayerScreenState
 
   /// Check if first-time tutorial should be shown
   Future<void> _checkFirstTimeTutorial() async {
-    final hasCompleted = await MarriageTutorialSteps.hasCompletedTutorial();
-    if (!hasCompleted && mounted) {
+    final isCompleted = await MarriageTutorial.isCompleted();
+    if (!isCompleted && mounted) {
       // Show tutorial after a brief delay to let the game load
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
@@ -151,9 +167,20 @@ class _MarriageMultiplayerScreenState
             ? _getCard(state.discardPile.last)
             : null;
 
+        // Update hints based on new state
+        if (_showHints) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _updateHints(state, currentUser.uid, myHand, tiplu, topDiscard);
+          });
+        }
+
         return Scaffold(
-          body: TableLayout(
-            child: Stack(
+          body: TutorialOverlay(
+            showTutorial: _showTutorial,
+            onComplete: () => setState(() => _showTutorial = false),
+            elementKeys: _tutorialKeys,
+            child: TableLayout(
+              child: Stack(
               children: [
                 // 1. Content Layer (Particles + Game Board)
                 ParticleBackground(
@@ -213,6 +240,7 @@ class _MarriageMultiplayerScreenState
                               _buildMyHand(
                                 myHand,
                                 isMyTurn,
+                                key: _tutorialKeys['player_hand'], // Add key
                                 tiplu: tiplu,
                                 config: state.config,
                               ),
@@ -366,15 +394,44 @@ class _MarriageMultiplayerScreenState
                 ),
 
                 // Tutorial Overlay (shows for first-time players)
-                if (_showTutorial)
-                  MarriageTutorial(
-                    onComplete: () => setState(() => _showTutorial = false),
-                    onSkip: () => setState(() => _showTutorial = false),
+                // Now handled by wrapper widget
+
+                // Hint Tooltip (Floating)
+                if (_currentHint != null && _showHints)
+                  Positioned(
+                    bottom: 180, // Above hand
+                    left: 16,
+                    right: 16, // Center horizontally
+                    child: Center(
+                      child: HintTooltip(
+                        hint: _currentHint!,
+                        onDismiss: () => setState(() => _currentHint = null),
+                      ),
+                    ),
                   ),
+
+                // Hint Button (Bottom Right)
+                Positioned(
+                  bottom: 240,
+                  right: 16,
+                  child: Container(
+                    key: _tutorialKeys['hint_button'],
+                    child: HintButton(
+                      currentHint: _currentHint,
+                      hintsEnabled: _showHints,
+                      onToggle: () {
+                         setState(() {
+                           _showHints = !_showHints;
+                           if (!_showHints) _currentHint = null;
+                         });
+                      },
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-        );
+        )); // Close TutorialOverlay and Scaffold
       },
     );
   }
@@ -757,6 +814,47 @@ class _MarriageMultiplayerScreenState
     }).toList();
   }
 
+  void _updateHints(
+    MarriageGameState state,
+    String myId,
+    List<String> handIds,
+    PlayingCard? tiplu,
+    PlayingCard? topDiscard,
+  ) {
+    if (handIds.isEmpty) return;
+    
+    // Convert IDs to cards
+    final hand = handIds
+        .map((id) => _getCard(id))
+        .whereType<PlayingCard>()
+        .toList();
+
+    // Check if it's my turn
+    final isMyTurn = state.currentPlayerId == myId;
+    final hasVisited = state.hasVisited(myId);
+
+    if (isMyTurn) {
+      final hint = _hintService.getPrimaryHint(
+        hand: hand,
+        topDiscard: topDiscard,
+        tiplu: tiplu,
+        hasVisited: hasVisited,
+        isDrawPhase: state.isDrawingPhase,
+        isDiscardPhase: state.isDiscardingPhase,
+        canPickFromDiscard: state.isDrawingPhase && topDiscard != null,
+        deckCount: state.deckCards.length,
+      );
+
+      if (mounted && hint != null && hint.type != _currentHint?.type) {
+         setState(() => _currentHint = hint);
+      }
+    } else {
+      if (mounted && _currentHint != null) {
+        setState(() => _currentHint = null);
+      }
+    }
+  }
+
   Widget _buildCenterArea(
     MarriageGameState state,
     Card? topDiscard,
@@ -786,7 +884,10 @@ class _MarriageMultiplayerScreenState
             children: [
               GestureDetector(
                 onTap: canDraw ? _drawFromDeck : null,
-                child: _buildDeckPile(state.deckCards.length, canDraw),
+                child: Container(
+                  key: _tutorialKeys['deck_pile'], // Add key
+                  child: _buildDeckPile(state.deckCards.length, canDraw),
+                ),
               ),
               const SizedBox(height: 4),
               Text('DECK', style: labelStyle),
@@ -800,6 +901,7 @@ class _MarriageMultiplayerScreenState
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
+                key: _tutorialKeys['finish_button'],
                 width: 65,
                 height: 90,
                 decoration: BoxDecoration(
@@ -807,8 +909,6 @@ class _MarriageMultiplayerScreenState
                   borderRadius: BorderRadius.circular(6),
                   border: Border.all(
                     color: CasinoColors.gold.withValues(alpha: 0.4),
-                    width: 1,
-                    style: BorderStyle.solid,
                   ),
                 ),
                 child: Center(
@@ -1009,6 +1109,7 @@ class _MarriageMultiplayerScreenState
   Widget _buildMyHand(
     List<String> cardIds,
     bool isMyTurn, {
+    Key? key,
     Card? tiplu,
     required MarriageGameConfig config,
   }) {
@@ -1020,6 +1121,7 @@ class _MarriageMultiplayerScreenState
         .toList();
 
     return MarriageHandWidget(
+      key: key, // Pass key down
       cards: cards,
       selectedCardId: _selectedCardId,
       onCardSelected: (id) =>
@@ -1190,14 +1292,17 @@ class _MarriageMultiplayerScreenState
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _buildGameActionButton(
-                    label: '🔒 VISIT (Unlock Maal)',
-                    color: Colors
-                        .purple, // Matching the user's reference Guide color
-                    icon: Icons.lock_open,
-                    isEnabled: canVisit,
-                    onPressed: _attemptVisit,
-                    isPrimary: true,
+                  child: Container(
+                    key: _tutorialKeys['visit_button'],
+                    child: _buildGameActionButton(
+                      label: '🔒 VISIT (Unlock Maal)',
+                      color: Colors
+                          .purple, // Matching the user's reference Guide color
+                      icon: Icons.lock_open,
+                      isEnabled: canVisit,
+                      onPressed: _attemptVisit,
+                      isPrimary: true,
+                    ),
                   ),
                 ),
               )

@@ -9,6 +9,7 @@ import 'package:clubroyale/firebase_options.dart';
 import 'package:clubroyale/core/services/feature_flags.dart';
 import 'core/services/analytics_service.dart';
 import 'core/services/update_service.dart';
+import 'package:clubroyale/core/performance/asset_preloader.dart'; // Asset Preloader
 
 import 'features/lobby/lobby_screen.dart';
 import 'features/lobby/room_waiting_screen.dart';
@@ -472,7 +473,6 @@ void main() async {
 
   // Initialize Feature Flags (Gaming-First Strategy)
   await featureFlags.init();
-  await featureFlags.init();
   debugPrint(
     '🏴 Feature Flags initialized: Social=${featureFlags.socialEnabled}',
   );
@@ -506,6 +506,7 @@ class MyApp extends ConsumerWidget {
     return MaterialApp.router(
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       routerConfig: _router,
+      builder: (context, child) => AssetPreloadSplash(child: child!),
       title: 'ClubRoyale',
       theme: themeData, // Dynamic theme from provider
       darkTheme: themeData, // Same theme for dark mode
