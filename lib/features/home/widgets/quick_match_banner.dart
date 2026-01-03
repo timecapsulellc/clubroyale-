@@ -3,7 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
 /// Quick Match Banner
-/// 
+///
 /// Displays when a bot-hosted game is available for instant join:
 /// - Game type
 /// - Players waiting
@@ -12,7 +12,7 @@ class QuickMatchBanner extends StatelessWidget {
   final String gameType;
   final int playersWaiting;
   final String roomId;
-  
+
   const QuickMatchBanner({
     super.key,
     required this.gameType,
@@ -48,21 +48,26 @@ class QuickMatchBanner extends StatelessWidget {
               children: [
                 // Lightning Icon
                 Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.bolt,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ).animate(onPlay: (c) => c.repeat(reverse: true))
-                  .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 500.ms),
-                
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.bolt,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    )
+                    .animate(onPlay: (c) => c.repeat(reverse: true))
+                    .scale(
+                      begin: const Offset(1, 1),
+                      end: const Offset(1.1, 1.1),
+                      duration: 500.ms,
+                    ),
+
                 const SizedBox(width: 16),
-                
+
                 // Text Content
                 Expanded(
                   child: Column(
@@ -81,7 +86,10 @@ class QuickMatchBanner extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(8),
@@ -89,7 +97,11 @@ class QuickMatchBanner extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.smart_toy, color: Colors.white, size: 12),
+                                const Icon(
+                                  Icons.smart_toy,
+                                  color: Colors.white,
+                                  size: 12,
+                                ),
                                 const SizedBox(width: 4),
                                 const Text(
                                   'AI',
@@ -115,10 +127,13 @@ class QuickMatchBanner extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 // Join Button - Enhanced
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -143,7 +158,11 @@ class QuickMatchBanner extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 4),
-                      Icon(Icons.play_arrow_rounded, color: Color(0xFF2E7D32), size: 18), // Arrow to Play icon
+                      Icon(
+                        Icons.play_arrow_rounded,
+                        color: Color(0xFF2E7D32),
+                        size: 18,
+                      ), // Arrow to Play icon
                     ],
                   ),
                 ),
@@ -172,7 +191,11 @@ class NoQuickMatchBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.search, color: Colors.white.withValues(alpha: 0.4), size: 24),
+          Icon(
+            Icons.search,
+            color: Colors.white.withValues(alpha: 0.4),
+            size: 24,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

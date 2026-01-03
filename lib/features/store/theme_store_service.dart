@@ -1,5 +1,5 @@
 /// Theme Store Service
-/// 
+///
 /// Manages user customization preferences in Firestore
 /// for table themes and card skins.
 library;
@@ -22,10 +22,7 @@ class ThemeStoreService {
   final FirebaseFirestore firestore;
   final AuthService authService;
 
-  ThemeStoreService({
-    required this.firestore,
-    required this.authService,
-  });
+  ThemeStoreService({required this.firestore, required this.authService});
 
   /// Get the current user's customization preferences
   Future<UserCustomization> getUserCustomization() async {
@@ -52,14 +49,10 @@ class ThemeStoreService {
       return Stream.value(const UserCustomization());
     }
 
-    return firestore
-        .collection('users')
-        .doc(userId)
-        .snapshots()
-        .map((doc) {
-          if (!doc.exists) return const UserCustomization();
-          return UserCustomization.fromMap(doc.data() ?? {});
-        });
+    return firestore.collection('users').doc(userId).snapshots().map((doc) {
+      if (!doc.exists) return const UserCustomization();
+      return UserCustomization.fromMap(doc.data() ?? {});
+    });
   }
 
   /// Update the selected theme

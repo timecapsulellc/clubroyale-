@@ -7,7 +7,7 @@ final analyticsAgentProvider = Provider<AnalyticsAgent>((ref) {
 });
 
 /// Analytics Agent - User Insights & Engagement
-/// 
+///
 /// Features:
 /// - Engagement prediction
 /// - Trend analysis
@@ -56,6 +56,7 @@ class AnalyticsAgent {
 // ==================== ENUMS ====================
 
 enum TimeRange { day, week, month }
+
 enum ChurnRisk { low, medium, high }
 
 // ==================== DATA MODELS ====================
@@ -109,9 +110,11 @@ class EngagementPrediction {
         (r) => r.name == json['churnRisk'],
         orElse: () => ChurnRisk.medium,
       ),
-      predictedNextAction: json['predictedNextAction'] as String? ?? 'Play a game',
+      predictedNextAction:
+          json['predictedNextAction'] as String? ?? 'Play a game',
       retentionStrategies: List<String>.from(json['retentionStrategies'] ?? []),
-      upsellOpportunities: (json['upsellOpportunities'] as List<dynamic>?)?.cast<String>(),
+      upsellOpportunities: (json['upsellOpportunities'] as List<dynamic>?)
+          ?.cast<String>(),
     );
   }
 
@@ -164,9 +167,11 @@ class TrendAnalysis {
 
   factory TrendAnalysis.fromJson(Map<String, dynamic> json) {
     return TrendAnalysis(
-      insights: (json['insights'] as List<dynamic>?)
-          ?.map((i) => TrendInsight.fromJson(i))
-          .toList() ?? [],
+      insights:
+          (json['insights'] as List<dynamic>?)
+              ?.map((i) => TrendInsight.fromJson(i))
+              .toList() ??
+          [],
       recommendations: List<String>.from(json['recommendations'] ?? []),
       highlights: List<String>.from(json['highlights'] ?? []),
       concerns: (json['concerns'] as List<dynamic>?)?.cast<String>(),
@@ -174,11 +179,7 @@ class TrendAnalysis {
   }
 
   factory TrendAnalysis.empty() {
-    return TrendAnalysis(
-      insights: [],
-      recommendations: [],
-      highlights: [],
-    );
+    return TrendAnalysis(insights: [], recommendations: [], highlights: []);
   }
 }
 

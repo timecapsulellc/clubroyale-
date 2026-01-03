@@ -10,7 +10,8 @@ class UserSupportChatScreen extends ConsumerStatefulWidget {
   const UserSupportChatScreen({super.key});
 
   @override
-  ConsumerState<UserSupportChatScreen> createState() => _UserSupportChatScreenState();
+  ConsumerState<UserSupportChatScreen> createState() =>
+      _UserSupportChatScreenState();
 }
 
 class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
@@ -59,7 +60,7 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
         userName: user.displayName ?? 'User',
         subject: 'Support Request',
       );
-      
+
       if (mounted) {
         setState(() {
           _activeChatId = chatId;
@@ -91,7 +92,7 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
         content: content,
         isAdmin: false,
       );
-      
+
       // Scroll to bottom
       Future.delayed(const Duration(milliseconds: 100), () {
         if (_scrollController.hasClients) {
@@ -129,7 +130,11 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
                   color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.support_agent, size: 64, color: Theme.of(context).primaryColor),
+                child: Icon(
+                  Icons.support_agent,
+                  size: 64,
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
               const SizedBox(height: 24),
               Text(
@@ -147,7 +152,10 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
                 icon: const Icon(Icons.chat_bubble),
                 label: const Text('Start Conversation'),
                 style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
                 ),
               ),
             ],
@@ -191,21 +199,21 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
 
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
+                  ),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final msg = messages[index];
                     final isMe = msg.senderId == user?.uid;
-                    return _MessageBubble(
-                      message: msg,
-                      isMe: isMe,
-                    );
+                    return _MessageBubble(message: msg, isMe: isMe);
                   },
                 );
               },
             ),
           ),
-          
+
           // Input area
           Container(
             padding: const EdgeInsets.all(8),
@@ -232,7 +240,10 @@ class _UserSupportChatScreenState extends ConsumerState<UserSupportChatScreen> {
                           borderSide: BorderSide.none,
                         ),
                         filled: true,
-                        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                        fillColor: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest
+                            .withValues(alpha: 0.3),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 10,
@@ -261,28 +272,23 @@ class _MessageBubble extends StatelessWidget {
   final ChatMessage message;
   final bool isMe;
 
-  const _MessageBubble({
-    required this.message,
-    required this.isMe,
-  });
+  const _MessageBubble({required this.message, required this.isMe});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final timeStr = message.createdAt != null 
-      ? DateFormat('HH:mm').format(message.createdAt!) 
-      : '';
+    final timeStr = message.createdAt != null
+        ? DateFormat('HH:mm').format(message.createdAt!)
+        : '';
 
     // User messages (Me) -> Blue/Primary
     // Admin messages (Other) -> Grey/Surface
-    
-    final bubbleColor = isMe 
-        ? theme.primaryColor 
+
+    final bubbleColor = isMe
+        ? theme.primaryColor
         : theme.colorScheme.surfaceContainerHighest;
-    
-    final textColor = isMe 
-        ? Colors.white 
-        : theme.colorScheme.onSurface;
+
+    final textColor = isMe ? Colors.white : theme.colorScheme.onSurface;
 
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -318,9 +324,7 @@ class _MessageBubble extends StatelessWidget {
               ),
             Text(
               message.content,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: textColor,
-              ),
+              style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
             ),
             const SizedBox(height: 4),
             Text(

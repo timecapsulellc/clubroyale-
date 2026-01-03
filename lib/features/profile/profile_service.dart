@@ -4,7 +4,9 @@ import 'package:clubroyale/features/profile/user_profile.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Profile service provider
-final profileServiceProvider = Provider<ProfileService>((ref) => ProfileService(ref));
+final profileServiceProvider = Provider<ProfileService>(
+  (ref) => ProfileService(ref),
+);
 
 /// Current user's profile stream
 final myProfileProvider = StreamProvider<UserProfile?>((ref) {
@@ -14,22 +16,34 @@ final myProfileProvider = StreamProvider<UserProfile?>((ref) {
 });
 
 /// Profile by ID provider
-final profileByIdProvider = StreamProvider.family<UserProfile?, String>((ref, userId) {
+final profileByIdProvider = StreamProvider.family<UserProfile?, String>((
+  ref,
+  userId,
+) {
   return ref.watch(profileServiceProvider).getProfileStream(userId);
 });
 
 /// Followers list provider
-final followersProvider = StreamProvider.family<List<UserProfile>, String>((ref, userId) {
+final followersProvider = StreamProvider.family<List<UserProfile>, String>((
+  ref,
+  userId,
+) {
   return ref.watch(profileServiceProvider).getFollowers(userId);
 });
 
 /// Following list provider
-final followingProvider = StreamProvider.family<List<UserProfile>, String>((ref, userId) {
+final followingProvider = StreamProvider.family<List<UserProfile>, String>((
+  ref,
+  userId,
+) {
   return ref.watch(profileServiceProvider).getFollowing(userId);
 });
 
 /// User posts provider
-final userPostsProvider = StreamProvider.family<List<UserPost>, String>((ref, userId) {
+final userPostsProvider = StreamProvider.family<List<UserPost>, String>((
+  ref,
+  userId,
+) {
   return ref.watch(profileServiceProvider).getUserPosts(userId);
 });
 
@@ -70,17 +84,19 @@ class ProfileService {
 
   /// Create or update profile
   Future<void> saveProfile(UserProfile profile) async {
-    await _profilesRef.doc(profile.id).set(
-      _profileToFirestore(profile),
-      SetOptions(merge: true),
-    );
+    await _profilesRef
+        .doc(profile.id)
+        .set(_profileToFirestore(profile), SetOptions(merge: true));
   }
 
   /// Alias for saveProfile (backward compatibility)
   Future<void> updateProfile(UserProfile profile) => saveProfile(profile);
 
   /// Update specific profile fields
-  Future<void> updateProfileFields(String userId, Map<String, dynamic> fields) async {
+  Future<void> updateProfileFields(
+    String userId,
+    Map<String, dynamic> fields,
+  ) async {
     await _profilesRef.doc(userId).update(fields);
   }
 
@@ -270,8 +286,9 @@ class ProfileService {
         .orderBy('createdAt', descending: true)
         .limit(50)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => _postFromDoc(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs.map((doc) => _postFromDoc(doc)).toList(),
+        );
   }
 
   /// Get feed posts (from following)

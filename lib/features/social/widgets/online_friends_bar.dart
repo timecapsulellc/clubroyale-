@@ -14,16 +14,16 @@ class OnlineFriendsBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final friendService = ref.watch(friendServiceProvider);
-    
+
     return StreamBuilder<List<String>>(
       stream: friendService.watchMyFriendIds(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return _EmptyFriendsState();
         }
-        
+
         final friendIds = snapshot.data!;
-        
+
         return Container(
           height: 100,
           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -50,7 +50,10 @@ class OnlineFriendsBar extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: CasinoColors.gold.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
@@ -86,9 +89,10 @@ class OnlineFriendsBar extends ConsumerWidget {
                   itemCount: friendIds.length,
                   itemBuilder: (context, index) {
                     return _FriendAvatar(
-                      userId: friendIds[index],
-                      onTap: () => context.go('/user/${friendIds[index]}'),
-                    ).animate(delay: (50 * index).ms)
+                          userId: friendIds[index],
+                          onTap: () => context.go('/user/${friendIds[index]}'),
+                        )
+                        .animate(delay: (50 * index).ms)
                         .fadeIn()
                         .slideX(begin: 0.2);
                   },
@@ -105,24 +109,22 @@ class OnlineFriendsBar extends ConsumerWidget {
 class _FriendAvatar extends ConsumerWidget {
   final String userId;
   final VoidCallback onTap;
-  
-  const _FriendAvatar({
-    required this.userId,
-    required this.onTap,
-  });
+
+  const _FriendAvatar({required this.userId, required this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final presenceService = ref.watch(presenceServiceProvider);
-    
+
     return StreamBuilder<SocialUserStatus>(
       stream: presenceService.watchUserStatus(userId),
       builder: (context, snapshot) {
         final presence = snapshot.data;
-        final isOnline = presence?.status == UserStatus.online || 
-                        presence?.status == UserStatus.inGame;
+        final isOnline =
+            presence?.status == UserStatus.online ||
+            presence?.status == UserStatus.inGame;
         final isInGame = presence?.status == UserStatus.inGame;
-        
+
         return GestureDetector(
           onTap: onTap,
           child: Container(
@@ -139,23 +141,24 @@ class _FriendAvatar extends ConsumerWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isInGame 
-                              ? Colors.amber 
+                          color: isInGame
+                              ? Colors.amber
                               : (isOnline ? Colors.green : Colors.grey),
                           width: 2,
                         ),
-                        boxShadow: isOnline ? [
-                          BoxShadow(
-                            color: (isInGame ? Colors.amber : Colors.green)
-                                .withValues(alpha: 0.4),
-                            blurRadius: 8,
-                            spreadRadius: 1,
-                          ),
-                        ] : null,
+                        boxShadow: isOnline
+                            ? [
+                                BoxShadow(
+                                  color:
+                                      (isInGame ? Colors.amber : Colors.green)
+                                          .withValues(alpha: 0.4),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : null,
                       ),
-                      child: ClipOval(
-                        child: _buildAvatar(userId),
-                      ),
+                      child: ClipOval(child: _buildAvatar(userId)),
                     ),
                     // Status indicator
                     Positioned(
@@ -165,8 +168,8 @@ class _FriendAvatar extends ConsumerWidget {
                         width: 14,
                         height: 14,
                         decoration: BoxDecoration(
-                          color: isInGame 
-                              ? Colors.amber 
+                          color: isInGame
+                              ? Colors.amber
                               : (isOnline ? Colors.green : Colors.grey),
                           shape: BoxShape.circle,
                           border: Border.all(
@@ -174,8 +177,12 @@ class _FriendAvatar extends ConsumerWidget {
                             width: 2,
                           ),
                         ),
-                        child: isInGame 
-                            ? const Icon(Icons.gamepad, size: 8, color: Colors.black)
+                        child: isInGame
+                            ? const Icon(
+                                Icons.gamepad,
+                                size: 8,
+                                color: Colors.black,
+                              )
                             : null,
                       ),
                     ),
@@ -199,7 +206,7 @@ class _FriendAvatar extends ConsumerWidget {
       },
     );
   }
-  
+
   String _formatUserId(String id) {
     // Show first 6 chars or the whole thing if shorter
     if (id.length > 8) {
@@ -207,12 +214,12 @@ class _FriendAvatar extends ConsumerWidget {
     }
     return id;
   }
-  
+
   Widget _buildAvatar(String id) {
     // Generate color based on id
     final hue = (id.hashCode % 360).abs().toDouble();
     final bgColor = HSLColor.fromAHSL(1.0, hue, 0.6, 0.4).toColor();
-    
+
     return Container(
       color: bgColor,
       child: Center(
@@ -238,9 +245,7 @@ class _EmptyFriendsState extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: CasinoColors.gold.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.2)),
       ),
       child: InkWell(
         onTap: () => context.go('/friends'),

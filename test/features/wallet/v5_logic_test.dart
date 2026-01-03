@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/features/wallet/models/user_tier.dart';
 import 'package:clubroyale/features/wallet/diamond_wallet.dart';
 import 'package:clubroyale/features/governance/governance_service.dart';
-import 'package:clubroyale/features/wallet/diamond_service.dart'; // Imports Firestore? No, need explicit.
+// Imports Firestore? No, need explicit.
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Mock Timestamp for testing

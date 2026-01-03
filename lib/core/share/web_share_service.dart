@@ -7,16 +7,10 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// Share result status
-enum ShareResult {
-  success,
-  dismissed,
-  unavailable,
-  copied,
-}
+enum ShareResult { success, dismissed, unavailable, copied }
 
 /// Web Share Service
 class WebShareService {
-  
   /// Share text content
   static Future<ShareResult> shareText({
     required String text,
@@ -25,10 +19,14 @@ class WebShareService {
     try {
       if (kIsWeb) {
         // Use share_plus which handles Web Share API
-        await SharePlus.instance.share(ShareParams(text: text, subject: subject));
+        await SharePlus.instance.share(
+          ShareParams(text: text, subject: subject),
+        );
         return ShareResult.success;
       } else {
-        await SharePlus.instance.share(ShareParams(text: text, subject: subject));
+        await SharePlus.instance.share(
+          ShareParams(text: text, subject: subject),
+        );
         return ShareResult.success;
       }
     } catch (e) {
@@ -47,7 +45,9 @@ class WebShareService {
   }) async {
     try {
       final content = text != null ? '$text\n$url' : url;
-      await SharePlus.instance.share(ShareParams(text: content, subject: title));
+      await SharePlus.instance.share(
+        ShareParams(text: content, subject: title),
+      );
       return ShareResult.success;
     } catch (e) {
       debugPrint('Share URL error: $e');
@@ -64,8 +64,9 @@ class WebShareService {
     required String gameType,
   }) async {
     final gameDisplayName = _getGameDisplayName(gameType);
-    
-    final message = '''
+
+    final message =
+        '''
 🎴 Join my $gameDisplayName game on ClubRoyale!
 
 📍 Room Code: $roomCode
@@ -86,26 +87,32 @@ Or open ClubRoyale and enter the room code!
     required Map<String, int> scores,
   }) async {
     final gameDisplayName = _getGameDisplayName(gameType);
-    
+
     final buffer = StringBuffer();
     buffer.writeln('🎴 $gameDisplayName Game Results');
     buffer.writeln('─' * 20);
-    
+
     // Sort by score
     final sortedScores = scores.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
-    
+
     for (var i = 0; i < sortedScores.length; i++) {
       final entry = sortedScores[i];
-      final medal = i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '  ';
+      final medal = i == 0
+          ? '🥇'
+          : i == 1
+          ? '🥈'
+          : i == 2
+          ? '🥉'
+          : '  ';
       buffer.writeln('$medal ${entry.key}: ${entry.value} pts');
     }
-    
+
     buffer.writeln('─' * 20);
     buffer.writeln(summary);
     buffer.writeln();
     buffer.writeln('Play at: clubroyale.app');
-    
+
     return shareText(
       text: buffer.toString(),
       subject: '$gameDisplayName Game Results',
@@ -123,26 +130,32 @@ Or open ClubRoyale and enter the room code!
   }) async {
     final gameDisplayName = _getGameDisplayName(gameType);
     final gameEmoji = _getGameEmoji(gameType);
-    
+
     final buffer = StringBuffer();
-    
+
     if (isWinner) {
       buffer.writeln('🏆 I WON! 🏆');
     }
     buffer.writeln('$gameEmoji $gameDisplayName on ClubRoyale');
     buffer.writeln('─' * 25);
-    
+
     // Sort by score
     final sortedScores = allScores.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
-    
+
     for (var i = 0; i < sortedScores.length; i++) {
       final entry = sortedScores[i];
-      final medal = i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '  ';
+      final medal = i == 0
+          ? '🥇'
+          : i == 1
+          ? '🥈'
+          : i == 2
+          ? '🥉'
+          : '  ';
       final isMe = entry.key == playerName ? ' ⭐' : '';
       buffer.writeln('$medal ${entry.key}: ${entry.value} pts$isMe');
     }
-    
+
     buffer.writeln('─' * 25);
     buffer.writeln();
     buffer.writeln('📱 Play with me: clubroyale.app');
@@ -151,11 +164,11 @@ Or open ClubRoyale and enter the room code!
     }
     buffer.writeln();
     buffer.writeln('#ClubRoyale #$gameDisplayName #CardGames');
-    
+
     return shareText(
       text: buffer.toString(),
-      subject: isWinner 
-          ? 'I won $gameDisplayName on ClubRoyale! 🏆' 
+      subject: isWinner
+          ? 'I won $gameDisplayName on ClubRoyale! 🏆'
           : '$gameDisplayName Results',
     );
   }
@@ -167,7 +180,7 @@ Or open ClubRoyale and enter the room code!
     required String rarity,
   }) async {
     final rarityEmoji = _getRarityEmoji(rarity);
-    
+
     final buffer = StringBuffer();
     buffer.writeln('🏅 Achievement Unlocked! 🏅');
     buffer.writeln();
@@ -178,7 +191,7 @@ Or open ClubRoyale and enter the room code!
     buffer.writeln('📱 Join me: clubroyale.app');
     buffer.writeln();
     buffer.writeln('#ClubRoyale #Achievement #Gaming');
-    
+
     return shareText(
       text: buffer.toString(),
       subject: 'I unlocked "$achievementTitle" on ClubRoyale!',

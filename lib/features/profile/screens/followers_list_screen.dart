@@ -27,9 +27,7 @@ class FollowersListScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isFollowers ? 'Followers' : 'Following'),
-      ),
+      appBar: AppBar(title: Text(isFollowers ? 'Followers' : 'Following')),
       body: listAsync.when(
         loading: () => const Padding(
           padding: EdgeInsets.all(16),
@@ -43,13 +41,17 @@ class FollowersListScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    isFollowers ? Icons.people_outline : Icons.person_add_outlined,
+                    isFollowers
+                        ? Icons.people_outline
+                        : Icons.person_add_outlined,
                     size: 64,
                     color: Colors.grey,
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    isFollowers ? 'No followers yet' : 'Not following anyone yet',
+                    isFollowers
+                        ? 'No followers yet'
+                        : 'Not following anyone yet',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: Colors.grey,
                     ),
@@ -117,10 +119,7 @@ class _UserTile extends ConsumerWidget {
       ),
       subtitle: Text(
         '${profile.rankTitle} • ${profile.followersCount} followers',
-        style: TextStyle(
-          color: colorScheme.onSurfaceVariant,
-          fontSize: 12,
-        ),
+        style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
       ),
       trailing: isFollowingAsync.when(
         loading: () => const SizedBox(
@@ -133,8 +132,12 @@ class _UserTile extends ConsumerWidget {
           width: 100,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: isFollowing ? colorScheme.surfaceContainerHighest : colorScheme.primary,
-              foregroundColor: isFollowing ? colorScheme.onSurface : colorScheme.onPrimary,
+              backgroundColor: isFollowing
+                  ? colorScheme.surfaceContainerHighest
+                  : colorScheme.primary,
+              foregroundColor: isFollowing
+                  ? colorScheme.onSurface
+                  : colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 12),
             ),
             onPressed: () async {
@@ -190,17 +193,13 @@ class UserSearchDelegate extends SearchDelegate<UserProfile?> {
   @override
   Widget buildResults(BuildContext context) {
     // TODO: Implement search with Firestore query
-    return Center(
-      child: Text('Search for: $query'),
-    );
+    return Center(child: Text('Search for: $query'));
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     if (query.isEmpty) {
-      return const Center(
-        child: Text('Search for users by name'),
-      );
+      return const Center(child: Text('Search for users by name'));
     }
     return buildResults(context);
   }

@@ -41,20 +41,23 @@ void main() {
     });
     
     test('ImpureSetMeld with joker is valid', () {
-      // 7♥, 7♦, Joker - Joker substitutes for 7♣
-      final sevenDiamonds = PlayingCard(rank: CardRank.seven, suit: CardSuit.diamonds);
-      final cards = [sevenHearts, sevenDiamonds, joker];
+      // 9♥, 9♦, Joker - Joker substitutes for 9♣
+      final nineDiamonds = PlayingCard(rank: CardRank.nine, suit: CardSuit.diamonds);
+      final cards = [nineHearts, nineDiamonds, joker];
       final meld = ImpureSetMeld(cards, tiplu: tiplu);
       expect(meld.wildcardCount, greaterThan(0));
       expect(meld.isValid, true);
       expect(meld.type, MeldType.impureSet);
     });
     
-    test('WildcardHelper identifies tiplu as wild', () {
+    test('WildcardHelper identifies tiplu and poplu as wild', () {
       final helper = WildcardHelper(tiplu);
       expect(helper.isWildcard(tiplu), true);
       expect(helper.isWildcard(joker), true);
-      expect(helper.isWildcard(eightHearts), false);
+      // 8♥ is Poplu (card above Tiplu 7♥), so it IS wild
+      expect(helper.isWildcard(eightHearts), true);
+      // 10♥ is neither Tiplu/Poplu/Jhiplu nor Joker
+      expect(helper.isWildcard(tenHearts), false);
     });
     
     test('MeldDetector finds impure runs', () {

@@ -24,7 +24,7 @@ class UserProfile {
 final userProfileProvider = FutureProvider<UserProfile?>((ref) async {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return null;
-  
+
   // Return dummy data for now to fix build
   return UserProfile(
     id: userId,

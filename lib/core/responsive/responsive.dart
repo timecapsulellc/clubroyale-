@@ -14,19 +14,14 @@ class Breakpoints {
 }
 
 /// Device type enumeration
-enum DeviceType {
-  mobile,
-  tablet,
-  desktop,
-  wide,
-}
+enum DeviceType { mobile, tablet, desktop, wide }
 
 /// Responsive utility class
 class Responsive {
   /// Get current device type based on screen width
   static DeviceType getDeviceType(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    
+
     if (width < Breakpoints.mobile) return DeviceType.mobile;
     if (width < Breakpoints.tablet) return DeviceType.tablet;
     if (width < Breakpoints.desktop) return DeviceType.desktop;
@@ -107,14 +102,15 @@ class ResponsiveBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deviceType = Responsive.getDeviceType(context);
-    
+
     // Use specific widgets if provided
     if (deviceType == DeviceType.mobile && mobile != null) return mobile!;
     if ((deviceType == DeviceType.tablet) && tablet != null) return tablet!;
-    if ((deviceType == DeviceType.desktop || deviceType == DeviceType.wide) && desktop != null) {
+    if ((deviceType == DeviceType.desktop || deviceType == DeviceType.wide) &&
+        desktop != null) {
       return desktop!;
     }
-    
+
     // Fall back to builder
     return builder(context, deviceType);
   }
@@ -136,7 +132,7 @@ class ResponsiveLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deviceType = Responsive.getDeviceType(context);
-    
+
     switch (deviceType) {
       case DeviceType.mobile:
         return mobile;
@@ -169,13 +165,13 @@ class ResponsiveVisibility extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deviceType = Responsive.getDeviceType(context);
-    
+
     final isVisible = switch (deviceType) {
       DeviceType.mobile => visibleOnMobile,
       DeviceType.tablet => visibleOnTablet,
       DeviceType.desktop || DeviceType.wide => visibleOnDesktop,
     };
-    
+
     return isVisible ? child : replacement;
   }
 }
@@ -240,10 +236,7 @@ class ResponsiveGameTable extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(
-            width: 320,
-            child: sidebar!,
-          ),
+          SizedBox(width: 320, child: sidebar!),
         ],
       );
     }

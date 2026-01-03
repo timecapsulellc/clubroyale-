@@ -23,9 +23,7 @@ class Deck {
   }
 
   /// Deal cards to 4 players (13 cards each)
-  static Map<String, List<PlayingCard>> dealHands(
-    List<String> playerIds,
-  ) {
+  static Map<String, List<PlayingCard>> dealHands(List<String> playerIds) {
     if (playerIds.length != 4) {
       throw ArgumentError('Call Break requires exactly 4 players');
     }

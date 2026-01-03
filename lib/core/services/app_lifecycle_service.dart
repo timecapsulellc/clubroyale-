@@ -13,12 +13,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/services/game_audio_service.dart';
 
 /// Provider for app lifecycle state
-final appLifecycleProvider = NotifierProvider<AppLifecycleNotifier, ui.AppLifecycleState>(() {
-  return AppLifecycleNotifier();
-});
+final appLifecycleProvider =
+    NotifierProvider<AppLifecycleNotifier, ui.AppLifecycleState>(() {
+      return AppLifecycleNotifier();
+    });
 
 /// Notifier that tracks app lifecycle and manages audio accordingly
-class AppLifecycleNotifier extends Notifier<ui.AppLifecycleState> with WidgetsBindingObserver {
+class AppLifecycleNotifier extends Notifier<ui.AppLifecycleState>
+    with WidgetsBindingObserver {
   bool _wasAudioEnabled = true;
   bool _initialized = false;
 
@@ -35,7 +37,7 @@ class AppLifecycleNotifier extends Notifier<ui.AppLifecycleState> with WidgetsBi
   @override
   void didChangeAppLifecycleState(ui.AppLifecycleState appState) {
     state = appState;
-    
+
     switch (appState) {
       case ui.AppLifecycleState.resumed:
         _onResumed();
@@ -56,7 +58,7 @@ class AppLifecycleNotifier extends Notifier<ui.AppLifecycleState> with WidgetsBi
   void _onResumed() {
     debugPrint('🔄 App resumed - restoring audio state');
     final audioService = ref.read(gameAudioServiceProvider);
-    
+
     // Restore audio if it was enabled before pausing
     if (_wasAudioEnabled) {
       audioService.setSoundEnabled(true);
@@ -66,11 +68,11 @@ class AppLifecycleNotifier extends Notifier<ui.AppLifecycleState> with WidgetsBi
   void _onPaused() {
     debugPrint('⏸️ App paused - saving state and pausing audio');
     final audioService = ref.read(gameAudioServiceProvider);
-    
+
     // Remember audio state and pause
     _wasAudioEnabled = audioService.isSoundEnabled;
     audioService.setSoundEnabled(false);
-    
+
     // TODO: Save game state to local storage if in active game
   }
 
@@ -89,7 +91,8 @@ class AppLifecycleWrapper extends ConsumerStatefulWidget {
   const AppLifecycleWrapper({super.key, required this.child});
 
   @override
-  ConsumerState<AppLifecycleWrapper> createState() => _AppLifecycleWrapperState();
+  ConsumerState<AppLifecycleWrapper> createState() =>
+      _AppLifecycleWrapperState();
 }
 
 class _AppLifecycleWrapperState extends ConsumerState<AppLifecycleWrapper> {

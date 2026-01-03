@@ -1,5 +1,5 @@
 /// Game Opponent Widget
-/// 
+///
 /// A reusable widget for displaying opponent players in game screens.
 /// Supports both human players and AI bots with distinctive visual treatment.
 library;
@@ -59,7 +59,7 @@ class BotAvatars {
     final index = botId.hashCode.abs() % avatars.length;
     return avatars.values.elementAt(index);
   }
-  
+
   /// Get all available bot names
   static List<String> get names => avatars.keys.toList();
 }
@@ -103,7 +103,7 @@ class GameOpponentWidget extends StatelessWidget {
 
   Widget _buildAvatar() {
     Widget avatarContent;
-    
+
     if (opponent.isBot) {
       // Bot avatar with distinctive styling
       avatarContent = Stack(
@@ -182,9 +182,11 @@ class GameOpponentWidget extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: opponent.isCurrentTurn 
-              ? Colors.green 
-              : (opponent.isBot ? Colors.purple.withValues(alpha: 0.5) : Colors.white24),
+          color: opponent.isCurrentTurn
+              ? Colors.green
+              : (opponent.isBot
+                    ? Colors.purple.withValues(alpha: 0.5)
+                    : Colors.white24),
           width: opponent.isCurrentTurn ? 3 : 1,
         ),
         boxShadow: opponent.isCurrentTurn
@@ -232,11 +234,7 @@ class GameOpponentWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (opponent.isBot) ...[
-            Icon(
-              Icons.smart_toy,
-              size: 10,
-              color: Colors.purple.shade300,
-            ),
+            Icon(Icons.smart_toy, size: 10, color: Colors.purple.shade300),
             const SizedBox(width: 2),
           ],
           Text(
@@ -254,36 +252,42 @@ class GameOpponentWidget extends StatelessWidget {
 
   Widget _buildStats() {
     final stats = <Widget>[];
-    
+
     if (opponent.status != null) {
       stats.add(_buildStatusBadge(opponent.status!));
     }
-    
+
     if (opponent.bet != null) {
-      stats.add(Text(
-        'Bet: ${opponent.bet}',
-        style: const TextStyle(color: Colors.white70, fontSize: 10),
-      ));
-    }
-    
-    if (opponent.bid != null && opponent.tricksWon != null) {
-      stats.add(Text(
-        '${opponent.tricksWon}/${opponent.bid}',
-        style: TextStyle(
-          color: (opponent.tricksWon ?? 0) >= (opponent.bid ?? 0)
-              ? Colors.green
-              : Colors.amber,
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
+      stats.add(
+        Text(
+          'Bet: ${opponent.bet}',
+          style: const TextStyle(color: Colors.white70, fontSize: 10),
         ),
-      ));
+      );
     }
-    
+
+    if (opponent.bid != null && opponent.tricksWon != null) {
+      stats.add(
+        Text(
+          '${opponent.tricksWon}/${opponent.bid}',
+          style: TextStyle(
+            color: (opponent.tricksWon ?? 0) >= (opponent.bid ?? 0)
+                ? Colors.green
+                : Colors.amber,
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    }
+
     if (opponent.score != null) {
-      stats.add(Text(
-        'Score: ${opponent.score}',
-        style: const TextStyle(color: Colors.amber, fontSize: 10),
-      ));
+      stats.add(
+        Text(
+          'Score: ${opponent.score}',
+          style: const TextStyle(color: Colors.amber, fontSize: 10),
+        ),
+      );
     }
 
     if (opponent.cardCount > 0) {
@@ -294,10 +298,7 @@ class GameOpponentWidget extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(top: 2),
-      child: Wrap(
-        spacing: 4,
-        children: stats,
-      ),
+      child: Wrap(spacing: 4, children: stats),
     );
   }
 
@@ -309,10 +310,7 @@ class GameOpponentWidget extends StatelessWidget {
         color: config.color.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(
-        config.emoji,
-        style: const TextStyle(fontSize: 10),
-      ),
+      child: Text(config.emoji, style: const TextStyle(fontSize: 10)),
     );
   }
 
@@ -368,11 +366,7 @@ class OpponentRow extends StatelessWidget {
   final List<GameOpponent> opponents;
   final double avatarSize;
 
-  const OpponentRow({
-    super.key,
-    required this.opponents,
-    this.avatarSize = 50,
-  });
+  const OpponentRow({super.key, required this.opponents, this.avatarSize = 50});
 
   @override
   Widget build(BuildContext context) {
@@ -384,10 +378,7 @@ class OpponentRow extends StatelessWidget {
         children: opponents.map((opponent) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: GameOpponentWidget(
-              opponent: opponent,
-              size: avatarSize,
-            ),
+            child: GameOpponentWidget(opponent: opponent, size: avatarSize),
           );
         }).toList(),
       ),

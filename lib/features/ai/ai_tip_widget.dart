@@ -85,7 +85,7 @@ class _AiTipWidgetState extends ConsumerState<AiTipWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -164,8 +164,9 @@ class _AiTipWidgetState extends ConsumerState<AiTipWidget> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: _getConfidenceColor(_tip!.confidence)
-                              .withValues(alpha: 0.2),
+                          color: _getConfidenceColor(
+                            _tip!.confidence,
+                          ).withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -218,10 +219,7 @@ class _AiTipWidgetState extends ConsumerState<AiTipWidget> {
                   ),
                   const SizedBox(height: 8),
                   // Reasoning
-                  Text(
-                    _tip!.reasoning,
-                    style: theme.textTheme.bodySmall,
-                  ),
+                  Text(_tip!.reasoning, style: theme.textTheme.bodySmall),
                 ],
               ),
             ),
@@ -340,10 +338,7 @@ class _AiBidSuggestionWidgetState extends ConsumerState<AiBidSuggestionWidget> {
                         color: theme.colorScheme.secondary,
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        'AI Suggests: ',
-                        style: theme.textTheme.labelMedium,
-                      ),
+                      Text('AI Suggests: ', style: theme.textTheme.labelMedium),
                       Text(
                         '${_suggestion!.suggestedBid}',
                         style: theme.textTheme.titleLarge?.copyWith(
@@ -358,8 +353,9 @@ class _AiBidSuggestionWidgetState extends ConsumerState<AiBidSuggestionWidget> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: _getStrengthColor(_suggestion!.handStrength)
-                              .withValues(alpha: 0.2),
+                          color: _getStrengthColor(
+                            _suggestion!.handStrength,
+                          ).withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(

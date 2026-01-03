@@ -5,7 +5,7 @@ import 'package:clubroyale/features/landing/widgets/game_showcase_section.dart';
 import 'package:clubroyale/features/landing/widgets/ai_rivals_section.dart';
 
 /// Landing Page - World-Class First Impression
-/// 
+///
 /// A premium, cinematic landing experience that showcases:
 /// - The ClubRoyale brand and value proposition
 /// - All 4 games with live stats
@@ -24,13 +24,13 @@ class LandingPage extends ConsumerWidget {
           children: const [
             // 1. Hero Section - "The Royal Table"
             HeroSection(),
-            
+
             // 2. Game Showcase - "The Four Pillars"
             GameShowcaseSection(),
-            
+
             // 3. AI Rivals - "Meet Your Rivals"
             AIRivalsSection(),
-            
+
             // 4. Footer
             _FooterSection(),
           ],
@@ -51,9 +51,7 @@ class _FooterSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
       decoration: const BoxDecoration(
         color: Color(0xFF030D08),
-        border: Border(
-          top: BorderSide(color: Color(0xFFD4AF37), width: 0.5),
-        ),
+        border: Border(top: BorderSide(color: Color(0xFFD4AF37), width: 0.5)),
       ),
       child: Column(
         children: [
@@ -73,9 +71,9 @@ class _FooterSection extends StatelessWidget {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Tagline
           Text(
             'Where Legends Play',
@@ -85,9 +83,9 @@ class _FooterSection extends StatelessWidget {
               fontStyle: FontStyle.italic,
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Social Links
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -97,9 +95,9 @@ class _FooterSection extends StatelessWidget {
               _SocialIcon(Icons.email_outlined, onTap: () {}),
             ],
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           // Legal Links
           Wrap(
             spacing: 24,
@@ -112,9 +110,9 @@ class _FooterSection extends StatelessWidget {
               _FooterLink('FAQ', onTap: () {}),
             ],
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Copyright
           Text(
             '© 2025 ClubRoyale. All rights reserved.',
@@ -132,7 +130,7 @@ class _FooterSection extends StatelessWidget {
 class _SocialIcon extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-  
+
   const _SocialIcon(this.icon, {required this.onTap});
 
   @override
@@ -155,7 +153,7 @@ class _SocialIcon extends StatelessWidget {
 class _FooterLink extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
-  
+
   const _FooterLink(this.label, {required this.onTap});
 
   @override
@@ -164,10 +162,7 @@ class _FooterLink extends StatelessWidget {
       onPressed: onTap,
       child: Text(
         label,
-        style: TextStyle(
-          color: Colors.white.withOpacity(0.5),
-          fontSize: 13,
-        ),
+        style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
       ),
     );
   }

@@ -32,7 +32,8 @@ class CallBreakGameScreen extends ConsumerStatefulWidget {
   const CallBreakGameScreen({super.key, required this.gameId});
 
   @override
-  ConsumerState<CallBreakGameScreen> createState() => _CallBreakGameScreenState();
+  ConsumerState<CallBreakGameScreen> createState() =>
+      _CallBreakGameScreenState();
 }
 
 class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
@@ -71,9 +72,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
 
         final game = snapshot.data!;
         final playerIds = game.players.map((p) => p.id).toList();
-        final playerNames = {
-          for (var p in game.players) p.id: p.name,
-        };
+        final playerNames = {for (var p in game.players) p.id: p.name};
         final isHost = game.hostId == currentUserId;
         final isMyTurn = game.currentTurn == currentUserId;
         final myHand = game.playerHands[currentUserId] ?? [];
@@ -97,7 +96,10 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [CasinoColors.gold.withValues(alpha: 0.8), CasinoColors.bronzeGold],
+                  colors: [
+                    CasinoColors.gold.withValues(alpha: 0.8),
+                    CasinoColors.bronzeGold,
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -121,8 +123,15 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                     color: CasinoColors.gold.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.star, color: CasinoColors.gold, size: 20),
-                ).animate().shimmer(duration: 2.seconds, color: CasinoColors.gold.withValues(alpha: 0.3)),
+                  child: const Icon(
+                    Icons.star,
+                    color: CasinoColors.gold,
+                    size: 20,
+                  ),
+                ).animate().shimmer(
+                  duration: 2.seconds,
+                  color: CasinoColors.gold.withValues(alpha: 0.3),
+                ),
               // Show scores
               IconButton(
                 icon: const Icon(Icons.leaderboard, color: Colors.white),
@@ -131,8 +140,11 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
               ),
               // Video Toggle
               IconButton(
-                icon: Icon(_showVideoGrid ? Icons.videocam_off : Icons.videocam),
-                onPressed: () => setState(() => _showVideoGrid = !_showVideoGrid),
+                icon: Icon(
+                  _showVideoGrid ? Icons.videocam_off : Icons.videocam,
+                ),
+                onPressed: () =>
+                    setState(() => _showVideoGrid = !_showVideoGrid),
                 tooltip: _showVideoGrid ? 'Hide Video' : 'Show Video',
               ),
             ],
@@ -144,9 +156,16 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                 primaryColor: CasinoColors.gold,
                 secondaryColor: CasinoColors.richPurple,
                 particleCount: 25,
-                child: _buildGameBody(game, playerIds, playerNames, currentUserId!, myHand, isMyTurn),
+                child: _buildGameBody(
+                  game,
+                  playerIds,
+                  playerNames,
+                  currentUserId!,
+                  myHand,
+                  isMyTurn,
+                ),
               ),
-              
+
               // Floating Audio Controls (top-left)
               Positioned(
                 top: 8,
@@ -156,7 +175,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                   userId: currentUserId,
                 ),
               ),
-              
+
               // Floating Chat Overlay (bottom-right)
               Positioned(
                 bottom: 80,
@@ -166,10 +185,11 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                   userId: currentUserId,
                   userName: playerNames[currentUserId] ?? 'Player',
                   isExpanded: _isChatExpanded,
-                  onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
+                  onToggle: () =>
+                      setState(() => _isChatExpanded = !_isChatExpanded),
                 ),
               ),
-              
+
               // Video Grid Overlay
               if (_showVideoGrid)
                 Positioned(
@@ -189,16 +209,24 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                     ),
                   ),
                 ),
-              
+
               // AI Tip Widget (shown when it's user's turn during playing phase)
-              if (isMyTurn && game.gamePhase == GamePhase.playing && myHand.isNotEmpty)
+              if (isMyTurn &&
+                  game.gamePhase == GamePhase.playing &&
+                  myHand.isNotEmpty)
                 Positioned(
                   top: 8,
                   right: 8,
                   child: AiTipWidget(
                     hand: myHand.map((c) => c.displayString).toList(),
-                    trickCards: game.currentTrick?.cards.map((c) => c.card.displayString).toList() ?? [],
-                    tricksNeeded: (game.bids[currentUserId]?.amount ?? 0) - (game.tricksWon[currentUserId] ?? 0),
+                    trickCards:
+                        game.currentTrick?.cards
+                            .map((c) => c.card.displayString)
+                            .toList() ??
+                        [],
+                    tricksNeeded:
+                        (game.bids[currentUserId]?.amount ?? 0) -
+                        (game.tricksWon[currentUserId] ?? 0),
                     tricksWon: game.tricksWon[currentUserId] ?? 0,
                     bid: game.bids[currentUserId]?.amount ?? 0,
                     ledSuit: game.currentTrick?.ledSuit.name,
@@ -206,7 +234,12 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                 ),
             ],
           ),
-          bottomNavigationBar: _buildBottomBar(game, currentUserId, isMyTurn, myHand),
+          bottomNavigationBar: _buildBottomBar(
+            game,
+            currentUserId,
+            isMyTurn,
+            myHand,
+          ),
         );
       },
     );
@@ -221,7 +254,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
     bool isMyTurn,
   ) {
     final theme = Theme.of(context);
-    
+
     // Get other players (exclude current user)
     final otherPlayers = playerIds.where((id) => id != currentUserId).toList();
 
@@ -235,85 +268,106 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
               Center(
                 child: SingleChildScrollView(
                   child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Phase indicator
-                          if (game.gamePhase != null)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: _getPhaseColor(game.gamePhase!),
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: _getPhaseColor(game.gamePhase!).withValues(alpha: 0.5),
-                                    blurRadius: 12,
-                                    spreadRadius: 2,
-                                  ),
-                                ],
-                              ),
-                              child: Text(
-                                _getPhaseText(game.gamePhase!),
-                                style: theme.textTheme.labelLarge?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ).animate().fadeIn().scale(),
-                  
-                          const SizedBox(height: 16),
-                  
-                          // Trick area
-                          TrickAreaWidget(
-                            currentTrick: game.currentTrick,
-                            playerNames: playerNames,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Phase indicator
+                      if (game.gamePhase != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
                           ),
-                  
-                          const SizedBox(height: 12),
-                  
-                          // Turn indicator
-                          if (game.gamePhase == GamePhase.playing)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: isMyTurn ? CasinoColors.gold.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: isMyTurn ? CasinoColors.gold : Colors.white.withValues(alpha: 0.3),
-                                ),
+                          decoration: BoxDecoration(
+                            color: _getPhaseColor(game.gamePhase!),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: _getPhaseColor(
+                                  game.gamePhase!,
+                                ).withValues(alpha: 0.5),
+                                blurRadius: 12,
+                                spreadRadius: 2,
                               ),
-                              child: Text(
-                                isMyTurn ? '🎯 Your turn!' : '${playerNames[game.currentTurn]}\'s turn',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: isMyTurn ? CasinoColors.gold : Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                            ],
+                          ),
+                          child: Text(
+                            _getPhaseText(game.gamePhase!),
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
-                            
-                          if (game.currentTrick?.ledSuit != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.5),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  'Must follow: ${game.currentTrick!.ledSuit.symbol}',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: game.currentTrick!.ledSuit.isRed ? Colors.red.shade300 : Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
+                          ),
+                        ).animate().fadeIn().scale(),
+
+                      const SizedBox(height: 16),
+
+                      // Trick area
+                      TrickAreaWidget(
+                        currentTrick: game.currentTrick,
+                        playerNames: playerNames,
                       ),
-                    ),
+
+                      const SizedBox(height: 12),
+
+                      // Turn indicator
+                      if (game.gamePhase == GamePhase.playing)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isMyTurn
+                                ? CasinoColors.gold.withValues(alpha: 0.2)
+                                : Colors.white.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isMyTurn
+                                  ? CasinoColors.gold
+                                  : Colors.white.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Text(
+                            isMyTurn
+                                ? '🎯 Your turn!'
+                                : '${playerNames[game.currentTurn]}\'s turn',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: isMyTurn
+                                  ? CasinoColors.gold
+                                  : Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+
+                      if (game.currentTrick?.ledSuit != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'Must follow: ${game.currentTrick!.ledSuit.symbol}',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: game.currentTrick!.ledSuit.isRed
+                                    ? Colors.red.shade300
+                                    : Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-              
+                ),
+              ),
+
               // Top player (opponent across table)
               if (otherPlayers.isNotEmpty)
                 Positioned(
@@ -330,7 +384,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                     ).animate().fadeIn(delay: 100.ms).slideY(begin: -0.3),
                   ),
                 ),
-              
+
               // Left player (if 3+ players)
               if (otherPlayers.length >= 2)
                 Positioned(
@@ -347,7 +401,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                     ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.3),
                   ),
                 ),
-              
+
               // Right player (if 4 players)
               if (otherPlayers.length >= 3)
                 Positioned(
@@ -386,13 +440,17 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isMyTurn ? CasinoColors.gold : CasinoColors.feltGreenMid,
+                      color: isMyTurn
+                          ? CasinoColors.gold
+                          : CasinoColors.feltGreenMid,
                       border: Border.all(color: CasinoColors.gold, width: 2),
                     ),
                     child: Text(
                       'You'[0],
                       style: TextStyle(
-                        color: isMyTurn ? CasinoColors.feltGreenDark : Colors.white,
+                        color: isMyTurn
+                            ? CasinoColors.feltGreenDark
+                            : Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -421,7 +479,10 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
               ),
               if (game.hostId == currentUserId)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: CasinoColors.gold.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
@@ -432,7 +493,13 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                     children: [
                       Icon(Icons.star, color: CasinoColors.gold, size: 14),
                       SizedBox(width: 4),
-                      Text('Host', style: TextStyle(color: CasinoColors.gold, fontSize: 12)),
+                      Text(
+                        'Host',
+                        style: TextStyle(
+                          color: CasinoColors.gold,
+                          fontSize: 12,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -470,7 +537,9 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: FilledButton.icon(
-            onPressed: _isProcessing ? null : () => _showBidDialog(game, currentUserId),
+            onPressed: _isProcessing
+                ? null
+                : () => _showBidDialog(game, currentUserId),
             icon: const Icon(Icons.gavel),
             label: const Text('Place Your Bid'),
           ),
@@ -479,7 +548,9 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
     }
 
     // Playing phase - show play card button
-    if (game.gamePhase == GamePhase.playing && isMyTurn && _selectedCard != null) {
+    if (game.gamePhase == GamePhase.playing &&
+        isMyTurn &&
+        _selectedCard != null) {
       return SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -515,10 +586,7 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
   }
 
   Future<void> _showBidDialog(GameRoom game, String currentUserId) async {
-    final bid = await showBiddingDialog(
-      context: context,
-      playerName: 'You',
-    );
+    final bid = await showBiddingDialog(context: context, playerName: 'You');
 
     if (bid != null && mounted) {
       setState(() => _isProcessing = true);
@@ -538,7 +606,11 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
     }
   }
 
-  Future<void> _playCard(String gameId, PlayingCard card, CallBreakService service) async {
+  Future<void> _playCard(
+    String gameId,
+    PlayingCard card,
+    CallBreakService service,
+  ) async {
     setState(() => _isProcessing = true);
     try {
       HapticHelper.cardMove();
@@ -547,32 +619,40 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
       setState(() => _selectedCard = null);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to play card: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to play card: $e')));
       }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
   }
 
-  Future<void> _startNextRound(String gameId, List<String> playerIds, CallBreakService service) async {
+  Future<void> _startNextRound(
+    String gameId,
+    List<String> playerIds,
+    CallBreakService service,
+  ) async {
     setState(() => _isProcessing = true);
     try {
       HapticHelper.mediumTap();
       await service.startNewRound(gameId, playerIds);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to start round: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to start round: $e')));
       }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
   }
 
-  void _showScoreboard(BuildContext context, GameRoom game, Map<String, String> playerNames) {
+  void _showScoreboard(
+    BuildContext context,
+    GameRoom game,
+    Map<String, String> playerNames,
+  ) {
     showModalBottomSheet(
       context: context,
       builder: (context) => DraggableScrollableSheet(
@@ -617,8 +697,9 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
 
     // Sort by total score
     final sortedPlayers = playerNames.entries.toList()
-      ..sort((a, b) =>
-          (game.scores[b.key] ?? 0).compareTo(game.scores[a.key] ?? 0));
+      ..sort(
+        (a, b) => (game.scores[b.key] ?? 0).compareTo(game.scores[a.key] ?? 0),
+      );
 
     return Card(
       child: Padding(
@@ -628,8 +709,20 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
             // Header
             Row(
               children: [
-                const Expanded(flex: 2, child: Text('Player', style: TextStyle(fontWeight: FontWeight.bold))),
-                const Expanded(child: Text('Total', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold))),
+                const Expanded(
+                  flex: 2,
+                  child: Text(
+                    'Player',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const Expanded(
+                  child: Text(
+                    'Total',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
               ],
             ),
             const Divider(),
@@ -645,14 +738,15 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
                 child: Row(
                   children: [
                     if (isLeader)
-                      const Icon(Icons.emoji_events, color: Colors.amber, size: 20)
+                      const Icon(
+                        Icons.emoji_events,
+                        color: Colors.amber,
+                        size: 20,
+                      )
                     else
                       const SizedBox(width: 20),
                     const SizedBox(width: 8),
-                    Expanded(
-                      flex: 2,
-                      child: Text(player.value),
-                    ),
+                    Expanded(flex: 2, child: Text(player.value)),
                     Expanded(
                       child: Text(
                         '$score',

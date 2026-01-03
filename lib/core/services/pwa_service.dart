@@ -7,11 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:web/web.dart' as web;
 
 /// PWA installation state
-enum PWAInstallState {
-  notAvailable,
-  available,
-  installed,
-}
+enum PWAInstallState { notAvailable, available, installed }
 
 /// PWA Service for web-specific features
 class PWAService {
@@ -23,7 +19,8 @@ class PWAService {
   PWAInstallState _installState = PWAInstallState.notAvailable;
 
   PWAInstallState get installState => _installState;
-  Stream<PWAInstallState> get installStateStream => _installStateController.stream;
+  Stream<PWAInstallState> get installStateStream =>
+      _installStateController.stream;
   bool get isInstallable => _installState == PWAInstallState.available;
   bool get isInstalled => _installState == PWAInstallState.installed;
 
@@ -45,7 +42,7 @@ class PWAService {
   /// Check if running as installed PWA
   bool _isPWAInstalled() {
     if (!kIsWeb) return false;
-    
+
     // Check display mode
     final mediaQuery = web.window.matchMedia('(display-mode: standalone)');
     return mediaQuery.matches;
@@ -65,9 +62,10 @@ class PWAService {
   bool shouldShowInstallPrompt() {
     if (!kIsWeb) return false;
     if (_installState != PWAInstallState.available) return false;
-    
+
     // Check if dismissed recently (use localStorage)
-    final dismissed = web.window.localStorage.getItem('pwa_install_dismissed') ?? '';
+    final dismissed =
+        web.window.localStorage.getItem('pwa_install_dismissed') ?? '';
     if (dismissed.isNotEmpty) {
       final dismissedTime = int.tryParse(dismissed) ?? 0;
       final now = DateTime.now().millisecondsSinceEpoch;
@@ -76,7 +74,7 @@ class PWAService {
         return false;
       }
     }
-    
+
     return true;
   }
 
@@ -92,7 +90,7 @@ class PWAService {
   /// Get platform for display (iOS, Android, Desktop)
   String getPlatform() {
     if (!kIsWeb) return 'unknown';
-    
+
     final userAgent = web.window.navigator.userAgent.toLowerCase();
     if (userAgent.contains('iphone') || userAgent.contains('ipad')) {
       return 'ios';

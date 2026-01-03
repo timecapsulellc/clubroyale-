@@ -1,5 +1,5 @@
 /// Admin Configuration for Diamond Economy
-/// 
+///
 /// Defines admin emails, approval thresholds, and permissions.
 library;
 

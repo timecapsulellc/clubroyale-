@@ -23,7 +23,10 @@ class DiamondRewardsService {
         .get();
 
     if (existing.docs.isNotEmpty) {
-      return ClaimResult(success: false, reason: 'Signup bonus already claimed');
+      return ClaimResult(
+        success: false,
+        reason: 'Signup bonus already claimed',
+      );
     }
 
     // Grant bonus
@@ -40,7 +43,7 @@ class DiamondRewardsService {
   /// Claim daily login bonus (10 diamonds per day)
   Future<ClaimResult> claimDailyLogin(String userId) async {
     final today = _getTodayKey();
-    
+
     // Check if already claimed today
     final existing = await _db
         .collection('diamond_rewards')
@@ -51,7 +54,10 @@ class DiamondRewardsService {
         .get();
 
     if (existing.docs.isNotEmpty) {
-      return ClaimResult(success: false, reason: 'Daily login already claimed today');
+      return ClaimResult(
+        success: false,
+        reason: 'Daily login already claimed today',
+      );
     }
 
     await _grantReward(
@@ -68,7 +74,7 @@ class DiamondRewardsService {
   /// Claim ad watch reward (20 diamonds per ad, 6 max per day)
   Future<ClaimResult> claimAdReward(String userId, String adId) async {
     final today = _getTodayKey();
-    
+
     // Check how many ads watched today
     final todayAds = await _db
         .collection('diamond_rewards')
@@ -79,7 +85,7 @@ class DiamondRewardsService {
 
     if (todayAds.docs.length >= DiamondConfig.maxAdsPerDay) {
       return ClaimResult(
-        success: false, 
+        success: false,
         reason: 'Maximum ads for today reached (${DiamondConfig.maxAdsPerDay})',
       );
     }
@@ -94,7 +100,7 @@ class DiamondRewardsService {
     );
 
     return ClaimResult(
-      success: true, 
+      success: true,
       amount: DiamondConfig.perAdWatch,
       remaining: DiamondConfig.maxAdsPerDay - todayAds.docs.length - 1,
     );
@@ -103,7 +109,7 @@ class DiamondRewardsService {
   /// Claim game completion reward (5 diamonds per game, 15 max per day)
   Future<ClaimResult> claimGameReward(String userId, String gameId) async {
     final today = _getTodayKey();
-    
+
     // Check if this game already rewarded
     final gameRewarded = await _db
         .collection('diamond_rewards')
@@ -128,7 +134,8 @@ class DiamondRewardsService {
     if (todayGames.docs.length >= DiamondConfig.maxGamesPerDay) {
       return ClaimResult(
         success: false,
-        reason: 'Maximum games for today reached (${DiamondConfig.maxGamesPerDay})',
+        reason:
+            'Maximum games for today reached (${DiamondConfig.maxGamesPerDay})',
       );
     }
 
@@ -149,7 +156,10 @@ class DiamondRewardsService {
   }
 
   /// Claim referral bonus (50 diamonds, 20 max per month)
-  Future<ClaimResult> claimReferralBonus(String referrerId, String newUserId) async {
+  Future<ClaimResult> claimReferralBonus(
+    String referrerId,
+    String newUserId,
+  ) async {
     final monthKey = _getMonthKey();
 
     // Check if this referral already rewarded
@@ -192,7 +202,8 @@ class DiamondRewardsService {
     return ClaimResult(
       success: true,
       amount: DiamondConfig.referralBonus,
-      remaining: DiamondConfig.maxReferralsPerMonth - monthlyReferrals.docs.length - 1,
+      remaining:
+          DiamondConfig.maxReferralsPerMonth - monthlyReferrals.docs.length - 1,
     );
   }
 
@@ -218,7 +229,10 @@ class DiamondRewardsService {
         .get();
 
     if (existing.docs.isNotEmpty) {
-      return ClaimResult(success: false, reason: 'Weekly bonus already claimed');
+      return ClaimResult(
+        success: false,
+        reason: 'Weekly bonus already claimed',
+      );
     }
 
     await _grantReward(
@@ -233,7 +247,10 @@ class DiamondRewardsService {
   }
 
   /// Claim win streak bonus (progressive: 3→10, 5→20, 10→50, etc.)
-  Future<ClaimResult> claimWinStreakBonus(String userId, int streakCount) async {
+  Future<ClaimResult> claimWinStreakBonus(
+    String userId,
+    int streakCount,
+  ) async {
     final reward = DiamondConfig.getStreakReward(streakCount);
     if (reward == null) {
       return ClaimResult(
@@ -255,7 +272,9 @@ class DiamondRewardsService {
     if (existing.docs.isNotEmpty) {
       final lastClaim = existing.docs.first.data()['claimedAt'] as Timestamp?;
       if (lastClaim != null) {
-        final hoursSinceClaim = DateTime.now().difference(lastClaim.toDate()).inHours;
+        final hoursSinceClaim = DateTime.now()
+            .difference(lastClaim.toDate())
+            .inHours;
         if (hoursSinceClaim < 24) {
           return ClaimResult(
             success: false,

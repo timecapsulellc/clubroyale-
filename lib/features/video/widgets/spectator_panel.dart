@@ -23,7 +23,7 @@ class SpectatorApprovalPanel extends ConsumerWidget {
       stream: approvalService.pendingApprovals,
       builder: (context, snapshot) {
         final requests = snapshot.data ?? [];
-        
+
         if (requests.isEmpty) return const SizedBox.shrink();
 
         return Card(
@@ -116,10 +116,7 @@ class SpectatorApprovalPanel extends ConsumerWidget {
 class SpectatorWaitingWidget extends StatelessWidget {
   final VoidCallback onCancel;
 
-  const SpectatorWaitingWidget({
-    super.key,
-    required this.onCancel,
-  });
+  const SpectatorWaitingWidget({super.key, required this.onCancel});
 
   @override
   Widget build(BuildContext context) {
@@ -145,10 +142,7 @@ class SpectatorWaitingWidget extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-              OutlinedButton(
-                onPressed: onCancel,
-                child: const Text('Cancel'),
-              ),
+              OutlinedButton(onPressed: onCancel, child: const Text('Cancel')),
             ],
           ),
         ),
@@ -240,7 +234,9 @@ class VideoMiniWidget extends ConsumerWidget {
                   ),
                   const SizedBox(width: 8),
                   _buildMiniButton(
-                    icon: videoService.isCameraEnabled ? Icons.videocam : Icons.videocam_off,
+                    icon: videoService.isCameraEnabled
+                        ? Icons.videocam
+                        : Icons.videocam_off,
                     isActive: videoService.isCameraEnabled,
                     onPressed: () => videoService.toggleCamera(),
                   ),
@@ -263,7 +259,9 @@ class VideoMiniWidget extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: isActive ? Colors.green.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.2),
+          color: isActive
+              ? Colors.green.withValues(alpha: 0.2)
+              : Colors.red.withValues(alpha: 0.2),
           shape: BoxShape.circle,
         ),
         child: Icon(

@@ -1,5 +1,5 @@
 /// Create Club Screen
-/// 
+///
 /// Form to create a new gaming club
 library;
 
@@ -23,7 +23,7 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
   ClubPrivacy _privacy = ClubPrivacy.public;
   final Set<String> _gameTypes = {'marriage'};
   bool _isLoading = false;
@@ -31,7 +31,10 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
     if (picked != null) {
       setState(() => _imageFile = File(picked.path));
     }
@@ -47,9 +50,7 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Club'),
-      ),
+      appBar: AppBar(title: const Text('Create Club')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -65,11 +66,15 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                        backgroundImage: _imageFile != null ? FileImage(_imageFile!) : null,
-                        child: _imageFile == null 
-                          ? const Icon(Icons.groups, size: 48) 
-                          : null,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.primaryContainer,
+                        backgroundImage: _imageFile != null
+                            ? FileImage(_imageFile!)
+                            : null,
+                        child: _imageFile == null
+                            ? const Icon(Icons.groups, size: 48)
+                            : null,
                       ),
                       Positioned(
                         right: 0,
@@ -136,11 +141,14 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
                 onSelectionChanged: (s) => setState(() => _privacy = s.first),
               ),
               const SizedBox(height: 8),
-              
+
               const SizedBox(height: 24),
 
               // Game Types (Keep existing)
-              Text('Games Played', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Games Played',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -149,14 +157,18 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
                     label: const Text('Marriage'),
                     selected: _gameTypes.contains('marriage'),
                     onSelected: (s) => setState(() {
-                      s ? _gameTypes.add('marriage') : _gameTypes.remove('marriage');
+                      s
+                          ? _gameTypes.add('marriage')
+                          : _gameTypes.remove('marriage');
                     }),
                   ),
-                   FilterChip(
+                  FilterChip(
                     label: const Text('Teen Patti'),
                     selected: _gameTypes.contains('teen_patti'),
                     onSelected: (s) => setState(() {
-                      s ? _gameTypes.add('teen_patti') : _gameTypes.remove('teen_patti');
+                      s
+                          ? _gameTypes.add('teen_patti')
+                          : _gameTypes.remove('teen_patti');
                     }),
                   ),
                 ],
@@ -193,18 +205,22 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
 
       String? avatarUrl;
       if (_imageFile != null) {
-        avatarUrl = await ref.read(clubServiceProvider).uploadClubAvatar(_imageFile!);
+        avatarUrl = await ref
+            .read(clubServiceProvider)
+            .uploadClubAvatar(_imageFile!);
       }
 
-      await ref.read(clubServiceProvider).createClub(
-        ownerId: user.uid,
-        ownerName: user.displayName ?? 'Host',
-        name: _nameController.text,
-        description: _descriptionController.text,
-        privacy: _privacy,
-        gameTypes: _gameTypes.toList(),
-        avatarUrl: avatarUrl,
-      );
+      await ref
+          .read(clubServiceProvider)
+          .createClub(
+            ownerId: user.uid,
+            ownerName: user.displayName ?? 'Host',
+            name: _nameController.text,
+            description: _descriptionController.text,
+            privacy: _privacy,
+            gameTypes: _gameTypes.toList(),
+            avatarUrl: avatarUrl,
+          );
 
       if (mounted) {
         Navigator.pop(context);
@@ -218,7 +234,10 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(ErrorHelper.getFriendlyMessage(e)),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {

@@ -1,5 +1,5 @@
 /// Dynamic Chip Stack Widget
-/// 
+///
 /// Displays chip stacks that dynamically change based on pot size.
 /// Uses the chip assets for visual variety.
 library;
@@ -9,9 +9,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 /// Chip stack size thresholds
 enum ChipStackSize {
-  small,  // Under 100
+  small, // Under 100
   medium, // 100-500
-  large,  // 500-1000
+  large, // 500-1000
   massive, // Over 1000
 }
 
@@ -91,7 +91,10 @@ class DynamicChipStack extends StatelessWidget {
     if (animate && stackSize == ChipStackSize.massive) {
       stack = stack
           .animate(onPlay: (c) => c.repeat(reverse: true))
-          .shimmer(duration: 2.seconds, color: Colors.amber.withValues(alpha: 0.3));
+          .shimmer(
+            duration: 2.seconds,
+            color: Colors.amber.withValues(alpha: 0.3),
+          );
     }
 
     return Column(
@@ -179,11 +182,7 @@ class PotDisplay extends StatelessWidget {
             ),
           ),
         const SizedBox(height: 4),
-        DynamicChipStack(
-          amount: potAmount,
-          width: size,
-          height: size,
-        ),
+        DynamicChipStack(amount: potAmount, width: size, height: size),
       ],
     );
   }

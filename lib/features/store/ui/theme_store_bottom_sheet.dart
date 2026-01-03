@@ -1,5 +1,5 @@
 /// Theme Store Bottom Sheet
-/// 
+///
 /// Premium UI for selecting table themes and card skins.
 /// Features live preview and unlockable progression.
 library;
@@ -24,7 +24,8 @@ class ThemeStoreBottomSheet extends ConsumerStatefulWidget {
   const ThemeStoreBottomSheet({super.key});
 
   @override
-  ConsumerState<ThemeStoreBottomSheet> createState() => _ThemeStoreBottomSheetState();
+  ConsumerState<ThemeStoreBottomSheet> createState() =>
+      _ThemeStoreBottomSheetState();
 }
 
 class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
@@ -60,13 +61,17 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Title
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                Icon(Icons.palette_outlined, color: Colors.amber.shade400, size: 28),
+                Icon(
+                  Icons.palette_outlined,
+                  color: Colors.amber.shade400,
+                  size: 28,
+                ),
                 const SizedBox(width: 12),
                 const Text(
                   'Customize Your Table',
@@ -78,7 +83,10 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.amber.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
@@ -86,7 +94,10 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                   ),
                   child: Text(
                     'Level $userLevel',
-                    style: TextStyle(color: Colors.amber.shade400, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.amber.shade400,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -100,7 +111,9 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
             decoration: BoxDecoration(
               gradient: previewTheme.gradient,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: previewTheme.accentColor.withValues(alpha: 0.5)),
+              border: Border.all(
+                color: previewTheme.accentColor.withValues(alpha: 0.5),
+              ),
               boxShadow: [
                 BoxShadow(
                   color: previewTheme.primaryColor.withValues(alpha: 0.3),
@@ -115,7 +128,12 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                 // Card suit pattern
                 ...List.generate(4, (i) {
                   final suits = ['♠', '♥', '♣', '♦'];
-                  final colors = [Colors.white, Colors.red, Colors.white, Colors.red];
+                  final colors = [
+                    Colors.white,
+                    Colors.red,
+                    Colors.white,
+                    Colors.red,
+                  ];
                   return Positioned(
                     left: 30.0 + i * 70,
                     top: 60,
@@ -150,11 +168,19 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Icon(Icons.color_lens_outlined, color: Colors.amber.shade400, size: 20),
+                Icon(
+                  Icons.color_lens_outlined,
+                  color: Colors.amber.shade400,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 const Text(
                   'Table Themes',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),
@@ -176,7 +202,9 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                   onTap: () {
                     setState(() => _previewTheme = theme);
                     if (isUnlocked) {
-                      ref.read(themeSelectionProvider.notifier).selectTheme(theme);
+                      ref
+                          .read(themeSelectionProvider.notifier)
+                          .selectTheme(theme);
                     }
                   },
                   child: Container(
@@ -186,7 +214,9 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                       gradient: theme.gradient,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isPreviewing || isSelected ? Colors.amber.shade400 : Colors.transparent,
+                        color: isPreviewing || isSelected
+                            ? Colors.amber.shade400
+                            : Colors.transparent,
                         width: 2,
                       ),
                     ),
@@ -219,11 +249,18 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.lock, color: Colors.white60, size: 24),
+                                  const Icon(
+                                    Icons.lock,
+                                    color: Colors.white60,
+                                    size: 24,
+                                  ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Lvl ${theme.unlockLevel}',
-                                    style: const TextStyle(color: Colors.white60, fontSize: 10),
+                                    style: const TextStyle(
+                                      color: Colors.white60,
+                                      fontSize: 10,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -240,7 +277,11 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                                 color: Colors.amber.shade600,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.check, color: Colors.white, size: 14),
+                              child: const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 14,
+                              ),
                             ),
                           ),
                       ],
@@ -258,11 +299,19 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Icon(Icons.style_outlined, color: Colors.amber.shade400, size: 20),
+                Icon(
+                  Icons.style_outlined,
+                  color: Colors.amber.shade400,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 const Text(
                   'Card Skins',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),
@@ -284,7 +333,9 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                   onTap: () {
                     setState(() => _previewSkin = skin);
                     if (isUnlocked) {
-                      ref.read(themeSelectionProvider.notifier).selectCardSkin(skin);
+                      ref
+                          .read(themeSelectionProvider.notifier)
+                          .selectCardSkin(skin);
                     }
                   },
                   child: Container(
@@ -294,7 +345,9 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                       color: skin.cardBackColor,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isPreviewing || isSelected ? Colors.amber.shade400 : Colors.transparent,
+                        color: isPreviewing || isSelected
+                            ? Colors.amber.shade400
+                            : Colors.transparent,
                         width: 2,
                       ),
                     ),
@@ -322,14 +375,20 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                             top: 4,
                             left: 4,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.amber.shade700,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: const Text(
                                 '★',
-                                style: TextStyle(color: Colors.white, fontSize: 10),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                ),
                               ),
                             ),
                           ),
@@ -344,11 +403,18 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.lock, color: Colors.white60, size: 24),
+                                  const Icon(
+                                    Icons.lock,
+                                    color: Colors.white60,
+                                    size: 24,
+                                  ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Lvl ${skin.unlockLevel}',
-                                    style: const TextStyle(color: Colors.white60, fontSize: 10),
+                                    style: const TextStyle(
+                                      color: Colors.white60,
+                                      fontSize: 10,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -365,7 +431,11 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                                 color: Colors.amber.shade600,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.check, color: Colors.white, size: 14),
+                              child: const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 14,
+                              ),
                             ),
                           ),
                       ],
@@ -387,12 +457,16 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
+                      side: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.5),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     child: Text(
                       'Close',
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.8),
+                      ),
                     ),
                   ),
                 ),
@@ -406,7 +480,10 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text('Apply & Close', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      'Apply & Close',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],
@@ -417,7 +494,12 @@ class _ThemeStoreBottomSheetState extends ConsumerState<ThemeStoreBottomSheet> {
     );
   }
 
-  Widget _buildPreviewCard(String rank, String suit, CardSkin skin, {bool isRed = false}) {
+  Widget _buildPreviewCard(
+    String rank,
+    String suit,
+    CardSkin skin, {
+    bool isRed = false,
+  }) {
     return Container(
       width: 50,
       height: 70,

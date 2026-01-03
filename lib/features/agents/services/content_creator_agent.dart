@@ -7,7 +7,7 @@ final contentCreatorAgentProvider = Provider<ContentCreatorAgent>((ref) {
 });
 
 /// Content Creator Agent - AI-Generated Content for ClubRoyale
-/// 
+///
 /// Features:
 /// - Story content generation
 /// - Reel/video script creation
@@ -103,7 +103,9 @@ class ContentCreatorAgent {
     int? value,
   }) async {
     try {
-      final callable = _functions.httpsCallable('generateAchievementCelebration');
+      final callable = _functions.httpsCallable(
+        'generateAchievementCelebration',
+      );
       final result = await callable.call<Map<String, dynamic>>({
         'achievement': achievement,
         'achievementType': achievementType.name,
@@ -124,9 +126,9 @@ class ContentCreatorAgent {
   }) async {
     final result = await generateCaption(
       contentType: CaptionType.story,
-      context: isWin 
-        ? 'Just won a $gameType game${score != null ? ' with $score points' : ''}!'
-        : 'Close game of $gameType! GG everyone!',
+      context: isWin
+          ? 'Just won a $gameType game${score != null ? ' with $score points' : ''}!'
+          : 'Close game of $gameType! GG everyone!',
       tone: isWin ? CaptionTone.competitive : CaptionTone.casual,
     );
     return result.primary;
@@ -136,10 +138,15 @@ class ContentCreatorAgent {
 // ==================== ENUMS ====================
 
 enum StoryType { gameResult, achievement, highlight, social, custom }
+
 enum StoryStyle { celebratory, funny, dramatic, minimal, professional }
+
 enum ReelStyle { tutorial, entertainment, highlight, meme, storytelling }
+
 enum CaptionType { post, story, bio, comment }
+
 enum CaptionTone { casual, professional, funny, inspirational, competitive }
+
 enum AchievementType { rank, streak, wins, diamonds, social, special }
 
 enum ReelDuration {
@@ -261,9 +268,11 @@ class ReelScript {
 
   factory ReelScript.fromJson(Map<String, dynamic> json) {
     return ReelScript(
-      scenes: (json['script'] as List<dynamic>?)
-          ?.map((s) => ScriptScene.fromJson(s))
-          .toList() ?? [],
+      scenes:
+          (json['script'] as List<dynamic>?)
+              ?.map((s) => ScriptScene.fromJson(s))
+              .toList() ??
+          [],
       suggestedMusic: json['suggestedMusic'] as String? ?? 'Upbeat electronic',
       hashtags: List<String>.from(json['hashtags'] ?? []),
       hook: json['hook'] as String? ?? 'Watch this!',
@@ -274,9 +283,21 @@ class ReelScript {
   factory ReelScript.fallback(String topic) {
     return ReelScript(
       scenes: [
-        ScriptScene(timestamp: '0:00', action: 'Hook', visualCue: 'Bold text: "$topic"'),
-        ScriptScene(timestamp: '0:03', action: 'Content', visualCue: 'Game footage'),
-        ScriptScene(timestamp: '0:12', action: 'CTA', visualCue: 'Follow button'),
+        ScriptScene(
+          timestamp: '0:00',
+          action: 'Hook',
+          visualCue: 'Bold text: "$topic"',
+        ),
+        ScriptScene(
+          timestamp: '0:03',
+          action: 'Content',
+          visualCue: 'Game footage',
+        ),
+        ScriptScene(
+          timestamp: '0:12',
+          action: 'CTA',
+          visualCue: 'Follow button',
+        ),
       ],
       suggestedMusic: 'Trending beats',
       hashtags: ['#ClubRoyale', '#Gaming', '#Viral'],

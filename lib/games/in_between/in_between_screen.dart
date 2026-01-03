@@ -1,5 +1,5 @@
 /// In Between Game Screen
-/// 
+///
 /// Real-time multiplayer In Between game UI
 library;
 
@@ -14,7 +14,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/config/casino_theme.dart';
-import 'package:clubroyale/core/design_system/game/felt_texture_painter.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
 import 'package:clubroyale/games/in_between/in_between_service.dart';
@@ -28,11 +27,8 @@ import 'package:clubroyale/features/game/ui/components/table_layout.dart';
 
 class InBetweenScreen extends ConsumerStatefulWidget {
   final String roomId;
-  
-  const InBetweenScreen({
-    required this.roomId,
-    super.key,
-  });
+
+  const InBetweenScreen({required this.roomId, super.key});
 
   @override
   ConsumerState<InBetweenScreen> createState() => _InBetweenScreenState();
@@ -44,48 +40,53 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
   String? _lastResult;
   bool _isChatExpanded = false;
   bool _showVideoGrid = false;
-  
+
   // Tutorial state
   bool _showTutorial = true;
   final GlobalKey _cardsKey = GlobalKey();
   final GlobalKey _bettingKey = GlobalKey();
   final GlobalKey _actionsKey = GlobalKey();
   final GlobalKey _rulesKey = GlobalKey();
-  
+
   List<TutorialStep> get _tutorialSteps => [
     TutorialStep(
       title: 'Welcome to In-Between! 🎰',
-      description: 'The goal is to guess if the third card falls between the first two cards.',
+      description:
+          'The goal is to guess if the third card falls between the first two cards.',
     ),
     TutorialStep(
       title: 'The Cards',
-      description: 'The first two cards are "Low" and "High" - your third card needs to fall in between!',
+      description:
+          'The first two cards are "Low" and "High" - your third card needs to fall in between!',
       targetKey: _cardsKey,
       tooltipAlignment: Alignment.bottomCenter,
     ),
     TutorialStep(
       title: 'Place Your Bet',
-      description: 'Use the slider to choose how much you want to bet. Higher probability = safer bet.',
+      description:
+          'Use the slider to choose how much you want to bet. Higher probability = safer bet.',
       targetKey: _bettingKey,
       tooltipAlignment: Alignment.topCenter,
     ),
     TutorialStep(
       title: 'Actions',
-      description: 'Pass to skip your turn, or Bet to reveal the middle card. Reveal to see your fate!',
+      description:
+          'Pass to skip your turn, or Bet to reveal the middle card. Reveal to see your fate!',
       targetKey: _actionsKey,
       tooltipAlignment: Alignment.topCenter,
     ),
     TutorialStep(
       title: 'Rules',
-      description: 'Tap here to learn about "Hitting the Post" and other rules.',
+      description:
+          'Tap here to learn about "Hitting the Post" and other rules.',
       targetKey: _rulesKey,
       tooltipAlignment: Alignment.bottomLeft,
     ),
   ];
-  
+
   // Card lookup cache
   final Map<String, Card> _cardCache = {};
-  
+
   @override
   void initState() {
     super.initState();
@@ -96,38 +97,41 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
   void dispose() {
     super.dispose();
   }
-  
+
   void _buildCardCache() {
     final deck = Deck.standard();
     for (final card in deck.cards) {
       _cardCache[card.id] = card;
     }
   }
-  
+
   Card? _getCard(String id) => _cardCache[id];
-  
+
   int _cardValue(Card card) {
     switch (card.rank) {
-      case Rank.ace: return 14;
-      case Rank.king: return 13;
-      case Rank.queen: return 12;
-      case Rank.jack: return 11;
-      default: return card.rank.points;
+      case Rank.ace:
+        return 14;
+      case Rank.king:
+        return 13;
+      case Rank.queen:
+        return 12;
+      case Rank.jack:
+        return 11;
+      default:
+        return card.rank.points;
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final inBetweenService = ref.watch(inBetweenServiceProvider);
     final authService = ref.watch(authServiceProvider);
     final currentUser = authService.currentUser;
-    
+
     if (currentUser == null) {
-      return const Scaffold(
-        body: Center(child: Text('Please sign in')),
-      );
+      return const Scaffold(body: Center(child: Text('Please sign in')));
     }
-    
+
     return StreamBuilder<InBetweenGameState?>(
       stream: inBetweenService.watchGameState(widget.roomId),
       builder: (context, snapshot) {
@@ -140,7 +144,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
             ),
           );
         }
-        
+
         final state = snapshot.data;
         if (state == null) {
           return Scaffold(
@@ -150,15 +154,18 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
               title: Text(GameTerminology.inBetweenGame),
             ),
             body: const Center(
-              child: Text('Waiting for game...', style: TextStyle(color: Colors.white70)),
+              child: Text(
+                'Waiting for game...',
+                style: TextStyle(color: Colors.white70),
+              ),
             ),
           );
         }
-        
+
         final myChips = state.playerChips[currentUser.uid] ?? 0;
         final isMyTurn = state.currentPlayerId == currentUser.uid;
         final maxBet = myChips < state.pot ? myChips : state.pot;
-        
+
         return Scaffold(
           extendBodyBehindAppBar: true,
           appBar: AppBar(
@@ -168,8 +175,8 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: const BoxDecoration(
-                  color: Colors.black26, 
-                  shape: BoxShape.circle
+                  color: Colors.black26,
+                  shape: BoxShape.circle,
                 ),
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back),
@@ -180,7 +187,10 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
             title: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(GameTerminology.inBetweenGame, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  GameTerminology.inBetweenGame,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(width: 12),
                 _buildChipsBadge(myChips),
               ],
@@ -192,37 +202,51 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
                 key: _rulesKey,
                 child: IconButton(
                   icon: const Icon(Icons.help_outline),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (c) => AlertDialog(
-                      backgroundColor: CasinoColors.cardBackground,
-                      title: Text('${GameTerminology.inBetweenGame} Rules', style: const TextStyle(color: CasinoColors.gold)),
-                      content: const Text(
-                        '1. Place a bet based on the probability.\n'
-                        '2. A "Low" and "High" card are dealt.\n'
-                        '3. A third "Middle" card is dealt.\n'
-                        '4. WIN if the Middle card is literally in-between.\n'
-                        '5. LOSE if outside the range.\n'
-                        '6. POST (Hit the Post): If Middle card matches High or Low, you lose 2x the bet!',
-                        style: TextStyle(color: Colors.white70),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (c) => AlertDialog(
+                        backgroundColor: CasinoColors.cardBackground,
+                        title: Text(
+                          '${GameTerminology.inBetweenGame} Rules',
+                          style: const TextStyle(color: CasinoColors.gold),
+                        ),
+                        content: const Text(
+                          '1. Place a bet based on the probability.\n'
+                          '2. A "Low" and "High" card are dealt.\n'
+                          '3. A third "Middle" card is dealt.\n'
+                          '4. WIN if the Middle card is literally in-between.\n'
+                          '5. LOSE if outside the range.\n'
+                          '6. POST (Hit the Post): If Middle card matches High or Low, you lose 2x the bet!',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(c),
+                            child: const Text('Got it'),
+                          ),
+                        ],
                       ),
-                      actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('Got it'))],
-                    ),
-                  );
-                },
-                tooltip: 'Rules',
+                    );
+                  },
+                  tooltip: 'Rules',
                 ),
               ),
               _buildPotBadge(state.pot),
               // Video Toggle
               IconButton(
-                icon: Icon(_showVideoGrid ? Icons.videocam_off : Icons.videocam),
-                onPressed: () => setState(() => _showVideoGrid = !_showVideoGrid),
+                icon: Icon(
+                  _showVideoGrid ? Icons.videocam_off : Icons.videocam,
+                ),
+                onPressed: () =>
+                    setState(() => _showVideoGrid = !_showVideoGrid),
                 tooltip: _showVideoGrid ? 'Hide Video' : 'Show Video',
               ),
               // Audio Mute/Unmute
-              AudioFloatingButton(roomId: widget.roomId, userId: currentUser.uid),
+              AudioFloatingButton(
+                roomId: widget.roomId,
+                userId: currentUser.uid,
+              ),
               const SizedBox(width: 8),
             ],
           ),
@@ -232,36 +256,52 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
                 SafeArea(
                   child: SingleChildScrollView(
                     child: SizedBox(
-                      height: MediaQuery.of(context).size.height - kToolbarHeight - 20, // Ensure min height for layout
+                      height:
+                          MediaQuery.of(context).size.height -
+                          kToolbarHeight -
+                          20, // Ensure min height for layout
                       child: Column(
                         children: [
                           SizedBox(height: kToolbarHeight + 10),
                           // Game mode indicator
                           _buildGameModeBanner(state),
-                          
+
                           // Opponents area
                           _buildOpponentsArea(state, currentUser.uid),
-                          
+
                           // Turn indicator
                           _buildTurnIndicator(isMyTurn, state.phase),
-                          
+
                           const Spacer(),
-                          
+
                           // Cards area
-                          Container(key: _cardsKey, child: _buildCardsArea(state)),
-                          
+                          Container(
+                            key: _cardsKey,
+                            child: _buildCardsArea(state),
+                          ),
+
                           // Result display
                           if (_lastResult != null)
                             _buildResultBanner(_lastResult!),
-                          
+
                           const Spacer(),
-                          
+
                           // Betting area
                           if (isMyTurn && state.phase == 'betting')
-                            Container(key: _bettingKey, child: _buildBettingArea(state.pot, myChips, maxBet)),
-                          
+                            Container(
+                              key: _bettingKey,
+                              child: _buildBettingArea(
+                                state.pot,
+                                myChips,
+                                maxBet,
+                              ),
+                            ),
+
                           // Action buttons
-                            Container(key: _actionsKey, child: _buildActionBar(isMyTurn, state)),
+                          Container(
+                            key: _actionsKey,
+                            child: _buildActionBar(isMyTurn, state),
+                          ),
                         ],
                       ),
                     ),
@@ -295,7 +335,8 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
                     userId: currentUser.uid,
                     userName: currentUser.displayName ?? 'Player',
                     isExpanded: _isChatExpanded,
-                    onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
+                    onToggle: () =>
+                        setState(() => _isChatExpanded = !_isChatExpanded),
                   ),
                 ),
                 // Tutorial Overlay
@@ -312,7 +353,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       },
     );
   }
-  
+
   Widget _buildChipsBadge(int chips) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -323,17 +364,24 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset('assets/images/chips/chip_blue.png', width: 14, height: 14),
+          Image.asset(
+            'assets/images/chips/chip_blue.png',
+            width: 14,
+            height: 14,
+          ),
           const SizedBox(width: 4),
           Text(
             '$chips',
-            style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Colors.amber,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildPotBadge(int pot) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -346,11 +394,18 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset('assets/images/chips/chip_red.png', width: 18, height: 18),
+          Image.asset(
+            'assets/images/chips/chip_red.png',
+            width: 18,
+            height: 18,
+          ),
           const SizedBox(width: 4),
           Text(
             'Pot: $pot',
-            style: const TextStyle(color: CasinoColors.gold, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: CasinoColors.gold,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -369,7 +424,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
           final chips = state.playerChips[pid] ?? 0;
           final isCurrent = state.currentPlayerId == pid;
           final isBot = pid.startsWith('bot_');
-          
+
           return GameOpponent(
             id: pid,
             name: isBot ? 'Bot ${pid.split('_').last}' : 'Player',
@@ -382,22 +437,24 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       ),
     );
   }
-  
+
   Widget _buildTurnIndicator(bool isMyTurn, String phase) {
     String message;
     Color color;
-    
+
     if (phase == 'result') {
       message = 'Waiting for next turn...';
       color = Colors.orange;
     } else if (isMyTurn) {
-      message = phase == 'betting' ? '🎲 Your Turn - Place a Bet!' : '🎯 Reveal the Card!';
+      message = phase == 'betting'
+          ? '🎲 Your Turn - Place a Bet!'
+          : '🎯 Reveal the Card!';
       color = Colors.green;
     } else {
       message = '⏳ Waiting for opponent...';
       color = Colors.white54;
     }
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
@@ -423,13 +480,13 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       ),
     );
   }
-  
+
   /// Build the game mode banner showing AI/Multiplayer status
   Widget _buildGameModeBanner(InBetweenGameState state) {
     final allPlayers = state.playerChips.keys.toList();
     final botCount = allPlayers.where((id) => id.startsWith('bot_')).length;
     final humanCount = allPlayers.length - botCount;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: GameModeBanner(
@@ -439,14 +496,14 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       ),
     );
   }
-  
+
   Widget _buildCardsArea(InBetweenGameState state) {
     final lowCard = _getCard(state.lowCardId);
     final highCard = _getCard(state.highCardId);
-    final middleCard = state.middleCardId != null 
-        ? _getCard(state.middleCardId!) 
+    final middleCard = state.middleCardId != null
+        ? _getCard(state.middleCardId!)
         : null;
-    
+
     // Calculate probability
     double probability = 0;
     if (lowCard != null && highCard != null) {
@@ -455,7 +512,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       final winningCards = highValue - lowValue - 1;
       probability = winningCards > 0 ? (winningCards / 14) : 0;
     }
-    
+
     return Column(
       children: [
         // Probability indicator
@@ -476,39 +533,37 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
               ),
             ),
           ),
-        
+
         // Cards row
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Low card
-            if (lowCard != null)
-              _buildCardWidget(lowCard, 'LOW'),
-            
+            if (lowCard != null) _buildCardWidget(lowCard, 'LOW'),
+
             const SizedBox(width: 16),
-            
+
             // Middle card (or placeholder)
             middleCard != null
                 ? _buildCardWidget(middleCard, 'MIDDLE', isMiddle: true)
                 : _buildCardBack(),
-            
+
             const SizedBox(width: 16),
-            
+
             // High card
-            if (highCard != null)
-              _buildCardWidget(highCard, 'HIGH'),
+            if (highCard != null) _buildCardWidget(highCard, 'HIGH'),
           ],
         ),
       ],
     );
   }
-  
+
   Color _probabilityColor(double p) {
     if (p >= 0.5) return Colors.green;
     if (p >= 0.3) return Colors.orange;
     return Colors.red;
   }
-  
+
   Widget _buildCardWidget(Card card, String label, {bool isMiddle = false}) {
     return Column(
       children: [
@@ -520,8 +575,8 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: isMiddle 
-                    ? CasinoColors.gold.withValues(alpha: 0.5) 
+                color: isMiddle
+                    ? CasinoColors.gold.withValues(alpha: 0.5)
                     : Colors.black.withValues(alpha: 0.3),
                 blurRadius: isMiddle ? 16 : 8,
                 spreadRadius: isMiddle ? 2 : 0,
@@ -561,34 +616,38 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       ],
     );
   }
-  
+
   Widget _buildCardBack() {
     return Column(
       children: [
         Container(
-          width: 120,
-          height: 175,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [CasinoColors.richPurple, CasinoColors.deepPurple],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.5), width: 2),
-          ),
-          child: Center(
-            child: Text(
-              '?',
-              style: TextStyle(
-                color: CasinoColors.gold.withValues(alpha: 0.6),
-                fontSize: 56,
-                fontWeight: FontWeight.bold,
+              width: 120,
+              height: 175,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [CasinoColors.richPurple, CasinoColors.deepPurple],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: CasinoColors.gold.withValues(alpha: 0.5),
+                  width: 2,
+                ),
               ),
-            ),
-          ),
-        ).animate(onPlay: (c) => c.repeat(reverse: true))
-         .shimmer(duration: 1.5.seconds),
+              child: Center(
+                child: Text(
+                  '?',
+                  style: TextStyle(
+                    color: CasinoColors.gold.withValues(alpha: 0.6),
+                    fontSize: 56,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            )
+            .animate(onPlay: (c) => c.repeat(reverse: true))
+            .shimmer(duration: 1.5.seconds),
         const SizedBox(height: 8),
         Text(
           'MIDDLE',
@@ -601,12 +660,12 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       ],
     );
   }
-  
+
   Widget _buildResultBanner(String result) {
     Color color;
     String text;
     IconData icon;
-    
+
     switch (result) {
       case 'win':
         color = Colors.green;
@@ -626,7 +685,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       default:
         return const SizedBox();
     }
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 16),
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
@@ -652,7 +711,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       ),
     ).animate().fadeIn().scale();
   }
-  
+
   Widget _buildBettingArea(int pot, int chips, int maxBet) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -687,7 +746,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       ),
     );
   }
-  
+
   Widget _buildQuickBetButton(String label, int amount) {
     return ElevatedButton(
       onPressed: () => setState(() => _betAmount = amount),
@@ -699,13 +758,15 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       child: Text(label),
     );
   }
-  
+
   Widget _buildActionBar(bool isMyTurn, InBetweenGameState state) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.7),
-        border: Border(top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3))),
+        border: Border(
+          top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3)),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -721,7 +782,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
                 side: const BorderSide(color: Colors.white54),
               ),
             ),
-            
+
             // Bet button
             ElevatedButton.icon(
               onPressed: _isProcessing ? null : _placeBet,
@@ -730,11 +791,13 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: CasinoColors.gold,
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
             ),
-          ]
-          else if (state.phase == 'revealing' && isMyTurn) ...[
+          ] else if (state.phase == 'revealing' && isMyTurn) ...[
             ElevatedButton.icon(
               onPressed: _isProcessing ? null : _reveal,
               icon: const Icon(Icons.visibility),
@@ -742,11 +805,13 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
               ),
             ),
-          ]
-          else if (state.phase == 'result' && isMyTurn) ...[
+          ] else if (state.phase == 'result' && isMyTurn) ...[
             ElevatedButton.icon(
               onPressed: _isProcessing ? null : _nextTurn,
               icon: const Icon(Icons.skip_next),
@@ -754,11 +819,13 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: CasinoColors.gold,
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
             ),
-          ]
-          else ...[
+          ] else ...[
             Text(
               'Waiting...',
               style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
@@ -768,11 +835,11 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       ),
     );
   }
-  
+
   Future<void> _pass() async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
-    
+
     try {
       // Play pass sound
       await SoundService.playCardSlide();
@@ -786,18 +853,21 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(ErrorHelper.getFriendlyMessage(e)),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
   }
-  
+
   Future<void> _placeBet() async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
-    
+
     try {
       // Play bet sound
       await SoundService.playChipSound();
@@ -810,18 +880,21 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(ErrorHelper.getFriendlyMessage(e)),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
   }
-  
+
   Future<void> _reveal() async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
-    
+
     try {
       // Play reveal sound
       await SoundService.playCardSlide();
@@ -831,7 +904,7 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
       if (userId != null) {
         final result = await service.reveal(widget.roomId, userId);
         setState(() => _lastResult = result);
-        
+
         // Play result sound
         if (result == 'win') {
           await SoundService.playRoundEnd();
@@ -843,18 +916,21 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(ErrorHelper.getFriendlyMessage(e)),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
   }
-  
+
   Future<void> _nextTurn() async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
-    
+
     try {
       final service = ref.read(inBetweenServiceProvider);
       await service.nextTurn(widget.roomId);
@@ -865,7 +941,10 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e)), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(ErrorHelper.getFriendlyMessage(e)),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {

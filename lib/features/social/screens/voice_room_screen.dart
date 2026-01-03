@@ -6,19 +6,19 @@ import '../services/voice_room_service.dart';
 
 class VoiceRoomScreen extends ConsumerWidget {
   final String chatId;
-  
+
   const VoiceRoomScreen({super.key, required this.chatId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final service = ref.watch(liveKitRoomServiceProvider(chatId));
-    
+
     // Connect on mount if not connected
     // Note: Provider is autoDispose, so it creates fresh service.
     // We should trigger join once.
-    
+
     // Ideally use useEffect or a StatefulWidget to init.
-    
+
     return const _VoiceRoomContent();
   }
 }
@@ -31,17 +31,16 @@ class _VoiceRoomContent extends ConsumerStatefulWidget {
 }
 
 class _VoiceRoomContentState extends ConsumerState<_VoiceRoomContent> {
-  
   @override
   void initState() {
     super.initState();
     // Auto-join as speaker for now (or pass param)
     // Delay to allow build
     Future.microtask(() {
-       // We can get chatId from parent provider family? No.
-       // We need to pass chatId down or find it.
-       // Actually, the provider is family. We can't easily find "which family" was used in parent
-       // unless we pass it.
+      // We can get chatId from parent provider family? No.
+      // We need to pass chatId down or find it.
+      // Actually, the provider is family. We can't easily find "which family" was used in parent
+      // unless we pass it.
     });
   }
 
@@ -115,16 +114,16 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
               style: const TextStyle(color: Colors.white70),
             ),
           ),
-          
+
           // Grid
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                 crossAxisCount: 3,
-                 crossAxisSpacing: 16,
-                 mainAxisSpacing: 16,
-                 childAspectRatio: 0.8,
+                crossAxisCount: 3,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.8,
               ),
               itemCount: participants.length,
               itemBuilder: (context, index) {
@@ -132,7 +131,7 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
               },
             ),
           ),
-          
+
           // Controls
           _buildControls(service),
         ],
@@ -160,11 +159,13 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
                 size: 32,
               ),
               style: IconButton.styleFrom(
-                backgroundColor: service.isMicEnabled ? Colors.white.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.2),
+                backgroundColor: service.isMicEnabled
+                    ? Colors.white.withValues(alpha: 0.2)
+                    : Colors.red.withValues(alpha: 0.2),
                 padding: const EdgeInsets.all(16),
               ),
             ),
-            
+
             // Leave (Hangup)
             IconButton(
               onPressed: () {
@@ -186,37 +187,64 @@ class _VoiceRoomPageState extends ConsumerState<VoiceRoomPage> {
 
 class _ParticipantTile extends StatelessWidget {
   final Participant participant;
-  
+
   const _ParticipantTile({required this.participant});
 
   @override
   Widget build(BuildContext context) {
     final isSpeaking = participant.isSpeaking;
-    
+
     return Column(
       children: [
         Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.grey.shade800,
-              border: isSpeaking ? Border.all(color: Colors.greenAccent, width: 3) : null,
-              boxShadow: isSpeaking ? [
-                BoxShadow(color: Colors.greenAccent.withValues(alpha: 0.5), blurRadius: 10, spreadRadius: 2)
-              ] : null,
-            ),
-            child: Center(
-              child: Text(
-                participant.identity.isNotEmpty ? participant.identity[0].toUpperCase() : '?',
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-            ),
-          ).animate(target: isSpeaking ? 1 : 0).scale(begin: const Offset(1,1), end: const Offset(1.1, 1.1), duration: 200.ms),
+          child:
+              Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey.shade800,
+                      border: isSpeaking
+                          ? Border.all(color: Colors.greenAccent, width: 3)
+                          : null,
+                      boxShadow: isSpeaking
+                          ? [
+                              BoxShadow(
+                                color: Colors.greenAccent.withValues(
+                                  alpha: 0.5,
+                                ),
+                                blurRadius: 10,
+                                spreadRadius: 2,
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Center(
+                      child: Text(
+                        participant.identity.isNotEmpty
+                            ? participant.identity[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  )
+                  .animate(target: isSpeaking ? 1 : 0)
+                  .scale(
+                    begin: const Offset(1, 1),
+                    end: const Offset(1.1, 1.1),
+                    duration: 200.ms,
+                  ),
         ),
         const SizedBox(height: 8),
         Text(
           participant.name ?? participant.identity,
-          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),

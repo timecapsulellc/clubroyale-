@@ -17,7 +17,8 @@ class FriendsScreen extends ConsumerStatefulWidget {
   ConsumerState<FriendsScreen> createState() => _FriendsScreenState();
 }
 
-class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTickerProviderStateMixin {
+class _FriendsScreenState extends ConsumerState<FriendsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -48,11 +49,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          MyFriendsTab(),
-          FriendRequestsTab(),
-          FindFriendsTab(),
-        ],
+        children: const [MyFriendsTab(), FriendRequestsTab(), FindFriendsTab()],
       ),
     );
   }
@@ -71,7 +68,11 @@ class MyFriendsTab extends ConsumerWidget {
     return StreamBuilder<List<String>>(
       stream: friendIdsStream,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) return const ContextualLoader(message: 'Loading friends...', icon: Icons.people);
+        if (snapshot.connectionState == ConnectionState.waiting)
+          return const ContextualLoader(
+            message: 'Loading friends...',
+            icon: Icons.people,
+          );
         final ids = snapshot.data ?? [];
 
         if (ids.isEmpty) {
@@ -87,7 +88,7 @@ class MyFriendsTab extends ConsumerWidget {
         // Fetch User Data for each ID (FutureBuilder or specialized stream)
         // Ideally we should have a provider family that streams user data.
         // For now, simpler: ListView with UserTile that fetches/streams individual user data.
-        
+
         return ListView.separated(
           itemCount: ids.length,
           separatorBuilder: (_, __) => const Divider(height: 1),
@@ -106,9 +107,11 @@ class FriendTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final statusStream = ref.watch(presenceServiceProvider).watchUserStatus(userId);
+    final statusStream = ref
+        .watch(presenceServiceProvider)
+        .watchUserStatus(userId);
     final userFuture = ref.watch(socialServiceProvider).getUserProfile(userId);
-    
+
     return FutureBuilder<SocialUser?>(
       future: userFuture,
       builder: (context, snapshot) {
@@ -119,46 +122,55 @@ class FriendTile extends ConsumerWidget {
         return ListTile(
           leading: Stack(
             children: [
-               CircleAvatar(
-                 backgroundImage: avatarUrl != null ? CachedNetworkImageProvider(avatarUrl) : null,
-                 child: avatarUrl == null ? Text(name.isNotEmpty ? name[0].toUpperCase() : '?') : null,
-               ),
-               Positioned(
-                 right: 0, bottom: 0,
-                 child: StreamBuilder<SocialUserStatus>(
-                   stream: statusStream, 
-                   builder: (c, s) {
+              CircleAvatar(
+                backgroundImage: avatarUrl != null
+                    ? CachedNetworkImageProvider(avatarUrl)
+                    : null,
+                child: avatarUrl == null
+                    ? Text(name.isNotEmpty ? name[0].toUpperCase() : '?')
+                    : null,
+              ),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: StreamBuilder<SocialUserStatus>(
+                  stream: statusStream,
+                  builder: (c, s) {
                     if (!s.hasData) return const SizedBox();
                     final isOnline = s.data!.status == UserStatus.online;
                     return Container(
-                      width: 12, height: 12, 
+                      width: 12,
+                      height: 12,
                       decoration: BoxDecoration(
                         color: isOnline ? Colors.green : Colors.grey,
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white)
+                        border: Border.all(color: Colors.white),
                       ),
                     );
-                 }),
-               )
+                  },
+                ),
+              ),
             ],
           ),
           title: Text(name),
           subtitle: StreamBuilder<SocialUserStatus>(
-            stream: statusStream, 
+            stream: statusStream,
             builder: (c, s) {
               final status = s.data?.status;
               return Text(status?.name ?? 'offline');
-            }
+            },
           ),
           trailing: IconButton(
             icon: const Icon(Icons.chat_bubble_outline),
             onPressed: () async {
-              final chatId = await ref.read(socialServiceProvider).createDirectChat(userId);
+              final chatId = await ref
+                  .read(socialServiceProvider)
+                  .createDirectChat(userId);
               if (context.mounted) context.push('/social/chat/$chatId');
             },
           ),
         );
-      }
+      },
     );
   }
 }
@@ -171,16 +183,20 @@ class FriendRequestsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final requestsStream = ref.watch(friendServiceProvider).watchIncomingRequests();
-    
+    final requestsStream = ref
+        .watch(friendServiceProvider)
+        .watchIncomingRequests();
+
     return StreamBuilder<List<FriendRequest>>(
       stream: requestsStream,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+        if (snapshot.connectionState == ConnectionState.waiting)
+          return const Center(child: CircularProgressIndicator());
         final requests = snapshot.data ?? [];
-        
-        if (requests.isEmpty) return const Center(child: Text('No pending requests'));
-        
+
+        if (requests.isEmpty)
+          return const Center(child: Text('No pending requests'));
+
         return ListView.builder(
           itemCount: requests.length,
           itemBuilder: (context, index) {
@@ -194,11 +210,15 @@ class FriendRequestsTab extends ConsumerWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.check, color: Colors.green),
-                    onPressed: () => ref.read(friendServiceProvider).acceptFriendRequest(req.id),
+                    onPressed: () => ref
+                        .read(friendServiceProvider)
+                        .acceptFriendRequest(req.id),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close, color: Colors.red),
-                    onPressed: () => ref.read(friendServiceProvider).rejectFriendRequest(req.id),
+                    onPressed: () => ref
+                        .read(friendServiceProvider)
+                        .rejectFriendRequest(req.id),
                   ),
                 ],
               ),
@@ -225,7 +245,7 @@ class _FindFriendsTabState extends ConsumerState<FindFriendsTab> {
   List<SocialUser> _results = [];
   bool _loading = false;
   Timer? _debounce;
-  
+
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () async {
@@ -233,10 +253,12 @@ class _FindFriendsTabState extends ConsumerState<FindFriendsTab> {
         setState(() => _results = []);
         return;
       }
-      
+
       setState(() => _loading = true);
       try {
-        final results = await ref.read(friendServiceProvider).searchUsers(query);
+        final results = await ref
+            .read(friendServiceProvider)
+            .searchUsers(query);
         setState(() => _results = results);
       } catch (e) {
         // Handle error
@@ -263,7 +285,7 @@ class _FindFriendsTabState extends ConsumerState<FindFriendsTab> {
           ),
         ),
         if (_loading) const LinearProgressIndicator(),
-        
+
         Expanded(
           child: ListView.builder(
             itemCount: _results.length,
@@ -271,23 +293,33 @@ class _FindFriendsTabState extends ConsumerState<FindFriendsTab> {
               final user = _results[index];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundImage: user.avatarUrl != null 
-                    ? CachedNetworkImageProvider(user.avatarUrl!) 
-                    : null,
-                  child: user.avatarUrl == null ? Text(user.displayName[0]) : null,
+                  backgroundImage: user.avatarUrl != null
+                      ? CachedNetworkImageProvider(user.avatarUrl!)
+                      : null,
+                  child: user.avatarUrl == null
+                      ? Text(user.displayName[0])
+                      : null,
                 ),
                 title: Text(user.displayName),
                 trailing: IconButton(
                   icon: const Icon(Icons.person_add),
                   onPressed: () async {
                     try {
-                      await ref.read(friendServiceProvider).sendFriendRequest(user.id);
+                      await ref
+                          .read(friendServiceProvider)
+                          .sendFriendRequest(user.id);
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Request sent')));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Request sent')),
+                        );
                       }
                     } catch (e) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e))));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(ErrorHelper.getFriendlyMessage(e)),
+                          ),
+                        );
                       }
                     }
                   },

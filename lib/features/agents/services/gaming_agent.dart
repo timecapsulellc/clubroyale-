@@ -113,11 +113,7 @@ class GamingAgent {
         confidence = 0.6;
     }
 
-    return {
-      'action': 'play',
-      'card': selectedCard,
-      'confidence': confidence,
-    };
+    return {'action': 'play', 'card': selectedCard, 'confidence': confidence};
   }
 
   /// Marriage bot logic
@@ -132,7 +128,7 @@ class GamingAgent {
     if (phase == 'drawing') {
       // Decide whether to draw from deck or discard
       bool drawFromDeck = true;
-      
+
       if (topDiscard != null) {
         // Simple heuristic: check if discard helps a meld
         final wouldHelp = _wouldHelpMeld(hand, topDiscard);
@@ -140,7 +136,7 @@ class GamingAgent {
           drawFromDeck = false;
         }
       }
-      
+
       return {
         'action': drawFromDeck ? 'drawDeck' : 'drawDiscard',
         'confidence': difficulty == 'hard' ? 0.8 : 0.6,
@@ -150,49 +146,41 @@ class GamingAgent {
     if (phase == 'discarding') {
       // Find least valuable card to discard
       final discardCard = _findBestDiscard(hand, difficulty);
-      return {
-        'action': 'discard',
-        'card': discardCard,
-        'confidence': 0.7,
-      };
+      return {'action': 'discard', 'card': discardCard, 'confidence': 0.7};
     }
 
     // Default play phase
-    return {
-      'action': 'play',
-      'card': _getLowestCard(hand),
-      'confidence': 0.6,
-    };
+    return {'action': 'play', 'card': _getLowestCard(hand), 'confidence': 0.6};
   }
-  
+
   /// Check if a card would help form a meld
   bool _wouldHelpMeld(List<String> hand, String card) {
     // Simple check: look for same rank or adjacent in same suit
     final cardRank = card.length > 1 ? card.substring(1) : '';
     final cardSuit = card.isNotEmpty ? card[0] : '';
-    
+
     for (final h in hand) {
       final hRank = h.length > 1 ? h.substring(1) : '';
       final hSuit = h.isNotEmpty ? h[0] : '';
-      
+
       // Same rank = potential tunnel
       if (hRank == cardRank) return true;
-      
+
       // Same suit = potential run
       if (hSuit == cardSuit) return true;
     }
     return false;
   }
-  
+
   /// Find best card to discard
   String _findBestDiscard(List<String> hand, String difficulty) {
     if (hand.isEmpty) return '';
-    
+
     // Easy: random discard
     if (difficulty == 'easy') {
       return hand[_random.nextInt(hand.length)];
     }
-    
+
     // Medium/Hard: discard lowest card
     return _getLowestCard(hand);
   }
@@ -206,17 +194,17 @@ class GamingAgent {
     final highCardValue = gameState['highCardValue'] as int? ?? 14;
     final pot = gameState['pot'] as int? ?? 100;
     final chips = gameState['chips'] as int? ?? 100;
-    
+
     // Calculate spread and winning probability
     final spread = highCardValue - lowCardValue;
     final winProbability = spread > 2 ? (spread - 2) / 12.0 : 0.0;
-    
+
     // Max bet is min of pot and chips
     final maxBet = pot < chips ? pot : chips;
-    
+
     int betAmount = 0;
     double confidence = winProbability;
-    
+
     switch (difficulty) {
       case 'easy':
         // Random betting regardless of probability
@@ -225,7 +213,7 @@ class GamingAgent {
         }
         confidence = 0.3;
         break;
-        
+
       case 'hard':
         // Optimal betting based on expected value
         if (winProbability > 0.6) {
@@ -238,7 +226,7 @@ class GamingAgent {
         // Otherwise pass (bet 0)
         confidence = winProbability * 0.9;
         break;
-        
+
       default: // medium
         if (winProbability > 0.5) {
           betAmount = (maxBet * 0.3).round();
@@ -247,14 +235,11 @@ class GamingAgent {
         }
         confidence = winProbability * 0.7;
     }
-    
+
     if (betAmount <= 0) {
-      return {
-        'action': 'pass',
-        'confidence': 1.0 - winProbability,
-      };
+      return {'action': 'pass', 'confidence': 1.0 - winProbability};
     }
-    
+
     return {
       'action': 'bet',
       'amount': betAmount,
@@ -295,10 +280,7 @@ class GamingAgent {
           'bluff': true,
         };
       }
-      return {
-        'action': 'fold',
-        'confidence': 1.0 - handStrength,
-      };
+      return {'action': 'fold', 'confidence': 1.0 - handStrength};
     }
   }
 
@@ -405,7 +387,21 @@ class GamingAgent {
   // ==================== HELPERS ====================
 
   String _getHighestCard(List<String> cards) {
-    const rankOrder = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'];
+    const rankOrder = [
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      'T',
+      'J',
+      'Q',
+      'K',
+      'A',
+    ];
     cards.sort((a, b) {
       final aRank = rankOrder.indexOf(a.substring(1));
       final bRank = rankOrder.indexOf(b.substring(1));
@@ -415,7 +411,21 @@ class GamingAgent {
   }
 
   String _getLowestCard(List<String> cards) {
-    const rankOrder = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'];
+    const rankOrder = [
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      'T',
+      'J',
+      'Q',
+      'K',
+      'A',
+    ];
     cards.sort((a, b) {
       final aRank = rankOrder.indexOf(a.substring(1));
       final bRank = rankOrder.indexOf(b.substring(1));

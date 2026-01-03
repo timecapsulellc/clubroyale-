@@ -12,11 +12,7 @@ class ChatRoomScreen extends ConsumerStatefulWidget {
   final String chatId;
   final String title;
 
-  const ChatRoomScreen({
-    super.key, 
-    required this.chatId,
-    this.title = 'Chat',
-  });
+  const ChatRoomScreen({super.key, required this.chatId, this.title = 'Chat'});
 
   @override
   ConsumerState<ChatRoomScreen> createState() => _ChatRoomScreenState();
@@ -31,33 +27,36 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
 
     final text = _controller.text.trim();
     _controller.clear();
-    
+
     // Capture reply context if active
     final replyId = _replyingTo?.id;
-    final replyPreview = _replyingTo != null 
+    final replyPreview = _replyingTo != null
         ? SocialMessagePreviewData(
             id: _replyingTo!.id,
             senderName: _replyingTo!.senderName,
             contentPreview: _getMessagePreviewText(_replyingTo!),
-          ) 
+          )
         : null;
 
     // Clear reply state
     setState(() => _replyingTo = null);
 
-    ref.read(socialServiceProvider).sendTextMessage(
-      chatId: widget.chatId,
-      text: text,
-      replyToMessageId: replyId,
-      replyToPreview: replyPreview,
-    ).catchError((e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send: $e')),
-      );
-    });
+    ref
+        .read(socialServiceProvider)
+        .sendTextMessage(
+          chatId: widget.chatId,
+          text: text,
+          replyToMessageId: replyId,
+          replyToPreview: replyPreview,
+        )
+        .catchError((e) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to send: $e')));
+        });
   }
-  
+
   String _getMessagePreviewText(SocialMessage msg) {
     if (msg.type == SocialMessageType.text) return msg.content.text ?? '';
     if (msg.type == SocialMessageType.image) return '📷 Image';
@@ -68,25 +67,31 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
 
   Future<void> _pickAndSendImage() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
-    
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
+
     if (picked != null) {
       final file = File(picked.path);
       try {
-        await ref.read(socialServiceProvider).sendImageMessage(
-          chatId: widget.chatId, 
-          imageFile: file,
-        );
+        await ref
+            .read(socialServiceProvider)
+            .sendImageMessage(chatId: widget.chatId, imageFile: file);
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to send image: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to send image: $e')));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final messagesStream = ref.watch(socialServiceProvider).watchMessages(widget.chatId);
+    final messagesStream = ref
+        .watch(socialServiceProvider)
+        .watchMessages(widget.chatId);
 
     return Scaffold(
       appBar: AppBar(
@@ -106,8 +111,12 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
                   return ListView.builder(
                     itemCount: 12,
                     reverse: true,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    itemBuilder: (context, index) => SkeletonMessage(isMe: index % 2 == 0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    itemBuilder: (context, index) =>
+                        SkeletonMessage(isMe: index % 2 == 0),
                   );
                 }
 
@@ -118,16 +127,20 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final message = messages[index];
-                    final isMe = message.senderId == ref.read(socialServiceProvider).currentUserId;
-                    
+                    final isMe =
+                        message.senderId ==
+                        ref.read(socialServiceProvider).currentUserId;
+
                     return GestureDetector(
                       onLongPress: () {
-                         setState(() => _replyingTo = message);
+                        setState(() => _replyingTo = message);
                       },
                       child: MessageBubble(
-                        message: message, 
+                        message: message,
                         isMe: isMe,
-                        onSwipe: () => setState(() => _replyingTo = message), // Future: Implement swipe gesture
+                        onSwipe: () => setState(
+                          () => _replyingTo = message,
+                        ), // Future: Implement swipe gesture
                       ),
                     );
                   },
@@ -135,7 +148,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
               },
             ),
           ),
-          
+
           // Reply Preview Bar
           if (_replyingTo != null)
             Container(
@@ -150,7 +163,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Replying to ${_replyingTo!.senderName}', 
+                          'Replying to ${_replyingTo!.senderName}',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.primary,
@@ -189,9 +202,9 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
         child: Row(
           children: [
             IconButton(
-               icon: const Icon(Icons.photo_camera), 
-               onPressed: _pickAndSendImage,
-               tooltip: 'Send Image',
+              icon: const Icon(Icons.photo_camera),
+              onPressed: _pickAndSendImage,
+              tooltip: 'Send Image',
             ),
             Expanded(
               child: TextField(
@@ -203,7 +216,10 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                 ),
                 textCapitalization: TextCapitalization.sentences,
                 onSubmitted: (_) => _sendMessage(),
@@ -231,8 +247,8 @@ class MessageBubble extends StatelessWidget {
   final VoidCallback? onSwipe;
 
   const MessageBubble({
-    super.key, 
-    required this.message, 
+    super.key,
+    required this.message,
     required this.isMe,
     this.participantCount = 2,
     this.onSwipe,
@@ -241,32 +257,44 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget contentWidget;
-    
+
     switch (message.type) {
       case SocialMessageType.text:
         contentWidget = Text(
           message.content.text ?? '',
-          style: TextStyle(color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface),
+          style: TextStyle(
+            color: isMe
+                ? Colors.white
+                : Theme.of(context).colorScheme.onSurface,
+          ),
         );
         break;
       case SocialMessageType.image:
         final url = message.content.mediaUrl;
-        contentWidget = url != null 
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: CachedNetworkImage(
-                 imageUrl: url,
-                 width: 200,
-                 fit: BoxFit.cover,
-                 placeholder: (context, url) => Container(
-                   width: 200, height: 150, 
-                   color: Colors.grey.shade300,
-                   child: const Center(child: CircularProgressIndicator()),
-                 ),
-                 errorWidget: (context, url, error) => const Icon(Icons.broken_image, size: 50, color: Colors.white),
-              ),
-            ) 
-          : const Text('📷 Image (Error)', style: TextStyle(fontStyle: FontStyle.italic));
+        contentWidget = url != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: CachedNetworkImage(
+                  imageUrl: url,
+                  width: 200,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    width: 200,
+                    height: 150,
+                    color: Colors.grey.shade300,
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                  errorWidget: (context, url, error) => const Icon(
+                    Icons.broken_image,
+                    size: 50,
+                    color: Colors.white,
+                  ),
+                ),
+              )
+            : const Text(
+                '📷 Image (Error)',
+                style: TextStyle(fontStyle: FontStyle.italic),
+              );
         break;
       case SocialMessageType.gameInvite:
         contentWidget = _buildGameInviteContent(context);
@@ -283,12 +311,14 @@ class MessageBubble extends StatelessWidget {
 
     final bool isDiamondGift = message.type == SocialMessageType.diamondGift;
     final bool isGameInvite = message.type == SocialMessageType.gameInvite;
-    
+
     // Styling base - use theme colors for dark mode support
     final colorScheme = Theme.of(context).colorScheme;
-    Color bubbleColor = isMe ? colorScheme.primary : colorScheme.surfaceContainerHighest;
+    Color bubbleColor = isMe
+        ? colorScheme.primary
+        : colorScheme.surfaceContainerHighest;
     Color textColor = isMe ? Colors.white : colorScheme.onSurface;
-    
+
     if (isDiamondGift) {
       textColor = Colors.white;
     }
@@ -299,17 +329,19 @@ class MessageBubble extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         padding: EdgeInsets.all(isDiamondGift || isGameInvite ? 0 : 12),
         decoration: BoxDecoration(
-          gradient: isDiamondGift 
-            ? const LinearGradient(
-                colors: [Color(0xFF9C27B0), Color(0xFFE91E63)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : (isGameInvite ? const LinearGradient(
-                colors: [Color(0xFF1A237E), Color(0xFF3949AB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ) : null),
+          gradient: isDiamondGift
+              ? const LinearGradient(
+                  colors: [Color(0xFF9C27B0), Color(0xFFE91E63)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : (isGameInvite
+                    ? const LinearGradient(
+                        colors: [Color(0xFF1A237E), Color(0xFF3949AB)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : null),
           color: (isDiamondGift || isGameInvite) ? null : bubbleColor,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
@@ -317,15 +349,20 @@ class MessageBubble extends StatelessWidget {
             bottomLeft: Radius.circular(isMe ? 16 : 4),
             bottomRight: Radius.circular(isMe ? 4 : 16),
           ),
-          boxShadow: (isDiamondGift || isGameInvite) ? [
-            BoxShadow(
-              color: (isDiamondGift ? Colors.pink : Colors.indigo).withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            )
-          ] : null,
+          boxShadow: (isDiamondGift || isGameInvite)
+              ? [
+                  BoxShadow(
+                    color: (isDiamondGift ? Colors.pink : Colors.indigo)
+                        .withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -335,35 +372,37 @@ class MessageBubble extends StatelessWidget {
 
             // Main Content
             Padding(
-               padding: const EdgeInsets.all(12), // Inner padding for special widgets
-               child: Column(
-                 crossAxisAlignment: CrossAxisAlignment.end,
-                 children: [
-                   contentWidget,
-                   const SizedBox(height: 4),
-                   Row(
-                     mainAxisSize: MainAxisSize.min,
-                     children: [
-                       Text(
-                         DateFormat.Hm().format(message.timestamp),
-                         style: TextStyle(
-                           fontSize: 10,
-                           color: textColor.withValues(alpha: 0.7),
-                         ),
-                       ),
-                       if (isMe) ...[
-                         const SizedBox(width: 4),
-                         _ReadReceiptIndicator(
-                           readBy: message.readBy,
-                           participantCount: participantCount,
-                           senderId: message.senderId,
-                           color: textColor.withValues(alpha: 0.7),
-                         ),
-                       ],
-                     ],
-                   ),
-                 ],
-               ),
+              padding: const EdgeInsets.all(
+                12,
+              ), // Inner padding for special widgets
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  contentWidget,
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        DateFormat.Hm().format(message.timestamp),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: textColor.withValues(alpha: 0.7),
+                        ),
+                      ),
+                      if (isMe) ...[
+                        const SizedBox(width: 4),
+                        _ReadReceiptIndicator(
+                          readBy: message.readBy,
+                          participantCount: participantCount,
+                          senderId: message.senderId,
+                          color: textColor.withValues(alpha: 0.7),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -371,7 +410,10 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildReplyPreview(BuildContext context, SocialMessagePreviewData reply) {
+  Widget _buildReplyPreview(
+    BuildContext context,
+    SocialMessagePreviewData reply,
+  ) {
     return Container(
       margin: const EdgeInsets.all(4),
       padding: const EdgeInsets.all(8),
@@ -379,19 +421,19 @@ class MessageBubble extends StatelessWidget {
         color: Colors.black.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border(
-           left: BorderSide(
-             color: isMe ? Colors.white70 : Theme.of(context).primaryColor, 
-             width: 4,
-           ),
+          left: BorderSide(
+            color: isMe ? Colors.white70 : Theme.of(context).primaryColor,
+            width: 4,
+          ),
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            reply.senderName, 
+            reply.senderName,
             style: TextStyle(
-              fontWeight: FontWeight.bold, 
+              fontWeight: FontWeight.bold,
               fontSize: 11,
               color: isMe ? Colors.white70 : Theme.of(context).primaryColor,
             ),
@@ -402,8 +444,10 @@ class MessageBubble extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 11, 
-              color: isMe ? Colors.white70 : Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 11,
+              color: isMe
+                  ? Colors.white70
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -423,10 +467,18 @@ class MessageBubble extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Game Invite', 
-                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 16)),
-                  Text('Let\'s play ${message.content.gameType}!', 
-                    style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                  const Text(
+                    'Game Invite',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    'Let\'s play ${message.content.gameType}!',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
                 ],
               ),
             ],
@@ -434,15 +486,18 @@ class MessageBubble extends StatelessWidget {
           const SizedBox(height: 12),
           FilledButton(
             onPressed: () {
-               // Navigation logic handled by GoRouter usually
-               // context.push('/lobby/${message.content.gameRoomId}');
+              // Navigation logic handled by GoRouter usually
+              // context.push('/lobby/${message.content.gameRoomId}');
             },
             style: FilledButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFF1A237E),
             ),
-            child: const Text('JOIN GAME', style: TextStyle(fontWeight: FontWeight.bold)),
-          )
+            child: const Text(
+              'JOIN GAME',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
         ],
       ),
     );
@@ -456,16 +511,21 @@ class MessageBubble extends StatelessWidget {
           alignment: Alignment.center,
           children: [
             // Shine effect
-             Container(
-               width: 60, height: 60,
-               decoration: BoxDecoration(
-                 shape: BoxShape.circle,
-                 boxShadow: [
-                   BoxShadow(color: Colors.white.withValues(alpha: 0.6), blurRadius: 20, spreadRadius: 5),
-                 ],
-               ),
-             ),
-             const Text('💎', style: TextStyle(fontSize: 48)),
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.6),
+                    blurRadius: 20,
+                    spreadRadius: 5,
+                  ),
+                ],
+              ),
+            ),
+            const Text('💎', style: TextStyle(fontSize: 48)),
           ],
         ),
         const SizedBox(height: 8),
@@ -475,11 +535,25 @@ class MessageBubble extends StatelessWidget {
             color: Colors.white,
             fontWeight: FontWeight.w900,
             fontSize: 24,
-            shadows: [Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4)],
+            shadows: [
+              Shadow(
+                color: Colors.black26,
+                offset: Offset(0, 2),
+                blurRadius: 4,
+              ),
+            ],
           ),
         ),
-        const Text('DIAMONDS', style: TextStyle(color: Colors.white70, fontSize: 10, letterSpacing: 1.5)),
-        if (message.content.text != null && message.content.text!.isNotEmpty) ...[
+        const Text(
+          'DIAMONDS',
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 10,
+            letterSpacing: 1.5,
+          ),
+        ),
+        if (message.content.text != null &&
+            message.content.text!.isNotEmpty) ...[
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -489,7 +563,10 @@ class MessageBubble extends StatelessWidget {
             ),
             child: Text(
               message.content.text!,
-              style: const TextStyle(color: Colors.white, fontStyle: FontStyle.italic),
+              style: const TextStyle(
+                color: Colors.white,
+                fontStyle: FontStyle.italic,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -502,8 +579,14 @@ class MessageBubble extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('🏆 Game Result', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-        Text('${message.content.gameType}', style: const TextStyle(color: Colors.white70)),
+        const Text(
+          '🏆 Game Result',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        Text(
+          '${message.content.gameType}',
+          style: const TextStyle(color: Colors.white70),
+        ),
       ],
     );
   }
@@ -526,12 +609,16 @@ class _ReadReceiptIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final othersWhoRead = readBy.where((id) => id != senderId).length;
     final totalOthers = participantCount - 1;
-    
+
     final bool isRead = othersWhoRead > 0 && othersWhoRead >= totalOthers;
     final bool isDelivered = readBy.isNotEmpty;
-    
+
     if (isRead) {
-      return const Icon(Icons.done_all, size: 14, color: Colors.lightBlueAccent); // Blue checks
+      return const Icon(
+        Icons.done_all,
+        size: 14,
+        color: Colors.lightBlueAccent,
+      ); // Blue checks
     } else if (isDelivered) {
       return Icon(Icons.done_all, size: 14, color: color); // Grey checks
     } else {
@@ -539,4 +626,3 @@ class _ReadReceiptIndicator extends StatelessWidget {
     }
   }
 }
-

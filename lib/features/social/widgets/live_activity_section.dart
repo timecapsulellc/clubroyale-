@@ -5,7 +5,6 @@ import 'package:clubroyale/features/social/providers/dashboard_providers.dart';
 import 'package:clubroyale/features/social/voice_rooms/models/voice_room.dart';
 import 'package:clubroyale/features/game/game_room.dart';
 
-
 /// Nanobanana-style Live Activity Section
 /// Shows Voice Room (purple) and Game Match (blue) cards with rich visual design
 class LiveActivitySection extends ConsumerWidget {
@@ -15,8 +14,10 @@ class LiveActivitySection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Explicit types to enforce import usage and type safety
     // Explicit types to enforce import usage and type safety
-    final List<VoiceRoom> activeVoiceRoomsAsync = ref.watch(activeVoiceRoomsProvider).value ?? [];
-    final List<GameRoom> ongoingGamesAsync = ref.watch(spectatorGamesProvider).value ?? [];
+    final List<VoiceRoom> activeVoiceRoomsAsync =
+        ref.watch(activeVoiceRoomsProvider).value ?? [];
+    final List<GameRoom> ongoingGamesAsync =
+        ref.watch(spectatorGamesProvider).value ?? [];
 
     // Use Real Data Only (User requested backend alignment)
     final List<VoiceRoom> activeVoiceRooms = activeVoiceRoomsAsync;
@@ -26,7 +27,7 @@ class LiveActivitySection extends ConsumerWidget {
     if (activeVoiceRooms.isEmpty && ongoingGames.isEmpty) {
       return const SizedBox.shrink(); // Hide section entirely if empty
     }
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -42,9 +43,9 @@ class LiveActivitySection extends ConsumerWidget {
             ),
           ),
         ),
-        
+
         SizedBox(
-          height: 140, 
+          height: 140,
           child: ListView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -54,7 +55,7 @@ class LiveActivitySection extends ConsumerWidget {
               ...activeVoiceRooms.asMap().entries.map((entry) {
                 final index = entry.key;
                 final room = entry.value;
-                
+
                 // Determine layout based on index/data
                 String title = 'VOICE\nROOM';
                 IconData icon = Icons.mic_rounded;
@@ -83,7 +84,10 @@ class LiveActivitySection extends ConsumerWidget {
                   status = 'LISTEN';
                   statusColor = const Color(0xFF06b6d4); // Cyan
                   gradient = const LinearGradient(
-                    colors: [Color(0xFF4c1d95), Color(0xFF8b5cf6)], // Deep Purple
+                    colors: [
+                      Color(0xFF4c1d95),
+                      Color(0xFF8b5cf6),
+                    ], // Deep Purple
                     begin: Alignment.bottomLeft,
                     end: Alignment.topRight,
                   );
@@ -100,67 +104,79 @@ class LiveActivitySection extends ConsumerWidget {
                   onTap: () => context.push('/voice-room/${room.id}'),
                 );
               }),
-              
+
               if (activeVoiceRooms.isNotEmpty) const SizedBox(width: 12),
 
               // Game Match Cards with Varied Styles
               ...ongoingGames.map((game) {
-
                 // Default Styles
                 String title = 'GAME\nMATCH';
                 IconData icon = Icons.gamepad_rounded;
                 String status = 'WATCH';
                 Color statusColor = const Color(0xFF10b981); // Green
                 LinearGradient gradient = const LinearGradient(
-                    colors: [Color(0xFF1e40af), Color(0xFF3b82f6)], // Blue
-                    begin: Alignment.bottomLeft,
-                    end: Alignment.topRight,
+                  colors: [Color(0xFF1e40af), Color(0xFF3b82f6)], // Blue
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
                 );
 
                 // Specific Styling based on Game Type
                 final gameTypeLower = game.gameType.toLowerCase();
-                
-                if (gameTypeLower.contains('teen') || gameTypeLower.contains('patti')) {
+
+                if (gameTypeLower.contains('teen') ||
+                    gameTypeLower.contains('patti')) {
                   title = 'TEEN\nPATTI';
                   icon = Icons.style; // Cards
                   status = 'BLIND';
                   statusColor = const Color(0xFF9333ea); // Purple
                   gradient = const LinearGradient(
-                    colors: [Color(0xFF4c1d95), Color(0xFF7c3aed)], // Deep Purple
+                    colors: [
+                      Color(0xFF4c1d95),
+                      Color(0xFF7c3aed),
+                    ], // Deep Purple
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   );
-                } else if (gameTypeLower.contains('marriage') || gameTypeLower.contains('royal')) {
+                } else if (gameTypeLower.contains('marriage') ||
+                    gameTypeLower.contains('royal')) {
                   title = 'ROYAL\nMELD'; // Marriage
                   icon = Icons.diamond_outlined;
                   status = 'MAAL'; // Feature specific
                   statusColor = const Color(0xFFeab308); // Gold
                   gradient = const LinearGradient(
-                    colors: [Color(0xFF065f46), Color(0xFF059669)], // Emerald Green
+                    colors: [
+                      Color(0xFF065f46),
+                      Color(0xFF059669),
+                    ], // Emerald Green
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   );
-                } else if (gameTypeLower.contains('call') || gameTypeLower.contains('break')) {
+                } else if (gameTypeLower.contains('call') ||
+                    gameTypeLower.contains('break')) {
                   title = 'CALL\nBREAK';
                   icon = Icons.filter_vintage_rounded; // Spades
                   status = 'BIDDING'; // Feature specific
                   statusColor = const Color(0xFF0ea5e9); // Sky Blue
                   gradient = const LinearGradient(
-                    colors: [Color(0xFF0f172a), Color(0xFF334155)], // Slate/Dark
+                    colors: [
+                      Color(0xFF0f172a),
+                      Color(0xFF334155),
+                    ], // Slate/Dark
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   );
                 } else if (game.config.bootAmount > 1000) {
-                   // High Stakes Fallback
-                   title = 'HIGH\nSTAKES';
-                   status = 'VIP';
+                  // High Stakes Fallback
+                  title = 'HIGH\nSTAKES';
+                  status = 'VIP';
                 }
 
                 return _ProLiveCard(
                   type: _CardType.game,
                   title: title,
                   // Safe ID Display
-                  subtitle: 'Table: ${(game.id ?? "Unknown").length > 4 ? (game.id ?? "Unknown").substring(0, 4) : (game.id ?? "Unknown")}...', // Show Table ID snippet
+                  subtitle:
+                      'Table: ${(game.id ?? "Unknown").length > 4 ? (game.id ?? "Unknown").substring(0, 4) : (game.id ?? "Unknown")}...', // Show Table ID snippet
                   status: status,
                   statusColor: statusColor,
                   icon: icon,
@@ -250,17 +266,20 @@ class _ProLiveCard extends StatelessWidget {
                       children: [
                         Icon(icon, color: Colors.white, size: 28),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: statusColor,
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2), 
-                                blurRadius: 4, 
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 4,
                                 offset: const Offset(0, 2),
-                              )
-                            ]
+                              ),
+                            ],
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -285,7 +304,9 @@ class _ProLiveCard extends StatelessWidget {
                                   letterSpacing: 0.5,
                                   shadows: [
                                     Shadow(
-                                      color: Colors.black.withValues(alpha: 0.3),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.3,
+                                      ),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),

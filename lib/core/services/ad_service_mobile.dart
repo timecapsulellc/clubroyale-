@@ -41,7 +41,7 @@ class AdServiceMobile implements _AdServiceInterface {
     if (_rewardedAd == null) {
       debugPrint('Warning: Ad attempted to show before loading.');
       _loadRewardedAd();
-      
+
       if (kDebugMode) {
         debugPrint('Dev Mode: Simulating ad success');
         return true;
@@ -57,7 +57,7 @@ class AdServiceMobile implements _AdServiceInterface {
         rewardEarned = true;
       },
     );
-    
+
     _rewardedAd = null;
     _loadRewardedAd();
 

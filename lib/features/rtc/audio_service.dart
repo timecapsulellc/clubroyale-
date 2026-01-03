@@ -21,10 +21,7 @@ class WebRTCConfig {
   ];
 
   static const Map<String, dynamic> offerSdpConstraints = {
-    'mandatory': {
-      'OfferToReceiveAudio': true,
-      'OfferToReceiveVideo': false,
-    },
+    'mandatory': {'OfferToReceiveAudio': true, 'OfferToReceiveVideo': false},
     'optional': [],
   };
 
@@ -35,12 +32,7 @@ class WebRTCConfig {
 }
 
 /// Audio connection state
-enum AudioConnectionState {
-  disconnected,
-  connecting,
-  connected,
-  failed,
-}
+enum AudioConnectionState { disconnected, connecting, connected, failed }
 
 /// Represents a peer connection with another user
 class PeerConnection {
@@ -49,17 +41,14 @@ class PeerConnection {
   MediaStream? remoteStream;
   bool isMuted = false;
 
-  PeerConnection({
-    required this.peerId,
-    required this.connection,
-  });
+  PeerConnection({required this.peerId, required this.connection});
 }
 
 /// Audio service managing WebRTC peer connections for voice chat
 class AudioService extends ChangeNotifier {
   final SignalingService _signaling;
   final Map<String, PeerConnection> _peerConnections = {};
-  
+
   MediaStream? _localStream;
   bool _isMuted = false;
   bool _isEnabled = false;
@@ -142,7 +131,7 @@ class AudioService extends ChangeNotifier {
   /// Toggle local mute
   void toggleMute() {
     _isMuted = !_isMuted;
-    
+
     _localStream?.getAudioTracks().forEach((track) {
       track.enabled = !_isMuted;
     });
@@ -214,26 +203,23 @@ class AudioService extends ChangeNotifier {
     };
 
     // Store peer connection
-    _peerConnections[peerId] = PeerConnection(
-      peerId: peerId,
-      connection: pc,
-    );
+    _peerConnections[peerId] = PeerConnection(peerId: peerId, connection: pc);
 
     // If initiator, create and send offer
     if (isInitiator) {
       final offer = await pc.createOffer(WebRTCConfig.offerSdpConstraints);
       await pc.setLocalDescription(offer);
-      await _signaling.sendOffer(
-        toPeerId: peerId,
-        offer: offer.toMap(),
-      );
+      await _signaling.sendOffer(toPeerId: peerId, offer: offer.toMap());
     }
 
     return pc;
   }
 
   /// Handle incoming offer
-  Future<void> _handleOffer(Map<String, dynamic> offer, String fromUserId) async {
+  Future<void> _handleOffer(
+    Map<String, dynamic> offer,
+    String fromUserId,
+  ) async {
     debugPrint('Received offer from $fromUserId');
 
     // Create peer connection as non-initiator
@@ -247,14 +233,14 @@ class AudioService extends ChangeNotifier {
     // Create and send answer
     final answer = await pc.createAnswer();
     await pc.setLocalDescription(answer);
-    await _signaling.sendAnswer(
-      toPeerId: fromUserId,
-      answer: answer.toMap(),
-    );
+    await _signaling.sendAnswer(toPeerId: fromUserId, answer: answer.toMap());
   }
 
   /// Handle incoming answer
-  Future<void> _handleAnswer(Map<String, dynamic> answer, String fromUserId) async {
+  Future<void> _handleAnswer(
+    Map<String, dynamic> answer,
+    String fromUserId,
+  ) async {
     debugPrint('Received answer from $fromUserId');
 
     final peer = _peerConnections[fromUserId];
@@ -266,7 +252,10 @@ class AudioService extends ChangeNotifier {
   }
 
   /// Handle incoming ICE candidate
-  Future<void> _handleCandidate(Map<String, dynamic> candidate, String fromUserId) async {
+  Future<void> _handleCandidate(
+    Map<String, dynamic> candidate,
+    String fromUserId,
+  ) async {
     final peer = _peerConnections[fromUserId];
     if (peer != null) {
       await peer.connection.addCandidate(
@@ -295,27 +284,26 @@ class AudioService extends ChangeNotifier {
 }
 
 /// Provider for audio service state
-final audioServiceProvider = Provider.family.autoDispose<AudioService, SignalingParams>(
-  (ref, params) {
-    final signaling = ref.watch(signalingServiceProvider(params));
-    final service = AudioService(signaling: signaling);
-    ref.onDispose(() => service.dispose());
-    return service;
-  },
-);
+final audioServiceProvider = Provider.family
+    .autoDispose<AudioService, SignalingParams>((ref, params) {
+      final signaling = ref.watch(signalingServiceProvider(params));
+      final service = AudioService(signaling: signaling);
+      ref.onDispose(() => service.dispose());
+      return service;
+    });
 
 /// Provider for audio connection state
-final audioConnectionStateProvider = Provider.family<AudioConnectionState, SignalingParams>(
-  (ref, params) {
-    final audioService = ref.watch(audioServiceProvider(params));
-    return audioService.state;
-  },
-);
+final audioConnectionStateProvider =
+    Provider.family<AudioConnectionState, SignalingParams>((ref, params) {
+      final audioService = ref.watch(audioServiceProvider(params));
+      return audioService.state;
+    });
 
 /// Provider for mute state
-final audioMuteStateProvider = Provider.family<bool, SignalingParams>(
-  (ref, params) {
-    final audioService = ref.watch(audioServiceProvider(params));
-    return audioService.isMuted;
-  },
-);
+final audioMuteStateProvider = Provider.family<bool, SignalingParams>((
+  ref,
+  params,
+) {
+  final audioService = ref.watch(audioServiceProvider(params));
+  return audioService.isMuted;
+});

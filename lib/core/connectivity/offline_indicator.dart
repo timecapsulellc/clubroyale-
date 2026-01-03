@@ -7,11 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 /// Connectivity status
-enum ConnectionStatus {
-  online,
-  offline,
-  reconnecting,
-}
+enum ConnectionStatus { online, offline, reconnecting }
 
 /// Connectivity service
 class ConnectivityService {
@@ -21,7 +17,7 @@ class ConnectivityService {
 
   final Connectivity _connectivity = Connectivity();
   final _statusController = StreamController<ConnectionStatus>.broadcast();
-  
+
   ConnectionStatus _currentStatus = ConnectionStatus.online;
   StreamSubscription? _subscription;
 
@@ -41,13 +37,12 @@ class ConnectivityService {
   }
 
   void _updateStatus(List<ConnectivityResult> results) {
-    final hasConnection = results.any((r) => 
-        r != ConnectivityResult.none);
-    
-    final newStatus = hasConnection 
-        ? ConnectionStatus.online 
+    final hasConnection = results.any((r) => r != ConnectivityResult.none);
+
+    final newStatus = hasConnection
+        ? ConnectionStatus.online
         : ConnectionStatus.offline;
-    
+
     if (newStatus != _currentStatus) {
       _currentStatus = newStatus;
       _statusController.add(newStatus);
@@ -64,10 +59,7 @@ class ConnectivityService {
 class OfflineIndicator extends StatelessWidget {
   final Widget child;
 
-  const OfflineIndicator({
-    super.key,
-    required this.child,
-  });
+  const OfflineIndicator({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +68,7 @@ class OfflineIndicator extends StatelessWidget {
       initialData: ConnectivityService().currentStatus,
       builder: (context, snapshot) {
         final status = snapshot.data ?? ConnectionStatus.online;
-        
+
         return Column(
           children: [
             // Offline banner
@@ -104,7 +96,7 @@ class OfflineIndicator extends StatelessWidget {
                     )
                   : null,
             ),
-            
+
             // Reconnecting banner
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
@@ -137,7 +129,7 @@ class OfflineIndicator extends StatelessWidget {
                     )
                   : null,
             ),
-            
+
             // Main content
             Expanded(child: child),
           ],
@@ -165,7 +157,7 @@ class OfflineOverlay extends StatelessWidget {
       initialData: ConnectivityService().currentStatus,
       builder: (context, snapshot) {
         final isOffline = snapshot.data == ConnectionStatus.offline;
-        
+
         return Stack(
           children: [
             child,
@@ -197,9 +189,7 @@ class OfflineOverlay extends StatelessWidget {
                           Text(
                             message,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                            ),
+                            style: TextStyle(color: Colors.grey.shade600),
                           ),
                           const SizedBox(height: 20),
                           OutlinedButton.icon(
@@ -233,7 +223,7 @@ class ConnectionStatusIcon extends StatelessWidget {
       initialData: ConnectivityService().currentStatus,
       builder: (context, snapshot) {
         final status = snapshot.data ?? ConnectionStatus.online;
-        
+
         switch (status) {
           case ConnectionStatus.online:
             return const SizedBox.shrink();

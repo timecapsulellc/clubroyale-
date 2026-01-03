@@ -11,25 +11,25 @@ class AnalyticsEvents {
   static const String login = 'login';
   static const String signUp = 'sign_up';
   static const String logout = 'logout';
-  
+
   // Game
   static const String gameCreate = 'game_create';
   static const String gameJoin = 'game_join';
   static const String gameStart = 'game_start';
   static const String gameEnd = 'game_end';
   static const String gameLeave = 'game_leave';
-  
+
   // Monetization
   static const String storeOpen = 'store_open';
   static const String purchaseStart = 'purchase_start';
   static const String purchaseComplete = 'purchase_complete';
   static const String purchaseFail = 'purchase_fail';
-  
+
   // Social
   static const String inviteSend = 'invite_send';
   static const String inviteAccept = 'invite_accept';
   static const String settlementShare = 'settlement_share';
-  
+
   // Engagement
   static const String botMatch = 'bot_match';
   static const String tutorialStart = 'tutorial_start';
@@ -98,10 +98,7 @@ class AnalyticsService {
   }) async {
     await _analytics.logEvent(
       name: AnalyticsEvents.gameJoin,
-      parameters: {
-        'game_type': gameType,
-        'join_method': joinMethod,
-      },
+      parameters: {'game_type': gameType, 'join_method': joinMethod},
     );
   }
 
@@ -140,13 +137,17 @@ class AnalyticsService {
   // Backwards Compatibility / Legacy Methods
   Future<void> logGameStarted(String gameId, {int playerCount = 4}) async {
     await logGameStart(
-      gameType: 'unknown', 
-      playerCount: playerCount, 
-      botCount: 0
+      gameType: 'unknown',
+      playerCount: playerCount,
+      botCount: 0,
     );
   }
 
-  Future<void> logGameCompleted(String gameId, {required int durationSeconds, required int totalRounds}) async {
+  Future<void> logGameCompleted(
+    String gameId, {
+    required int durationSeconds,
+    required int totalRounds,
+  }) async {
     await logGameEnd(
       gameType: 'unknown',
       durationMinutes: durationSeconds ~/ 60,
@@ -223,28 +224,29 @@ class AnalyticsService {
   }) async {
     await _analytics.logEvent(
       name: AnalyticsEvents.purchaseFail,
-      parameters: {
-        'product_id': productId,
-        'error_code': errorCode,
-      },
+      parameters: {'product_id': productId, 'error_code': errorCode},
     );
   }
-  
+
   // Legacy alias
-  Future<void> logPurchaseCompleted(String productId, double amount, String currency) async {
+  Future<void> logPurchaseCompleted(
+    String productId,
+    double amount,
+    String currency,
+  ) async {
     await logPurchaseComplete(
-      productId: productId, 
-      price: amount, 
-      currency: currency, 
-      diamondsGranted: 0
+      productId: productId,
+      price: amount,
+      currency: currency,
+      diamondsGranted: 0,
     );
   }
-  
+
   Future<void> logPurchaseAttempt(String productId, double amount) async {
     await logPurchaseStart(
-      productId: productId, 
-      price: amount, 
-      currency: 'USD'
+      productId: productId,
+      price: amount,
+      currency: 'USD',
     );
   }
 
@@ -265,7 +267,7 @@ class AnalyticsService {
       method: 'share_sheet',
     );
   }
-  
+
   Future<void> logRoomCreated(String roomId, {bool isPublic = true}) async {
     await _analytics.logEvent(
       name: 'room_created',
@@ -273,20 +275,17 @@ class AnalyticsService {
     );
   }
 
-  Future<void> logCustomEvent(String eventName, {Map<String, Object>? parameters}) async {
-     await _analytics.logEvent(
-      name: eventName,
-      parameters: parameters,
-    );
+  Future<void> logCustomEvent(
+    String eventName, {
+    Map<String, Object>? parameters,
+  }) async {
+    await _analytics.logEvent(name: eventName, parameters: parameters);
   }
 
   Future<void> logError(String errorType, String errorMessage) async {
     await _analytics.logEvent(
       name: 'error_occurred',
-      parameters: {
-        'error_type': errorType,
-        'error_message': errorMessage,
-      },
+      parameters: {'error_type': errorType, 'error_message': errorMessage},
     );
   }
 
@@ -325,10 +324,10 @@ class AnalyticsService {
   Future<void> logScreenView(String screenName) async {
     await _analytics.logScreenView(screenName: screenName);
   }
-  
+
   // Alias
   Future<void> setCurrentScreen(String screenName) => logScreenView(screenName);
-  
+
   Future<void> logProfileUpdate() async {
     await _analytics.logEvent(name: 'profile_updated');
   }

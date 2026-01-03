@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 /// AI Rivals Section - "Meet Your Rivals"
-/// 
+///
 /// Showcase the 5 cognitive bot personalities as character cards:
 /// - TrickMaster, CardShark, LuckyDice, DeepThink, RoyalAce
 class AIRivalsSection extends StatelessWidget {
@@ -12,23 +12,21 @@ class AIRivalsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
-    
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
         horizontal: isDesktop ? 48 : 24,
         vertical: 64,
       ),
-      decoration: const BoxDecoration(
-        color: Color(0xFF051A12),
-      ),
+      decoration: const BoxDecoration(color: Color(0xFF051A12)),
       child: Column(
         children: [
           // Section Title
           _buildSectionTitle().animate().fadeIn(duration: 500.ms),
-          
+
           const SizedBox(height: 48),
-          
+
           // Bot Cards
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -44,16 +42,20 @@ class AIRivalsSection extends StatelessWidget {
                   difficultyColor: Colors.red,
                   traits: ['Aggressive', 'Bluffs often', 'Targets weak'],
                 ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.2, end: 0),
-                
+
                 _BotCard(
                   name: 'CardShark',
                   emoji: '🃏',
                   title: 'The Cautious',
                   difficulty: 'MEDIUM',
                   difficultyColor: Colors.orange,
-                  traits: ['Conservative', 'Safe plays', 'Preserves high cards'],
+                  traits: [
+                    'Conservative',
+                    'Safe plays',
+                    'Preserves high cards',
+                  ],
                 ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.2, end: 0),
-                
+
                 _BotCard(
                   name: 'LuckyDice',
                   emoji: '🎲',
@@ -62,7 +64,7 @@ class AIRivalsSection extends StatelessWidget {
                   difficultyColor: Colors.green,
                   traits: ['Unpredictable', 'Fun mistakes', 'Chaotic plays'],
                 ).animate().fadeIn(delay: 300.ms).slideX(begin: -0.2, end: 0),
-                
+
                 _BotCard(
                   name: 'DeepThink',
                   emoji: '🧠',
@@ -71,7 +73,7 @@ class AIRivalsSection extends StatelessWidget {
                   difficultyColor: Colors.purple,
                   traits: ['Analytical', 'ToT Reasoning', 'Optimal strategy'],
                 ).animate().fadeIn(delay: 400.ms).slideX(begin: -0.2, end: 0),
-                
+
                 _BotCard(
                   name: 'RoyalAce',
                   emoji: '💎',
@@ -87,7 +89,7 @@ class AIRivalsSection extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildSectionTitle() {
     return Column(
       children: [
@@ -131,7 +133,7 @@ class _BotCard extends StatefulWidget {
   final String difficulty;
   final Color difficultyColor;
   final List<String> traits;
-  
+
   const _BotCard({
     required this.name,
     required this.emoji,
@@ -157,7 +159,7 @@ class _BotCardState extends State<_BotCard> {
         duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.symmetric(horizontal: 12),
         width: 200,
-        transform: _isHovered 
+        transform: _isHovered
             ? (Matrix4.identity()..scale(1.05))
             : Matrix4.identity(),
         transformAlignment: Alignment.center,
@@ -174,14 +176,14 @@ class _BotCardState extends State<_BotCard> {
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: _isHovered 
+              color: _isHovered
                   ? widget.difficultyColor.withValues(alpha: 0.6)
                   : const Color(0xFFD4AF37).withValues(alpha: 0.2),
               width: _isHovered ? 2 : 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: _isHovered 
+                color: _isHovered
                     ? widget.difficultyColor.withValues(alpha: 0.2)
                     : Colors.black.withValues(alpha: 0.3),
                 blurRadius: _isHovered ? 25 : 10,
@@ -210,9 +212,9 @@ class _BotCardState extends State<_BotCard> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Name
               Text(
                 widget.name,
@@ -224,9 +226,9 @@ class _BotCardState extends State<_BotCard> {
                   letterSpacing: 1,
                 ),
               ),
-              
+
               const SizedBox(height: 4),
-              
+
               // Title
               Text(
                 widget.title,
@@ -236,16 +238,21 @@ class _BotCardState extends State<_BotCard> {
                   fontStyle: FontStyle.italic,
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Difficulty Badge
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: widget.difficultyColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: widget.difficultyColor.withValues(alpha: 0.5)),
+                  border: Border.all(
+                    color: widget.difficultyColor.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: Text(
                   widget.difficulty,
@@ -257,45 +264,47 @@ class _BotCardState extends State<_BotCard> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Traits
-              ...widget.traits.map((trait) => Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.check_circle_outline,
-                      size: 12,
-                      color: Colors.white.withValues(alpha: 0.4),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      trait,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.white.withValues(alpha: 0.6),
+              ...widget.traits.map(
+                (trait) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.check_circle_outline,
+                        size: 12,
+                        color: Colors.white.withValues(alpha: 0.4),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 6),
+                      Text(
+                        trait,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.white.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              )),
-              
+              ),
+
               const SizedBox(height: 16),
-              
+
               // Challenge Button
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
-                  color: _isHovered 
+                  color: _isHovered
                       ? widget.difficultyColor
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: _isHovered 
+                    color: _isHovered
                         ? widget.difficultyColor
                         : const Color(0xFFD4AF37).withValues(alpha: 0.5),
                   ),
@@ -304,7 +313,9 @@ class _BotCardState extends State<_BotCard> {
                   child: Text(
                     'CHALLENGE',
                     style: TextStyle(
-                      color: _isHovered ? Colors.white : const Color(0xFFD4AF37),
+                      color: _isHovered
+                          ? Colors.white
+                          : const Color(0xFFD4AF37),
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                       letterSpacing: 1,

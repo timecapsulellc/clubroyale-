@@ -29,17 +29,16 @@ abstract class DiamondWallet with _$DiamondWallet {
   const factory DiamondWallet({
     /// User ID
     required String userId,
-    
+
     /// Current diamond balance
-    @JsonKey(name: 'diamondBalance')
-    @Default(0) int balance,
-    
+    @JsonKey(name: 'diamondBalance') @Default(0) int balance,
+
     /// User Tier (V5)
     @Default(UserTier.basic) UserTier tier,
 
     /// Diamonds breakdown by origin (V5)
     @Default({}) Map<String, int> diamondsByOrigin,
-    
+
     /// Daily limits tracking
     @Default(0) int dailyEarned,
     @Default(0) int dailyTransferred,
@@ -47,22 +46,34 @@ abstract class DiamondWallet with _$DiamondWallet {
 
     /// Login streak tracking
     @Default(0) int loginStreak,
-    
+
     /// Last daily login claim
-    @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)
+    @JsonKey(
+      fromJson: _nullableDateTimeFromJson,
+      toJson: _nullableDateTimeToJson,
+    )
     DateTime? lastDailyLoginClaim,
 
     /// Verification timestamps
-    @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)
+    @JsonKey(
+      fromJson: _nullableDateTimeFromJson,
+      toJson: _nullableDateTimeToJson,
+    )
     DateTime? verifiedAt,
-    
-    @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)
+
+    @JsonKey(
+      fromJson: _nullableDateTimeFromJson,
+      toJson: _nullableDateTimeToJson,
+    )
     DateTime? trustedAt,
 
     /// Legacy fields (kept for backward compatibility if needed)
     @Default(0) int totalPurchased,
     @Default(0) int totalSpent,
-    @JsonKey(fromJson: _nullableDateTimeFromJson, toJson: _nullableDateTimeToJson)
+    @JsonKey(
+      fromJson: _nullableDateTimeFromJson,
+      toJson: _nullableDateTimeToJson,
+    )
     DateTime? lastUpdated,
   }) = _DiamondWallet;
 
@@ -89,10 +100,10 @@ abstract class DiamondTransaction with _$DiamondTransaction {
 }
 
 enum DiamondTransactionType {
-  purchase,    // IAP purchase
+  purchase, // IAP purchase
   roomCreation, // Spent on creating a room
-  adDisable,   // Spent to disable ads
-  refund,      // Refund from cancelled room
-  bonus,       // Free diamonds (referral, etc.)
-  signup,      // Signup bonus diamonds
+  adDisable, // Spent to disable ads
+  refund, // Refund from cancelled room
+  bonus, // Free diamonds (referral, etc.)
+  signup, // Signup bonus diamonds
 }

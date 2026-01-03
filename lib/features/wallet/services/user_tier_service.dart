@@ -1,4 +1,3 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/wallet/models/user_tier.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart';
@@ -12,9 +11,9 @@ final userTierServiceProvider = Provider<UserTierService>((ref) {
 final currentUserTierProvider = StreamProvider<UserTier>((ref) {
   final authState = ref.watch(authStateProvider);
   final user = authState.value;
-  
+
   if (user == null) return Stream.value(UserTier.basic);
-  
+
   final service = ref.watch(userTierServiceProvider);
   return service.watchUserTier(user.uid);
 });
@@ -39,9 +38,9 @@ class UserTierService {
   Future<int> getRemainingTransferLimit(String userId) async {
     final wallet = await _diamondService.getWallet(userId);
     final limit = wallet.tier.dailyTransferLimit;
-    
+
     if (limit == -1) return -1; // Unlimited
-    
+
     return (limit - wallet.dailyTransferred).clamp(0, limit);
   }
 
@@ -49,9 +48,9 @@ class UserTierService {
   Future<int> getRemainingEarningCap(String userId) async {
     final wallet = await _diamondService.getWallet(userId);
     final cap = wallet.tier.dailyEarningCap;
-    
+
     if (cap == -1) return -1; // Unlimited
-    
+
     return (cap - wallet.dailyEarned).clamp(0, cap);
   }
 

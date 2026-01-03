@@ -33,36 +33,23 @@ class EmptyState extends StatelessWidget {
                 color: Colors.grey.shade100,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: 64,
-                color: Colors.grey.shade400,
-              ),
+              child: Icon(icon, size: 64, color: Colors.grey.shade400),
             ),
             const SizedBox(height: 24),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             if (subtitle != null) ...[
               const SizedBox(height: 8),
               Text(
                 subtitle!,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                 textAlign: TextAlign.center,
               ),
             ],
-            if (action != null) ...[
-              const SizedBox(height: 24),
-              action!,
-            ],
+            if (action != null) ...[const SizedBox(height: 24), action!],
           ],
         ),
       ),
@@ -74,10 +61,7 @@ class EmptyState extends StatelessWidget {
 class NoRoomsEmptyState extends StatelessWidget {
   final VoidCallback? onCreateRoom;
 
-  const NoRoomsEmptyState({
-    super.key,
-    this.onCreateRoom,
-  });
+  const NoRoomsEmptyState({super.key, this.onCreateRoom});
 
   @override
   Widget build(BuildContext context) {
@@ -142,10 +126,7 @@ class WaitingForPlayersState extends StatelessWidget {
 class NoFriendsEmptyState extends StatelessWidget {
   final VoidCallback? onAddFriend;
 
-  const NoFriendsEmptyState({
-    super.key,
-    this.onAddFriend,
-  });
+  const NoFriendsEmptyState({super.key, this.onAddFriend});
 
   @override
   Widget build(BuildContext context) {
@@ -168,10 +149,7 @@ class NoFriendsEmptyState extends StatelessWidget {
 class NoDiamondsEmptyState extends StatelessWidget {
   final VoidCallback? onBuyDiamonds;
 
-  const NoDiamondsEmptyState({
-    super.key,
-    this.onBuyDiamonds,
-  });
+  const NoDiamondsEmptyState({super.key, this.onBuyDiamonds});
 
   @override
   Widget build(BuildContext context) {
@@ -194,10 +172,7 @@ class NoDiamondsEmptyState extends StatelessWidget {
 class NoSearchResultsState extends StatelessWidget {
   final String query;
 
-  const NoSearchResultsState({
-    super.key,
-    required this.query,
-  });
+  const NoSearchResultsState({super.key, required this.query});
 
   @override
   Widget build(BuildContext context) {
@@ -214,11 +189,7 @@ class ErrorState extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
 
-  const ErrorState({
-    super.key,
-    required this.message,
-    this.onRetry,
-  });
+  const ErrorState({super.key, required this.message, this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -243,18 +214,12 @@ class ErrorState extends StatelessWidget {
             const SizedBox(height: 24),
             const Text(
               'Something went wrong',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               message,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[

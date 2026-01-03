@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -69,13 +68,16 @@ class GameHistoryScreen extends ConsumerWidget {
                         opacity: 0.1,
                         child: GridView.builder(
                           physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 8,
-                          ),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 8,
+                              ),
                           itemCount: 64,
                           itemBuilder: (context, index) {
                             return Icon(
-                              index % 3 == 0 ? Icons.history : Icons.access_time,
+                              index % 3 == 0
+                                  ? Icons.history
+                                  : Icons.access_time,
                               color: Colors.white,
                               size: 20,
                             );
@@ -117,24 +119,22 @@ class GameHistoryScreen extends ConsumerWidget {
           historyAsyncValue.when(
             data: (games) {
               if (games.isEmpty) {
-                return SliverFillRemaining(
-                  child: _EmptyState(),
-                );
+                return SliverFillRemaining(child: _EmptyState());
               }
 
               return SliverPadding(
                 padding: const EdgeInsets.all(16),
                 sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final game = games[index];
-                      return _EnhancedGameCard(
-                        game: game,
-                        onTap: () => context.go('/ledger/${game.id}'),
-                      ).animate(delay: (100 * index).ms).fadeIn().slideX(begin: -0.1);
-                    },
-                    childCount: games.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final game = games[index];
+                    return _EnhancedGameCard(
+                          game: game,
+                          onTap: () => context.go('/ledger/${game.id}'),
+                        )
+                        .animate(delay: (100 * index).ms)
+                        .fadeIn()
+                        .slideX(begin: -0.1);
+                  }, childCount: games.length),
                 ),
               );
             },
@@ -172,7 +172,7 @@ class _StatsBar extends StatelessWidget {
     // Calculate wins (where current user had highest score - simplified for now)
     int totalWins = 0;
     int totalPoints = 0;
-    
+
     for (final game in games) {
       for (final entry in game.scores.entries) {
         totalPoints += entry.value;
@@ -183,12 +183,7 @@ class _StatsBar extends StatelessWidget {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.indigo.shade50,
-            Colors.white,
-          ],
-        ),
+        gradient: LinearGradient(colors: [Colors.indigo.shade50, Colors.white]),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -263,9 +258,9 @@ class _StatItem extends StatelessWidget {
         ),
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Colors.grey.shade600,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
         ),
       ],
     );
@@ -277,10 +272,7 @@ class _EnhancedGameCard extends StatelessWidget {
   final GameRoom game;
   final VoidCallback onTap;
 
-  const _EnhancedGameCard({
-    required this.game,
-    required this.onTap,
-  });
+  const _EnhancedGameCard({required this.game, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -328,7 +320,9 @@ class _EnhancedGameCard extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [Colors.indigo.shade400, Colors.indigo.shade600],
                   ),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -338,7 +332,11 @@ class _EnhancedGameCard extends StatelessWidget {
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.sports_esports, color: Colors.white, size: 24),
+                      child: const Icon(
+                        Icons.sports_esports,
+                        color: Colors.white,
+                        size: 24,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -363,18 +361,28 @@ class _EnhancedGameCard extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.people, size: 16, color: Colors.white.withValues(alpha: 0.9)),
+                          Icon(
+                            Icons.people,
+                            size: 16,
+                            color: Colors.white.withValues(alpha: 0.9),
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             '${game.players.length}',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
@@ -386,7 +394,10 @@ class _EnhancedGameCard extends StatelessWidget {
               // Winner banner
               if (winner != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.amber.shade100, Colors.amber.shade50],
@@ -394,7 +405,11 @@ class _EnhancedGameCard extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.emoji_events, color: Colors.amber.shade700, size: 24),
+                      Icon(
+                        Icons.emoji_events,
+                        color: Colors.amber.shade700,
+                        size: 24,
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -417,7 +432,10 @@ class _EnhancedGameCard extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.amber.shade700,
                           borderRadius: BorderRadius.circular(20),
@@ -444,14 +462,20 @@ class _EnhancedGameCard extends StatelessWidget {
                     final score = game.scores[player.id] ?? 0;
                     final isWinner = player.id == winnerId;
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: isWinner
                             ? Colors.amber.withValues(alpha: 0.15)
                             : colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(12),
                         border: isWinner
-                            ? Border.all(color: Colors.amber.shade400, width: 1.5)
+                            ? Border.all(
+                                color: Colors.amber.shade400,
+                                width: 1.5,
+                              )
                             : null,
                       ),
                       child: Row(
@@ -459,7 +483,9 @@ class _EnhancedGameCard extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 12,
-                            backgroundColor: isWinner ? Colors.amber : Colors.indigo.shade100,
+                            backgroundColor: isWinner
+                                ? Colors.amber
+                                : Colors.indigo.shade100,
                             child: Text(
                               player.name[0].toUpperCase(),
                               style: TextStyle(
@@ -478,13 +504,16 @@ class _EnhancedGameCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
-                              color: score > 0 
-                                  ? Colors.green.withValues(alpha: 0.15) 
-                                  : score < 0 
-                                      ? Colors.red.withValues(alpha: 0.15)
-                                      : Colors.grey.withValues(alpha: 0.15),
+                              color: score > 0
+                                  ? Colors.green.withValues(alpha: 0.15)
+                                  : score < 0
+                                  ? Colors.red.withValues(alpha: 0.15)
+                                  : Colors.grey.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -492,11 +521,11 @@ class _EnhancedGameCard extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
-                                color: score > 0 
-                                    ? Colors.green.shade700 
-                                    : score < 0 
-                                        ? Colors.red.shade700
-                                        : Colors.grey,
+                                color: score > 0
+                                    ? Colors.green.shade700
+                                    : score < 0
+                                    ? Colors.red.shade700
+                                    : Colors.grey,
                               ),
                             ),
                           ),
@@ -521,7 +550,11 @@ class _EnhancedGameCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Icon(Icons.arrow_forward_ios, size: 14, color: Colors.indigo),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 14,
+                      color: Colors.indigo,
+                    ),
                   ],
                 ),
               ),
@@ -553,7 +586,7 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -597,7 +630,10 @@ class _EmptyState extends StatelessWidget {
               label: const Text('Start Playing'),
               style: FilledButton.styleFrom(
                 backgroundColor: Colors.indigo,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -619,7 +655,7 @@ class _ErrorState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),

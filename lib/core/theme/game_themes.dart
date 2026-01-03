@@ -1,5 +1,5 @@
 /// Game Themes and Card Skins
-/// 
+///
 /// Defines available table themes and card customization options
 /// for the ClubRoyale Game Store feature.
 library;
@@ -113,7 +113,6 @@ enum CardSkin {
     cardFaceStyle: CardFaceStyle.nepali,
     cardBackColor: Color(0xFF4A2C6E),
     isExclusive: true, // ClubRoyale exclusive!
-
   ),
   minimalist(
     id: 'minimalist',
@@ -165,11 +164,11 @@ enum CardSkin {
 
 /// Card face rendering styles
 enum CardFaceStyle {
-  standard,   // Traditional card design
-  poker,      // Casino-style with larger symbols
-  nepali,     // Nepali cultural motifs
+  standard, // Traditional card design
+  poker, // Casino-style with larger symbols
+  nepali, // Nepali cultural motifs
   minimalist, // Clean, modern design
-  gold,       // Premium gold-trimmed design
+  gold, // Premium gold-trimmed design
 }
 
 /// User customization preferences
@@ -193,8 +192,12 @@ class UserCustomization {
     return UserCustomization(
       selectedTheme: GameTheme.fromId(data['selectedTheme'] ?? 'forest_green'),
       selectedCardSkin: CardSkin.fromId(data['selectedCardSkin'] ?? 'classic'),
-      unlockedThemeIds: List<String>.from(data['unlockedThemes'] ?? ['forest_green', 'midnight']),
-      unlockedCardSkinIds: List<String>.from(data['unlockedCardSkins'] ?? ['classic']),
+      unlockedThemeIds: List<String>.from(
+        data['unlockedThemes'] ?? ['forest_green', 'midnight'],
+      ),
+      unlockedCardSkinIds: List<String>.from(
+        data['unlockedCardSkins'] ?? ['classic'],
+      ),
       userLevel: data['level'] ?? 1,
     );
   }

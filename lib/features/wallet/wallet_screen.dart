@@ -22,18 +22,23 @@ class WalletScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authService = ref.watch(authServiceProvider);
     final userId = authService.currentUser?.uid;
-    
+
     if (userId == null) {
       return const Scaffold(
         backgroundColor: CasinoColors.darkPurple,
-        body: Center(child: Text('Please log in to view wallet', style: TextStyle(color: Colors.white))),
+        body: Center(
+          child: Text(
+            'Please log in to view wallet',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       );
     }
 
     final diamondService = ref.watch(diamondServiceProvider);
     final userTierAsync = ref.watch(currentUserTierProvider);
     final governanceService = ref.watch(governanceServiceProvider);
-    
+
     return Scaffold(
       backgroundColor: CasinoColors.darkPurple,
       extendBodyBehindAppBar: true,
@@ -64,11 +69,21 @@ class WalletScreen extends ConsumerWidget {
             stream: diamondService.watchWallet(userId),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
-                 return Center(child: Text(ErrorHelper.getFriendlyMessage(snapshot.error), style: const TextStyle(color: Colors.red)));
+                return Center(
+                  child: Text(
+                    ErrorHelper.getFriendlyMessage(snapshot.error),
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                );
               }
 
               if (!snapshot.hasData) {
-                return const Center(child: ContextualLoader(message: 'Loading vault...', icon: Icons.diamond));
+                return const Center(
+                  child: ContextualLoader(
+                    message: 'Loading vault...',
+                    icon: Icons.diamond,
+                  ),
+                );
               }
 
               final wallet = snapshot.data!;
@@ -82,15 +97,24 @@ class WalletScreen extends ConsumerWidget {
                     const LegalDisclaimerBanner(type: DisclaimerType.wallet),
                     const SizedBox(height: 16),
                     // Balance Card
-                    _buildPremiumBalanceCard(context, wallet, userTierAsync.value ?? UserTier.basic, governanceService),
-                    
+                    _buildPremiumBalanceCard(
+                      context,
+                      wallet,
+                      userTierAsync.value ?? UserTier.basic,
+                      governanceService,
+                    ),
+
                     const SizedBox(height: 24),
 
                     // Daily Limits & Tier Stats
-                    _buildDailyLimits(context, wallet, userTierAsync.value ?? UserTier.basic),
-                    
+                    _buildDailyLimits(
+                      context,
+                      wallet,
+                      userTierAsync.value ?? UserTier.basic,
+                    ),
+
                     const SizedBox(height: 32),
-                    
+
                     // Main Actions
                     Row(
                       children: [
@@ -98,7 +122,9 @@ class WalletScreen extends ConsumerWidget {
                           child: _PremiumActionButton(
                             icon: Icons.add_card,
                             label: 'Purchase',
-                            gradient: const LinearGradient(colors: [ClubRoyaleTheme.gold, Colors.orange]),
+                            gradient: const LinearGradient(
+                              colors: [ClubRoyaleTheme.gold, Colors.orange],
+                            ),
                             onTap: () => context.push('/diamond-store'),
                             textColor: Colors.black,
                           ),
@@ -108,7 +134,12 @@ class WalletScreen extends ConsumerWidget {
                           child: _PremiumActionButton(
                             icon: Icons.emoji_events,
                             label: 'Rewards',
-                            gradient: LinearGradient(colors: [Colors.purpleAccent.shade400, Colors.purple]),
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.purpleAccent.shade400,
+                                Colors.purple,
+                              ],
+                            ),
                             onTap: () => context.push('/earn-diamonds'),
                             textColor: Colors.white,
                           ),
@@ -121,15 +152,33 @@ class WalletScreen extends ConsumerWidget {
                         Expanded(
                           child: _PremiumActionButton(
                             icon: Icons.swap_horiz,
-                            label: 'Transfer', 
-                            gradient: (userTierAsync.value?.canTransfer ?? false)
-                                ? LinearGradient(colors: [Colors.blue.shade400, Colors.blue.shade700])
-                                : LinearGradient(colors: [Colors.grey.shade700, Colors.grey.shade800]),
+                            label: 'Transfer',
+                            gradient:
+                                (userTierAsync.value?.canTransfer ?? false)
+                                ? LinearGradient(
+                                    colors: [
+                                      Colors.blue.shade400,
+                                      Colors.blue.shade700,
+                                    ],
+                                  )
+                                : LinearGradient(
+                                    colors: [
+                                      Colors.grey.shade700,
+                                      Colors.grey.shade800,
+                                    ],
+                                  ),
                             onTap: (userTierAsync.value?.canTransfer ?? false)
                                 ? () => context.push('/transfer')
-                                : () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Transfers require Verified Tier or higher!'))),
+                                : () => ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Transfers require Verified Tier or higher!',
+                                      ),
+                                    ),
+                                  ),
                             textColor: Colors.white,
-                            isLocked: !(userTierAsync.value?.canTransfer ?? false),
+                            isLocked:
+                                !(userTierAsync.value?.canTransfer ?? false),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -137,24 +186,37 @@ class WalletScreen extends ConsumerWidget {
                           child: _PremiumActionButton(
                             icon: Icons.support_agent,
                             label: 'Support',
-                            gradient: LinearGradient(colors: [Colors.grey.shade700, Colors.grey.shade900]),
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.grey.shade700,
+                                Colors.grey.shade900,
+                              ],
+                            ),
                             onTap: () {
                               if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Support chat coming soon'))); // context.push('/support'),
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Support chat coming soon'),
+                                ),
+                              ); // context.push('/support'),
                             },
                             textColor: Colors.white,
                           ),
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 48),
-                    
+
                     // Transaction History Header
                     const Row(
                       children: [
-                        Icon(Icons.history, color: ClubRoyaleTheme.gold, size: 24),
-                         SizedBox(width: 12),
+                        Icon(
+                          Icons.history,
+                          color: ClubRoyaleTheme.gold,
+                          size: 24,
+                        ),
+                        SizedBox(width: 12),
                         Text(
                           'Ledger History',
                           style: TextStyle(
@@ -166,20 +228,25 @@ class WalletScreen extends ConsumerWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Transaction List
                     FutureBuilder<List<DiamondTransaction>>(
                       future: diamondService.getTransactionHistory(userId),
                       builder: (context, historySnapshot) {
-                        if (historySnapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: Padding(
-                            padding: EdgeInsets.all(32.0),
-                            child: CircularProgressIndicator(color: Colors.white54),
-                          ));
+                        if (historySnapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(32.0),
+                              child: CircularProgressIndicator(
+                                color: Colors.white54,
+                              ),
+                            ),
+                          );
                         }
-                        
+
                         final transactions = historySnapshot.data ?? [];
-                        
+
                         if (transactions.isEmpty) {
                           return Container(
                             padding: const EdgeInsets.all(32),
@@ -190,7 +257,11 @@ class WalletScreen extends ConsumerWidget {
                             ),
                             child: Column(
                               children: [
-                                Icon(Icons.receipt_long, size: 48, color: Colors.white.withValues(alpha: 0.3)),
+                                Icon(
+                                  Icons.receipt_long,
+                                  size: 48,
+                                  color: Colors.white.withValues(alpha: 0.3),
+                                ),
                                 const SizedBox(height: 16),
                                 Text(
                                   'The ledger is empty.',
@@ -202,19 +273,20 @@ class WalletScreen extends ConsumerWidget {
                             ),
                           );
                         }
-                        
+
                         return ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: transactions.length,
-                          separatorBuilder: (c, i) => const SizedBox(height: 12),
+                          separatorBuilder: (c, i) =>
+                              const SizedBox(height: 12),
                           itemBuilder: (context, index) {
-                             return _TransactionTile(tx: transactions[index]);
+                            return _TransactionTile(tx: transactions[index]);
                           },
                         );
-                      }
+                      },
                     ),
-                    
+
                     const SizedBox(height: 48),
                   ],
                 ),
@@ -226,11 +298,15 @@ class WalletScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDailyLimits(BuildContext context, DiamondWallet wallet, UserTier tier) {
+  Widget _buildDailyLimits(
+    BuildContext context,
+    DiamondWallet wallet,
+    UserTier tier,
+  ) {
     // Limits
     final transferLimit = tier.dailyTransferLimit;
     final earnLimit = tier.dailyEarningCap;
-    
+
     // Usage
     final transferred = wallet.dailyTransferred;
     final earned = wallet.dailyEarned;
@@ -245,29 +321,38 @@ class WalletScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Daily Limits', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+          const Text(
+            'Daily Limits',
+            style: TextStyle(
+              color: Colors.white70,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
-          
+
           if (transferLimit > 0 || transferLimit == -1) ...[
             _buildLimitBar(
-              'Transfers', 
-              transferred, 
-              transferLimit, 
-              Colors.blueAccent
+              'Transfers',
+              transferred,
+              transferLimit,
+              Colors.blueAccent,
             ),
             const SizedBox(height: 8),
           ],
-          
+
           if (earnLimit > 0 || earnLimit == -1)
             _buildLimitBar(
-              'Free Earnings', 
-              earned, 
-              earnLimit, 
-              Colors.greenAccent
+              'Free Earnings',
+              earned,
+              earnLimit,
+              Colors.greenAccent,
             ),
-            
+
           if (transferLimit == 0 && earnLimit == 0)
-            const Text('Upgrade tier to increase limits', style: TextStyle(color: Colors.grey, fontSize: 12)),
+            const Text(
+              'Upgrade tier to increase limits',
+              style: TextStyle(color: Colors.grey, fontSize: 12),
+            ),
         ],
       ),
     );
@@ -276,7 +361,7 @@ class WalletScreen extends ConsumerWidget {
   Widget _buildLimitBar(String label, int current, int max, Color color) {
     double progress = 0.0;
     String statusText = '';
-    
+
     if (max == -1) {
       progress = 0.5; // Just show half bar for unlimited
       statusText = '$current / ∞';
@@ -293,13 +378,25 @@ class WalletScreen extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(color: Colors.white60, fontSize: 12)),
-            Text(statusText, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white60, fontSize: 12),
+            ),
+            Text(
+              statusText,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 4),
         LinearProgressIndicator(
-          value: max == -1 ? null : progress, // null for indeterminate if unlimited? No, better show solid line or custom
+          value: max == -1
+              ? null
+              : progress, // null for indeterminate if unlimited? No, better show solid line or custom
           backgroundColor: Colors.white10,
           color: color,
           borderRadius: BorderRadius.circular(2),
@@ -308,19 +405,21 @@ class WalletScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPremiumBalanceCard(BuildContext context, DiamondWallet wallet, UserTier tier, GovernanceService govService) {
+  Widget _buildPremiumBalanceCard(
+    BuildContext context,
+    DiamondWallet wallet,
+    UserTier tier,
+    GovernanceService govService,
+  ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: const LinearGradient(
-           colors: [
-             ClubRoyaleTheme.royalPurple,
-             Colors.black87,
-           ],
-           begin: Alignment.topLeft,
-           end: Alignment.bottomRight,
+          colors: [ClubRoyaleTheme.royalPurple, Colors.black87],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
         border: Border.all(color: ClubRoyaleTheme.gold, width: 2),
         boxShadow: [
@@ -338,7 +437,11 @@ class WalletScreen extends ConsumerWidget {
           Positioned(
             right: -20,
             top: -20,
-            child: Icon(Icons.diamond_outlined, size: 150, color: Colors.white.withValues(alpha: 0.05)),
+            child: Icon(
+              Icons.diamond_outlined,
+              size: 150,
+              color: Colors.white.withValues(alpha: 0.05),
+            ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,11 +451,22 @@ class WalletScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [ClubRoyaleTheme.gold, Colors.orange]),
+                      gradient: const LinearGradient(
+                        colors: [ClubRoyaleTheme.gold, Colors.orange],
+                      ),
                       shape: BoxShape.circle,
-                      boxShadow: [BoxShadow(color: Colors.orange.withValues(alpha: 0.5), blurRadius: 10)],
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.orange.withValues(alpha: 0.5),
+                          blurRadius: 10,
+                        ),
+                      ],
                     ),
-                    child: const Icon(Icons.account_balance_wallet, color: Colors.black, size: 20),
+                    child: const Icon(
+                      Icons.account_balance_wallet,
+                      color: Colors.black,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   const Text(
@@ -366,7 +480,10 @@ class WalletScreen extends ConsumerWidget {
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: tier.color.withValues(alpha: 0.2),
                       border: Border.all(color: tier.color),
@@ -396,7 +513,13 @@ class WalletScreen extends ConsumerWidget {
                       fontSize: 42,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -1,
-                      shadows: [Shadow(color: Colors.black, blurRadius: 4, offset: Offset(0, 2))],
+                      shadows: [
+                        Shadow(
+                          color: Colors.black,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -410,16 +533,20 @@ class WalletScreen extends ConsumerWidget {
                   ),
                 ],
               ).animate().fadeIn().slideY(begin: 0.3),
-              
+
               const SizedBox(height: 16),
-              
+
               // Voting Power
               FutureBuilder<double>(
                 future: govService.getVotingPower(wallet.userId),
                 builder: (context, snapshot) {
                   return Row(
                     children: [
-                      Icon(Icons.how_to_vote, size: 14, color: Colors.white.withValues(alpha: 0.5)),
+                      Icon(
+                        Icons.how_to_vote,
+                        size: 14,
+                        color: Colors.white.withValues(alpha: 0.5),
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'Voting Power: ${snapshot.data?.toStringAsFixed(0) ?? "..."}',
@@ -430,7 +557,7 @@ class WalletScreen extends ConsumerWidget {
                       ),
                     ],
                   );
-                }
+                },
               ),
             ],
           ),
@@ -507,7 +634,7 @@ class _TransactionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isCredit = tx.amount > 0;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -520,9 +647,9 @@ class _TransactionTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isCredit 
-                ? Colors.green.withValues(alpha: 0.2)
-                : Colors.red.withValues(alpha: 0.2),
+              color: isCredit
+                  ? Colors.green.withValues(alpha: 0.2)
+                  : Colors.red.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(

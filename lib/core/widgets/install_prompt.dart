@@ -11,11 +11,7 @@ class PWAInstallBanner extends StatefulWidget {
   final VoidCallback? onInstalled;
   final VoidCallback? onDismissed;
 
-  const PWAInstallBanner({
-    super.key,
-    this.onInstalled,
-    this.onDismissed,
-  });
+  const PWAInstallBanner({super.key, this.onInstalled, this.onDismissed});
 
   @override
   State<PWAInstallBanner> createState() => _PWAInstallBannerState();
@@ -41,11 +37,11 @@ class _PWAInstallBannerState extends State<PWAInstallBanner> {
 
   Future<void> _install() async {
     setState(() => _installing = true);
-    
+
     final success = await _pwaService.promptInstall();
-    
+
     setState(() => _installing = false);
-    
+
     if (success) {
       widget.onInstalled?.call();
       _checkVisibility();
@@ -68,10 +64,7 @@ class _PWAInstallBannerState extends State<PWAInstallBanner> {
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Colors.deepPurple.shade700,
-            Colors.deepPurple.shade500,
-          ],
+          colors: [Colors.deepPurple.shade700, Colors.deepPurple.shade500],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
@@ -102,7 +95,7 @@ class _PWAInstallBannerState extends State<PWAInstallBanner> {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Text
               Expanded(
                 child: Column(
@@ -128,7 +121,7 @@ class _PWAInstallBannerState extends State<PWAInstallBanner> {
                   ],
                 ),
               ),
-              
+
               // Actions
               Column(
                 mainAxisSize: MainAxisSize.min,
@@ -136,7 +129,11 @@ class _PWAInstallBannerState extends State<PWAInstallBanner> {
                   // Dismiss button
                   IconButton(
                     onPressed: _dismiss,
-                    icon: const Icon(Icons.close, color: Colors.white70, size: 20),
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white70,
+                      size: 20,
+                    ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
@@ -148,7 +145,10 @@ class _PWAInstallBannerState extends State<PWAInstallBanner> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.deepPurple,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),

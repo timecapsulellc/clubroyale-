@@ -56,8 +56,8 @@ void main() {
     testWidgets('should have test mode button', (WidgetTester tester) async {
       await buildAuthScreen(tester);
       
-      // Quick Test Mode button from _buildTestModeButton (line 417)
-      expect(find.text('Quick Test Mode'), findsOneWidget);
+      // Quick Test Mode button - Removed for Production
+      expect(find.text('Quick Test Mode'), findsNothing);
     });
   });
 }

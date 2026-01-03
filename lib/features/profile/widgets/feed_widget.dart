@@ -23,7 +23,9 @@ class FeedWidget extends ConsumerWidget {
         }
 
         if (snapshot.hasError) {
-          return Center(child: Text(ErrorHelper.getFriendlyMessage(snapshot.error)));
+          return Center(
+            child: Text(ErrorHelper.getFriendlyMessage(snapshot.error)),
+          );
         }
 
         final posts = snapshot.data ?? [];
@@ -56,16 +58,13 @@ class _EmptyFeed extends StatelessWidget {
         children: [
           const Icon(Icons.dynamic_feed_outlined, size: 64, color: Colors.grey),
           const SizedBox(height: 16),
-          Text(
-            'No posts yet',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          Text('No posts yet', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           Text(
             'Follow some players to see their posts!',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
           ),
         ],
       ),
@@ -84,7 +83,8 @@ class PostCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final currentUserId = ref.watch(currentUserIdProvider);
-    final isLiked = currentUserId != null && post.likedBy.contains(currentUserId);
+    final isLiked =
+        currentUserId != null && post.likedBy.contains(currentUserId);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -98,7 +98,11 @@ class PostCard extends ConsumerWidget {
                   ? NetworkImage(post.userAvatarUrl!)
                   : null,
               child: post.userAvatarUrl == null
-                  ? Text(post.userName.isNotEmpty ? post.userName[0].toUpperCase() : '?')
+                  ? Text(
+                      post.userName.isNotEmpty
+                          ? post.userName[0].toUpperCase()
+                          : '?',
+                    )
                   : null,
             ),
             title: Text(
@@ -132,7 +136,11 @@ class PostCard extends ConsumerWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.sports_esports, size: 14, color: colorScheme.primary),
+                    Icon(
+                      Icons.sports_esports,
+                      size: 14,
+                      color: colorScheme.primary,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       post.gameType ?? 'Game',
@@ -237,7 +245,10 @@ class PostCard extends ConsumerWidget {
             if (isOwn) ...[
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text('Delete Post', style: TextStyle(color: Colors.red)),
+                title: const Text(
+                  'Delete Post',
+                  style: TextStyle(color: Colors.red),
+                ),
                 onTap: () async {
                   Navigator.pop(context);
                   final confirm = await showDialog<bool>(
@@ -252,7 +263,10 @@ class PostCard extends ConsumerWidget {
                         ),
                         TextButton(
                           onPressed: () => Navigator.pop(context, true),
-                          child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                          child: const Text(
+                            'Delete',
+                            style: TextStyle(color: Colors.red),
+                          ),
                         ),
                       ],
                     ),

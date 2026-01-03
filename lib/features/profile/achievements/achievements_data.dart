@@ -1,5 +1,5 @@
 /// Achievement and Badge Definitions
-/// 
+///
 /// Defines all achievements available in ClubRoyale
 library;
 
@@ -264,7 +264,7 @@ class BadgesData {
       description: 'Mastered Teen Patti',
       type: BadgeType.game,
     ),
-    
+
     // Social badges
     const ProfileBadge(
       id: 'influencer',
@@ -280,7 +280,7 @@ class BadgesData {
       description: 'Active community member',
       type: BadgeType.social,
     ),
-    
+
     // Special badges
     const ProfileBadge(
       id: 'verified',

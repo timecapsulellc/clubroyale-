@@ -1,5 +1,5 @@
 /// Tournament Models
-/// 
+///
 /// Models for tournament bracket system
 library;
 
@@ -10,18 +10,18 @@ part 'tournament_model.g.dart';
 
 /// Tournament status
 enum TournamentStatus {
-  draft,       // Being created
+  draft, // Being created
   registration, // Open for sign-ups
-  inProgress,  // Matches being played
-  completed,   // All matches finished
-  cancelled,   // Cancelled
+  inProgress, // Matches being played
+  completed, // All matches finished
+  cancelled, // Cancelled
 }
 
 /// Tournament format
 enum TournamentFormat {
-  singleElimination,  // Lose once, you're out
-  doubleElimination,  // Lose twice to be eliminated
-  roundRobin,         // Everyone plays everyone
+  singleElimination, // Lose once, you're out
+  doubleElimination, // Lose twice to be eliminated
+  roundRobin, // Everyone plays everyone
 }
 
 /// Main tournament model
@@ -56,7 +56,7 @@ abstract class Tournament with _$Tournament {
       _$TournamentFromJson(json);
 
   /// Check if registration is open
-  bool get isRegistrationOpen => 
+  bool get isRegistrationOpen =>
       status == TournamentStatus.registration &&
       participantIds.length < maxParticipants;
 
@@ -106,10 +106,10 @@ abstract class TournamentBracket with _$TournamentBracket {
 
 /// Bracket status
 enum BracketStatus {
-  pending,     // Waiting to start
-  inProgress,  // Currently playing
-  completed,   // Match finished
-  cancelled,   // Match cancelled
+  pending, // Waiting to start
+  inProgress, // Currently playing
+  completed, // Match finished
+  cancelled, // Match cancelled
 }
 
 /// Tournament participant

@@ -28,7 +28,7 @@ class FirestoreService {
         'Player B': -20,
         'Player C': -30,
         'Player D': 0,
-      }
+      },
     });
   }
 }

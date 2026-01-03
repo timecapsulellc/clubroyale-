@@ -1,5 +1,5 @@
 /// Club Service
-/// 
+///
 /// Manages gaming clubs/groups
 library;
 
@@ -23,7 +23,9 @@ class ClubService {
 
   /// Upload Club Avatar
   Future<String> uploadClubAvatar(File file) async {
-    final ref = _storage.ref().child('clubs/${DateTime.now().millisecondsSinceEpoch}.jpg');
+    final ref = _storage.ref().child(
+      'clubs/${DateTime.now().millisecondsSinceEpoch}.jpg',
+    );
     await ref.putFile(file);
     return await ref.getDownloadURL();
   }
@@ -39,7 +41,7 @@ class ClubService {
     String? avatarUrl,
   }) async {
     final doc = _clubsRef.doc();
-    
+
     // 1. Create Linked Chat
     final chatRef = _firestore.collection('chats').doc();
     await chatRef.set({
@@ -133,11 +135,11 @@ class ClubService {
         'winsInClub': 0,
         'totalPoints': 0,
       });
-      
+
       // Add to Chat
       if (chatId != null) {
         await _firestore.collection('chats').doc(chatId).update({
-          'participants': FieldValue.arrayUnion([oderId])
+          'participants': FieldValue.arrayUnion([oderId]),
         });
       }
 
@@ -172,7 +174,7 @@ class ClubService {
         debugPrint('Owner cannot leave. Transfer ownership first.');
         return false;
       }
-      
+
       final chatId = doc.data()!['chatId'] as String?;
 
       await _clubDoc(clubId).update({
@@ -181,11 +183,11 @@ class ClubService {
       });
 
       await _clubDoc(clubId).collection('members').doc(oderId).delete();
-      
+
       // Remove from Chat
       if (chatId != null) {
         await _firestore.collection('chats').doc(chatId).update({
-          'participants': FieldValue.arrayRemove([oderId])
+          'participants': FieldValue.arrayRemove([oderId]),
         });
       }
 
@@ -206,7 +208,7 @@ class ClubService {
     String? message,
   }) async {
     final inviteRef = _firestore.collection('club_invites').doc();
-    
+
     await inviteRef.set({
       'id': inviteRef.id,
       'clubId': clubId,
@@ -232,7 +234,10 @@ class ClubService {
     String? avatarUrl,
   }) async {
     try {
-      final inviteDoc = await _firestore.collection('club_invites').doc(inviteId).get();
+      final inviteDoc = await _firestore
+          .collection('club_invites')
+          .doc(inviteId)
+          .get();
       if (!inviteDoc.exists) return false;
 
       final data = inviteDoc.data()!;
@@ -279,7 +284,7 @@ class ClubService {
       final data = entry.value.data();
       final games = data['gamesPlayedInClub'] as int? ?? 0;
       final wins = data['winsInClub'] as int? ?? 0;
-      
+
       return ClubLeaderboardEntry(
         rank: entry.key + 1,
         oderId: data['oderId'] as String,
@@ -329,12 +334,11 @@ class ClubService {
 
   /// Watch user's clubs
   Stream<List<Club>> watchUserClubs(String oderId) {
-    return _clubsRef
-        .where('memberIds', arrayContains: oderId)
-        .snapshots()
-        .map((snapshot) {
-          return snapshot.docs.map((doc) => Club.fromJson(doc.data())).toList();
-        });
+    return _clubsRef.where('memberIds', arrayContains: oderId).snapshots().map((
+      snapshot,
+    ) {
+      return snapshot.docs.map((doc) => Club.fromJson(doc.data())).toList();
+    });
   }
 
   /// Search clubs
@@ -346,9 +350,11 @@ class ClubService {
 
     return snapshot.docs
         .map((doc) => Club.fromJson(doc.data()))
-        .where((club) => 
-            club.name.toLowerCase().contains(query.toLowerCase()) ||
-            club.description.toLowerCase().contains(query.toLowerCase()))
+        .where(
+          (club) =>
+              club.name.toLowerCase().contains(query.toLowerCase()) ||
+              club.description.toLowerCase().contains(query.toLowerCase()),
+        )
         .toList();
   }
 
@@ -378,11 +384,15 @@ final clubProvider = StreamProvider.family<Club?, String>((ref, id) {
 });
 
 /// Watch user's clubs
-final userClubsProvider = StreamProvider.family<List<Club>, String>((ref, oderId) {
+final userClubsProvider = StreamProvider.family<List<Club>, String>((
+  ref,
+  oderId,
+) {
   return ref.watch(clubServiceProvider).watchUserClubs(oderId);
 });
 
 /// Watch pending invites
-final pendingClubInvitesProvider = StreamProvider.family<List<ClubInvite>, String>((ref, oderId) {
-  return ref.watch(clubServiceProvider).watchPendingInvites(oderId);
-});
+final pendingClubInvitesProvider =
+    StreamProvider.family<List<ClubInvite>, String>((ref, oderId) {
+      return ref.watch(clubServiceProvider).watchPendingInvites(oderId);
+    });

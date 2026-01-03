@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:clubroyale/core/utils/haptic_helper.dart';
 import 'package:clubroyale/core/models/playing_card.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:clubroyale/core/design_system/animations/card_animations.dart';
 
 /// Helper to get asset path
 String _getCardAssetPath(PlayingCard card) {
@@ -46,16 +48,18 @@ class PlayingCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: isPlayable ? () {
-        HapticHelper.cardMove();
-        onTap?.call();
-      } : null,
+      onTap: isPlayable
+          ? () {
+              HapticHelper.cardMove();
+              onTap?.call();
+            }
+          : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         width: width,
         height: height,
         transform: isSelected
-            ? (Matrix4.identity()..translate(0.0, -12.0))
+            ? (Matrix4.identity()..translate(0.0, -12.0, 0.0))
             : Matrix4.identity(),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
@@ -78,7 +82,11 @@ class PlayingCardWidget extends StatelessWidget {
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
                 // Fallback to basic rendering
-                return _BasicCard(card: card, isSelected: isSelected, isPlayable: isPlayable);
+                return _BasicCard(
+                  card: card,
+                  isSelected: isSelected,
+                  isPlayable: isPlayable,
+                );
               },
             ),
           ),
@@ -112,8 +120,8 @@ class _BasicCard extends StatelessWidget {
           color: isSelected
               ? colorScheme.primary
               : isPlayable
-                  ? Colors.grey.shade300
-                  : Colors.grey.shade200,
+              ? Colors.grey.shade300
+              : Colors.grey.shade200,
           width: isSelected ? 2 : 1,
         ),
       ),
@@ -146,11 +154,7 @@ class CardBackWidget extends StatelessWidget {
   final double width;
   final double height;
 
-  const CardBackWidget({
-    super.key,
-    this.width = 60,
-    this.height = 90,
-  });
+  const CardBackWidget({super.key, this.width = 60, this.height = 90});
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +222,7 @@ class PlayerHandWidget extends StatelessWidget {
   bool _canPlayCard(PlayingCard card) {
     if (!isMyTurn) return false;
     if (requiredSuit == null) return true;
-    
+
     // Check if player has cards of required suit
     final hasRequiredSuit = cards.any((c) => c.suit == requiredSuit);
     if (hasRequiredSuit) {
@@ -258,17 +262,19 @@ class PlayerHandWidget extends StatelessWidget {
         itemBuilder: (context, index) {
           final card = sortedCards[index];
           final canPlay = _canPlayCard(card);
-          
+
+          // Calculate stagger delay based on index
+          // 50ms per card for a ripple effect
+          final delay = (index * 50).ms;
+
           return Transform.translate(
             offset: Offset(-overlap * index, 0),
             child: PlayingCardWidget(
               card: card,
               isSelected: selectedCard == card,
               isPlayable: canPlay,
-              onTap: canPlay
-                  ? () => onCardSelected?.call(card)
-                  : null,
-            ),
+              onTap: canPlay ? () => onCardSelected?.call(card) : null,
+            ).animateCardDeal(delay: delay),
           );
         },
       ),
@@ -281,11 +287,7 @@ class MiniCardWidget extends StatelessWidget {
   final PlayingCard card;
   final String? playerName;
 
-  const MiniCardWidget({
-    super.key,
-    required this.card,
-    this.playerName,
-  });
+  const MiniCardWidget({super.key, required this.card, this.playerName});
 
   @override
   Widget build(BuildContext context) {
@@ -311,9 +313,9 @@ class MiniCardWidget extends StatelessWidget {
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
                 return _BasicCard(
-                     card: card, 
-                     isSelected: false, 
-                     isPlayable: true
+                  card: card,
+                  isSelected: false,
+                  isPlayable: true,
                 );
               },
             ),

@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/wallet/diamond_wallet.dart';
 
-final diamondServiceProvider = Provider<DiamondService>((ref) => DiamondService());
+final diamondServiceProvider = Provider<DiamondService>(
+  (ref) => DiamondService(),
+);
 
 /// Service for managing diamond currency (virtual currency for monetization)
 class DiamondService {
@@ -15,19 +17,19 @@ class DiamondService {
   Future<DiamondWallet> getWallet(String userId) async {
     try {
       final doc = await _db.collection('users').doc(userId).get();
-      
+
       if (!doc.exists) {
-        // In V5, user document should exist. 
+        // In V5, user document should exist.
         // If not, we return a default wallet (safe fallback)
         return DiamondWallet(userId: userId);
       }
-      
+
       // Map 'users' fields to DiamondWallet
       // We assume data has been migrated or new user created correctly
       final data = doc.data()!;
       // Handle legacy 'balance' vs new 'diamondBalance'
       final balance = data['diamondBalance'] ?? data['balance'] ?? 0;
-      
+
       return DiamondWallet.fromJson({
         ...data,
         'userId': userId,
@@ -66,27 +68,34 @@ class DiamondService {
   /// Deduct diamonds locally (for Room Creation)
   /// Note: Ideally this should also be a Cloud Function to enforce limits strictly,
   /// but for V5 Phase A we keep it client-side with 'users' collection update.
-  Future<bool> deductDiamonds(String userId, int amount, {String? description, String? gameId}) async {
+  Future<bool> deductDiamonds(
+    String userId,
+    int amount, {
+    String? description,
+    String? gameId,
+  }) async {
     try {
       // Validate amount is positive (prevent exploits)
       if (amount <= 0) {
         debugPrint('Invalid deduction amount: $amount (must be positive)');
         return false;
       }
-      
+
       final wallet = await getWallet(userId);
-      
+
       if (wallet.balance < amount) {
         return false; // Insufficient balance
       }
-      
+
       // Update users collection
       await _db.collection('users').doc(userId).update({
         'diamondBalance': FieldValue.increment(-amount),
-        'diamondsByOrigin.spent': FieldValue.increment(amount), // Track spending
+        'diamondsByOrigin.spent': FieldValue.increment(
+          amount,
+        ), // Track spending
         'lastActive': FieldValue.serverTimestamp(),
       });
-      
+
       // Record transaction (Legacy collection for client-side history)
       // V5 Main ledger is processed by Cloud Functions, but we can keep 'transactions' for UI history
       await _recordTransaction(
@@ -96,7 +105,7 @@ class DiamondService {
         description: description ?? 'Room creation',
         gameId: gameId,
       );
-      
+
       return true;
     } catch (e) {
       debugPrint('Error deducting diamonds: $e');
@@ -113,19 +122,16 @@ class DiamondService {
       debugPrint('⚠️ grantDevDiamonds blocked - not in debug mode');
       return false;
     }
-    
+
     try {
       debugPrint('💎 Granting $amount dev diamonds to user: $userId');
-      
+
       await _db.collection('users').doc(userId).set({
         'diamondBalance': amount,
-        'diamondsByOrigin': {
-          'signup': amount,
-          'spent': 0,
-        },
+        'diamondsByOrigin': {'signup': amount, 'spent': 0},
         'lastActive': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-      
+
       // Record transaction for transparency
       await _recordTransaction(
         userId: userId,
@@ -133,7 +139,7 @@ class DiamondService {
         type: DiamondTransactionType.signup,
         description: 'Dev Testing Grant',
       );
-      
+
       debugPrint('✅ Successfully granted $amount diamonds to $userId');
       return true;
     } catch (e) {
@@ -148,7 +154,7 @@ class DiamondService {
   Future<void> upgradeToVerified() async {
     try {
       final callable = _functions.httpsCallable('upgradeToVerified');
-      await callable.call(); 
+      await callable.call();
       // Success means no exception thrown
     } catch (e) {
       debugPrint('Error upgrading tier: $e');
@@ -157,7 +163,11 @@ class DiamondService {
   }
 
   /// Transfer Diamonds P2P (Calls Cloud Function)
-  Future<void> transferDiamonds(String toUserId, int amount, {String? message}) async {
+  Future<void> transferDiamonds(
+    String toUserId,
+    int amount, {
+    String? message,
+  }) async {
     try {
       final callable = _functions.httpsCallable('validateTransfer');
       await callable.call({
@@ -185,7 +195,11 @@ class DiamondService {
 
   /// Grant Gameplay Reward (Calls Cloud Function)
   /// [result] e.g., 'win', 'second', 'participation'
-  Future<void> grantGameplayReward(String gameType, String result, String gameId) async {
+  Future<void> grantGameplayReward(
+    String gameType,
+    String result,
+    String gameId,
+  ) async {
     try {
       final callable = _functions.httpsCallable('grantGameplayReward');
       await callable.call({
@@ -195,7 +209,7 @@ class DiamondService {
       });
     } catch (e) {
       debugPrint('Error granting reward: $e');
-      // Warning: Don't rethrow indiscriminately for gameplay to avoid blocking UI flow, 
+      // Warning: Don't rethrow indiscriminately for gameplay to avoid blocking UI flow,
       // but maybe log it remotely.
     }
   }
@@ -219,12 +233,15 @@ class DiamondService {
       gameId: gameId,
       createdAt: DateTime.now(),
     );
-    
+
     await _db.collection('transactions').add(transaction.toJson());
   }
 
   /// Get transaction history for a user
-  Future<List<DiamondTransaction>> getTransactionHistory(String userId, {int limit = 50}) async {
+  Future<List<DiamondTransaction>> getTransactionHistory(
+    String userId, {
+    int limit = 50,
+  }) async {
     try {
       final snapshot = await _db
           .collection('transactions')
@@ -232,7 +249,7 @@ class DiamondService {
           .orderBy('createdAt', descending: true)
           .limit(limit)
           .get();
-      
+
       return snapshot.docs
           .map((doc) => DiamondTransaction.fromJson(doc.data()))
           .toList();

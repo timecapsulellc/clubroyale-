@@ -7,7 +7,7 @@ import 'package:clubroyale/features/admin/admin_diamond_service.dart';
 /// Screen for creating a new diamond grant request
 class GrantRequestScreen extends ConsumerStatefulWidget {
   final String? prefillUserId;
-  
+
   const GrantRequestScreen({super.key, this.prefillUserId});
 
   @override
@@ -22,7 +22,7 @@ class _GrantRequestScreenState extends ConsumerState<GrantRequestScreen> {
   final _reasonController = TextEditingController();
 
   bool _isLoading = false;
-  
+
   @override
   void initState() {
     super.initState();
@@ -49,7 +49,8 @@ class _GrantRequestScreenState extends ConsumerState<GrantRequestScreen> {
       );
 
       if (mounted) {
-        final needsSecondApproval = AdminConfig.getRequiredApprovals(amount) > 1;
+        final needsSecondApproval =
+            AdminConfig.getRequiredApprovals(amount) > 1;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -65,10 +66,7 @@ class _GrantRequestScreenState extends ConsumerState<GrantRequestScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -93,9 +91,7 @@ class _GrantRequestScreenState extends ConsumerState<GrantRequestScreen> {
         : null;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Diamond Grant'),
-      ),
+      appBar: AppBar(title: const Text('Create Diamond Grant')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -229,24 +225,33 @@ class _GrantRequestScreenState extends ConsumerState<GrantRequestScreen> {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        const Text('Preview', style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Text(
+                          'Preview',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         const SizedBox(height: 8),
-                        Builder(builder: (context) {
-                          final amount = int.tryParse(_amountController.text) ?? 0;
-                          final approvals = AdminConfig.getRequiredApprovals(amount);
-                          final hasCooling = AdminConfig.requiresCoolingPeriod(amount);
-                          return Column(
-                            children: [
-                              Text('Amount: $amount 💎'),
-                              Text('Required Approvals: $approvals'),
-                              if (hasCooling)
-                                const Text(
-                                  '⏱️ 24h cooling period applies',
-                                  style: TextStyle(color: Colors.orange),
-                                ),
-                            ],
-                          );
-                        }),
+                        Builder(
+                          builder: (context) {
+                            final amount =
+                                int.tryParse(_amountController.text) ?? 0;
+                            final approvals = AdminConfig.getRequiredApprovals(
+                              amount,
+                            );
+                            final hasCooling =
+                                AdminConfig.requiresCoolingPeriod(amount);
+                            return Column(
+                              children: [
+                                Text('Amount: $amount 💎'),
+                                Text('Required Approvals: $approvals'),
+                                if (hasCooling)
+                                  const Text(
+                                    '⏱️ 24h cooling period applies',
+                                    style: TextStyle(color: Colors.orange),
+                                  ),
+                              ],
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),

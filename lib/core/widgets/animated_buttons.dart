@@ -18,7 +18,7 @@ class AnimatedPressButton extends StatefulWidget {
   final Duration duration;
   final EdgeInsets? padding;
   final BorderRadius? borderRadius;
-  
+
   const AnimatedPressButton({
     super.key,
     required this.child,
@@ -30,44 +30,53 @@ class AnimatedPressButton extends StatefulWidget {
     this.padding,
     this.borderRadius,
   });
-  
+
   @override
   State<AnimatedPressButton> createState() => _AnimatedPressButtonState();
 }
 
 class _AnimatedPressButtonState extends State<AnimatedPressButton> {
   bool _isPressed = false;
-  
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: widget.onPressed != null ? (_) {
-        setState(() => _isPressed = true);
-        HapticHelper.lightTap();
-      } : null,
-      onTapUp: widget.onPressed != null ? (_) {
-        setState(() => _isPressed = false);
-        widget.onPressed?.call();
-      } : null,
+      onTapDown: widget.onPressed != null
+          ? (_) {
+              setState(() => _isPressed = true);
+              HapticHelper.lightTap();
+            }
+          : null,
+      onTapUp: widget.onPressed != null
+          ? (_) {
+              setState(() => _isPressed = false);
+              widget.onPressed?.call();
+            }
+          : null,
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedScale(
         scale: _isPressed ? widget.scaleDown : 1.0,
         duration: widget.duration,
         curve: Curves.easeInOut,
         child: Container(
-          padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          padding:
+              widget.padding ??
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           decoration: BoxDecoration(
-            color: widget.onPressed != null 
+            color: widget.onPressed != null
                 ? (widget.backgroundColor ?? CasinoColors.gold)
                 : Colors.grey,
             borderRadius: widget.borderRadius ?? BorderRadius.circular(12),
-            boxShadow: _isPressed ? [] : [
-              BoxShadow(
-                color: (widget.backgroundColor ?? CasinoColors.gold).withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: _isPressed
+                ? []
+                : [
+                    BoxShadow(
+                      color: (widget.backgroundColor ?? CasinoColors.gold)
+                          .withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
           ),
           child: DefaultTextStyle(
             style: TextStyle(
@@ -88,7 +97,7 @@ class CasinoActionButton extends StatelessWidget {
   final IconData? icon;
   final VoidCallback? onPressed;
   final bool isLoading;
-  
+
   const CasinoActionButton({
     super.key,
     required this.label,
@@ -96,7 +105,7 @@ class CasinoActionButton extends StatelessWidget {
     this.onPressed,
     this.isLoading = false,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return AnimatedPressButton(
@@ -111,7 +120,10 @@ class CasinoActionButton extends StatelessWidget {
             const SizedBox(
               width: 20,
               height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.black,
+              ),
             )
           else if (icon != null)
             Icon(icon, size: 20),
@@ -129,7 +141,7 @@ class GameActionButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onPressed;
   final GameActionType type;
-  
+
   const GameActionButton({
     super.key,
     required this.label,
@@ -137,23 +149,29 @@ class GameActionButton extends StatelessWidget {
     required this.type,
     this.onPressed,
   });
-  
+
   Color get _backgroundColor {
     switch (type) {
-      case GameActionType.positive: return Colors.green;
-      case GameActionType.negative: return Colors.red;
-      case GameActionType.neutral: return Colors.blue;
-      case GameActionType.primary: return CasinoColors.gold;
+      case GameActionType.positive:
+        return Colors.green;
+      case GameActionType.negative:
+        return Colors.red;
+      case GameActionType.neutral:
+        return Colors.blue;
+      case GameActionType.primary:
+        return CasinoColors.gold;
     }
   }
-  
+
   Color get _foregroundColor {
     switch (type) {
-      case GameActionType.primary: return Colors.black;
-      default: return Colors.white;
+      case GameActionType.primary:
+        return Colors.black;
+      default:
+        return Colors.white;
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return AnimatedPressButton(
@@ -181,7 +199,7 @@ class AnimatedCard extends StatefulWidget {
   final VoidCallback? onTap;
   final bool isSelected;
   final double elevation;
-  
+
   const AnimatedCard({
     super.key,
     required this.child,
@@ -189,25 +207,29 @@ class AnimatedCard extends StatefulWidget {
     this.isSelected = false,
     this.elevation = 2,
   });
-  
+
   @override
   State<AnimatedCard> createState() => _AnimatedCardState();
 }
 
 class _AnimatedCardState extends State<AnimatedCard> {
   bool _isPressed = false;
-  
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: widget.onTap != null ? (_) {
-        setState(() => _isPressed = true);
-        HapticHelper.lightTap();
-      } : null,
-      onTapUp: widget.onTap != null ? (_) {
-        setState(() => _isPressed = false);
-        widget.onTap?.call();
-      } : null,
+      onTapDown: widget.onTap != null
+          ? (_) {
+              setState(() => _isPressed = true);
+              HapticHelper.lightTap();
+            }
+          : null,
+      onTapUp: widget.onTap != null
+          ? (_) {
+              setState(() => _isPressed = false);
+              widget.onTap?.call();
+            }
+          : null,
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
@@ -218,7 +240,7 @@ class _AnimatedCardState extends State<AnimatedCard> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: widget.isSelected 
+              color: widget.isSelected
                   ? CasinoColors.gold.withValues(alpha: 0.4)
                   : Colors.black.withValues(alpha: _isPressed ? 0.1 : 0.2),
               blurRadius: _isPressed ? 4 : (widget.elevation * 4),
@@ -230,7 +252,7 @@ class _AnimatedCardState extends State<AnimatedCard> {
           duration: const Duration(milliseconds: 150),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: widget.isSelected 
+            border: widget.isSelected
                 ? Border.all(color: CasinoColors.gold, width: 2)
                 : null,
           ),
@@ -245,24 +267,22 @@ class _AnimatedCardState extends State<AnimatedCard> {
 class SkeletonListItem extends StatelessWidget {
   final double height;
   final EdgeInsets? margin;
-  
-  const SkeletonListItem({
-    super.key,
-    this.height = 72,
-    this.margin,
-  });
-  
+
+  const SkeletonListItem({super.key, this.height = 72, this.margin});
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height,
-      margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(12),
-      ),
-    ).animate(onPlay: (c) => c.repeat())
-     .shimmer(duration: 1200.ms, color: Colors.grey.shade300);
+          height: height,
+          margin:
+              margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(12),
+          ),
+        )
+        .animate(onPlay: (c) => c.repeat())
+        .shimmer(duration: 1200.ms, color: Colors.grey.shade300);
   }
 }
 
@@ -270,13 +290,9 @@ class SkeletonListItem extends StatelessWidget {
 class SkeletonList extends StatelessWidget {
   final int itemCount;
   final double itemHeight;
-  
-  const SkeletonList({
-    super.key,
-    this.itemCount = 5,
-    this.itemHeight = 72,
-  });
-  
+
+  const SkeletonList({super.key, this.itemCount = 5, this.itemHeight = 72});
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(

@@ -34,12 +34,12 @@ class AdminChatService {
         .doc(docRef.id)
         .collection('messages')
         .add({
-      'senderId': userId,
-      'senderName': userName,
-      'content': subject,
-      'type': 'text',
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+          'senderId': userId,
+          'senderName': userName,
+          'content': subject,
+          'type': 'text',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
 
     return docRef.id;
   }
@@ -52,11 +52,7 @@ class AdminChatService {
     required String content,
     bool isAdmin = false,
   }) async {
-    await _db
-        .collection('admin_chats')
-        .doc(chatId)
-        .collection('messages')
-        .add({
+    await _db.collection('admin_chats').doc(chatId).collection('messages').add({
       'senderId': senderId,
       'senderName': senderName,
       'content': content,
@@ -80,8 +76,11 @@ class AdminChatService {
         .where('userId', isEqualTo: userId)
         .orderBy('lastMessageAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => SupportChat.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => SupportChat.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   /// Get all open chats (for admins)
@@ -91,8 +90,11 @@ class AdminChatService {
         .where('status', isEqualTo: 'open')
         .orderBy('lastMessageAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => SupportChat.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => SupportChat.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   /// Get chats assigned to a specific admin
@@ -103,8 +105,11 @@ class AdminChatService {
         .where('status', isEqualTo: 'open')
         .orderBy('lastMessageAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => SupportChat.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => SupportChat.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   /// Get messages for a chat
@@ -115,8 +120,11 @@ class AdminChatService {
         .collection('messages')
         .orderBy('createdAt', descending: false)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => ChatMessage.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => ChatMessage.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   /// Assign chat to an admin

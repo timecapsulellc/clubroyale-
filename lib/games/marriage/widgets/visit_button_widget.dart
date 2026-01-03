@@ -7,21 +7,23 @@ import 'package:clubroyale/features/game/ui/components/casino_button.dart';
 enum VisitButtonState {
   /// Cannot visit yet (requirements not met)
   locked,
+
   /// Requirements met, ready to click
   ready,
+
   /// Already visited
   visited,
 }
 
 /// A dedicated button for the "Visit" action in Marriage game.
-/// 
+///
 /// Shows status (e.g., "2/3 Sequences") and animates when ready.
 class VisitButtonWidget extends StatelessWidget {
   final VisitButtonState state;
   final VoidCallback? onPressed;
   final String label;
   final String subLabel;
-  
+
   const VisitButtonWidget({
     super.key,
     required this.state,
@@ -71,10 +73,7 @@ class VisitButtonWidget extends StatelessWidget {
           if (subLabel.isNotEmpty)
             Text(
               subLabel,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 10,
-              ),
+              style: TextStyle(color: Colors.grey[600], fontSize: 10),
             ),
         ],
       ),
@@ -83,17 +82,17 @@ class VisitButtonWidget extends StatelessWidget {
 
   Widget _buildReadyState() {
     return CasinoButton(
-      label: label,
-      onPressed: onPressed,
-      backgroundColor: AppTheme.gold,
-      borderColor: AppTheme.goldDark,
-      textColor: Colors.black,
-      icon: Icons.lock_open,
-      isLarge: true, // Make it prominent
-    )
-    .animate(onPlay: (controller) => controller.repeat(reverse: true))
-    .shimmer(duration: 2000.ms, color: Colors.white.withOpacity(0.5))
-    .scaleXY(end: 1.05, duration: 1000.ms, curve: Curves.easeInOut);
+          label: label,
+          onPressed: onPressed,
+          backgroundColor: AppTheme.gold,
+          borderColor: AppTheme.goldDark,
+          textColor: Colors.black,
+          icon: Icons.lock_open,
+          isLarge: true, // Make it prominent
+        )
+        .animate(onPlay: (controller) => controller.repeat(reverse: true))
+        .shimmer(duration: 2000.ms, color: Colors.white.withOpacity(0.5))
+        .scaleXY(end: 1.05, duration: 1000.ms, curve: Curves.easeInOut);
   }
 
   Widget _buildVisitedState() {
@@ -130,10 +129,7 @@ class VisitButtonWidget extends StatelessWidget {
               ),
               const Text(
                 'Maal Unlocked',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 10,
-                ),
+                style: TextStyle(color: Colors.white70, fontSize: 10),
               ),
             ],
           ),

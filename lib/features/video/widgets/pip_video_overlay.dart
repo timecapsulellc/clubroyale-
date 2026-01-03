@@ -12,27 +12,24 @@ import 'package:clubroyale/features/video/services/pip_service.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 
 /// Floating PiP video overlay widget
-/// 
+///
 /// Wrap your main app content with this widget to enable PiP functionality.
 /// The floating window will appear when a video call is minimized.
 class PipVideoOverlay extends ConsumerWidget {
   final Widget child;
-  
-  const PipVideoOverlay({
-    super.key,
-    required this.child,
-  });
-  
+
+  const PipVideoOverlay({super.key, required this.child});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pipState = ref.watch(pipServiceProvider);
     final isPipShowing = pipState.isPipShowing;
-    
+
     return Stack(
       children: [
         // Main app content
         child,
-        
+
         // Floating PiP window
         if (isPipShowing)
           _FloatingPipWindow(
@@ -63,7 +60,7 @@ class _FloatingPipWindow extends StatefulWidget {
   final VoidCallback onDragEnd;
   final VoidCallback onMaximize;
   final VoidCallback onClose;
-  
+
   const _FloatingPipWindow({
     required this.pipState,
     required this.onPositionChanged,
@@ -71,20 +68,20 @@ class _FloatingPipWindow extends StatefulWidget {
     required this.onMaximize,
     required this.onClose,
   });
-  
+
   @override
   State<_FloatingPipWindow> createState() => _FloatingPipWindowState();
 }
 
 class _FloatingPipWindowState extends State<_FloatingPipWindow> {
   late Offset _position;
-  
+
   @override
   void initState() {
     super.initState();
     _position = widget.pipState.position;
   }
-  
+
   @override
   void didUpdateWidget(covariant _FloatingPipWindow oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -92,11 +89,11 @@ class _FloatingPipWindowState extends State<_FloatingPipWindow> {
       _position = widget.pipState.position;
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final size = widget.pipState.size;
-    
+
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOutCubic,
@@ -120,10 +117,7 @@ class _FloatingPipWindowState extends State<_FloatingPipWindow> {
           decoration: BoxDecoration(
             color: Colors.black,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: CasinoColors.gold,
-              width: 2,
-            ),
+            border: Border.all(color: CasinoColors.gold, width: 2),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.5),
@@ -143,7 +137,7 @@ class _FloatingPipWindowState extends State<_FloatingPipWindow> {
               children: [
                 // Video content
                 _buildVideoContent(),
-                
+
                 // Controls overlay
                 Positioned(
                   top: 4,
@@ -168,13 +162,16 @@ class _FloatingPipWindowState extends State<_FloatingPipWindow> {
                     ],
                   ),
                 ),
-                
+
                 // Participant count badge
                 Positioned(
                   bottom: 8,
                   left: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black54,
                       borderRadius: BorderRadius.circular(12),
@@ -196,7 +193,7 @@ class _FloatingPipWindowState extends State<_FloatingPipWindow> {
                     ),
                   ),
                 ),
-                
+
                 // Drag hint
                 Center(
                   child: Icon(
@@ -212,11 +209,11 @@ class _FloatingPipWindowState extends State<_FloatingPipWindow> {
       ),
     );
   }
-  
+
   Widget _buildVideoContent() {
     final participants = widget.pipState.participants;
     final room = widget.pipState.activeRoom;
-    
+
     if (room == null || participants.isEmpty) {
       // No video - show placeholder
       return Container(
@@ -236,21 +233,21 @@ class _FloatingPipWindowState extends State<_FloatingPipWindow> {
         ),
       );
     }
-    
+
     // Show first participant's video
     final firstParticipant = participants.first;
     final videoPublication = firstParticipant.videoTrackPublications
         .where((pub) => pub.track != null && pub.subscribed)
         .firstOrNull;
     final videoTrack = videoPublication?.track as VideoTrack?;
-    
+
     if (videoTrack != null) {
       return VideoTrackRenderer(
         videoTrack,
         fit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
       );
     }
-    
+
     // No video track - show avatar
     return Container(
       color: CasinoColors.deepPurple,
@@ -259,7 +256,9 @@ class _FloatingPipWindowState extends State<_FloatingPipWindow> {
           radius: 30,
           backgroundColor: CasinoColors.gold,
           child: Text(
-            firstParticipant.name.isNotEmpty ? firstParticipant.name[0].toUpperCase() : 'U',
+            firstParticipant.name.isNotEmpty
+                ? firstParticipant.name[0].toUpperCase()
+                : 'U',
             style: const TextStyle(
               color: Colors.black,
               fontSize: 24,
@@ -270,7 +269,7 @@ class _FloatingPipWindowState extends State<_FloatingPipWindow> {
       ),
     );
   }
-  
+
   Widget _buildControlButton({
     required IconData icon,
     required VoidCallback onTap,
@@ -285,16 +284,12 @@ class _FloatingPipWindowState extends State<_FloatingPipWindow> {
           width: 28,
           height: 28,
           decoration: BoxDecoration(
-            color: isDestructive 
-                ? Colors.red.withValues(alpha: 0.8) 
+            color: isDestructive
+                ? Colors.red.withValues(alpha: 0.8)
                 : Colors.black54,
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 16,
-          ),
+          child: Icon(icon, color: Colors.white, size: 16),
         ),
       ),
     );

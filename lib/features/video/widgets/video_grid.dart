@@ -37,17 +37,14 @@ class VideoGridWidget extends ConsumerWidget {
           participant: videoService.localParticipant!,
           isLocal: true,
         ),
-      ...videoService.remoteParticipants.map((p) => _ParticipantInfo(
-            participant: p,
-            isLocal: false,
-          )),
+      ...videoService.remoteParticipants.map(
+        (p) => _ParticipantInfo(participant: p, isLocal: false),
+      ),
     ];
 
     return Column(
       children: [
-        Expanded(
-          child: _buildVideoGrid(context, allParticipants),
-        ),
+        Expanded(child: _buildVideoGrid(context, allParticipants)),
         _buildControlBar(context, videoService, ref),
       ],
     );
@@ -134,7 +131,10 @@ class VideoGridWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildVideoGrid(BuildContext context, List<_ParticipantInfo> participants) {
+  Widget _buildVideoGrid(
+    BuildContext context,
+    List<_ParticipantInfo> participants,
+  ) {
     if (participants.isEmpty) {
       return const Center(child: Text('Waiting for participants...'));
     }
@@ -148,7 +148,7 @@ class VideoGridWidget extends ConsumerWidget {
     final int count = participants.length;
     int columns;
     double aspectRatio;
-    
+
     if (count == 1) {
       columns = 1;
       aspectRatio = 4 / 3;
@@ -185,13 +185,15 @@ class VideoGridWidget extends ConsumerWidget {
   Widget _buildParticipantTile(BuildContext context, _ParticipantInfo info) {
     final theme = Theme.of(context);
     final participant = info.participant;
-    
+
     // Get video track
     VideoTrack? videoTrack;
     if (participant is LocalParticipant) {
-      videoTrack = participant.videoTrackPublications.firstOrNull?.track as VideoTrack?;
+      videoTrack =
+          participant.videoTrackPublications.firstOrNull?.track as VideoTrack?;
     } else if (participant is RemoteParticipant) {
-      videoTrack = participant.videoTrackPublications.firstOrNull?.track as VideoTrack?;
+      videoTrack =
+          participant.videoTrackPublications.firstOrNull?.track as VideoTrack?;
     }
 
     return Container(
@@ -264,7 +266,11 @@ class VideoGridWidget extends ConsumerWidget {
                       color: Colors.red.withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.mic_off, size: 14, color: Colors.white),
+                    child: const Icon(
+                      Icons.mic_off,
+                      size: 14,
+                      color: Colors.white,
+                    ),
                   ),
                 const SizedBox(width: 4),
                 if (!_isCameraEnabled(participant))
@@ -274,7 +280,11 @@ class VideoGridWidget extends ConsumerWidget {
                       color: Colors.red.withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.videocam_off, size: 14, color: Colors.white),
+                    child: const Icon(
+                      Icons.videocam_off,
+                      size: 14,
+                      color: Colors.white,
+                    ),
                   ),
               ],
             ),
@@ -294,7 +304,11 @@ class VideoGridWidget extends ConsumerWidget {
         participant.videoTrackPublications.first.muted == false;
   }
 
-  Widget _buildControlBar(BuildContext context, VideoService service, WidgetRef ref) {
+  Widget _buildControlBar(
+    BuildContext context,
+    VideoService service,
+    WidgetRef ref,
+  ) {
     final theme = Theme.of(context);
 
     return Container(
@@ -319,7 +333,9 @@ class VideoGridWidget extends ConsumerWidget {
             isActive: true,
             onPressed: service.room != null
                 ? () {
-                    ref.read(pipServiceProvider.notifier).enablePip(service.room!);
+                    ref
+                        .read(pipServiceProvider.notifier)
+                        .enablePip(service.room!);
                     // Optionally navigate back or to game screen
                   }
                 : null,
@@ -347,7 +363,9 @@ class VideoGridWidget extends ConsumerWidget {
             onPressed: service.localRole != ParticipantRole.spectator
                 ? () => service.toggleCamera()
                 : null,
-            tooltip: service.isCameraEnabled ? 'Turn off camera' : 'Turn on camera',
+            tooltip: service.isCameraEnabled
+                ? 'Turn off camera'
+                : 'Turn on camera',
           ),
           const SizedBox(width: 16),
 
@@ -356,7 +374,9 @@ class VideoGridWidget extends ConsumerWidget {
             context,
             icon: Icons.flip_camera_ios,
             isActive: true,
-            onPressed: service.isCameraEnabled ? () => service.switchCamera() : null,
+            onPressed: service.isCameraEnabled
+                ? () => service.switchCamera()
+                : null,
             tooltip: 'Switch camera',
           ),
           const SizedBox(width: 16),
@@ -384,10 +404,10 @@ class VideoGridWidget extends ConsumerWidget {
     bool isDestructive = false,
   }) {
     final theme = Theme.of(context);
-    
+
     Color backgroundColor;
     Color iconColor;
-    
+
     if (isDestructive) {
       backgroundColor = theme.colorScheme.errorContainer;
       iconColor = theme.colorScheme.onErrorContainer;

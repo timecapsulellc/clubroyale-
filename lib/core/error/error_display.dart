@@ -83,7 +83,7 @@ class ErrorDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = accentColor ?? Colors.redAccent;
-    
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -92,22 +92,22 @@ class ErrorDisplay extends StatelessWidget {
           children: [
             // Animated error icon
             Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: color.withValues(alpha: 0.1),
-              ),
-              child: Icon(icon, size: 64, color: color),
-            )
-            .animate(onPlay: (c) => c.repeat(reverse: true))
-            .scale(
-              begin: const Offset(1, 1),
-              end: const Offset(1.05, 1.05),
-              duration: 2.seconds,
-            ),
-            
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: color.withValues(alpha: 0.1),
+                  ),
+                  child: Icon(icon, size: 64, color: color),
+                )
+                .animate(onPlay: (c) => c.repeat(reverse: true))
+                .scale(
+                  begin: const Offset(1, 1),
+                  end: const Offset(1.05, 1.05),
+                  duration: 2.seconds,
+                ),
+
             const SizedBox(height: 32),
-            
+
             // Title
             Text(
               title,
@@ -118,9 +118,9 @@ class ErrorDisplay extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ).animate().fadeIn(delay: 200.ms),
-            
+
             const SizedBox(height: 12),
-            
+
             // Message
             Text(
               message,
@@ -130,7 +130,7 @@ class ErrorDisplay extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ).animate().fadeIn(delay: 300.ms),
-            
+
             // Retry button
             if (onRetry != null) ...[
               const SizedBox(height: 32),
@@ -188,16 +188,12 @@ class InlineError extends StatelessWidget {
   final String message;
   final bool visible;
 
-  const InlineError({
-    super.key,
-    required this.message,
-    this.visible = true,
-  });
+  const InlineError({super.key, required this.message, this.visible = true});
 
   @override
   Widget build(BuildContext context) {
     if (!visible) return const SizedBox.shrink();
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       margin: const EdgeInsets.only(top: 8),
@@ -224,10 +220,14 @@ class InlineError extends StatelessWidget {
 
 /// Toast-style error notification
 class ErrorToast {
-  static void show(BuildContext context, String message, {Duration duration = const Duration(seconds: 3)}) {
+  static void show(
+    BuildContext context,
+    String message, {
+    Duration duration = const Duration(seconds: 3),
+  }) {
     final overlay = Overlay.of(context);
     late OverlayEntry entry;
-    
+
     entry = OverlayEntry(
       builder: (context) => Positioned(
         top: MediaQuery.of(context).padding.top + 16,
@@ -243,7 +243,7 @@ class ErrorToast {
         ),
       ),
     );
-    
+
     overlay.insert(entry);
   }
 }
@@ -292,7 +292,10 @@ class _AnimatedToastState extends State<_AnimatedToast> {
           Expanded(
             child: Text(
               widget.message,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           GestureDetector(
@@ -307,7 +310,11 @@ class _AnimatedToastState extends State<_AnimatedToast> {
 
 /// Success toast
 class SuccessToast {
-  static void show(BuildContext context, String message, {Duration duration = const Duration(seconds: 2)}) {
+  static void show(
+    BuildContext context,
+    String message, {
+    Duration duration = const Duration(seconds: 2),
+  }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -331,11 +338,7 @@ class ErrorBoundary extends StatefulWidget {
   final Widget child;
   final Widget Function(Object error, VoidCallback retry)? errorBuilder;
 
-  const ErrorBoundary({
-    super.key,
-    required this.child,
-    this.errorBuilder,
-  });
+  const ErrorBoundary({super.key, required this.child, this.errorBuilder});
 
   @override
   State<ErrorBoundary> createState() => _ErrorBoundaryState();
@@ -354,10 +357,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
       if (widget.errorBuilder != null) {
         return widget.errorBuilder!(_error!, _retry);
       }
-      return ErrorDisplay(
-        message: _error.toString(),
-        onRetry: _retry,
-      );
+      return ErrorDisplay(message: _error.toString(), onRetry: _retry);
     }
 
     return widget.child;
@@ -387,10 +387,7 @@ class AsyncStateBuilder<T> extends StatelessWidget {
       if (errorBuilder != null) {
         return errorBuilder!(snapshot.error!);
       }
-      return ErrorDisplay(
-        message: snapshot.error.toString(),
-        onRetry: onRetry,
-      );
+      return ErrorDisplay(message: snapshot.error.toString(), onRetry: onRetry);
     }
 
     if (!snapshot.hasData) {

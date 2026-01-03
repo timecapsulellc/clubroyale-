@@ -18,26 +18,26 @@ This is a skill-based entertainment platform. Play responsibly.
 ''';
 
   /// Wallet screen disclaimer
-  static const String walletDisclaimer = 
+  static const String walletDisclaimer =
       'Diamonds are virtual entertainment tokens for use within ClubRoyale only. '
       'They have no cash value and are not a financial instrument.';
 
   /// Store disclaimer (no prices shown)
-  static const String storeDisclaimer = 
+  static const String storeDisclaimer =
       'Diamonds are virtual tokens for entertainment. '
       'Contact admin for acquisition options.';
 
   /// Skill-gaming disclaimer
-  static const String skillGameDisclaimer = 
+  static const String skillGameDisclaimer =
       'ClubRoyale is a skill-based gaming platform for entertainment only. '
       'Play responsibly.';
 
   /// Loading screen disclaimer
-  static const String loadingDisclaimer = 
+  static const String loadingDisclaimer =
       'ClubRoyale is a skill-based card game platform for entertainment.';
 
   /// Settlement disclaimer (short)
-  static const String shortSettlementDisclaimer = 
+  static const String shortSettlementDisclaimer =
       'Score summaries are for informational purposes only.';
 
   /// Settlement disclaimer (full)
@@ -48,36 +48,35 @@ Any settlements between players occur privately outside this app.
 ''';
 
   /// Age verification disclaimer
-  static const String ageVerification = 
+  static const String ageVerification =
       'You must be 18 years or older to use this app. '
       'Card games are skill-based entertainment only.';
 
   /// Diamond disclaimer - Critical compliance
-  static const String diamondsDisclaimer = 
+  static const String diamondsDisclaimer =
       'Diamonds are virtual entertainment tokens with no real-world value. '
       'They cannot be purchased or redeemed through this app.';
 
   /// Welcome bonus disclaimer
-  static const String welcomeBonusDisclaimer = 
+  static const String welcomeBonusDisclaimer =
       'Welcome diamonds are non-transferable entertainment tokens. '
       'They have no cash value and enable gameplay features.';
 
   /// Request submission disclaimer
-  static const String requestDisclaimer = 
+  static const String requestDisclaimer =
       'Submitting a request does not guarantee any external action. '
       'Any services are governed by separate external terms.';
 
   /// Terms acceptance text
-  static const String termsAcceptance = 
+  static const String termsAcceptance =
       'By using ClubRoyale, you agree that this is a skill-based entertainment app '
       'and not a gambling platform. You confirm you are 18+ years old.';
 
   /// WhatsApp share footer
-  static const String shareFooter = 
-      '🎴 Play skill games at ClubRoyale';
+  static const String shareFooter = '🎴 Play skill games at ClubRoyale';
 
   /// Short disclaimer for UI elements
-  static const String shortDisclaimer = 
+  static const String shortDisclaimer =
       'ClubRoyale is a skill-based entertainment platform. '
       'Diamonds are virtual tokens with no cash value.';
 
@@ -143,13 +142,13 @@ class SafeTerms {
   static const String diamonds = 'diamonds';
   static const String points = 'points';
   static const String score = 'score';
-  
+
   // Gaming terms
   static const String play = 'play';
   static const String game = 'game';
   static const String match = 'match';
   static const String room = 'room';
-  
+
   // Acquisition terms (no buy/purchase)
   static const String earn = 'earn';
   static const String claim = 'claim';
@@ -157,7 +156,7 @@ class SafeTerms {
   static const String bonus = 'bonus';
   static const String acquire = 'acquire';
   static const String contact = 'contact admin';
-  
+
   // Settlement terms
   static const String settlement = 'score summary';
   static const String request = 'submit request';

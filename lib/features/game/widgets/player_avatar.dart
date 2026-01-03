@@ -14,7 +14,7 @@ class PlayerAvatar extends StatelessWidget {
   final int? bid;
   final int? tricksWon;
   final double size;
-  
+
   const PlayerAvatar({
     super.key,
     required this.name,
@@ -38,16 +38,20 @@ class PlayerAvatar extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: isCurrentTurn ? CasinoColors.gold : Colors.white.withValues(alpha: 0.3),
+              color: isCurrentTurn
+                  ? CasinoColors.gold
+                  : Colors.white.withValues(alpha: 0.3),
               width: isCurrentTurn ? 3 : 2,
             ),
-            boxShadow: isCurrentTurn ? [
-              BoxShadow(
-                color: CasinoColors.gold.withValues(alpha: 0.6),
-                blurRadius: 12,
-                spreadRadius: 2,
-              ),
-            ] : null,
+            boxShadow: isCurrentTurn
+                ? [
+                    BoxShadow(
+                      color: CasinoColors.gold.withValues(alpha: 0.6),
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                    ),
+                  ]
+                : null,
           ),
           child: ClipOval(
             child: imageUrl != null
@@ -55,14 +59,14 @@ class PlayerAvatar extends StatelessWidget {
                 : _buildDefaultAvatar(),
           ),
         ),
-        
+
         const SizedBox(height: 6),
-        
+
         // Name label
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: isCurrentTurn 
+            color: isCurrentTurn
                 ? CasinoColors.gold
                 : Colors.black.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(12),
@@ -71,13 +75,21 @@ class PlayerAvatar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (isHost) ...[
-                Icon(Icons.star, color: isCurrentTurn ? CasinoColors.feltGreenDark : CasinoColors.gold, size: 12),
+                Icon(
+                  Icons.star,
+                  color: isCurrentTurn
+                      ? CasinoColors.feltGreenDark
+                      : CasinoColors.gold,
+                  size: 12,
+                ),
                 const SizedBox(width: 4),
               ],
               Text(
                 name,
                 style: TextStyle(
-                  color: isCurrentTurn ? CasinoColors.feltGreenDark : Colors.white,
+                  color: isCurrentTurn
+                      ? CasinoColors.feltGreenDark
+                      : Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
                 ),
@@ -87,7 +99,7 @@ class PlayerAvatar extends StatelessWidget {
             ],
           ),
         ),
-        
+
         // Bid and tricks info
         if (bid != null || tricksWon != null) ...[
           const SizedBox(height: 4),
@@ -96,12 +108,16 @@ class PlayerAvatar extends StatelessWidget {
             decoration: BoxDecoration(
               color: CasinoColors.feltGreenDark.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.3)),
+              border: Border.all(
+                color: CasinoColors.gold.withValues(alpha: 0.3),
+              ),
             ),
             child: Text(
               '${tricksWon ?? 0}/${bid ?? 0}',
               style: TextStyle(
-                color: (tricksWon ?? 0) >= (bid ?? 0) ? Colors.green.shade300 : Colors.white,
+                color: (tricksWon ?? 0) >= (bid ?? 0)
+                    ? Colors.green.shade300
+                    : Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 11,
               ),
@@ -111,12 +127,12 @@ class PlayerAvatar extends StatelessWidget {
       ],
     );
   }
-  
+
   Widget _buildDefaultAvatar() {
     // Generate color based on name
     final hue = (name.hashCode % 360).abs().toDouble();
     final bgColor = HSLColor.fromAHSL(1.0, hue, 0.6, 0.4).toColor();
-    
+
     return Container(
       color: bgColor,
       child: Center(
@@ -142,7 +158,7 @@ class PlayerInfo {
   final bool isHost;
   final int? bid;
   final int? tricksWon;
-  
+
   const PlayerInfo({
     required this.id,
     required this.name,
@@ -159,7 +175,7 @@ class GameTableLayout extends StatelessWidget {
   final List<PlayerInfo> players;
   final String currentPlayerId;
   final Widget centerContent;
-  
+
   const GameTableLayout({
     super.key,
     required this.players,
@@ -171,7 +187,7 @@ class GameTableLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     // Find the current player's index to position them at bottom
     final currentIndex = players.indexWhere((p) => p.id == currentPlayerId);
-    
+
     // Reorder players so current player is always at bottom
     final orderedPlayers = <PlayerInfo>[];
     if (currentIndex >= 0) {
@@ -182,26 +198,30 @@ class GameTableLayout extends StatelessWidget {
     } else {
       orderedPlayers.addAll(players);
     }
-    
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final height = constraints.maxHeight;
-        
+
         // Calculate positions based on player count
-        final positions = _getPlayerPositions(orderedPlayers.length, width, height);
-        
+        final positions = _getPlayerPositions(
+          orderedPlayers.length,
+          width,
+          height,
+        );
+
         return Stack(
           children: [
             // Center content (trick area)
             Center(child: centerContent),
-            
+
             // Player avatars
             ...orderedPlayers.asMap().entries.map((entry) {
               final index = entry.key;
               final player = entry.value;
               final position = positions[index];
-              
+
               return Positioned(
                 left: position.dx - 40,
                 top: position.dy - 50,
@@ -220,8 +240,12 @@ class GameTableLayout extends StatelessWidget {
       },
     );
   }
-  
-  List<Offset> _getPlayerPositions(int playerCount, double width, double height) {
+
+  List<Offset> _getPlayerPositions(
+    int playerCount,
+    double width,
+    double height,
+  ) {
     // Position players around a virtual table
     // Bottom = current player (not rendered), then clockwise from right
     switch (playerCount) {
@@ -263,14 +287,14 @@ class SocialBottomNav extends ConsumerWidget {
   final VoidCallback? onPlayTap;
   final VoidCallback? onClubsTap;
   final VoidCallback? onAccountTap;
-  
+
   // Legacy callbacks (for backward compatibility)
   final VoidCallback? onSettingsTap;
   final VoidCallback? onStoreTap;
   final VoidCallback? onBackTap;
   final VoidCallback? onActivityTap;
   final VoidCallback? onTournamentTap;
-  
+
   const SocialBottomNav({
     super.key,
     this.onHomeTap,
@@ -292,8 +316,9 @@ class SocialBottomNav extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch live data
     final unreadChatsCount = ref.watch(unreadChatsCountProvider).value ?? 0;
-    final pendingRequestsCount = ref.watch(pendingFriendRequestsProvider).value ?? 0;
-    
+    final pendingRequestsCount =
+        ref.watch(pendingFriendRequestsProvider).value ?? 0;
+
     return ClipRRect(
       borderRadius: isFloating ? BorderRadius.circular(30) : BorderRadius.zero,
       child: BackdropFilter(
@@ -301,7 +326,9 @@ class SocialBottomNav extends ConsumerWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.6), // More transparent for glass effect
+            color: Colors.black.withValues(
+              alpha: 0.6,
+            ), // More transparent for glass effect
             borderRadius: isFloating ? BorderRadius.circular(30) : null,
             border: isFloating
                 ? Border.all(
@@ -309,7 +336,9 @@ class SocialBottomNav extends ConsumerWidget {
                     width: 1.5,
                   )
                 : Border(
-                    top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3)),
+                    top: BorderSide(
+                      color: CasinoColors.gold.withValues(alpha: 0.3),
+                    ),
                   ),
             boxShadow: [
               BoxShadow(
@@ -337,9 +366,7 @@ class SocialBottomNav extends ConsumerWidget {
                   badgeCount: unreadChatsCount,
                 ),
                 // Play Button - Center & Prominent
-                _PlayButton(
-                  onTap: onPlayTap,
-                ),
+                _PlayButton(onTap: onPlayTap),
                 // Clubs
                 _NavItem(
                   icon: Icons.groups_rounded,
@@ -365,7 +392,7 @@ class SocialBottomNav extends ConsumerWidget {
 /// Special prominent Play button for center of nav
 class _PlayButton extends StatelessWidget {
   final VoidCallback? onTap;
-  
+
   const _PlayButton({this.onTap});
 
   @override
@@ -377,14 +404,19 @@ class _PlayButton extends StatelessWidget {
         height: 64,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.amber.shade300, Colors.amber.shade600], // Brighter Gold
+            colors: [
+              Colors.amber.shade300,
+              Colors.amber.shade600,
+            ], // Brighter Gold
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.amber.shade600.withValues(alpha: 0.6), // Glowing shadow
+              color: Colors.amber.shade600.withValues(
+                alpha: 0.6,
+              ), // Glowing shadow
               blurRadius: 16,
               spreadRadius: 4,
             ),
@@ -411,7 +443,7 @@ class _NavItem extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
   final int badgeCount;
-  
+
   const _NavItem({
     required this.icon,
     required this.label,
@@ -432,7 +464,11 @@ class _NavItem extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                Icon(icon, color: CasinoColors.gold.withValues(alpha: 0.9), size: 24),
+                Icon(
+                  icon,
+                  color: CasinoColors.gold.withValues(alpha: 0.9),
+                  size: 24,
+                ),
                 if (badgeCount > 0)
                   Positioned(
                     right: -6,
@@ -447,7 +483,7 @@ class _NavItem extends StatelessWidget {
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.3),
                             blurRadius: 2,
-                          )
+                          ),
                         ],
                       ),
                       constraints: const BoxConstraints(

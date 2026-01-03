@@ -4,7 +4,6 @@ import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/core/card_engine/meld.dart';
 import 'package:clubroyale/games/marriage/marriage_scorer.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
-import 'package:clubroyale/games/marriage/marriage_visit_validator.dart';
 
 void main() {
   group('Nepali Marriage Rules Verification', () {

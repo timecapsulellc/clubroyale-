@@ -13,16 +13,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 /// Provider for connectivity state
-final connectivityProvider = NotifierProvider<ConnectivityNotifier, ConnectivityStatus>(() {
-  return ConnectivityNotifier();
-});
+final connectivityProvider =
+    NotifierProvider<ConnectivityNotifier, ConnectivityStatus>(() {
+      return ConnectivityNotifier();
+    });
 
 /// Connectivity status
-enum ConnectivityStatus {
-  online,
-  offline,
-  checking,
-}
+enum ConnectivityStatus { online, offline, checking }
 
 /// Extension for easier checks
 extension ConnectivityStatusX on ConnectivityStatus {
@@ -39,12 +36,12 @@ class ConnectivityNotifier extends Notifier<ConnectivityStatus> {
   ConnectivityStatus build() {
     // Initialize subscription on first build
     _init();
-    
+
     // Clean up on dispose
     ref.onDispose(() {
       _subscription?.cancel();
     });
-    
+
     return ConnectivityStatus.checking;
   }
 
@@ -59,14 +56,14 @@ class ConnectivityNotifier extends Notifier<ConnectivityStatus> {
 
   void _updateStatus(List<ConnectivityResult> results) {
     final wasOffline = state.isOffline;
-    
+
     if (results.contains(ConnectivityResult.none)) {
       state = ConnectivityStatus.offline;
       debugPrint('📴 Device went offline');
     } else {
       state = ConnectivityStatus.online;
       debugPrint('📶 Device is online');
-      
+
       // If we just came back online, process pending actions
       if (wasOffline && _pendingActions.isNotEmpty) {
         _processPendingActions();
@@ -82,16 +79,18 @@ class ConnectivityNotifier extends Notifier<ConnectivityStatus> {
     } else {
       // Queue for later
       _pendingActions.add(action);
-      debugPrint('📝 Action queued for when online (${_pendingActions.length} pending)');
+      debugPrint(
+        '📝 Action queued for when online (${_pendingActions.length} pending)',
+      );
     }
   }
 
   Future<void> _processPendingActions() async {
     debugPrint('🔄 Processing ${_pendingActions.length} pending actions...');
-    
+
     final actions = List<Future<void> Function()>.from(_pendingActions);
     _pendingActions.clear();
-    
+
     for (final action in actions) {
       try {
         await action();
@@ -101,7 +100,7 @@ class ConnectivityNotifier extends Notifier<ConnectivityStatus> {
         _pendingActions.add(action);
       }
     }
-    
+
     debugPrint('✅ Finished processing pending actions');
   }
 }
@@ -142,7 +141,9 @@ class OfflineBanner extends ConsumerWidget {
               height: 16,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation(Colors.white.withValues(alpha: 0.7)),
+                valueColor: AlwaysStoppedAnimation(
+                  Colors.white.withValues(alpha: 0.7),
+                ),
               ),
             ),
           ],
@@ -170,7 +171,8 @@ class ConnectivityWrapper extends StatelessWidget {
 }
 
 /// Mixin for widgets that need connectivity awareness
-mixin ConnectivityAwareMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
+mixin ConnectivityAwareMixin<T extends ConsumerStatefulWidget>
+    on ConsumerState<T> {
   bool get isOnline => ref.read(connectivityProvider).isOnline;
   bool get isOffline => ref.read(connectivityProvider).isOffline;
 

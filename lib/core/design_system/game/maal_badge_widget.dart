@@ -1,5 +1,5 @@
 /// Maal Badge Widget - Visual indicator for Maal card types
-/// 
+///
 /// Displays color-coded badges for Tiplu, Jhiplu, Poplu, Alter, and Man cards
 library;
 
@@ -12,21 +12,23 @@ class MaalBadgeWidget extends StatelessWidget {
   final MaalType type;
   final double size;
   final bool showLabel;
-  
+
   const MaalBadgeWidget({
     super.key,
     required this.type,
     this.size = 16,
     this.showLabel = false,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     if (type == MaalType.none) return const SizedBox.shrink();
-    
+
     // If it's a special card (Tiplu/Alter/Man), show Rive animated star
     // Poplu/Jhiplu can stay simple or also use star with different colors
-    if (type == MaalType.tiplu || type == MaalType.alter || type == MaalType.man) {
+    if (type == MaalType.tiplu ||
+        type == MaalType.alter ||
+        type == MaalType.man) {
       return SizedBox(
         width: size * 1.5,
         height: size * 1.5,
@@ -35,17 +37,14 @@ class MaalBadgeWidget extends StatelessWidget {
     }
 
     final config = _getMaalConfig(type);
-    
+
     return Container(
       padding: EdgeInsets.all(size * 0.15),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            config.color,
-            config.color.withValues(alpha: 0.8),
-          ],
+          colors: [config.color, config.color.withValues(alpha: 0.8)],
         ),
         borderRadius: BorderRadius.circular(size * 0.25),
         boxShadow: [
@@ -59,10 +58,7 @@ class MaalBadgeWidget extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            config.icon,
-            style: TextStyle(fontSize: size * 0.7),
-          ),
+          Text(config.icon, style: TextStyle(fontSize: size * 0.7)),
           if (showLabel) ...[
             SizedBox(width: size * 0.2),
             Text(
@@ -78,7 +74,7 @@ class MaalBadgeWidget extends StatelessWidget {
       ),
     );
   }
-  
+
   _MaalConfig _getMaalConfig(MaalType type) {
     return switch (type) {
       MaalType.tiplu => const _MaalConfig(
@@ -119,7 +115,7 @@ class _MaalConfig {
   final Color color;
   final String icon;
   final String label;
-  
+
   const _MaalConfig({
     required this.color,
     required this.icon,

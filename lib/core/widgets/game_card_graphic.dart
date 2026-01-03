@@ -10,7 +10,21 @@ import 'package:flutter_animate/flutter_animate.dart';
 enum CardSuit { hearts, diamonds, clubs, spades }
 
 /// Card value enum
-enum CardValue { ace, two, three, four, five, six, seven, eight, nine, ten, jack, queen, king }
+enum CardValue {
+  ace,
+  two,
+  three,
+  four,
+  five,
+  six,
+  seven,
+  eight,
+  nine,
+  ten,
+  jack,
+  queen,
+  king,
+}
 
 /// A single playing card widget
 class PlayingCardWidget extends StatelessWidget {
@@ -31,10 +45,14 @@ class PlayingCardWidget extends StatelessWidget {
 
   String get _suitSymbol {
     switch (suit) {
-      case CardSuit.hearts: return '♥';
-      case CardSuit.diamonds: return '♦';
-      case CardSuit.clubs: return '♣';
-      case CardSuit.spades: return '♠';
+      case CardSuit.hearts:
+        return '♥';
+      case CardSuit.diamonds:
+        return '♦';
+      case CardSuit.clubs:
+        return '♣';
+      case CardSuit.spades:
+        return '♠';
     }
   }
 
@@ -51,24 +69,39 @@ class PlayingCardWidget extends StatelessWidget {
 
   String get _valueString {
     switch (value) {
-      case CardValue.ace: return 'A';
-      case CardValue.two: return '2';
-      case CardValue.three: return '3';
-      case CardValue.four: return '4';
-      case CardValue.five: return '5';
-      case CardValue.six: return '6';
-      case CardValue.seven: return '7';
-      case CardValue.eight: return '8';
-      case CardValue.nine: return '9';
-      case CardValue.ten: return '10';
-      case CardValue.jack: return 'J';
-      case CardValue.queen: return 'Q';
-      case CardValue.king: return 'K';
+      case CardValue.ace:
+        return 'A';
+      case CardValue.two:
+        return '2';
+      case CardValue.three:
+        return '3';
+      case CardValue.four:
+        return '4';
+      case CardValue.five:
+        return '5';
+      case CardValue.six:
+        return '6';
+      case CardValue.seven:
+        return '7';
+      case CardValue.eight:
+        return '8';
+      case CardValue.nine:
+        return '9';
+      case CardValue.ten:
+        return '10';
+      case CardValue.jack:
+        return 'J';
+      case CardValue.queen:
+        return 'Q';
+      case CardValue.king:
+        return 'K';
     }
   }
 
   bool get _isFaceCard {
-    return value == CardValue.jack || value == CardValue.queen || value == CardValue.king;
+    return value == CardValue.jack ||
+        value == CardValue.queen ||
+        value == CardValue.king;
   }
 
   @override
@@ -196,10 +229,7 @@ class PlayingCardWidget extends StatelessWidget {
                 ? _buildFaceCardCenter()
                 : Text(
                     _suitSymbol,
-                    style: TextStyle(
-                      color: _suitColor,
-                      fontSize: width * 0.5,
-                    ),
+                    style: TextStyle(color: _suitColor, fontSize: width * 0.5),
                   ),
           ),
         ],
@@ -261,7 +291,7 @@ class GameCardGraphic extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget cardFan = _buildCardFan();
-    
+
     if (animate) {
       return cardFan
           .animate(onPlay: (c) => c.repeat(reverse: true))
@@ -272,7 +302,7 @@ class GameCardGraphic extends StatelessWidget {
             curve: Curves.easeInOut,
           );
     }
-    
+
     return cardFan;
   }
 

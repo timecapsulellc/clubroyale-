@@ -10,7 +10,7 @@ class FAQScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeColors = ref.watch(themeColorsProvider);
-    
+
     return Scaffold(
       backgroundColor: themeColors.background,
       appBar: AppBar(
@@ -20,7 +20,13 @@ class FAQScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
-        title: Text('FAQ', style: TextStyle(color: themeColors.gold, fontWeight: FontWeight.bold)),
+        title: Text(
+          'FAQ',
+          style: TextStyle(
+            color: themeColors.gold,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
       ),
       body: Container(
@@ -31,22 +37,25 @@ class FAQScreen extends ConsumerWidget {
             // Header
             _buildHeader(themeColors),
             const SizedBox(height: 24),
-            
+
             // General FAQ
             _buildSection('General', [
               _FAQItem(
                 question: 'What is ClubRoyale?',
-                answer: 'ClubRoyale is your private card club - a premium multiplayer card game platform. '
+                answer:
+                    'ClubRoyale is your private card club - a premium multiplayer card game platform. '
                     'Host private rooms, play popular card games with friends, and settle scores seamlessly.',
               ),
               _FAQItem(
                 question: 'Is ClubRoyale free to play?',
-                answer: 'Yes! ClubRoyale uses a FREE diamond system. You earn diamonds daily through login bonuses, '
+                answer:
+                    'Yes! ClubRoyale uses a FREE diamond system. You earn diamonds daily through login bonuses, '
                     'watching ads, completing games, and referrals. No real money purchases required.',
               ),
               _FAQItem(
                 question: 'What games are available?',
-                answer: 'We currently offer 4 complete games:\n'
+                answer:
+                    'We currently offer 4 complete games:\n'
                     '• Royal Meld (Marriage) - 2-8 players\n'
                     '• Call Break - 4 players\n'
                     '• Teen Patti - 2-8 players\n'
@@ -54,16 +63,18 @@ class FAQScreen extends ConsumerWidget {
               ),
               _FAQItem(
                 question: 'Can I play with friends?',
-                answer: 'Absolutely! Create a private room, share the 6-digit room code with friends, '
+                answer:
+                    'Absolutely! Create a private room, share the 6-digit room code with friends, '
                     'and they can join instantly. You can also use voice and video chat during games.',
               ),
             ], themeColors),
-            
+
             // Diamond Economy
             _buildSection('Diamonds 💎', [
               _FAQItem(
                 question: 'How do I earn diamonds?',
-                answer: '• Welcome Bonus: 100 💎\n'
+                answer:
+                    '• Welcome Bonus: 100 💎\n'
                     '• Daily Login: 10 💎\n'
                     '• Watch Ad: 20 💎 (up to 6x/day)\n'
                     '• Complete Game: 5 💎\n'
@@ -71,56 +82,64 @@ class FAQScreen extends ConsumerWidget {
               ),
               _FAQItem(
                 question: 'What can I use diamonds for?',
-                answer: '• Create Room: 10 💎\n'
+                answer:
+                    '• Create Room: 10 💎\n'
                     '• Ad-Free Game: 5 💎\n'
                     'Diamonds are for convenience only and have no real-world value.',
               ),
               _FAQItem(
                 question: 'Can I buy diamonds with real money?',
-                answer: 'Diamond purchases are optional. The game is fully playable for free with daily bonuses.',
+                answer:
+                    'Diamond purchases are optional. The game is fully playable for free with daily bonuses.',
               ),
             ], themeColors),
-            
+
             // Games
             _buildSection('Gameplay', [
               _FAQItem(
                 question: 'How does matchmaking work?',
-                answer: 'ClubRoyale uses ELO-based matchmaking to pair you with players of similar skill level. '
+                answer:
+                    'ClubRoyale uses ELO-based matchmaking to pair you with players of similar skill level. '
                     'You can also create private rooms to play with specific friends.',
               ),
               _FAQItem(
                 question: 'What are AI bots?',
-                answer: 'When there aren\'t enough players, AI-powered bots fill empty seats. '
+                answer:
+                    'When there aren\'t enough players, AI-powered bots fill empty seats. '
                     'Our bots use GenKit AI to make intelligent moves.',
               ),
               _FAQItem(
                 question: 'What is the Settlement feature?',
-                answer: 'After each game, ClubRoyale calculates "who owes whom" and generates a settlement summary. '
+                answer:
+                    'After each game, ClubRoyale calculates "who owes whom" and generates a settlement summary. '
                     'You can share this to WhatsApp for easy offline settlement with friends.',
               ),
             ], themeColors),
-            
+
             // Technical
             _buildSection('Technical', [
               _FAQItem(
                 question: 'Can I install ClubRoyale on my phone?',
-                answer: 'Yes! On Android, you can download our APK or install as a PWA from the browser. '
+                answer:
+                    'Yes! On Android, you can download our APK or install as a PWA from the browser. '
                     'On iPhone, add to Home Screen from Safari.',
               ),
               _FAQItem(
                 question: 'Is my data safe?',
-                answer: 'We take privacy seriously. We collect minimal data and never share with third parties. '
+                answer:
+                    'We take privacy seriously. We collect minimal data and never share with third parties. '
                     'See our Privacy Policy for details.',
               ),
               _FAQItem(
                 question: 'How do I change themes?',
-                answer: 'Go to Settings > Appearance to choose from 5 beautiful color themes. '
+                answer:
+                    'Go to Settings > Appearance to choose from 5 beautiful color themes. '
                     'You can also toggle Day/Night mode.',
               ),
             ], themeColors),
-            
+
             const SizedBox(height: 40),
-            
+
             // Contact
             _buildContactSection(themeColors),
           ],
@@ -128,7 +147,7 @@ class FAQScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildHeader(ThemeColors themeColors) {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -152,18 +171,19 @@ class FAQScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             'Find answers to common questions about ClubRoyale',
-            style: TextStyle(
-              color: themeColors.textSecondary,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: themeColors.textSecondary, fontSize: 14),
             textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
-  
-  Widget _buildSection(String title, List<_FAQItem> items, ThemeColors themeColors) {
+
+  Widget _buildSection(
+    String title,
+    List<_FAQItem> items,
+    ThemeColors themeColors,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -183,7 +203,7 @@ class FAQScreen extends ConsumerWidget {
       ],
     );
   }
-  
+
   Widget _buildContactSection(ThemeColors themeColors) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -205,10 +225,7 @@ class FAQScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             'Contact us at support@clubroyale.app',
-            style: TextStyle(
-              color: themeColors.gold,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: themeColors.gold, fontSize: 14),
           ),
         ],
       ),
@@ -219,23 +236,23 @@ class FAQScreen extends ConsumerWidget {
 class _FAQItem {
   final String question;
   final String answer;
-  
+
   _FAQItem({required this.question, required this.answer});
 }
 
 class _FAQTile extends StatefulWidget {
   final _FAQItem item;
   final ThemeColors themeColors;
-  
+
   const _FAQTile({required this.item, required this.themeColors});
-  
+
   @override
   State<_FAQTile> createState() => _FAQTileState();
 }
 
 class _FAQTileState extends State<_FAQTile> {
   bool _isExpanded = false;
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -244,8 +261,8 @@ class _FAQTileState extends State<_FAQTile> {
         color: widget.themeColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: _isExpanded 
-              ? widget.themeColors.gold.withValues(alpha: 0.5) 
+          color: _isExpanded
+              ? widget.themeColors.gold.withValues(alpha: 0.5)
               : Colors.transparent,
         ),
       ),
@@ -264,7 +281,8 @@ class _FAQTileState extends State<_FAQTile> {
             _isExpanded ? Icons.remove : Icons.add,
             color: widget.themeColors.gold,
           ),
-          onExpansionChanged: (expanded) => setState(() => _isExpanded = expanded),
+          onExpansionChanged: (expanded) =>
+              setState(() => _isExpanded = expanded),
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),

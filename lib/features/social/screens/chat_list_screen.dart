@@ -41,9 +41,11 @@ class ChatListScreen extends ConsumerWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          
+
           if (snapshot.hasError) {
-            return Center(child: Text(ErrorHelper.getFriendlyMessage(snapshot.error)));
+            return Center(
+              child: Text(ErrorHelper.getFriendlyMessage(snapshot.error)),
+            );
           }
 
           final chats = snapshot.data ?? [];
@@ -66,7 +68,7 @@ class ChatListScreen extends ConsumerWidget {
         child: const Icon(Icons.chat),
         onPressed: () {
           // Navigate to "New Chat" contact picker
-          // context.push('/social/new-chat'); 
+          // context.push('/social/new-chat');
         },
       ),
     );
@@ -75,9 +77,24 @@ class ChatListScreen extends ConsumerWidget {
   Widget _buildEmptyState(BuildContext context) {
     // AI Companion Bots for instant engagement
     final aiBots = [
-      {'id': 'tips_bot', 'name': '🎯 Tips Bot', 'desc': 'Get game strategies & tips', 'color': Colors.blue},
-      {'id': 'news_bot', 'name': '📰 News Bot', 'desc': 'Latest updates & features', 'color': Colors.orange},
-      {'id': 'finder_bot', 'name': '🎲 Club Finder', 'desc': 'Discover clubs to join', 'color': Colors.purple},
+      {
+        'id': 'tips_bot',
+        'name': '🎯 Tips Bot',
+        'desc': 'Get game strategies & tips',
+        'color': Colors.blue,
+      },
+      {
+        'id': 'news_bot',
+        'name': '📰 News Bot',
+        'desc': 'Latest updates & features',
+        'color': Colors.orange,
+      },
+      {
+        'id': 'finder_bot',
+        'name': '🎲 Club Finder',
+        'desc': 'Discover clubs to join',
+        'color': Colors.purple,
+      },
     ];
 
     return SingleChildScrollView(
@@ -85,7 +102,11 @@ class ChatListScreen extends ConsumerWidget {
       child: Column(
         children: [
           const SizedBox(height: 32),
-          Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey.shade400),
+          Icon(
+            Icons.chat_bubble_outline,
+            size: 64,
+            color: Colors.grey.shade400,
+          ),
           const SizedBox(height: 16),
           const Text(
             'No conversations yet',
@@ -94,10 +115,7 @@ class ChatListScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           const Text('Start a chat with a friend!'),
           const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () {},
-            child: const Text('Start New Chat'),
-          ),
+          ElevatedButton(onPressed: () {}, child: const Text('Start New Chat')),
           const SizedBox(height: 32),
           // AI Companions Section
           Container(
@@ -161,7 +179,11 @@ class ChatListScreen extends ConsumerWidget {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(bot['desc'] as String),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade400),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: Colors.grey.shade400,
+        ),
         onTap: () {
           // Navigate to AI bot chat
           ScaffoldMessenger.of(context).showSnackBar(
@@ -184,7 +206,9 @@ class ChatListScreen extends ConsumerWidget {
         title: const Text('New Voice Room'),
         content: TextField(
           controller: nameController,
-          decoration: const InputDecoration(hintText: 'Room Name (e.g. Chill Lounge)'),
+          decoration: const InputDecoration(
+            hintText: 'Room Name (e.g. Chill Lounge)',
+          ),
         ),
         actions: [
           TextButton(
@@ -195,17 +219,21 @@ class ChatListScreen extends ConsumerWidget {
             onPressed: () async {
               final name = nameController.text.trim();
               if (name.isEmpty) return;
-              
+
               Navigator.pop(context); // Close dialog
-              
+
               try {
-                final chatId = await ref.read(socialServiceProvider).createVoiceRoom(name);
+                final chatId = await ref
+                    .read(socialServiceProvider)
+                    .createVoiceRoom(name);
                 if (context.mounted) {
-                   context.push('/voice-room/$chatId');
+                  context.push('/voice-room/$chatId');
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e))));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e))),
+                  );
                 }
               }
             },
@@ -226,27 +254,29 @@ class ChatListTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Logic to determine Avatar and Title based on chat type
     final currentUserId = ref.read(socialServiceProvider).currentUserId;
-    
+
     // For Direct Chat, name/avatar is the other person
     String displayTitle = chat.name ?? 'Chat';
     String? displayAvatar = chat.avatarUrl;
     String? otherUserId;
 
     if (chat.type == ChatType.direct && currentUserId != null) {
-       final others = chat.participants.where((id) => id != currentUserId).toList();
-       if (others.isNotEmpty) {
-         otherUserId = others.first;
-         // TODO: We should ideally fetch the User Profile here to get the name/avatar 
-         // if it's not stored in the chat object. 
-         // For now, assume chat.name is updated or use 'User'
-       }
+      final others = chat.participants
+          .where((id) => id != currentUserId)
+          .toList();
+      if (others.isNotEmpty) {
+        otherUserId = others.first;
+        // TODO: We should ideally fetch the User Profile here to get the name/avatar
+        // if it's not stored in the chat object.
+        // For now, assume chat.name is updated or use 'User'
+      }
     }
 
     final subtitle = chat.lastMessage?.content ?? 'No messages yet';
-    final time = chat.lastMessage != null 
-        ? DateFormat.Hm().format(chat.lastMessage!.timestamp) 
+    final time = chat.lastMessage != null
+        ? DateFormat.Hm().format(chat.lastMessage!.timestamp)
         : '';
-        
+
     return ListTile(
       leading: Stack(
         children: [
@@ -255,60 +285,67 @@ class ChatListTile extends ConsumerWidget {
             backgroundColor: Colors.purple.shade100,
             child: displayAvatar != null
                 ? getAvatarImage(displayAvatar)
-                : Text(displayTitle.isNotEmpty ? displayTitle[0].toUpperCase() : '?'),
+                : Text(
+                    displayTitle.isNotEmpty
+                        ? displayTitle[0].toUpperCase()
+                        : '?',
+                  ),
           ),
           if (otherUserId != null)
-             Positioned(
-               right: 0,
-               bottom: 0,
-               child: Consumer(
-                 builder: (context, ref, child) {
-                   final statusSnapshot = ref.watch(presenceServiceProvider).watchUserStatus(otherUserId!);
-                   
-                   return StreamBuilder<SocialUserStatus>(
-                     stream: statusSnapshot,
-                     builder: (context, snapshot) {
-                        if (!snapshot.hasData) return const SizedBox();
-                        final isOnline = snapshot.data!.status == UserStatus.online;
-                        final isInGame = snapshot.data!.status == UserStatus.inGame;
-                        
-                        Color? statusColor;
-                        if (isOnline) statusColor = Colors.green;
-                        if (isInGame) statusColor = Colors.amber;
-                        
-                        if (statusColor == null) return const SizedBox();
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final statusSnapshot = ref
+                      .watch(presenceServiceProvider)
+                      .watchUserStatus(otherUserId!);
 
-                        return Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: statusColor,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 2),
+                  return StreamBuilder<SocialUserStatus>(
+                    stream: statusSnapshot,
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) return const SizedBox();
+                      final isOnline =
+                          snapshot.data!.status == UserStatus.online;
+                      final isInGame =
+                          snapshot.data!.status == UserStatus.inGame;
+
+                      Color? statusColor;
+                      if (isOnline) statusColor = Colors.green;
+                      if (isInGame) statusColor = Colors.amber;
+
+                      if (statusColor == null) return const SizedBox();
+
+                      return Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: statusColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            width: 2,
                           ),
-                        );
-                     },
-                   );
-                 }
-               ),
-             ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
         ],
       ),
       title: Text(
-        displayTitle, 
+        displayTitle,
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
-      subtitle: Text(
-        subtitle,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
+      subtitle: Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis),
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(
-            time, 
+            time,
             style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
           ),
         ],
@@ -322,7 +359,7 @@ class ChatListTile extends ConsumerWidget {
       },
     );
   }
-  
+
   Widget getAvatarImage(String url) {
     if (url.startsWith('http')) {
       return CircleAvatar(backgroundImage: NetworkImage(url));

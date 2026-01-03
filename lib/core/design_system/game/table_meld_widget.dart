@@ -1,5 +1,5 @@
 /// Table Meld Widget - Display declared melds on game table
-/// 
+///
 /// Used to show:
 /// 1. Opponent's open cards after they 'Visit'
 /// 2. Player's own declared melds
@@ -58,10 +58,7 @@ class _MeldCards extends StatelessWidget {
   final List<engine.Card> cards;
   final double scale;
 
-  const _MeldCards({
-    required this.cards,
-    required this.scale,
-  });
+  const _MeldCards({required this.cards, required this.scale});
 
   @override
   Widget build(BuildContext context) {

@@ -3,11 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final feedbackServiceProvider = Provider((ref) => FeedbackService());
 
-enum FeedbackType {
-  bug,
-  featureHelper,
-  general,
-}
+enum FeedbackType { bug, featureHelper, general }
 
 class FeedbackService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

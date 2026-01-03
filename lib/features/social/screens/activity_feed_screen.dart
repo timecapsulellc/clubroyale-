@@ -22,9 +22,7 @@ class ActivityFeedScreen extends ConsumerWidget {
 
     if (currentUser == null) {
       return const Scaffold(
-        body: Center(
-          child: Text('Please sign in to view activity'),
-        ),
+        body: Center(child: Text('Please sign in to view activity')),
       );
     }
 
@@ -112,7 +110,9 @@ class _EmptyFeedState extends StatelessWidget {
             Icon(
               Icons.dynamic_feed_outlined,
               size: 80,
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 24),
             Text(

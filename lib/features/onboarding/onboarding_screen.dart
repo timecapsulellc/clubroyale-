@@ -24,34 +24,38 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  
+
   final List<OnboardingPage> _pages = [
     OnboardingPage(
       icon: Icons.favorite,
       title: 'Welcome to ClubRoyale',
       subtitle: 'Play & Connect',
-      description: 'Your social club for classic card games, live chats, voice rooms, and making friends who share your passion.',
+      description:
+          'Your social club for classic card games, live chats, voice rooms, and making friends who share your passion.',
       color: CasinoColors.gold,
     ),
     OnboardingPage(
       icon: Icons.people_alt,
       title: 'Connect with Friends',
       subtitle: 'Chat • Stories • Activity Feed',
-      description: 'See who\'s online, share game highlights to your story, react to friends\' wins, and stay connected 24/7.',
+      description:
+          'See who\'s online, share game highlights to your story, react to friends\' wins, and stay connected 24/7.',
       color: Colors.pinkAccent,
     ),
     OnboardingPage(
       icon: Icons.mic,
       title: 'Live Voice Rooms & Clubs',
       subtitle: 'Talk • Play Together • Join Communities',
-      description: 'Drop into voice rooms, join exclusive clubs, and find your tribe of card game lovers.',
+      description:
+          'Drop into voice rooms, join exclusive clubs, and find your tribe of card game lovers.',
       color: Colors.purpleAccent,
     ),
     OnboardingPage(
       icon: Icons.style,
       title: 'Skill-Based Card Games',
       subtitle: 'Marriage • Call Break • Teen Patti • In-Between',
-      description: 'Master classic card games for fun and entertainment. '
+      description:
+          'Master classic card games for fun and entertainment. '
           'Diamonds are virtual tokens with no real-world value. '
           'This is a skill-based platform – no gambling, no real money.',
       color: Colors.cyanAccent,
@@ -67,11 +71,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _completeOnboarding() async {
     HapticFeedback.heavyImpact();
     SoundService.playRoundEnd();
-    
+
     // Mark onboarding as complete
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_complete', true);
-    
+
     if (mounted) {
       context.go('/');
     }
@@ -80,7 +84,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _nextPage() {
     HapticFeedback.lightImpact();
     SoundService.playCardSlide();
-    
+
     if (_currentPage < _pages.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 400),
@@ -116,7 +120,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
               ),
-              
+
               // Page content
               Expanded(
                 child: PageView.builder(
@@ -131,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   },
                 ),
               ),
-              
+
               // Page indicators
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 24),
@@ -147,64 +151,74 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       decoration: BoxDecoration(
                         color: isActive ? CasinoColors.gold : Colors.white24,
                         borderRadius: BorderRadius.circular(4),
-                        boxShadow: isActive ? [
-                          BoxShadow(
-                            color: CasinoColors.gold.withValues(alpha: 0.5),
-                            blurRadius: 8,
-                          ),
-                        ] : null,
+                        boxShadow: isActive
+                            ? [
+                                BoxShadow(
+                                  color: CasinoColors.gold.withValues(
+                                    alpha: 0.5,
+                                  ),
+                                  blurRadius: 8,
+                                ),
+                              ]
+                            : null,
                       ),
                     );
                   }),
                 ),
               ),
-              
+
               // Next/Get Started button
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-                child: GestureDetector(
-                  onTap: _nextPage,
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [CasinoColors.gold, Colors.orange],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: CasinoColors.gold.withValues(alpha: 0.4),
-                          blurRadius: 12,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _currentPage == _pages.length - 1 ? 'Get Started' : 'Next',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                child:
+                    GestureDetector(
+                          onTap: _nextPage,
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [CasinoColors.gold, Colors.orange],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: CasinoColors.gold.withValues(
+                                    alpha: 0.4,
+                                  ),
+                                  blurRadius: 12,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  _currentPage == _pages.length - 1
+                                      ? 'Get Started'
+                                      : 'Next',
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(
+                                  _currentPage == _pages.length - 1
+                                      ? Icons.rocket_launch
+                                      : Icons.arrow_forward,
+                                  color: Colors.black,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Icon(
-                          _currentPage == _pages.length - 1 
-                              ? Icons.rocket_launch 
-                              : Icons.arrow_forward,
-                          color: Colors.black,
-                        ),
-                      ],
-                    ),
-                  ),
-                ).animate(onPlay: (c) => c.repeat(reverse: true))
-                  .shimmer(delay: 3.seconds, duration: 2.seconds),
+                        )
+                        .animate(onPlay: (c) => c.repeat(reverse: true))
+                        .shimmer(delay: 3.seconds, duration: 2.seconds),
               ),
             ],
           ),
@@ -221,32 +235,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           // Icon with glow
           Container(
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.black.withValues(alpha: 0.3),
-              boxShadow: [
-                BoxShadow(
-                  color: page.color.withValues(alpha: 0.3),
-                  blurRadius: 40,
-                  spreadRadius: 10,
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black.withValues(alpha: 0.3),
+                  boxShadow: [
+                    BoxShadow(
+                      color: page.color.withValues(alpha: 0.3),
+                      blurRadius: 40,
+                      spreadRadius: 10,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Icon(
-              page.icon,
-              size: 80,
-              color: page.color,
-            ),
-          )
-          .animate()
-          .scale(delay: 200.ms, duration: 400.ms, curve: Curves.easeOutBack)
-          .fadeIn()
-          .animate(onPlay: (c) => c.repeat(reverse: true))
-          .moveY(begin: 0, end: -10, duration: 2.seconds, curve: Curves.easeInOutSine),
-          
+                child: Icon(page.icon, size: 80, color: page.color),
+              )
+              .animate()
+              .scale(delay: 200.ms, duration: 400.ms, curve: Curves.easeOutBack)
+              .fadeIn()
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .moveY(
+                begin: 0,
+                end: -10,
+                duration: 2.seconds,
+                curve: Curves.easeInOutSine,
+              ),
+
           const SizedBox(height: 48),
-          
+
           // Title
           Text(
             page.title,
@@ -258,9 +273,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             textAlign: TextAlign.center,
           ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2),
-          
+
           const SizedBox(height: 12),
-          
+
           // Subtitle
           Text(
             page.subtitle,
@@ -271,9 +286,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             textAlign: TextAlign.center,
           ).animate().fadeIn(delay: 400.ms),
-          
+
           const SizedBox(height: 24),
-          
+
           // Description
           Text(
             page.description,

@@ -18,7 +18,7 @@ class DiamondBalanceWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authService = ref.watch(authServiceProvider);
     final userId = authService.currentUser?.uid;
-    
+
     if (userId == null) {
       return const SizedBox.shrink();
     }
@@ -39,10 +39,7 @@ class DiamondBalanceWidget extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.purple.shade300,
-                  Colors.blue.shade300,
-                ],
+                colors: [Colors.purple.shade300, Colors.blue.shade300],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -59,11 +56,7 @@ class DiamondBalanceWidget extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Diamond icon
-                const Icon(
-                  Icons.diamond,
-                  color: Colors.white,
-                  size: 18,
-                ),
+                const Icon(Icons.diamond, color: Colors.white, size: 18),
                 const SizedBox(width: 6),
                 // Balance
                 Text(
@@ -75,11 +68,7 @@ class DiamondBalanceWidget extends ConsumerWidget {
                 ),
                 if (showPurchaseButton) ...[
                   const SizedBox(width: 4),
-                  const Icon(
-                    Icons.add_circle,
-                    color: Colors.white,
-                    size: 16,
-                  ),
+                  const Icon(Icons.add_circle, color: Colors.white, size: 16),
                 ],
               ],
             ),
@@ -98,7 +87,7 @@ class DiamondBalanceBadge extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authService = ref.watch(authServiceProvider);
     final userId = authService.currentUser?.uid;
-    
+
     if (userId == null) return const SizedBox.shrink();
 
     final diamondService = ref.watch(diamondServiceProvider);

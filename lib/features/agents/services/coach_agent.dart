@@ -7,7 +7,7 @@ final coachAgentProvider = Provider<CoachAgent>((ref) {
 });
 
 /// Coach Agent - Personal game strategy coach and skill trainer
-/// 
+///
 /// Features:
 /// - Strategy lessons for each game type
 /// - Play analysis with improvement suggestions
@@ -254,12 +254,13 @@ You need at least 2 melds to declare!
       },
     };
 
-    return lessons[gameType]?[topic] ?? StrategyLesson(
-      title: 'Lesson Coming Soon',
-      content: 'This lesson is being prepared by our coaches!',
-      examples: [],
-      keyTakeaways: ['Check back later for this lesson'],
-    );
+    return lessons[gameType]?[topic] ??
+        StrategyLesson(
+          title: 'Lesson Coming Soon',
+          content: 'This lesson is being prepared by our coaches!',
+          examples: [],
+          keyTakeaways: ['Check back later for this lesson'],
+        );
   }
 
   // ==================== PLAY ANALYSIS ====================
@@ -324,7 +325,7 @@ You need at least 2 melds to declare!
       case 'call_break':
         final led = gameState['ledSuit'] as String?;
         final currentTrick = gameState['currentTrick'] as List<dynamic>? ?? [];
-        
+
         if (led == null && currentTrick.isEmpty) {
           // Leading - play highest non-trump
           final nonSpades = hand.where((c) => !c.contains('♠')).toList();
@@ -337,7 +338,7 @@ You need at least 2 melds to declare!
             );
           }
         }
-        
+
         return PlaySuggestion(
           recommendedPlay: hand.first,
           confidence: 0.5,
@@ -405,7 +406,7 @@ You need at least 2 melds to declare!
 
   TrainingPlan _getDefaultTrainingPlan(String gameType) {
     final topics = getAvailableTopics(gameType);
-    
+
     return TrainingPlan(
       gameType: gameType,
       totalWeeks: 4,
@@ -420,14 +421,20 @@ You need at least 2 melds to declare!
         WeeklyGoal(
           week: 2,
           focus: 'Core Strategies',
-          lessons: topics.where((t) => t.difficulty == 'intermediate').take(2).toList(),
+          lessons: topics
+              .where((t) => t.difficulty == 'intermediate')
+              .take(2)
+              .toList(),
           practiceGames: 7,
           targetWinRate: 0.4,
         ),
         WeeklyGoal(
           week: 3,
           focus: 'Advanced Tactics',
-          lessons: topics.where((t) => t.difficulty == 'advanced').take(1).toList(),
+          lessons: topics
+              .where((t) => t.difficulty == 'advanced')
+              .take(1)
+              .toList(),
           practiceGames: 10,
           targetWinRate: 0.45,
         ),
@@ -513,9 +520,11 @@ class GameAnalysis {
       summary: json['summary'] as String? ?? '',
       strengths: List<String>.from(json['strengths'] ?? []),
       improvements: List<String>.from(json['improvements'] ?? []),
-      keyMoments: (json['keyMoments'] as List<dynamic>?)
-          ?.map((m) => KeyMoment.fromJson(m))
-          .toList() ?? [],
+      keyMoments:
+          (json['keyMoments'] as List<dynamic>?)
+              ?.map((m) => KeyMoment.fromJson(m))
+              .toList() ??
+          [],
       nextLesson: json['nextLesson'] as String?,
     );
   }
@@ -623,9 +632,11 @@ class TrainingPlan {
     return TrainingPlan(
       gameType: json['gameType'] as String? ?? '',
       totalWeeks: json['totalWeeks'] as int? ?? 4,
-      weeklyGoals: (json['weeklyGoals'] as List<dynamic>?)
-          ?.map((g) => WeeklyGoal.fromJson(g))
-          .toList() ?? [],
+      weeklyGoals:
+          (json['weeklyGoals'] as List<dynamic>?)
+              ?.map((g) => WeeklyGoal.fromJson(g))
+              .toList() ??
+          [],
     );
   }
 }

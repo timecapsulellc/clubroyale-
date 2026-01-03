@@ -30,12 +30,17 @@ class StoryCircle extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final hasUnviewed = userStories?.hasUnviewed ?? false;
     final hasStories = (userStories?.stories.isNotEmpty ?? false);
-    
+
     // Determine ring type based on story state or explicit override
-    final effectiveRingType = ringType ?? 
-        (isCurrentUser ? StoryRingType.gold : 
-         hasUnviewed ? StoryRingType.purple : 
-         hasStories ? StoryRingType.teal : StoryRingType.gray);
+    final effectiveRingType =
+        ringType ??
+        (isCurrentUser
+            ? StoryRingType.gold
+            : hasUnviewed
+            ? StoryRingType.purple
+            : hasStories
+            ? StoryRingType.teal
+            : StoryRingType.gray);
 
     return GestureDetector(
       onTap: isCurrentUser && !hasStories ? onAddTap : onTap,
@@ -49,37 +54,46 @@ class StoryCircle extends ConsumerWidget {
               children: [
                 // Avatar with colored ring
                 Container(
-                  width: 68,
-                  height: 68,
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: _getRingGradient(effectiveRingType),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF1a0a2e),
-                      shape: BoxShape.circle,
+                      width: 68,
+                      height: 68,
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: _getRingGradient(effectiveRingType),
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF1a0a2e),
+                          shape: BoxShape.circle,
+                        ),
+                        child: CircleAvatar(
+                          radius: 28,
+                          backgroundColor: const Color(0xFF2d1b4e),
+                          backgroundImage: userStories?.userPhotoUrl != null
+                              ? NetworkImage(userStories!.userPhotoUrl!)
+                              : null,
+                          child: userStories?.userPhotoUrl == null
+                              ? const Icon(
+                                  Icons.person,
+                                  size: 26,
+                                  color: Colors.white54,
+                                )
+                              : null,
+                        ),
+                      ),
+                    )
+                    .animate(
+                      onPlay: (controller) =>
+                          hasUnviewed ? controller.repeat() : null,
+                    )
+                    .shimmer(
+                      duration: 2000.ms,
+                      color: hasUnviewed
+                          ? Colors.white.withOpacity(0.4)
+                          : Colors.transparent,
                     ),
-                    child: CircleAvatar(
-                      radius: 28,
-                      backgroundColor: const Color(0xFF2d1b4e),
-                      backgroundImage: userStories?.userPhotoUrl != null
-                          ? NetworkImage(userStories!.userPhotoUrl!)
-                          : null,
-                      child: userStories?.userPhotoUrl == null
-                          ? const Icon(Icons.person, size: 26, color: Colors.white54)
-                          : null,
-                    ),
-                  ),
-                )
-                .animate(onPlay: (controller) => hasUnviewed ? controller.repeat() : null)
-                .shimmer(
-                   duration: 2000.ms, 
-                   color: hasUnviewed ? Colors.white.withOpacity(0.4) : Colors.transparent
-                ),
-                
+
                 // Add button for current user
                 if (isCurrentUser)
                   Positioned(
@@ -207,11 +221,14 @@ class StoryBar extends ConsumerWidget {
                 onTap: () {
                   final stories = myStoriesAsync.value ?? [];
                   if (stories.isNotEmpty) {
-                    context.push('/stories/view', extra: {
-                      'stories': stories,
-                      'initialIndex': 0,
-                      'isOwn': true,
-                    });
+                    context.push(
+                      '/stories/view',
+                      extra: {
+                        'stories': stories,
+                        'initialIndex': 0,
+                        'isOwn': true,
+                      },
+                    );
                   } else {
                     context.push('/stories/create');
                   }
@@ -226,19 +243,24 @@ class StoryBar extends ConsumerWidget {
                     final index = entry.key;
                     final userStories = entry.value;
                     // Alternate between teal and purple for variety
-                    final ringType = userStories.hasUnviewed 
-                        ? (index % 2 == 0 ? StoryRingType.purple : StoryRingType.teal)
+                    final ringType = userStories.hasUnviewed
+                        ? (index % 2 == 0
+                              ? StoryRingType.purple
+                              : StoryRingType.teal)
                         : StoryRingType.gray;
-                    
+
                     return StoryCircle(
                       userStories: userStories,
                       ringType: ringType,
                       onTap: () {
-                        context.push('/stories/view', extra: {
-                          'stories': userStories.stories,
-                          'initialIndex': 0,
-                          'isOwn': false,
-                        });
+                        context.push(
+                          '/stories/view',
+                          extra: {
+                            'stories': userStories.stories,
+                            'initialIndex': 0,
+                            'isOwn': false,
+                          },
+                        );
                       },
                     );
                   }).toList(),

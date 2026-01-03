@@ -11,12 +11,14 @@ final screenShareServiceProvider = Provider<ScreenShareService>((ref) {
 });
 
 /// Screen share state
-final isScreenSharingProvider = NotifierProvider<ScreenShareNotifier, bool>(() => ScreenShareNotifier());
+final isScreenSharingProvider = NotifierProvider<ScreenShareNotifier, bool>(
+  () => ScreenShareNotifier(),
+);
 
 class ScreenShareNotifier extends Notifier<bool> {
   @override
   bool build() => false;
-  
+
   void setSharing(bool value) {
     state = value;
   }
@@ -26,7 +28,7 @@ class ScreenShareNotifier extends Notifier<bool> {
 class ScreenShareService {
   final Ref ref;
   final FirebaseFunctions _functions = FirebaseFunctions.instance;
-  
+
   Room? _room;
   LocalVideoTrack? _screenTrack;
 

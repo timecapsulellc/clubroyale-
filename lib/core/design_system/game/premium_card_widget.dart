@@ -1,5 +1,5 @@
 /// Premium Card Widget - 3D Playing Card with Effects
-/// 
+///
 /// Features:
 /// - 3D shadows and depth
 /// - Flip animation
@@ -8,7 +8,6 @@
 /// - Playable/disabled states
 /// - Audio feedback on flip
 library;
-
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -49,8 +48,8 @@ class PremiumCardWidget extends ConsumerStatefulWidget {
   ConsumerState<PremiumCardWidget> createState() => _PremiumCardWidgetState();
 }
 
-class _PremiumCardWidgetState extends ConsumerState<PremiumCardWidget> with GameAudioMixin {
-
+class _PremiumCardWidgetState extends ConsumerState<PremiumCardWidget>
+    with GameAudioMixin {
   @override
   void initState() {
     super.initState();
@@ -64,11 +63,13 @@ class _PremiumCardWidgetState extends ConsumerState<PremiumCardWidget> with Game
   Widget build(BuildContext context) {
     // Rive Flip Animation
     Widget cardWidget = GestureDetector(
-      onTap: widget.isPlayable ? () {
-        HapticFeedback.lightImpact();
-        playCardFlip(); // Play card flip sound
-        widget.onTap?.call();
-      } : null,
+      onTap: widget.isPlayable
+          ? () {
+              HapticFeedback.lightImpact();
+              playCardFlip(); // Play card flip sound
+              widget.onTap?.call();
+            }
+          : null,
       child: RiveCardFlip(
         isFaceUp: widget.isFaceUp,
         width: widget.width,
@@ -78,12 +79,14 @@ class _PremiumCardWidgetState extends ConsumerState<PremiumCardWidget> with Game
 
     // Selection animation
     if (widget.isSelected) {
-      cardWidget = cardWidget
-          .animate()
-          .moveY(end: -12, duration: 200.ms, curve: Curves.easeOut);
+      cardWidget = cardWidget.animate().moveY(
+        end: -12,
+        duration: 200.ms,
+        curve: Curves.easeOut,
+      );
     }
 
-    // Maal shimmer effect (overlaying on top of Rive if needed, 
+    // Maal shimmer effect (overlaying on top of Rive if needed,
     // or we can rely on Rive's internal look, but keeping shimmer for now)
     if (widget.maalType != null && widget.maalType != MaalType.none) {
       cardWidget = cardWidget
@@ -95,7 +98,9 @@ class _PremiumCardWidgetState extends ConsumerState<PremiumCardWidget> with Game
     }
 
     // Maal Badge Overlay (since RiveCardFlip doesn't have it built-in yet)
-    if (widget.isFaceUp && widget.maalType != null && widget.maalType != MaalType.none) {
+    if (widget.isFaceUp &&
+        widget.maalType != null &&
+        widget.maalType != MaalType.none) {
       cardWidget = Stack(
         clipBehavior: Clip.none,
         children: [
@@ -104,8 +109,8 @@ class _PremiumCardWidgetState extends ConsumerState<PremiumCardWidget> with Game
             top: 2,
             right: 2,
             child: MaalBadgeWidget(
-               type: widget.maalType!,
-               size: widget.width * 0.25,
+              type: widget.maalType!,
+              size: widget.width * 0.25,
             ),
           ),
         ],
@@ -116,6 +121,4 @@ class _PremiumCardWidgetState extends ConsumerState<PremiumCardWidget> with Game
   }
 
   // Legacy build info removed as Rive handles rendering now
-
-
 }

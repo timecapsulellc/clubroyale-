@@ -104,13 +104,7 @@ class A2ATask {
   };
 }
 
-enum A2ATaskStatus {
-  pending,
-  running,
-  completed,
-  failed,
-  cancelled,
-}
+enum A2ATaskStatus { pending, running, completed, failed, cancelled }
 
 /// A2A Protocol Service for Agent-to-Agent communication
 /// Based on Google's Agent-to-Agent Protocol specification
@@ -153,7 +147,7 @@ class A2AProtocolService {
     required Map<String, dynamic> input,
   }) async {
     final taskId = DateTime.now().millisecondsSinceEpoch.toString();
-    
+
     final task = A2ATask(
       taskId: taskId,
       sourceAgent: sourceAgent,
@@ -214,8 +208,8 @@ class A2AProtocolService {
     final task = _activeTasks[taskId];
     if (task == null) return;
 
-    while (task.status == A2ATaskStatus.pending || 
-           task.status == A2ATaskStatus.running) {
+    while (task.status == A2ATaskStatus.pending ||
+        task.status == A2ATaskStatus.running) {
       yield task;
       await Future.delayed(const Duration(seconds: 1));
     }
@@ -234,11 +228,7 @@ class A2AProtocolService {
       sourceAgent: 'clubroyale-architect',
       targetAgent: 'clubroyale-gaming',
       action: 'analyzeGame',
-      input: {
-        'gameId': gameId,
-        'gameType': gameType,
-        'gameState': gameState,
-      },
+      input: {'gameId': gameId, 'gameType': gameType, 'gameState': gameState},
     );
 
     return task.output;

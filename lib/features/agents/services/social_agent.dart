@@ -13,7 +13,10 @@ class SocialAgent {
   // ==================== MODERATION ====================
 
   /// Moderate a chat message
-  Future<ModerationResult> moderateMessage(String message, {String? userId}) async {
+  Future<ModerationResult> moderateMessage(
+    String message, {
+    String? userId,
+  }) async {
     try {
       final callable = _functions.httpsCallable('moderateChat');
       final result = await callable.call<Map<String, dynamic>>({
@@ -39,7 +42,10 @@ class SocialAgent {
   }
 
   /// Check if content is safe for stories/posts
-  Future<ModerationResult> moderateContent(String content, {String? mediaUrl}) async {
+  Future<ModerationResult> moderateContent(
+    String content, {
+    String? mediaUrl,
+  }) async {
     try {
       final callable = _functions.httpsCallable('moderateContent');
       final result = await callable.call<Map<String, dynamic>>({
@@ -54,14 +60,21 @@ class SocialAgent {
         reason: result.data['reason'] as String?,
       );
     } catch (e) {
-      return ModerationResult(isAllowed: true, category: 'unknown', action: 'allow');
+      return ModerationResult(
+        isAllowed: true,
+        category: 'unknown',
+        action: 'allow',
+      );
     }
   }
 
   // ==================== TRANSLATION ====================
 
   /// Translate text to target language
-  Future<TranslationResult> translate(String text, String targetLanguage) async {
+  Future<TranslationResult> translate(
+    String text,
+    String targetLanguage,
+  ) async {
     try {
       final callable = _functions.httpsCallable('translateText');
       final result = await callable.call<Map<String, dynamic>>({
@@ -88,9 +101,7 @@ class SocialAgent {
   Future<String?> detectLanguage(String text) async {
     try {
       final callable = _functions.httpsCallable('detectLanguage');
-      final result = await callable.call<Map<String, dynamic>>({
-        'text': text,
-      });
+      final result = await callable.call<Map<String, dynamic>>({'text': text});
       return result.data['language'] as String?;
     } catch (e) {
       return null;
@@ -146,9 +157,7 @@ class SocialAgent {
   Future<SentimentResult> analyzeSentiment(String text) async {
     try {
       final callable = _functions.httpsCallable('analyzeSentiment');
-      final result = await callable.call<Map<String, dynamic>>({
-        'text': text,
-      });
+      final result = await callable.call<Map<String, dynamic>>({'text': text});
 
       return SentimentResult(
         sentiment: result.data['sentiment'] as String? ?? 'neutral',

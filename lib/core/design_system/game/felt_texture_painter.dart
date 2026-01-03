@@ -10,11 +10,7 @@ class FeltTexturePainter extends CustomPainter {
   final double density;
   final double opacity;
 
-  FeltTexturePainter({
-    this.seed = 42,
-    this.density = 800,
-    this.opacity = 0.05,
-  });
+  FeltTexturePainter({this.seed = 42, this.density = 800, this.opacity = 0.05});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -42,7 +38,7 @@ class FeltTexturePainter extends CustomPainter {
       final startY = random.nextDouble() * size.height;
       final length = 5 + random.nextDouble() * 15;
       final angle = random.nextDouble() * math.pi;
-      
+
       canvas.drawLine(
         Offset(startX, startY),
         Offset(
@@ -101,10 +97,7 @@ class FeltBackground extends StatelessWidget {
 
         // Felt texture overlay
         if (showTexture)
-          CustomPaint(
-            painter: FeltTexturePainter(),
-            size: Size.infinite,
-          ),
+          CustomPaint(painter: FeltTexturePainter(), size: Size.infinite),
 
         // Ambient light from above
         if (showAmbientLight)

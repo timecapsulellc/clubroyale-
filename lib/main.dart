@@ -1,4 +1,3 @@
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -52,7 +51,6 @@ import 'package:clubroyale/features/profile/screens/followers_list_screen.dart';
 import 'package:clubroyale/features/profile/screens/create_post_screen.dart';
 // TODO: Fix chat screen API mismatches before enabling
 
-
 import 'package:clubroyale/features/admin/screens/admin_chat_screen.dart';
 import 'package:clubroyale/features/wallet/screens/user_support_chat_screen.dart';
 
@@ -76,12 +74,12 @@ import 'package:clubroyale/features/replay/screens/replay_list_screen.dart';
 // Onboarding
 import 'package:clubroyale/features/onboarding/onboarding_screen.dart';
 
-
 // Analytics service singleton for screen tracking
 final _analyticsService = AnalyticsService();
 
 // Global key for SnackBars
-final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 // 1. Define your routes
 final GoRouter _router = GoRouter(
@@ -139,9 +137,10 @@ final GoRouter _router = GoRouter(
           },
         ),
         GoRoute(
-            path: 'ledger/:gameId',
-            builder: (BuildContext c, GoRouterState s) =>
-                LedgerScreen(gameId: s.pathParameters['gameId']!)),
+          path: 'ledger/:gameId',
+          builder: (BuildContext c, GoRouterState s) =>
+              LedgerScreen(gameId: s.pathParameters['gameId']!),
+        ),
         GoRoute(
           path: 'profile',
           builder: (BuildContext context, GoRouterState state) {
@@ -336,7 +335,7 @@ final GoRouter _router = GoRouter(
             return const UserSupportChatScreen();
           },
         ),
-        
+
         // Info Screens Routes
         GoRoute(
           path: 'faq',
@@ -416,8 +415,8 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'friends',
           builder: (BuildContext context, GoRouterState state) {
-             // Import needed at top
-             return const FriendsScreen();
+            // Import needed at top
+            return const FriendsScreen();
           },
         ),
       ],
@@ -427,31 +426,33 @@ final GoRouter _router = GoRouter(
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase with error handling
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     debugPrint('✅ Firebase initialized successfully');
-    
+
     // Configure Firebase Realtime Database URL (required for web)
     // The database URL must match the actual database in Firebase console
     if (kIsWeb) {
-      debugPrint('ℹ️ Running on web - Realtime Database available via Firestore');
+      debugPrint(
+        'ℹ️ Running on web - Realtime Database available via Firestore',
+      );
     }
   } catch (e) {
     debugPrint('⚠️ Firebase initialization failed: $e');
     // Continue anyway - app can work with limited functionality
   }
-  
+
   // Initialize Firebase Crashlytics (skip on web - not supported)
   if (!kIsWeb) {
     try {
       FlutterError.onError = (errorDetails) {
         FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
       };
-      
+
       // Pass all uncaught asynchronous errors to Crashlytics
       PlatformDispatcher.instance.onError = (error, stack) {
         FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
@@ -463,38 +464,34 @@ void main() async {
       // Continue anyway
     }
   }
-  
+
   // App is FREE - no IAP/subscriptions (Safe Harbor model)
   // Revenue comes from AdMob ads only
   // initialized in ProviderScope
   debugPrint('ℹ️ App runs in FREE mode (ads only)');
-  
+
   // Initialize Feature Flags (Gaming-First Strategy)
   await featureFlags.init();
   await featureFlags.init();
-  debugPrint('🏴 Feature Flags initialized: Social=${featureFlags.socialEnabled}');
-  
+  debugPrint(
+    '🏴 Feature Flags initialized: Social=${featureFlags.socialEnabled}',
+  );
+
   // Initialize Update Service (Remote Config)
   final updateService = UpdateService();
   await updateService.init();
-  
+
   // Initialize Sentry for error tracking
-  await SentryFlutter.init(
-    (options) {
-      options.dsn = 'https://examplePublicKey@o0.ingest.sentry.io/0'; // Replace with actual DSN
-      // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-      // We recommend adjusting this value in production.
-      options.tracesSampleRate = 1.0;
-      // The sampling rate for profiling is relative to tracesSampleRate
-      // Setting to 1.0 will profile 100% of sampled transactions:
-      options.profilesSampleRate = 1.0;
-    },
-    appRunner: () => runApp(
-      const ProviderScope(
-        child: MyApp(),
-      ),
-    ),
-  );
+  await SentryFlutter.init((options) {
+    options.dsn =
+        'https://examplePublicKey@o0.ingest.sentry.io/0'; // Replace with actual DSN
+    // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+    // We recommend adjusting this value in production.
+    options.tracesSampleRate = 1.0;
+    // The sampling rate for profiling is relative to tracesSampleRate
+    // Setting to 1.0 will profile 100% of sampled transactions:
+    options.profilesSampleRate = 1.0;
+  }, appRunner: () => runApp(const ProviderScope(child: MyApp())));
 }
 
 class MyApp extends ConsumerWidget {
@@ -505,17 +502,16 @@ class MyApp extends ConsumerWidget {
     // Watch theme changes from provider
     final themeData = ref.watch(themeDataProvider);
     final themeState = ref.watch(themeProvider);
-    
+
     return MaterialApp.router(
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       routerConfig: _router,
       title: 'ClubRoyale',
       theme: themeData, // Dynamic theme from provider
       darkTheme: themeData, // Same theme for dark mode
-      themeMode: themeState.mode == AppThemeMode.light 
-          ? ThemeMode.light 
+      themeMode: themeState.mode == AppThemeMode.light
+          ? ThemeMode.light
           : ThemeMode.dark,
     );
   }
 }
-

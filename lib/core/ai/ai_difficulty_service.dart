@@ -1,5 +1,5 @@
 /// AI Difficulty Service
-/// 
+///
 /// Manages AI opponent difficulty levels for all games
 library;
 
@@ -31,12 +31,12 @@ enum AIDifficulty {
     thinkDelay: Duration(milliseconds: 300),
     mistakeRate: 0.0,
   );
-  
+
   final String name;
   final String description;
   final Duration thinkDelay;
   final double mistakeRate;
-  
+
   const AIDifficulty({
     required this.name,
     required this.description,
@@ -51,14 +51,14 @@ class AIBehavior {
   final bool bluffEnabled;
   final bool countCards;
   final bool predictOpponents;
-  
+
   const AIBehavior({
     this.difficulty = AIDifficulty.medium,
     this.bluffEnabled = true,
     this.countCards = false,
     this.predictOpponents = false,
   });
-  
+
   AIBehavior copyWith({
     AIDifficulty? difficulty,
     bool? bluffEnabled,
@@ -72,7 +72,7 @@ class AIBehavior {
       predictOpponents: predictOpponents ?? this.predictOpponents,
     );
   }
-  
+
   factory AIBehavior.forDifficulty(AIDifficulty difficulty) {
     switch (difficulty) {
       case AIDifficulty.easy:
@@ -110,23 +110,24 @@ class AIBehavior {
 /// Service for managing AI settings
 class AIDifficultyService {
   AIBehavior _behavior = const AIBehavior();
-  
+
   AIBehavior get behavior => _behavior;
   AIDifficulty get difficulty => _behavior.difficulty;
-  
+
   void setDifficulty(AIDifficulty difficulty) {
     _behavior = AIBehavior.forDifficulty(difficulty);
   }
-  
+
   void setBehavior(AIBehavior behavior) {
     _behavior = behavior;
   }
-  
+
   bool shouldMakeMistake() {
     if (_behavior.difficulty.mistakeRate == 0) return false;
-    return (DateTime.now().millisecondsSinceEpoch % 100) / 100 < _behavior.difficulty.mistakeRate;
+    return (DateTime.now().millisecondsSinceEpoch % 100) / 100 <
+        _behavior.difficulty.mistakeRate;
   }
-  
+
   Duration get thinkDelay => _behavior.difficulty.thinkDelay;
 }
 

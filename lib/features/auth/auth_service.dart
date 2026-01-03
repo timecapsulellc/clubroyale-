@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,11 +49,11 @@ class TestUser {
 /// TestMode flag with reactive notifier
 class TestMode {
   static final ValueNotifier<bool> _notifier = ValueNotifier(false);
-  
+
   static ValueNotifier<bool> get notifier => _notifier;
-  
+
   static bool get isEnabled => _notifier.value;
-  
+
   static set isEnabled(bool value) {
     _notifier.value = value;
   }
@@ -91,25 +90,25 @@ class AuthService {
         );
 
         if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-           // Get token
-           final token = await FirebaseMessaging.instance.getToken(
-             vapidKey: FirebaseConfig.vapidKey,
-           );
-           
-           if (token != null) {
-             debugPrint('🔥 FCM Token: $token');
-             // Save to Firestore
-             await FirebaseFirestore.instance
-                 .collection('users')
-                 .doc(uid)
-                 .collection('fcmTokens')
-                 .doc(token)
-                 .set({
-               'token': token,
-               'createdAt': FieldValue.serverTimestamp(),
-               'platform': kIsWeb ? 'web' : 'mobile',
-             });
-           }
+          // Get token
+          final token = await FirebaseMessaging.instance.getToken(
+            vapidKey: FirebaseConfig.vapidKey,
+          );
+
+          if (token != null) {
+            debugPrint('🔥 FCM Token: $token');
+            // Save to Firestore
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(uid)
+                .collection('fcmTokens')
+                .doc(token)
+                .set({
+                  'token': token,
+                  'createdAt': FieldValue.serverTimestamp(),
+                  'platform': kIsWeb ? 'web' : 'mobile',
+                });
+          }
         }
       }
     } catch (e) {
@@ -119,9 +118,11 @@ class AuthService {
 
   /// Ensure user document exists in Firestore (triggers Cloud Functions)
   Future<void> _ensureUserDocExists(User user) async {
-    final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    final userRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid);
     final doc = await userRef.get();
-    
+
     if (!doc.exists) {
       debugPrint('Creating new user document for ${user.uid}...');
       await userRef.set({
@@ -132,18 +133,20 @@ class AuthService {
         'lastLoginAt': FieldValue.serverTimestamp(),
         'isAnonymous': user.isAnonymous,
       });
-      
+
       // Initialize empty profile if needed (separate from auth user doc, depending on architecture)
       // Based on ProfileService, it reads from 'profiles' collection, not 'users'.
       // Let's create 'profiles' doc too to be safe, as existing code might expect it.
-      // Wait, diamondRewards listens to 'users/{userId}'. 
+      // Wait, diamondRewards listens to 'users/{userId}'.
       // But ProfileService reads 'profiles/{userId}'.
-      
+
       // Let's ensure 'profiles' doc exists too for the UI
-      final profileRef = FirebaseFirestore.instance.collection('profiles').doc(user.uid);
+      final profileRef = FirebaseFirestore.instance
+          .collection('profiles')
+          .doc(user.uid);
       final profileDoc = await profileRef.get();
       if (!profileDoc.exists) {
-         await profileRef.set({
+        await profileRef.set({
           'displayName': user.displayName ?? 'Player',
           'avatarUrl': user.photoURL,
           'createdAt': FieldValue.serverTimestamp(),
@@ -151,12 +154,9 @@ class AuthService {
           'badges': [],
         });
       }
-
     } else {
       // access update
-      await userRef.update({
-        'lastLoginAt': FieldValue.serverTimestamp(),
-      });
+      await userRef.update({'lastLoginAt': FieldValue.serverTimestamp()});
     }
   }
 
@@ -168,7 +168,8 @@ class AuthService {
       if (googleUser == null) return null; // User canceled
 
       // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       // Create a new credential
       final OAuthCredential credential = GoogleAuthProvider.credential(
@@ -177,20 +178,22 @@ class AuthService {
       );
 
       // Sign in to Firebase with the Google User Credential
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
-      
+      final UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
+
       // Clear test mode if active
       if (TestMode.isEnabled) {
         TestMode.isEnabled = false;
         TestUser.clear();
       }
-      
+
       // Setup FCM and Firestore Doc after successful login
       if (userCredential.user != null) {
         await _ensureUserDocExists(userCredential.user!);
         await _setupFCM(userCredential.user!.uid);
       }
-      
+
       return userCredential.user;
     } catch (e) {
       debugPrint('Error signing in with Google: $e');
@@ -202,38 +205,40 @@ class AuthService {
   Future<User?> signInAnonymously() async {
     try {
       final userCredential = await _auth.signInAnonymously();
-      
+
       // Setup FCM and Firestore Doc after successful login
       if (userCredential.user != null) {
         await _ensureUserDocExists(userCredential.user!);
         await _setupFCM(userCredential.user!.uid);
       }
-      
+
       return userCredential.user;
     } catch (e) {
       debugPrint('Error signing in anonymously: $e');
-      
+
       // Only enable test mode in debug builds - production should fail clearly
       if (kDebugMode) {
         debugPrint('💡 Firebase Auth failed. Enabling Test Mode...');
         return await enableTestMode();
       }
-      
+
       // In release mode, rethrow to show proper error to user
-      throw e;
+      rethrow;
     }
   }
 
   /// Enable test mode and create a mock user
   Future<User?> enableTestMode({String? playerName}) async {
     debugPrint('🧪 Enabling Test Mode...');
-    
+
     // Create mock user
     TestUser.generate(name: playerName ?? 'Test Player');
     TestMode.isEnabled = true;
-    
-    debugPrint('✅ Test Mode enabled! User: ${TestUser.displayName} (${TestUser.uid})');
-    
+
+    debugPrint(
+      '✅ Test Mode enabled! User: ${TestUser.displayName} (${TestUser.uid})',
+    );
+
     return _TestModeUser();
   }
 
@@ -245,7 +250,7 @@ class AuthService {
       TestUser.clear();
       debugPrint('🧪 Test Mode disabled');
     }
-    
+
     try {
       await _googleSignIn.signOut(); // Sign out from Google
       await _auth.signOut();
@@ -316,7 +321,9 @@ class _TestModeUser implements User {
   }
 
   @override
-  Future<UserCredential> reauthenticateWithCredential(AuthCredential credential) {
+  Future<UserCredential> reauthenticateWithCredential(
+    AuthCredential credential,
+  ) {
     throw UnimplementedError();
   }
 
@@ -329,7 +336,9 @@ class _TestModeUser implements User {
   Future<void> reload() async {}
 
   @override
-  Future<void> sendEmailVerification([ActionCodeSettings? actionCodeSettings]) async {}
+  Future<void> sendEmailVerification([
+    ActionCodeSettings? actionCodeSettings,
+  ]) async {}
 
   @override
   Future<User> unlink(String providerId) {
@@ -354,10 +363,16 @@ class _TestModeUser implements User {
   Future<void> updateProfile({String? displayName, String? photoURL}) async {}
 
   @override
-  Future<void> verifyBeforeUpdateEmail(String newEmail, [ActionCodeSettings? actionCodeSettings]) async {}
+  Future<void> verifyBeforeUpdateEmail(
+    String newEmail, [
+    ActionCodeSettings? actionCodeSettings,
+  ]) async {}
 
   @override
-  Future<ConfirmationResult> linkWithPhoneNumber(String phoneNumber, [RecaptchaVerifier? verifier]) {
+  Future<ConfirmationResult> linkWithPhoneNumber(
+    String phoneNumber, [
+    RecaptchaVerifier? verifier,
+  ]) {
     throw UnimplementedError();
   }
 

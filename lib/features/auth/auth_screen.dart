@@ -33,22 +33,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       vsync: this,
       duration: const Duration(seconds: 3),
     )..repeat(reverse: true);
-    
+
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
-    
+
     _cardController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
     )..repeat();
-    
+
     _neonController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
-    
+
     _spotlightController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 6),
@@ -104,16 +104,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         children: [
           // Animated Background with spotlights
           _buildAnimatedBackground(),
-          
+
           // Spotlight beams
           _buildSpotlightEffects(),
-          
+
           // Gold particle rain
           _buildGoldParticleRain(),
-          
+
           // Floating Cards Background
           _buildFloatingCards(),
-          
+
           // Main Content
           SafeArea(
             child: Center(
@@ -123,48 +123,47 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(height: 40),
-                    
+
                     // VIP Badge
                     _buildVIPBadge(),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Animated Chip Logo
                     _buildChipLogo(),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Neon Title with Glow
                     _buildNeonTitle(),
-                    
+
                     const SizedBox(height: 8),
-                    
+
                     // Subtitle
                     _buildSubtitle(),
-                    
+
                     const SizedBox(height: 48),
-                    
+
                     // Error Message
                     if (_errorMessage != null) _buildErrorMessage(),
-                    
+
                     // Primary CTA Button
                     _buildPrimaryButton(),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Test Mode Button - Removed for Production
                     // _buildTestModeButton(),
-                    
                     const SizedBox(height: 40),
-                    
+
                     // Features Grid - Playing Card Style
                     _buildPlayingCardFeatures(),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Compliance Footer
                     _buildComplianceFooter(),
-                    
+
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -236,11 +235,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       builder: (context, child) {
         return Stack(
           children: List.generate(8, (index) {
-            final angle = (index * math.pi / 4) + (_cardController.value * 2 * math.pi);
+            final angle =
+                (index * math.pi / 4) + (_cardController.value * 2 * math.pi);
             final radius = 180.0 + (index * 25);
-            final x = MediaQuery.of(context).size.width / 2 + math.cos(angle) * radius;
-            final y = MediaQuery.of(context).size.height / 2 + math.sin(angle) * radius;
-            
+            final x =
+                MediaQuery.of(context).size.width / 2 +
+                math.cos(angle) * radius;
+            final y =
+                MediaQuery.of(context).size.height / 2 +
+                math.sin(angle) * radius;
+
             return Positioned(
               left: x - 30,
               top: y - 40,
@@ -260,8 +264,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   Widget _buildFloatingCard(int index) {
     final suits = ['♠', '♥', '♦', '♣'];
-    final colors = [Colors.white, const Color(0xFFFF4444), CasinoColors.gold, Colors.white];
-    
+    final colors = [
+      Colors.white,
+      const Color(0xFFFF4444),
+      CasinoColors.gold,
+      Colors.white,
+    ];
+
     return Container(
       width: 50,
       height: 70,
@@ -285,171 +294,182 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   Widget _buildVIPBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            CasinoColors.gold.withValues(alpha: 0.3),
-            CasinoColors.gold.withValues(alpha: 0.1),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.5)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.diamond, size: 16, color: CasinoColors.gold),
-          const SizedBox(width: 6),
-          Text(
-            'EXCLUSIVE CLUB',
-            style: TextStyle(
-              color: CasinoColors.gold,
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                CasinoColors.gold.withValues(alpha: 0.3),
+                CasinoColors.gold.withValues(alpha: 0.1),
+              ],
             ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.5)),
           ),
-          const SizedBox(width: 6),
-          Icon(Icons.diamond, size: 16, color: CasinoColors.gold),
-        ],
-      ),
-    ).animate()
-      .fadeIn(delay: 100.ms)
-      .shimmer(duration: 2.seconds, delay: 500.ms, color: CasinoColors.gold.withValues(alpha: 0.3));
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.diamond, size: 16, color: CasinoColors.gold),
+              const SizedBox(width: 6),
+              Text(
+                'EXCLUSIVE CLUB',
+                style: TextStyle(
+                  color: CasinoColors.gold,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Icon(Icons.diamond, size: 16, color: CasinoColors.gold),
+            ],
+          ),
+        )
+        .animate()
+        .fadeIn(delay: 100.ms)
+        .shimmer(
+          duration: 2.seconds,
+          delay: 500.ms,
+          color: CasinoColors.gold.withValues(alpha: 0.3),
+        );
   }
 
   Widget _buildChipLogo() {
     return AnimatedBuilder(
-      animation: Listenable.merge([_floatController, _neonController]),
-      builder: (context, child) {
-        final float = 8 * math.sin(_floatController.value * math.pi);
-        final glow = 0.3 + (_neonController.value * 0.2);
-        
-        return Transform.translate(
-          offset: Offset(0, float),
-          child: Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const RadialGradient(
-                colors: [
-                  Color(0xFFffd700),
-                  Color(0xFFf4a940),
-                  Color(0xFFd4920a),
-                ],
-                stops: [0.0, 0.6, 1.0],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: CasinoColors.gold.withValues(alpha: glow),
-                  blurRadius: 40,
-                  spreadRadius: 10,
+          animation: Listenable.merge([_floatController, _neonController]),
+          builder: (context, child) {
+            final float = 8 * math.sin(_floatController.value * math.pi);
+            final glow = 0.3 + (_neonController.value * 0.2);
+
+            return Transform.translate(
+              offset: Offset(0, float),
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const RadialGradient(
+                    colors: [
+                      Color(0xFFffd700),
+                      Color(0xFFf4a940),
+                      Color(0xFFd4920a),
+                    ],
+                    stops: [0.0, 0.6, 1.0],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: CasinoColors.gold.withValues(alpha: glow),
+                      blurRadius: 40,
+                      spreadRadius: 10,
+                    ),
+                    BoxShadow(
+                      color: CasinoColors.gold.withValues(alpha: glow * 0.5),
+                      blurRadius: 80,
+                      spreadRadius: 20,
+                    ),
+                  ],
                 ),
-                BoxShadow(
-                  color: CasinoColors.gold.withValues(alpha: glow * 0.5),
-                  blurRadius: 80,
-                  spreadRadius: 20,
-                ),
-              ],
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Chip edge ridges
-                ...List.generate(12, (i) {
-                  final angle = (i * math.pi / 6);
-                  return Transform.rotate(
-                    angle: angle,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Container(
-                        width: 8,
-                        height: 12,
-                        margin: const EdgeInsets.only(top: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1a0a2e),
-                          borderRadius: BorderRadius.circular(2),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Chip edge ridges
+                    ...List.generate(12, (i) {
+                      final angle = (i * math.pi / 6);
+                      return Transform.rotate(
+                        angle: angle,
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            width: 8,
+                            height: 12,
+                            margin: const EdgeInsets.only(top: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1a0a2e),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                    // Inner circle
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF1a0a2e),
+                        border: Border.all(color: CasinoColors.gold, width: 3),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'CR',
+                          style: TextStyle(
+                            color: CasinoColors.gold,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2,
+                          ),
                         ),
                       ),
                     ),
-                  );
-                }),
-                // Inner circle
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFF1a0a2e),
-                    border: Border.all(color: CasinoColors.gold, width: 3),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'CR',
-                      style: TextStyle(
-                        color: CasinoColors.gold,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
+        )
+        .animate()
+        .fadeIn(duration: 600.ms)
+        .scale(
+          begin: const Offset(0.5, 0.5),
+          end: const Offset(1, 1),
+          duration: 600.ms,
         );
-      },
-    ).animate()
-      .fadeIn(duration: 600.ms)
-      .scale(begin: const Offset(0.5, 0.5), end: const Offset(1, 1), duration: 600.ms);
   }
 
   Widget _buildNeonTitle() {
     return AnimatedBuilder(
-      animation: _neonController,
-      builder: (context, child) {
-        final flicker = 0.8 + (_neonController.value * 0.2);
-        final randomFlicker = math.Random().nextDouble() > 0.95 ? 0.6 : 1.0;
-        
-        return ShaderMask(
-          shaderCallback: (bounds) => LinearGradient(
-            colors: [
-              CasinoColors.gold.withValues(alpha: flicker * randomFlicker),
-              Colors.white.withValues(alpha: flicker * randomFlicker),
-              CasinoColors.gold.withValues(alpha: flicker * randomFlicker),
-            ],
-          ).createShader(bounds),
-          child: Text(
-            'ClubRoyale',
-            style: TextStyle(
-              fontSize: 48,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-              letterSpacing: 2,
-              shadows: [
-                Shadow(
-                  color: CasinoColors.gold.withValues(alpha: flicker * 0.8),
-                  blurRadius: 30,
+          animation: _neonController,
+          builder: (context, child) {
+            final flicker = 0.8 + (_neonController.value * 0.2);
+            final randomFlicker = math.Random().nextDouble() > 0.95 ? 0.6 : 1.0;
+
+            return ShaderMask(
+              shaderCallback: (bounds) => LinearGradient(
+                colors: [
+                  CasinoColors.gold.withValues(alpha: flicker * randomFlicker),
+                  Colors.white.withValues(alpha: flicker * randomFlicker),
+                  CasinoColors.gold.withValues(alpha: flicker * randomFlicker),
+                ],
+              ).createShader(bounds),
+              child: Text(
+                'ClubRoyale',
+                style: TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  letterSpacing: 2,
+                  shadows: [
+                    Shadow(
+                      color: CasinoColors.gold.withValues(alpha: flicker * 0.8),
+                      blurRadius: 30,
+                    ),
+                    Shadow(
+                      color: CasinoColors.gold.withValues(alpha: flicker * 0.5),
+                      blurRadius: 60,
+                    ),
+                    Shadow(
+                      color: Colors.orange.withValues(alpha: flicker * 0.3),
+                      blurRadius: 100,
+                    ),
+                  ],
                 ),
-                Shadow(
-                  color: CasinoColors.gold.withValues(alpha: flicker * 0.5),
-                  blurRadius: 60,
-                ),
-                Shadow(
-                  color: Colors.orange.withValues(alpha: flicker * 0.3),
-                  blurRadius: 100,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    ).animate()
-      .fadeIn(delay: 200.ms, duration: 500.ms)
-      .slideY(begin: 0.3, end: 0, duration: 500.ms);
+              ),
+            );
+          },
+        )
+        .animate()
+        .fadeIn(delay: 200.ms, duration: 500.ms)
+        .slideY(begin: 0.3, end: 0, duration: 500.ms);
   }
 
   Widget _buildSubtitle() {
@@ -458,7 +478,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('♠', style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 14)),
+          Text(
+            '♠',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.6),
+              fontSize: 14,
+            ),
+          ),
           const SizedBox(width: 8),
           Text(
             'The Ultimate Card Game Experience',
@@ -471,11 +497,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             ),
           ),
           const SizedBox(width: 8),
-          Text('♥', style: TextStyle(color: Colors.red.withValues(alpha: 0.6), fontSize: 14)),
+          Text(
+            '♥',
+            style: TextStyle(
+              color: Colors.red.withValues(alpha: 0.6),
+              fontSize: 14,
+            ),
+          ),
         ],
       ),
-    ).animate()
-      .fadeIn(delay: 400.ms, duration: 500.ms);
+    ).animate().fadeIn(delay: 400.ms, duration: 500.ms);
   }
 
   Widget _buildErrorMessage() {
@@ -504,74 +535,75 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   Widget _buildPrimaryButton() {
     return AnimatedBuilder(
-      animation: _pulseController,
-      builder: (context, child) {
-        final glow = 0.3 + (_pulseController.value * 0.2);
-        
-        return Container(
-          width: double.infinity,
-          height: 60,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: const LinearGradient(
-              colors: [CasinoColors.gold, Color(0xFFf4a940)],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: CasinoColors.gold.withValues(alpha: glow),
-                blurRadius: 25,
-                offset: const Offset(0, 8),
+          animation: _pulseController,
+          builder: (context, child) {
+            final glow = 0.3 + (_pulseController.value * 0.2);
+
+            return Container(
+              width: double.infinity,
+              height: 60,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: const LinearGradient(
+                  colors: [CasinoColors.gold, Color(0xFFf4a940)],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: CasinoColors.gold.withValues(alpha: glow),
+                    blurRadius: 25,
+                    offset: const Offset(0, 8),
+                  ),
+                  BoxShadow(
+                    color: CasinoColors.gold.withValues(alpha: glow * 0.5),
+                    blurRadius: 50,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              BoxShadow(
-                color: CasinoColors.gold.withValues(alpha: glow * 0.5),
-                blurRadius: 50,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: _isLoading ? null : _signIn,
-              borderRadius: BorderRadius.circular(16),
-              child: Center(
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Color(0xFF1a0a2e),
-                        ),
-                      )
-                    : const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.casino_rounded,
-                            color: Color(0xFF1a0a2e),
-                            size: 28,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'Enter the Club',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _isLoading ? null : _signIn,
+                  borderRadius: BorderRadius.circular(16),
+                  child: Center(
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
                               color: Color(0xFF1a0a2e),
-                              letterSpacing: 1,
                             ),
+                          )
+                        : const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.casino_rounded,
+                                color: Color(0xFF1a0a2e),
+                                size: 28,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Enter the Club',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1a0a2e),
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        );
-      },
-    ).animate()
-      .fadeIn(delay: 600.ms, duration: 500.ms)
-      .slideY(begin: 0.3, end: 0, duration: 500.ms);
+            );
+          },
+        )
+        .animate()
+        .fadeIn(delay: 600.ms, duration: 500.ms)
+        .slideY(begin: 0.3, end: 0, duration: 500.ms);
   }
 
   Widget _buildTestModeButton() {
@@ -614,8 +646,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           ),
         ),
       ),
-    ).animate()
-      .fadeIn(delay: 700.ms, duration: 500.ms);
+    ).animate().fadeIn(delay: 700.ms, duration: 500.ms);
   }
 
   Widget _buildPlayingCardFeatures() {
@@ -624,9 +655,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: CasinoColors.gold.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.3)),
         boxShadow: [
           BoxShadow(
             color: CasinoColors.gold.withValues(alpha: 0.1),
@@ -682,8 +711,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           ),
         ],
       ),
-    ).animate()
-      .fadeIn(delay: 800.ms, duration: 600.ms);
+    ).animate().fadeIn(delay: 800.ms, duration: 600.ms);
   }
 
   Widget _buildComplianceFooter() {
@@ -699,7 +727,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.info_outline, size: 16, color: Colors.white.withValues(alpha: 0.6)),
+              Icon(
+                Icons.info_outline,
+                size: 16,
+                color: Colors.white.withValues(alpha: 0.6),
+              ),
               const SizedBox(width: 8),
               Text(
                 'Skill-Based Entertainment',
@@ -723,8 +755,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           ),
         ],
       ),
-    ).animate()
-      .fadeIn(delay: 1200.ms, duration: 500.ms);
+    ).animate().fadeIn(delay: 1200.ms, duration: 500.ms);
   }
 }
 
@@ -751,10 +782,7 @@ class _PlayingCardFeature extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: suitColor.withValues(alpha: 0.4)),
         boxShadow: [
-          BoxShadow(
-            color: suitColor.withValues(alpha: 0.1),
-            blurRadius: 10,
-          ),
+          BoxShadow(color: suitColor.withValues(alpha: 0.1), blurRadius: 10),
         ],
       ),
       child: Stack(
@@ -763,7 +791,13 @@ class _PlayingCardFeature extends StatelessWidget {
           Positioned(
             top: 0,
             left: 0,
-            child: Text(suit, style: TextStyle(color: suitColor.withValues(alpha: 0.3), fontSize: 12)),
+            child: Text(
+              suit,
+              style: TextStyle(
+                color: suitColor.withValues(alpha: 0.3),
+                fontSize: 12,
+              ),
+            ),
           ),
           // Bottom-right suit
           Positioned(
@@ -771,7 +805,13 @@ class _PlayingCardFeature extends StatelessWidget {
             right: 0,
             child: Transform.rotate(
               angle: math.pi,
-              child: Text(suit, style: TextStyle(color: suitColor.withValues(alpha: 0.3), fontSize: 12)),
+              child: Text(
+                suit,
+                style: TextStyle(
+                  color: suitColor.withValues(alpha: 0.3),
+                  fontSize: 12,
+                ),
+              ),
             ),
           ),
           // Content
@@ -808,22 +848,25 @@ class _CasinoBackgroundPainter extends CustomPainter {
   final double animation;
   final double cardAnimation;
 
-  _CasinoBackgroundPainter({required this.animation, required this.cardAnimation});
+  _CasinoBackgroundPainter({
+    required this.animation,
+    required this.cardAnimation,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final random = math.Random(42);
-    
+
     // Draw sparkles
     for (int i = 0; i < 40; i++) {
       final x = random.nextDouble() * size.width;
       final y = random.nextDouble() * size.height;
       final opacity = 0.1 + (animation * 0.2) + (random.nextDouble() * 0.3);
-      
+
       final paint = Paint()
         ..color = CasinoColors.gold.withValues(alpha: opacity * 0.4)
         ..style = PaintingStyle.fill;
-      
+
       canvas.drawCircle(
         Offset(x, y + (math.sin(cardAnimation * math.pi * 2 + i) * 10)),
         1 + random.nextDouble() * 2,
@@ -834,7 +877,8 @@ class _CasinoBackgroundPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _CasinoBackgroundPainter oldDelegate) {
-    return oldDelegate.animation != animation || oldDelegate.cardAnimation != cardAnimation;
+    return oldDelegate.animation != animation ||
+        oldDelegate.cardAnimation != cardAnimation;
   }
 }
 
@@ -854,7 +898,7 @@ class _SpotlightPainter extends CustomPainter {
       animation,
       CasinoColors.gold.withValues(alpha: 0.03),
     );
-    
+
     // Top-right spotlight
     _drawSpotlight(
       canvas,
@@ -865,20 +909,28 @@ class _SpotlightPainter extends CustomPainter {
     );
   }
 
-  void _drawSpotlight(Canvas canvas, Offset start, Offset end, double anim, Color color) {
+  void _drawSpotlight(
+    Canvas canvas,
+    Offset start,
+    Offset end,
+    double anim,
+    Color color,
+  ) {
     final adjustedEnd = Offset(
       end.dx + math.sin(anim * math.pi * 2) * 50,
       end.dy + math.cos(anim * math.pi * 2) * 30,
     );
-    
+
     final gradient = RadialGradient(
       center: Alignment.center,
       colors: [color, color.withValues(alpha: 0)],
     );
-    
+
     final paint = Paint()
-      ..shader = gradient.createShader(Rect.fromCircle(center: adjustedEnd, radius: 200));
-    
+      ..shader = gradient.createShader(
+        Rect.fromCircle(center: adjustedEnd, radius: 200),
+      );
+
     canvas.drawCircle(adjustedEnd, 200, paint);
   }
 
@@ -897,18 +949,18 @@ class _GoldParticlePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final random = math.Random(123);
-    
+
     for (int i = 0; i < 20; i++) {
       final x = random.nextDouble() * size.width;
       final baseY = random.nextDouble() * size.height;
       final y = (baseY + animation * size.height) % size.height;
       final particleSize = 1.0 + random.nextDouble() * 2;
       final opacity = 0.2 + random.nextDouble() * 0.3;
-      
+
       final paint = Paint()
         ..color = CasinoColors.gold.withValues(alpha: opacity)
         ..style = PaintingStyle.fill;
-      
+
       canvas.drawCircle(Offset(x, y), particleSize, paint);
     }
   }

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
 /// Analytics Event Tracking Service
@@ -101,13 +100,11 @@ class EventTracker {
   /// Track diamond earning
   Future<void> trackDiamondsEarned({
     required int amount,
-    required String source, // 'game_win', 'daily_bonus', 'achievement', 'referral'
+    required String
+    source, // 'game_win', 'daily_bonus', 'achievement', 'referral'
   }) async {
     if (isTestMode) return;
-    await _logEvent('diamonds_earned', {
-      'amount': amount,
-      'source': source,
-    });
+    await _logEvent('diamonds_earned', {'amount': amount, 'source': source});
     await _analytics.logEarnVirtualCurrency(
       virtualCurrencyName: 'diamonds',
       value: amount.toDouble(),
@@ -183,7 +180,8 @@ class EventTracker {
   }) async {
     await _logEvent('session_start_detailed', {
       'is_returning_user': isReturningUser,
-      if (daysSinceLastVisit != null) 'days_since_last_visit': daysSinceLastVisit,
+      if (daysSinceLastVisit != null)
+        'days_since_last_visit': daysSinceLastVisit,
     });
   }
 
@@ -224,7 +222,10 @@ class EventTracker {
   }) async {
     await _logEvent('app_error', {
       'error_type': errorType,
-      'error_message': errorMessage.substring(0, errorMessage.length.clamp(0, 100)),
+      'error_message': errorMessage.substring(
+        0,
+        errorMessage.length.clamp(0, 100),
+      ),
       if (screen != null) 'screen': screen,
       if (action != null) 'action': action,
     });
@@ -246,14 +247,27 @@ class EventTracker {
     }
     if (totalGamesPlayed != null) {
       final bracket = _getPlayCountBracket(totalGamesPlayed);
-      await _analytics.setUserProperty(name: 'play_count_bracket', value: bracket);
+      await _analytics.setUserProperty(
+        name: 'play_count_bracket',
+        value: bracket,
+      );
     }
     if (friendCount != null) {
-      final socialLevel = friendCount > 20 ? 'high' : friendCount > 5 ? 'medium' : 'low';
-      await _analytics.setUserProperty(name: 'social_level', value: socialLevel);
+      final socialLevel = friendCount > 20
+          ? 'high'
+          : friendCount > 5
+          ? 'medium'
+          : 'low';
+      await _analytics.setUserProperty(
+        name: 'social_level',
+        value: socialLevel,
+      );
     }
     if (preferredGameType != null) {
-      await _analytics.setUserProperty(name: 'preferred_game', value: preferredGameType);
+      await _analytics.setUserProperty(
+        name: 'preferred_game',
+        value: preferredGameType,
+      );
     }
   }
 

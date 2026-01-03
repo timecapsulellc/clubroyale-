@@ -18,29 +18,30 @@ class GameLogOverlay extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: CustomPaint(
-         foregroundPainter: DashedBorderPainter(color: AppTheme.goldDark),
-         child: Padding(
-           padding: const EdgeInsets.all(8.0),
-           child: ListView.separated(
-             physics: const ClampingScrollPhysics(),
-             itemCount: logs.length,
-             reverse: true, // Show newest at bottom (or top based on preference)
-             separatorBuilder: (_, __) => const Divider(height: 4, color: Colors.transparent),
-             itemBuilder: (context, index) {
-               // Assuming logs are chronological, reverse makes index 0 the newest?
-               // Let's just standard list.
-               final log = logs[logs.length - 1 - index];
-               return Text(
-                 log,
-                 style: const TextStyle(
-                   color: Colors.white,
-                   fontSize: 12,
-                   shadows: [Shadow(blurRadius: 1, color: Colors.black)],
-                 ),
-               );
-             },
-           ),
-         ),
+        foregroundPainter: DashedBorderPainter(color: AppTheme.goldDark),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.separated(
+            physics: const ClampingScrollPhysics(),
+            itemCount: logs.length,
+            reverse: true, // Show newest at bottom (or top based on preference)
+            separatorBuilder: (_, __) =>
+                const Divider(height: 4, color: Colors.transparent),
+            itemBuilder: (context, index) {
+              // Assuming logs are chronological, reverse makes index 0 the newest?
+              // Let's just standard list.
+              final log = logs[logs.length - 1 - index];
+              return Text(
+                log,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  shadows: [Shadow(blurRadius: 1, color: Colors.black)],
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -57,14 +58,17 @@ class DashedBorderPainter extends CustomPainter {
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 
-    final path = Path()..addRRect(RRect.fromRectAndRadius(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      const Radius.circular(8),
-    ));
+    final path = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, 0, size.width, size.height),
+          const Radius.circular(8),
+        ),
+      );
 
     // Simple manual dashing for now
     // In production, use path_drawing package for dashPath
-    canvas.drawPath(path, paint); 
+    canvas.drawPath(path, paint);
   }
 
   @override

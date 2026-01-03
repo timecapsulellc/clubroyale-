@@ -11,6 +11,7 @@
 
 import { z } from 'zod';
 import { ai, geminiPro } from './config';
+import { personalities } from '../agents/cognitive/personalities';
 
 // Terminology configurations for each region
 const terminology = {
@@ -34,9 +35,10 @@ const terminology = {
     },
 };
 
-// Input schema for bot - now includes region
+// Input schema for bot - now includes region and personality
 const MarriageBotInputSchema = z.object({
     difficulty: z.enum(['easy', 'medium', 'hard', 'expert']),
+    personalityId: z.string().optional(),
     hand: z.array(z.string()),
     region: z.enum(['global', 'southAsia']).default('global'),
     gameState: z.object({
@@ -102,9 +104,15 @@ export const marriageBotPlayFlow = ai.defineFlow(
         outputSchema: MarriageBotOutputSchema,
     },
     async (input: MarriageBotInput): Promise<MarriageBotOutput> => {
-        const { difficulty, hand, gameState, region = 'global' } = input;
+        const { difficulty, personalityId, hand, gameState, region = 'global' } = input;
         const terms = terminology[region];
-        const strategy = getStrategyPrompt(difficulty, terms);
+        let strategy = getStrategyPrompt(difficulty, terms);
+
+        // Inject Personality Trait if provided
+        if (personalityId && personalities[personalityId]) {
+            const p = personalities[personalityId];
+            strategy += `\n\nPERSONALITY (${p.name}): ${p.promptModifier}`;
+        }
 
         const prompt = `You are an AI playing ${terms.gameName} ${terms.description} at ${difficulty} difficulty.
 

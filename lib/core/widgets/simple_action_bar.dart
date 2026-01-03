@@ -1,5 +1,5 @@
 /// Simple Game Action Buttons
-/// 
+///
 /// Large, easy-to-tap action buttons for card games.
 /// Designed for simple, intuitive gameplay UX.
 library;
@@ -31,16 +31,17 @@ class GameActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget button = _buildButton();
-    
+
     if (isPulsing && onPressed != null) {
-      button = button.animate(onPlay: (c) => c.repeat(reverse: true))
+      button = button
+          .animate(onPlay: (c) => c.repeat(reverse: true))
           .scale(
             begin: const Offset(1, 1),
             end: const Offset(1.05, 1.05),
             duration: 600.ms,
           );
     }
-    
+
     return button;
   }
 
@@ -56,9 +57,7 @@ class GameActionButton extends StatelessWidget {
           horizontal: isLarge ? 32 : 20,
           vertical: isLarge ? 16 : 12,
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: onPressed != null ? 4 : 0,
       ),
       child: Row(
@@ -100,7 +99,9 @@ class SimpleActionBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: backgroundColor,
-        border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
+        border: Border(
+          top: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -151,15 +152,20 @@ class SimpleAction {
   });
 
   /// Common actions
-  static SimpleAction fold({VoidCallback? onPressed, bool enabled = true}) => SimpleAction(
-    label: 'Fold',
-    icon: Icons.close,
-    onPressed: onPressed,
-    color: Colors.red.shade700,
-    enabled: enabled,
-  );
+  static SimpleAction fold({VoidCallback? onPressed, bool enabled = true}) =>
+      SimpleAction(
+        label: 'Fold',
+        icon: Icons.close,
+        onPressed: onPressed,
+        color: Colors.red.shade700,
+        enabled: enabled,
+      );
 
-  static SimpleAction call({required int amount, VoidCallback? onPressed, bool enabled = true}) => SimpleAction(
+  static SimpleAction call({
+    required int amount,
+    VoidCallback? onPressed,
+    bool enabled = true,
+  }) => SimpleAction(
     label: 'Call ${amount > 0 ? amount : ''}',
     icon: Icons.check,
     onPressed: onPressed,
@@ -168,7 +174,11 @@ class SimpleAction {
     isPrimary: true,
   );
 
-  static SimpleAction raise({required int amount, VoidCallback? onPressed, bool enabled = true}) => SimpleAction(
+  static SimpleAction raise({
+    required int amount,
+    VoidCallback? onPressed,
+    bool enabled = true,
+  }) => SimpleAction(
     label: 'Raise $amount',
     icon: Icons.arrow_upward,
     onPressed: onPressed,
@@ -178,7 +188,11 @@ class SimpleAction {
     isPrimary: true,
   );
 
-  static SimpleAction bet({required int amount, VoidCallback? onPressed, bool enabled = true}) => SimpleAction(
+  static SimpleAction bet({
+    required int amount,
+    VoidCallback? onPressed,
+    bool enabled = true,
+  }) => SimpleAction(
     label: 'Bet $amount',
     icon: Icons.monetization_on,
     onPressed: onPressed,
@@ -187,32 +201,38 @@ class SimpleAction {
     isPrimary: true,
   );
 
-  static SimpleAction pass({VoidCallback? onPressed, bool enabled = true}) => SimpleAction(
-    label: 'Pass',
-    icon: Icons.skip_next,
-    onPressed: onPressed,
-    color: Colors.grey.shade600,
-    enabled: enabled,
-  );
+  static SimpleAction pass({VoidCallback? onPressed, bool enabled = true}) =>
+      SimpleAction(
+        label: 'Pass',
+        icon: Icons.skip_next,
+        onPressed: onPressed,
+        color: Colors.grey.shade600,
+        enabled: enabled,
+      );
 
-  static SimpleAction reveal({VoidCallback? onPressed, bool enabled = true}) => SimpleAction(
-    label: 'Reveal',
-    icon: Icons.visibility,
-    onPressed: onPressed,
-    color: Colors.purple.shade600,
-    enabled: enabled,
-    isPrimary: true,
-  );
+  static SimpleAction reveal({VoidCallback? onPressed, bool enabled = true}) =>
+      SimpleAction(
+        label: 'Reveal',
+        icon: Icons.visibility,
+        onPressed: onPressed,
+        color: Colors.purple.shade600,
+        enabled: enabled,
+        isPrimary: true,
+      );
 
-  static SimpleAction see({VoidCallback? onPressed, bool enabled = true}) => SimpleAction(
-    label: 'See Cards',
-    icon: Icons.remove_red_eye,
-    onPressed: onPressed,
-    color: Colors.orange.shade600,
-    enabled: enabled,
-  );
+  static SimpleAction see({VoidCallback? onPressed, bool enabled = true}) =>
+      SimpleAction(
+        label: 'See Cards',
+        icon: Icons.remove_red_eye,
+        onPressed: onPressed,
+        color: Colors.orange.shade600,
+        enabled: enabled,
+      );
 
-  static SimpleAction showdown({VoidCallback? onPressed, bool enabled = true}) => SimpleAction(
+  static SimpleAction showdown({
+    VoidCallback? onPressed,
+    bool enabled = true,
+  }) => SimpleAction(
     label: 'Show',
     icon: Icons.emoji_events,
     onPressed: onPressed,
@@ -240,7 +260,7 @@ class QuickBetSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final presets = _calculatePresets();
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Column(
@@ -259,7 +279,9 @@ class QuickBetSelector extends StatelessWidget {
           // Quick select buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: presets.map((amount) => _buildPresetButton(amount)).toList(),
+            children: presets
+                .map((amount) => _buildPresetButton(amount))
+                .toList(),
           ),
         ],
       ),
@@ -268,7 +290,7 @@ class QuickBetSelector extends StatelessWidget {
 
   List<int> _calculatePresets() {
     if (maxBet <= minBet) return [minBet];
-    
+
     return [
       minBet,
       ((minBet + maxBet) / 4).round(),
@@ -279,8 +301,10 @@ class QuickBetSelector extends StatelessWidget {
 
   Widget _buildPresetButton(int amount) {
     final isSelected = amount == currentBet;
-    final label = amount == minBet ? 'Min' : (amount == maxBet ? 'Max' : '$amount');
-    
+    final label = amount == minBet
+        ? 'Min'
+        : (amount == maxBet ? 'Max' : '$amount');
+
     return GestureDetector(
       onTap: () => onBetChanged(amount),
       child: Container(

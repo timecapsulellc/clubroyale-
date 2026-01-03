@@ -1,5 +1,5 @@
 // Game Timer Widget with Color Transitions
-// 
+//
 // Timer that changes color as time runs out:
 // - Green: > 50% time remaining
 // - Yellow: 20-50% remaining
@@ -23,7 +23,7 @@ class GameTimerState {
   });
 
   double get progress => remainingSeconds / totalSeconds;
-  
+
   TimerPhase get phase {
     if (progress > 0.5) return TimerPhase.safe;
     if (progress > 0.2) return TimerPhase.warning;
@@ -64,20 +64,18 @@ class GameTimerController extends ChangeNotifier {
   final VoidCallback? onTimeUp;
   GameTimerState _state;
 
-  GameTimerController({
-    int totalSeconds = 30,
-    this.onTimeUp,
-  }) : _state = GameTimerState(
-          totalSeconds: totalSeconds,
-          remainingSeconds: totalSeconds,
-        );
+  GameTimerController({int totalSeconds = 30, this.onTimeUp})
+    : _state = GameTimerState(
+        totalSeconds: totalSeconds,
+        remainingSeconds: totalSeconds,
+      );
 
   GameTimerState get state => _state;
 
   /// Start the timer for a player's turn
   void startTurn({required bool isMyTurn, int? seconds}) {
     _timer?.cancel();
-    
+
     final totalSecs = seconds ?? _state.totalSeconds;
     _state = GameTimerState(
       totalSeconds: totalSecs,
@@ -152,10 +150,7 @@ class GameTimerWidget extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: timerState.color.withValues(alpha: 0.2),
-            border: Border.all(
-              color: timerState.color,
-              width: 3,
-            ),
+            border: Border.all(color: timerState.color, width: 3),
             boxShadow: timerState.phase == TimerPhase.danger
                 ? [
                     BoxShadow(
@@ -204,11 +199,7 @@ class GameTimerBar extends StatelessWidget {
   final GameTimerController controller;
   final double height;
 
-  const GameTimerBar({
-    super.key,
-    required this.controller,
-    this.height = 8,
-  });
+  const GameTimerBar({super.key, required this.controller, this.height = 8});
 
   @override
   Widget build(BuildContext context) {

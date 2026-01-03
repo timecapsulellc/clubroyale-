@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Game Showcase Section - "The Four Pillars"
-/// 
+///
 /// Premium glassmorphism cards showcasing each game with:
 /// - Live player counts
 /// - AI bot indicators
@@ -16,7 +16,7 @@ class GameShowcaseSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 900;
-    
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
@@ -27,27 +27,24 @@ class GameShowcaseSection extends ConsumerWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF1B7A4E),
-            Color(0xFF0D5C3D),
-            Color(0xFF051A12),
-          ],
+          colors: [Color(0xFF1B7A4E), Color(0xFF0D5C3D), Color(0xFF051A12)],
         ),
       ),
       child: Column(
         children: [
           // Section Title
           _buildSectionTitle().animate().fadeIn(duration: 500.ms),
-          
+
           const SizedBox(height: 48),
-          
+
           // Game Cards Grid
           LayoutBuilder(
             builder: (context, constraints) {
-              final cardWidth = isDesktop 
-                  ? (constraints.maxWidth - 72) / 4  // 4 columns
+              final cardWidth = isDesktop
+                  ? (constraints.maxWidth - 72) /
+                        4 // 4 columns
                   : (constraints.maxWidth - 24) / 2; // 2 columns
-              
+
               return Wrap(
                 spacing: 24,
                 runSpacing: 24,
@@ -62,7 +59,7 @@ class GameShowcaseSection extends ConsumerWidget {
                     route: '/marriage/practice',
                     width: cardWidth,
                   ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.2, end: 0),
-                  
+
                   _GameCard(
                     game: 'Call Break',
                     subtitle: 'Trick Taking',
@@ -72,7 +69,7 @@ class GameShowcaseSection extends ConsumerWidget {
                     route: '/call-break',
                     width: cardWidth,
                   ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, end: 0),
-                  
+
                   _GameCard(
                     game: 'Teen Patti',
                     subtitle: 'Indian Poker',
@@ -82,7 +79,7 @@ class GameShowcaseSection extends ConsumerWidget {
                     route: '/teen-patti',
                     width: cardWidth,
                   ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2, end: 0),
-                  
+
                   _GameCard(
                     game: 'In-Between',
                     subtitle: 'High or Low',
@@ -100,7 +97,7 @@ class GameShowcaseSection extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildSectionTitle() {
     return Column(
       children: [
@@ -145,7 +142,7 @@ class _GameCard extends StatefulWidget {
   final int onlinePlayers;
   final String route;
   final double width;
-  
+
   const _GameCard({
     required this.game,
     required this.subtitle,
@@ -173,7 +170,7 @@ class _GameCardState extends State<_GameCard> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           width: widget.width,
-          transform: _isHovered 
+          transform: _isHovered
               ? (Matrix4.identity()..translate(0.0, -8.0))
               : Matrix4.identity(),
           child: Container(
@@ -183,14 +180,14 @@ class _GameCardState extends State<_GameCard> {
               color: const Color(0xFF0A2E1F).withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: _isHovered 
+                color: _isHovered
                     ? widget.accentColor.withValues(alpha: 0.5)
                     : const Color(0xFFD4AF37).withValues(alpha: 0.2),
                 width: _isHovered ? 2 : 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: _isHovered 
+                  color: _isHovered
                       ? widget.accentColor.withValues(alpha: 0.2)
                       : Colors.black.withValues(alpha: 0.3),
                   blurRadius: _isHovered ? 30 : 15,
@@ -223,11 +220,16 @@ class _GameCardState extends State<_GameCard> {
                     ),
                     // AI Badge
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.green.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.green.withValues(alpha: 0.4)),
+                        border: Border.all(
+                          color: Colors.green.withValues(alpha: 0.4),
+                        ),
                       ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
@@ -247,9 +249,9 @@ class _GameCardState extends State<_GameCard> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Game Name
                 Text(
                   widget.game.toUpperCase(),
@@ -261,9 +263,9 @@ class _GameCardState extends State<_GameCard> {
                     letterSpacing: 2,
                   ),
                 ),
-                
+
                 const SizedBox(height: 4),
-                
+
                 // Subtitle
                 Text(
                   widget.subtitle,
@@ -272,17 +274,17 @@ class _GameCardState extends State<_GameCard> {
                     color: Colors.white.withValues(alpha: 0.5),
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Divider
                 Container(
                   height: 1,
                   color: Colors.white.withValues(alpha: 0.1),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Online Players
                 Row(
                   children: [
@@ -304,17 +306,20 @@ class _GameCardState extends State<_GameCard> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Play Button
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: _isHovered 
-                          ? [widget.accentColor, widget.accentColor.withValues(alpha: 0.8)]
+                      colors: _isHovered
+                          ? [
+                              widget.accentColor,
+                              widget.accentColor.withValues(alpha: 0.8),
+                            ]
                           : [const Color(0xFFD4AF37), const Color(0xFFF7E7CE)],
                     ),
                     borderRadius: BorderRadius.circular(12),

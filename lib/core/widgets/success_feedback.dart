@@ -11,13 +11,13 @@ import '../utils/haptic_helper.dart';
 class SuccessCheck extends StatelessWidget {
   final Color? color;
   final double size;
-  
+
   const SuccessCheck({super.key, this.color, this.size = 64});
-  
+
   @override
   Widget build(BuildContext context) {
     final effectiveColor = color ?? Colors.green;
-    
+
     return Container(
       width: size,
       height: size,
@@ -25,11 +25,7 @@ class SuccessCheck extends StatelessWidget {
         color: effectiveColor.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
-      child: Icon(
-        Icons.check,
-        color: effectiveColor,
-        size: size * 0.5,
-      ),
+      child: Icon(Icons.check, color: effectiveColor, size: size * 0.5),
     ).animate().scale(delay: 100.ms, curve: Curves.elasticOut).fadeIn();
   }
 }
@@ -38,13 +34,13 @@ class SuccessCheck extends StatelessWidget {
 class CelebrationOverlay extends StatefulWidget {
   final Widget child;
   final bool showCelebration;
-  
+
   const CelebrationOverlay({
     super.key,
     required this.child,
     required this.showCelebration,
   });
-  
+
   @override
   State<CelebrationOverlay> createState() => _CelebrationOverlayState();
 }
@@ -57,7 +53,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay> {
       HapticHelper.winCelebration();
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -73,12 +69,13 @@ class _CelebrationOverlayState extends State<CelebrationOverlay> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(
-                        Icons.emoji_events,
-                        size: 80,
-                        color: Colors.amber,
-                      ).animate()
-                        .scale(delay: 200.ms, curve: Curves.elasticOut)
-                        .shake(delay: 600.ms, hz: 2),
+                            Icons.emoji_events,
+                            size: 80,
+                            color: Colors.amber,
+                          )
+                          .animate()
+                          .scale(delay: 200.ms, curve: Curves.elasticOut)
+                          .shake(delay: 600.ms, hz: 2),
                       const SizedBox(height: 16),
                       const Text(
                         'You Win!',
@@ -104,13 +101,13 @@ class _CelebrationOverlayState extends State<CelebrationOverlay> {
 class SuccessToast extends StatelessWidget {
   final String message;
   final IconData icon;
-  
+
   const SuccessToast({
     super.key,
     required this.message,
     this.icon = Icons.check_circle,
   });
-  
+
   static void show(BuildContext context, String message, {IconData? icon}) {
     HapticHelper.success();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -129,7 +126,7 @@ class SuccessToast extends StatelessWidget {
       ),
     );
   }
-  
+
   @override
   Widget build(BuildContext context) => const SizedBox.shrink();
 }
@@ -144,7 +141,7 @@ class PremiumButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Color? backgroundColor;
   final Color? foregroundColor;
-  
+
   const PremiumButton({
     super.key,
     required this.label,
@@ -156,18 +153,20 @@ class PremiumButton extends StatelessWidget {
     this.backgroundColor,
     this.foregroundColor,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final disabled = isDisabled || isLoading;
-    
+
     return Tooltip(
       message: disabledReason ?? '',
       child: FilledButton(
-        onPressed: disabled ? null : () {
-          HapticHelper.lightTap();
-          onPressed?.call();
-        },
+        onPressed: disabled
+            ? null
+            : () {
+                HapticHelper.lightTap();
+                onPressed?.call();
+              },
         style: FilledButton.styleFrom(
           backgroundColor: backgroundColor,
           foregroundColor: foregroundColor,
@@ -180,7 +179,10 @@ class PremiumButton extends StatelessWidget {
                   const SizedBox(
                     width: 18,
                     height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Text(label),

@@ -4,35 +4,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Available theme presets for ClubRoyale
 enum ThemePreset {
-  royalPurple,   // Current default - Purple & Gold
-  royalGreen,    // Royal Green & Gold (new!)
-  midnight,      // Dark Blue & Silver
-  crimson,       // Red & Gold
-  emerald,       // Emerald & Champagne
+  royalPurple, // Current default - Purple & Gold
+  royalGreen, // Royal Green & Gold (new!)
+  midnight, // Dark Blue & Silver
+  crimson, // Red & Gold
+  emerald, // Emerald & Champagne
 }
 
 /// Theme mode (light/dark)
-enum AppThemeMode {
-  light,
-  dark,
-  system,
-}
+enum AppThemeMode { light, dark, system }
 
 /// Theme state model
 class ThemeState {
   final ThemePreset preset;
   final AppThemeMode mode;
-  
+
   const ThemeState({
     this.preset = ThemePreset.royalGreen, // Default to Royal Green + Gold
     this.mode = AppThemeMode.dark,
   });
-  
+
   ThemeState copyWith({ThemePreset? preset, AppThemeMode? mode}) {
-    return ThemeState(
-      preset: preset ?? this.preset,
-      mode: mode ?? this.mode,
-    );
+    return ThemeState(preset: preset ?? this.preset, mode: mode ?? this.mode);
   }
 }
 
@@ -43,36 +36,41 @@ class ThemeNotifier extends Notifier<ThemeState> {
     _loadFromPrefs();
     return const ThemeState();
   }
-  
+
   Future<void> _loadFromPrefs() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final presetIndex = prefs.getInt('theme_preset') ?? 1; // Default to royalGreen
+      final presetIndex =
+          prefs.getInt('theme_preset') ?? 1; // Default to royalGreen
       final modeIndex = prefs.getInt('theme_mode') ?? 1; // Default to dark
-      
+
       state = ThemeState(
-        preset: ThemePreset.values[presetIndex.clamp(0, ThemePreset.values.length - 1)],
-        mode: AppThemeMode.values[modeIndex.clamp(0, AppThemeMode.values.length - 1)],
+        preset: ThemePreset
+            .values[presetIndex.clamp(0, ThemePreset.values.length - 1)],
+        mode: AppThemeMode
+            .values[modeIndex.clamp(0, AppThemeMode.values.length - 1)],
       );
     } catch (e) {
       // Use defaults
     }
   }
-  
+
   Future<void> setPreset(ThemePreset preset) async {
     state = state.copyWith(preset: preset);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('theme_preset', preset.index);
   }
-  
+
   Future<void> setMode(AppThemeMode mode) async {
     state = state.copyWith(mode: mode);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('theme_mode', mode.index);
   }
-  
+
   void toggleDarkMode() {
-    setMode(state.mode == AppThemeMode.dark ? AppThemeMode.light : AppThemeMode.dark);
+    setMode(
+      state.mode == AppThemeMode.dark ? AppThemeMode.light : AppThemeMode.dark,
+    );
   }
 }
 
@@ -94,7 +92,7 @@ class ThemeColors {
   final Color textSecondary;
   final LinearGradient primaryGradient;
   final LinearGradient accentGradient;
-  
+
   const ThemeColors({
     required this.primary,
     required this.secondary,
@@ -108,16 +106,16 @@ class ThemeColors {
     required this.primaryGradient,
     required this.accentGradient,
   });
-  
+
   // ========== ROYAL GREEN + GOLD (NEW DEFAULT) ==========
   static const royalGreen = ThemeColors(
-    primary: Color(0xFF0D5C3D),        // Deep forest green
-    secondary: Color(0xFF1B7A4E),       // Rich green
-    accent: Color(0xFFD4AF37),          // Classic gold
-    background: Color(0xFF051A12),      // Very dark green
-    surface: Color(0xFF0A2E1F),         // Dark green card bg
-    surfaceLight: Color(0xFF134A32),    // Lighter green
-    gold: Color(0xFFD4AF37),            // Gold accents
+    primary: Color(0xFF0D5C3D), // Deep forest green
+    secondary: Color(0xFF1B7A4E), // Rich green
+    accent: Color(0xFFD4AF37), // Classic gold
+    background: Color(0xFF051A12), // Very dark green
+    surface: Color(0xFF0A2E1F), // Dark green card bg
+    surfaceLight: Color(0xFF134A32), // Lighter green
+    gold: Color(0xFFD4AF37), // Gold accents
     textPrimary: Color(0xFFFFFFFF),
     textSecondary: Color(0xFFB8D4C8),
     primaryGradient: LinearGradient(
@@ -131,15 +129,15 @@ class ThemeColors {
       end: Alignment.bottomRight,
     ),
   );
-  
+
   // ========== ROYAL PURPLE + GOLD (CURRENT) ==========
   static const royalPurple = ThemeColors(
-    primary: Color(0xFF4A1C6F),         // Royal purple
-    secondary: Color(0xFF6B21A8),       // Vibrant purple
-    accent: Color(0xFFD4AF37),          // Classic gold
-    background: Color(0xFF0D051A),      // Very dark purple
-    surface: Color(0xFF1A0A2E),         // Dark purple card bg
-    surfaceLight: Color(0xFF2D1B4E),    // Lighter purple
+    primary: Color(0xFF4A1C6F), // Royal purple
+    secondary: Color(0xFF6B21A8), // Vibrant purple
+    accent: Color(0xFFD4AF37), // Classic gold
+    background: Color(0xFF0D051A), // Very dark purple
+    surface: Color(0xFF1A0A2E), // Dark purple card bg
+    surfaceLight: Color(0xFF2D1B4E), // Lighter purple
     gold: Color(0xFFD4AF37),
     textPrimary: Color(0xFFFFFFFF),
     textSecondary: Color(0xFFB8A8D4),
@@ -154,16 +152,16 @@ class ThemeColors {
       end: Alignment.bottomRight,
     ),
   );
-  
+
   // ========== MIDNIGHT BLUE + SILVER ==========
   static const midnight = ThemeColors(
-    primary: Color(0xFF1A237E),         // Deep blue
-    secondary: Color(0xFF3949AB),       // Indigo
-    accent: Color(0xFFB0BEC5),          // Silver
-    background: Color(0xFF0A0E1A),      // Very dark blue
-    surface: Color(0xFF121830),         // Dark blue card bg
-    surfaceLight: Color(0xFF1E2746),    // Lighter blue
-    gold: Color(0xFFC0C0C0),            // Silver instead of gold
+    primary: Color(0xFF1A237E), // Deep blue
+    secondary: Color(0xFF3949AB), // Indigo
+    accent: Color(0xFFB0BEC5), // Silver
+    background: Color(0xFF0A0E1A), // Very dark blue
+    surface: Color(0xFF121830), // Dark blue card bg
+    surfaceLight: Color(0xFF1E2746), // Lighter blue
+    gold: Color(0xFFC0C0C0), // Silver instead of gold
     textPrimary: Color(0xFFFFFFFF),
     textSecondary: Color(0xFFB0BEC5),
     primaryGradient: LinearGradient(
@@ -177,15 +175,15 @@ class ThemeColors {
       end: Alignment.bottomRight,
     ),
   );
-  
+
   // ========== CRIMSON + GOLD ==========
   static const crimson = ThemeColors(
-    primary: Color(0xFF8B0000),         // Dark red
-    secondary: Color(0xFFB71C1C),       // Crimson
-    accent: Color(0xFFD4AF37),          // Classic gold
-    background: Color(0xFF1A0505),      // Very dark red
-    surface: Color(0xFF2D0A0A),         // Dark red card bg
-    surfaceLight: Color(0xFF4A1515),    // Lighter red
+    primary: Color(0xFF8B0000), // Dark red
+    secondary: Color(0xFFB71C1C), // Crimson
+    accent: Color(0xFFD4AF37), // Classic gold
+    background: Color(0xFF1A0505), // Very dark red
+    surface: Color(0xFF2D0A0A), // Dark red card bg
+    surfaceLight: Color(0xFF4A1515), // Lighter red
     gold: Color(0xFFD4AF37),
     textPrimary: Color(0xFFFFFFFF),
     textSecondary: Color(0xFFD4B8B8),
@@ -200,16 +198,16 @@ class ThemeColors {
       end: Alignment.bottomRight,
     ),
   );
-  
+
   // ========== EMERALD + CHAMPAGNE ==========
   static const emerald = ThemeColors(
-    primary: Color(0xFF004D40),         // Teal
-    secondary: Color(0xFF00695C),       // Emerald
-    accent: Color(0xFFF7E7CE),          // Champagne
-    background: Color(0xFF001A14),      // Very dark teal
-    surface: Color(0xFF002E26),         // Dark teal card bg
-    surfaceLight: Color(0xFF00473C),    // Lighter teal
-    gold: Color(0xFFF7E7CE),            // Champagne accents
+    primary: Color(0xFF004D40), // Teal
+    secondary: Color(0xFF00695C), // Emerald
+    accent: Color(0xFFF7E7CE), // Champagne
+    background: Color(0xFF001A14), // Very dark teal
+    surface: Color(0xFF002E26), // Dark teal card bg
+    surfaceLight: Color(0xFF00473C), // Lighter teal
+    gold: Color(0xFFF7E7CE), // Champagne accents
     textPrimary: Color(0xFFFFFFFF),
     textSecondary: Color(0xFFB2DFDB),
     primaryGradient: LinearGradient(
@@ -223,7 +221,7 @@ class ThemeColors {
       end: Alignment.bottomRight,
     ),
   );
-  
+
   /// Get colors for a preset
   static ThemeColors forPreset(ThemePreset preset) {
     switch (preset) {
@@ -272,7 +270,9 @@ class ThemeBuilder {
           backgroundColor: colors.gold,
           foregroundColor: colors.background,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -287,7 +287,7 @@ class ThemeBuilder {
       ),
     );
   }
-  
+
   static ThemeData buildLightTheme(ThemeColors colors) {
     return ThemeData(
       useMaterial3: true,
@@ -318,15 +318,17 @@ class ThemeBuilder {
           backgroundColor: colors.primary,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );
   }
-  
+
   static ThemeData getTheme(ThemeState state) {
     final colors = ThemeColors.forPreset(state.preset);
-    
+
     switch (state.mode) {
       case AppThemeMode.light:
         return buildLightTheme(colors);
@@ -339,12 +341,26 @@ class ThemeBuilder {
 }
 
 /// Extension to get current theme colors from context
+///
+/// Usage: `context.themeColors.primary` or use `ref.watch(themeColorsProvider)`
 extension ThemeColorsExtension on BuildContext {
+  /// Get theme colors - requires ProviderScope in widget tree
+  /// Falls back to royalGreen if provider not found
   ThemeColors get themeColors {
-    // This would need to be connected to the provider
-    // For now, return default
-    return ThemeColors.royalGreen;
+    try {
+      final container = ProviderScope.containerOf(this);
+      return container.read(themeColorsProvider);
+    } catch (_) {
+      // Fallback for widgets outside ProviderScope
+      return ThemeColors.royalGreen;
+    }
   }
+
+  /// Quick accessor for primary gradient
+  LinearGradient get primaryGradient => themeColors.primaryGradient;
+
+  /// Quick accessor for gold/accent color
+  Color get accentGold => themeColors.gold;
 }
 
 /// Provider to get current theme colors
@@ -366,7 +382,7 @@ class ThemePresetInfo {
       case ThemePreset.royalPurple:
         return 'Royal Purple';
       case ThemePreset.royalGreen:
-        return 'Royal Green'; 
+        return 'Royal Green';
       case ThemePreset.midnight:
         return 'Midnight Blue';
       case ThemePreset.crimson:
@@ -375,7 +391,7 @@ class ThemePresetInfo {
         return 'Emerald';
     }
   }
-  
+
   static Color getPreviewColor(ThemePreset preset) {
     switch (preset) {
       case ThemePreset.royalPurple:
@@ -390,7 +406,7 @@ class ThemePresetInfo {
         return const Color(0xFF00695C);
     }
   }
-  
+
   static Color getAccentColor(ThemePreset preset) {
     switch (preset) {
       case ThemePreset.royalPurple:

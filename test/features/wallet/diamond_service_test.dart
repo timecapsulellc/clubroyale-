@@ -1,6 +1,7 @@
 /// Diamond Service Tests
 /// 
 /// Unit tests for the financial diamond service.
+library;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

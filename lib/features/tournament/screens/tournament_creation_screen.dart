@@ -1,5 +1,5 @@
 /// Tournament Creation Screen
-/// 
+///
 /// Allows users to create new tournaments
 library;
 
@@ -13,14 +13,16 @@ class TournamentCreationScreen extends ConsumerStatefulWidget {
   const TournamentCreationScreen({super.key});
 
   @override
-  ConsumerState<TournamentCreationScreen> createState() => _TournamentCreationScreenState();
+  ConsumerState<TournamentCreationScreen> createState() =>
+      _TournamentCreationScreenState();
 }
 
-class _TournamentCreationScreenState extends ConsumerState<TournamentCreationScreen> {
+class _TournamentCreationScreenState
+    extends ConsumerState<TournamentCreationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
   String _gameType = 'marriage';
   TournamentFormat _format = TournamentFormat.singleElimination;
   int _maxParticipants = 8;
@@ -37,9 +39,7 @@ class _TournamentCreationScreenState extends ConsumerState<TournamentCreationScr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Tournament'),
-      ),
+      appBar: AppBar(title: const Text('Create Tournament')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -58,7 +58,7 @@ class _TournamentCreationScreenState extends ConsumerState<TournamentCreationScr
                 validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
               ),
               const SizedBox(height: 16),
-              
+
               // Description
               TextFormField(
                 controller: _descriptionController,
@@ -70,7 +70,7 @@ class _TournamentCreationScreenState extends ConsumerState<TournamentCreationScr
                 maxLines: 3,
               ),
               const SizedBox(height: 24),
-              
+
               // Game Type
               Text('Game Type', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
@@ -98,7 +98,7 @@ class _TournamentCreationScreenState extends ConsumerState<TournamentCreationScr
                 ],
               ),
               const SizedBox(height: 24),
-              
+
               // Format
               Text('Format', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
@@ -119,9 +119,12 @@ class _TournamentCreationScreenState extends ConsumerState<TournamentCreationScr
                 onSelectionChanged: (s) => setState(() => _format = s.first),
               ),
               const SizedBox(height: 24),
-              
+
               // Max Participants
-              Text('Max Participants', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Max Participants',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 8),
               Slider(
                 value: _maxParticipants.toDouble(),
@@ -138,7 +141,7 @@ class _TournamentCreationScreenState extends ConsumerState<TournamentCreationScr
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // Prize Pool (optional)
               TextFormField(
                 decoration: const InputDecoration(
@@ -150,7 +153,7 @@ class _TournamentCreationScreenState extends ConsumerState<TournamentCreationScr
                 onChanged: (v) => _prizePool = int.tryParse(v),
               ),
               const SizedBox(height: 32),
-              
+
               // Create Button
               SizedBox(
                 width: double.infinity,
@@ -179,16 +182,18 @@ class _TournamentCreationScreenState extends ConsumerState<TournamentCreationScr
       final user = auth.currentUser;
       if (user == null) throw Exception('Not logged in');
 
-      final tournamentId = await ref.read(tournamentServiceProvider).createTournament(
-        hostId: user.uid,
-        hostName: user.displayName ?? 'Host',
-        name: _nameController.text,
-        description: _descriptionController.text,
-        gameType: _gameType,
-        format: _format,
-        maxParticipants: _maxParticipants,
-        prizePool: _prizePool,
-      );
+      final tournamentId = await ref
+          .read(tournamentServiceProvider)
+          .createTournament(
+            hostId: user.uid,
+            hostName: user.displayName ?? 'Host',
+            name: _nameController.text,
+            description: _descriptionController.text,
+            gameType: _gameType,
+            format: _format,
+            maxParticipants: _maxParticipants,
+            prizePool: _prizePool,
+          );
 
       if (mounted) {
         Navigator.pop(context);
@@ -202,10 +207,7 @@ class _TournamentCreationScreenState extends ConsumerState<TournamentCreationScr
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {

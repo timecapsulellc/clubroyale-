@@ -10,14 +10,17 @@ import 'package:clubroyale/features/feedback/widgets/feedback_dialog.dart';
 final walletStreamProvider = StreamProvider<int?>((ref) {
   final user = ref.watch(authServiceProvider).currentUser;
   if (user == null) return Stream.value(null);
-  return ref.watch(diamondServiceProvider).watchWallet(user.uid).map((w) => w.balance);
+  return ref
+      .watch(diamondServiceProvider)
+      .watchWallet(user.uid)
+      .map((w) => w.balance);
 });
 
 /// Compact header matching Nanobanana design
 /// Shows: Avatar + Name | Diamond Balance | Settings
 class CompactHeader extends ConsumerWidget {
   const CompactHeader({super.key});
-  
+
   static const Map<String, List<Color>> _themeColors = {
     'Gold': [Color(0xFFD4AF37), Color(0xFFF7E7CE), Color(0xFFD4AF37)],
     'Neo': [Colors.cyan, Colors.blueAccent, Colors.cyan],
@@ -33,20 +36,23 @@ class CompactHeader extends ConsumerWidget {
     final profileAsync = ref.watch(myProfileProvider);
 
     // DEMO DATA FALLBACKS
-    final displayPhoto = user?.photoURL ?? 'https://ui-avatars.com/api/?name=Prince+D&background=D4AF37&color=fff&size=150';
-    final displayName = (user?.displayName == null || user?.displayName == 'Player') 
-        ? 'Prince D' 
+    final displayPhoto =
+        user?.photoURL ??
+        'https://ui-avatars.com/api/?name=Prince+D&background=D4AF37&color=fff&size=150';
+    final displayName =
+        (user?.displayName == null || user?.displayName == 'Player')
+        ? 'Prince D'
         : user!.displayName!;
 
     // Resolve Theme Colors
     List<Color> borderColors = _themeColors['Gold']!;
-    
+
     // Check if we have a custom theme in profile
     profileAsync.whenData((profile) {
       if (profile != null && profile.profileTheme != null) {
-         if (_themeColors.containsKey(profile.profileTheme)) {
-           borderColors = _themeColors[profile.profileTheme]!;
-         }
+        if (_themeColors.containsKey(profile.profileTheme)) {
+          borderColors = _themeColors[profile.profileTheme]!;
+        }
       }
     });
 
@@ -120,7 +126,9 @@ class CompactHeader extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFD4AF37).withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -130,7 +138,9 @@ class CompactHeader extends ConsumerWidget {
                   walletAsync.when(
                     data: (balance) {
                       // Demo fallback: show 50k if 0
-                      final displayBalance = (balance == null || balance == 0) ? 50000 : balance;
+                      final displayBalance = (balance == null || balance == 0)
+                          ? 50000
+                          : balance;
                       return Text(
                         _formatNumber(displayBalance),
                         style: const TextStyle(
@@ -140,8 +150,14 @@ class CompactHeader extends ConsumerWidget {
                         ),
                       );
                     },
-                    loading: () => const Text('...', style: TextStyle(color: Color(0xFFD4AF37))),
-                    error: (_, __) => const Text('50k', style: TextStyle(color: Color(0xFFD4AF37))),
+                    loading: () => const Text(
+                      '...',
+                      style: TextStyle(color: Color(0xFFD4AF37)),
+                    ),
+                    error: (_, __) => const Text(
+                      '50k',
+                      style: TextStyle(color: Color(0xFFD4AF37)),
+                    ),
                   ),
                 ],
               ),
@@ -150,7 +166,10 @@ class CompactHeader extends ConsumerWidget {
 
             // Feedback Button
             IconButton(
-              icon: const Icon(Icons.bug_report_outlined, color: Colors.white70),
+              icon: const Icon(
+                Icons.bug_report_outlined,
+                color: Colors.white70,
+              ),
               tooltip: 'Report Issue / Feedback',
               onPressed: () {
                 showDialog(
@@ -159,7 +178,7 @@ class CompactHeader extends ConsumerWidget {
                 );
               },
             ),
-            
+
             // Settings Button
             IconButton(
               icon: const Icon(Icons.settings_outlined, color: Colors.white70),

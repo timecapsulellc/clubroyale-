@@ -10,38 +10,22 @@ import 'package:flutter/semantics.dart';
 extension AccessibleWidget on Widget {
   /// Add a semantic label for screen readers
   Widget withSemanticLabel(String label) {
-    return Semantics(
-      label: label,
-      child: this,
-    );
+    return Semantics(label: label, child: this);
   }
 
   /// Mark as a button for screen readers
   Widget asSemanticButton(String label, {VoidCallback? onTap}) {
-    return Semantics(
-      button: true,
-      label: label,
-      onTap: onTap,
-      child: this,
-    );
+    return Semantics(button: true, label: label, onTap: onTap, child: this);
   }
 
   /// Mark as a header for screen readers
   Widget asSemanticHeader(String label) {
-    return Semantics(
-      header: true,
-      label: label,
-      child: this,
-    );
+    return Semantics(header: true, label: label, child: this);
   }
 
   /// Mark as an image with description
   Widget asSemanticImage(String description) {
-    return Semantics(
-      image: true,
-      label: description,
-      child: this,
-    );
+    return Semantics(image: true, label: description, child: this);
   }
 
   /// Exclude from screen readers (decorative elements)
@@ -52,10 +36,7 @@ extension AccessibleWidget on Widget {
   /// Ensure minimum touch target size (48x48 per WCAG)
   Widget ensureMinTouchTarget({double size = 48}) {
     return ConstrainedBox(
-      constraints: BoxConstraints(
-        minWidth: size,
-        minHeight: size,
-      ),
+      constraints: BoxConstraints(minWidth: size, minHeight: size),
       child: this,
     );
   }
@@ -208,7 +189,8 @@ class FocusIndicator extends StatelessWidget {
               borderRadius: BorderRadius.circular(borderRadius),
               border: isFocused
                   ? Border.all(
-                      color: focusColor ?? Theme.of(context).colorScheme.primary,
+                      color:
+                          focusColor ?? Theme.of(context).colorScheme.primary,
                       width: 2,
                     )
                   : null,
@@ -251,10 +233,7 @@ class AccessibleCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: padding,
-            child: child,
-          ),
+          child: Padding(padding: padding, child: child),
         ),
       ),
     );
@@ -278,19 +257,16 @@ class HighContrastText extends StatelessWidget {
   Widget build(BuildContext context) {
     final baseStyle = style ?? Theme.of(context).textTheme.bodyMedium;
     final baseColor = baseStyle?.color ?? Colors.white;
-    
+
     // Auto-adjust for contrast if needed
     Color textColor = baseColor;
     if (!ContrastHelper.meetsWCAG_AA(baseColor, backgroundColor)) {
-      textColor = backgroundColor.computeLuminance() > 0.5 
-          ? Colors.black 
+      textColor = backgroundColor.computeLuminance() > 0.5
+          ? Colors.black
           : Colors.white;
     }
 
-    return Text(
-      text,
-      style: baseStyle?.copyWith(color: textColor),
-    );
+    return Text(text, style: baseStyle?.copyWith(color: textColor));
   }
 }
 
@@ -298,14 +274,145 @@ class HighContrastText extends StatelessWidget {
 class ReducedMotionDetector extends StatelessWidget {
   final Widget Function(bool prefersReducedMotion) builder;
 
-  const ReducedMotionDetector({
-    super.key,
-    required this.builder,
-  });
+  const ReducedMotionDetector({super.key, required this.builder});
 
   @override
   Widget build(BuildContext context) {
     final prefersReducedMotion = MediaQuery.of(context).disableAnimations;
     return builder(prefersReducedMotion);
+  }
+}
+
+/// Wrapper that automatically disables animations when reduced motion is preferred
+///
+/// Use this to wrap animated widgets:
+/// ```dart
+/// ReducedMotionWrapper(
+///   child: myAnimatedWidget,
+///   reducedChild: myStaticWidget, // Optional fallback
+/// )
+/// ```
+class ReducedMotionWrapper extends StatelessWidget {
+  final Widget child;
+  final Widget? reducedChild;
+  final Duration animationDuration;
+
+  const ReducedMotionWrapper({
+    super.key,
+    required this.child,
+    this.reducedChild,
+    this.animationDuration = const Duration(milliseconds: 300),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final prefersReducedMotion = MediaQuery.of(context).disableAnimations;
+
+    if (prefersReducedMotion) {
+      // Return static version if reduced motion is preferred
+      return reducedChild ?? child;
+    }
+
+    return child;
+  }
+}
+
+/// Focus traversal group for keyboard navigation
+///
+/// Wraps a section of widgets to create a logical keyboard navigation group.
+/// Useful for game tables, dialogs, and multi-section screens.
+class FocusTraversalWrapper extends StatelessWidget {
+  final Widget child;
+  final FocusTraversalPolicy? policy;
+  final bool descendantsAreFocusable;
+
+  const FocusTraversalWrapper({
+    super.key,
+    required this.child,
+    this.policy,
+    this.descendantsAreFocusable = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FocusTraversalGroup(
+      policy: policy ?? WidgetOrderTraversalPolicy(),
+      descendantsAreFocusable: descendantsAreFocusable,
+      child: child,
+    );
+  }
+}
+
+/// Game action button with proper accessibility
+///
+/// Used for primary game actions like "Play Card", "Declare Maal", etc.
+/// Ensures 48x48 touch target and proper semantics.
+class AccessibleGameAction extends StatelessWidget {
+  final String label;
+  final String? semanticHint;
+  final IconData? icon;
+  final VoidCallback? onPressed;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  final bool isDestructive;
+
+  const AccessibleGameAction({
+    super.key,
+    required this.label,
+    this.semanticHint,
+    this.icon,
+    this.onPressed,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.isDestructive = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bgColor =
+        backgroundColor ??
+        (isDestructive ? Colors.red : theme.colorScheme.primary);
+    final fgColor =
+        foregroundColor ??
+        (isDestructive ? Colors.white : theme.colorScheme.onPrimary);
+
+    return Semantics(
+      button: true,
+      label: label,
+      hint: semanticHint,
+      enabled: onPressed != null,
+      child: Material(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(24),
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, color: fgColor, size: 20),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    label,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: fgColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -24,14 +24,14 @@ class ThemeSelectorWidget extends ConsumerWidget {
               const SizedBox(width: 8),
               Text(
                 'Theme',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
         ),
-        
+
         // Color presets
         SizedBox(
           height: 80,
@@ -44,76 +44,91 @@ class ThemeSelectorWidget extends ConsumerWidget {
               final isSelected = preset == themeState.preset;
               final previewColor = ThemePresetInfo.getPreviewColor(preset);
               final accentColor = ThemePresetInfo.getAccentColor(preset);
-              
+
               return GestureDetector(
-                onTap: () => themeNotifier.setPreset(preset),
-                child: Container(
-                  width: 70,
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Column(
-                    children: [
-                      // Color preview circle
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        width: isSelected ? 52 : 48,
-                        height: isSelected ? 52 : 48,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [previewColor, previewColor.withValues(alpha: 0.7)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected ? accentColor : Colors.transparent,
-                            width: 3,
-                          ),
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: previewColor.withValues(alpha: 0.5),
-                                    blurRadius: 12,
-                                    spreadRadius: 2,
-                                  ),
-                                ]
-                              : null,
-                        ),
-                        child: Center(
-                          // Inner gold/silver circle to show accent
-                          child: Container(
-                            width: 20,
-                            height: 20,
+                    onTap: () => themeNotifier.setPreset(preset),
+                    child: Container(
+                      width: 70,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Column(
+                        children: [
+                          // Color preview circle
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: isSelected ? 52 : 48,
+                            height: isSelected ? 52 : 48,
                             decoration: BoxDecoration(
-                              color: accentColor,
+                              gradient: LinearGradient(
+                                colors: [
+                                  previewColor,
+                                  previewColor.withValues(alpha: 0.7),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
                               shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected
+                                    ? accentColor
+                                    : Colors.transparent,
+                                width: 3,
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: previewColor.withValues(
+                                          alpha: 0.5,
+                                        ),
+                                        blurRadius: 12,
+                                        spreadRadius: 2,
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            child: Center(
+                              // Inner gold/silver circle to show accent
+                              child: Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: accentColor,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 4),
+                          // Theme name
+                          Text(
+                            ThemePresetInfo.getName(preset).split(' ').first,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall?.color,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      // Theme name
-                      Text(
-                        ThemePresetInfo.getName(preset).split(' ').first,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected 
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).textTheme.bodySmall?.color,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ).animate(target: isSelected ? 1 : 0)
-                  .scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05));
+                    ),
+                  )
+                  .animate(target: isSelected ? 1 : 0)
+                  .scale(
+                    begin: const Offset(1, 1),
+                    end: const Offset(1.05, 1.05),
+                  );
             },
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Day/Night toggle
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -122,7 +137,9 @@ class ThemeSelectorWidget extends ConsumerWidget {
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
@@ -159,7 +176,9 @@ class ThemeSelectorWidget extends ConsumerWidget {
                                   : FontWeight.normal,
                               color: themeState.mode == AppThemeMode.dark
                                   ? Colors.white
-                                  : Theme.of(context).textTheme.bodyMedium?.color,
+                                  : Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -199,7 +218,9 @@ class ThemeSelectorWidget extends ConsumerWidget {
                                   : FontWeight.normal,
                               color: themeState.mode == AppThemeMode.light
                                   ? Colors.white
-                                  : Theme.of(context).textTheme.bodyMedium?.color,
+                                  : Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -232,7 +253,9 @@ class ThemeToggleButton extends ConsumerWidget {
             : Icons.light_mode,
       ),
       onPressed: () => themeNotifier.toggleDarkMode(),
-      tooltip: themeState.mode == AppThemeMode.dark ? 'Switch to Day' : 'Switch to Night',
+      tooltip: themeState.mode == AppThemeMode.dark
+          ? 'Switch to Day'
+          : 'Switch to Night',
     );
   }
 }
@@ -263,9 +286,9 @@ void showThemeBottomSheet(BuildContext context) {
             const SizedBox(height: 16),
             Text(
               'Choose Theme',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             const ThemeSelectorWidget(),

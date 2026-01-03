@@ -22,7 +22,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
   final _messageController = TextEditingController();
   final _emailController = TextEditingController();
   final _feedbackService = FeedbackService();
-  
+
   FeedbackType _selectedType = FeedbackType.general;
   bool _isSubmitting = false;
 
@@ -42,8 +42,8 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
       await _feedbackService.submitFeedback(
         type: _selectedType,
         message: _messageController.text.trim(),
-        email: _emailController.text.trim().isNotEmpty 
-            ? _emailController.text.trim() 
+        email: _emailController.text.trim().isNotEmpty
+            ? _emailController.text.trim()
             : null,
       );
 
@@ -75,7 +75,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return AlertDialog(
       title: Row(
         children: [
@@ -108,7 +108,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // Message input
               TextFormField(
                 controller: _messageController,
@@ -128,7 +128,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                 },
               ),
               const SizedBox(height: 8),
-              
+
               // Email input (optional)
               TextFormField(
                 controller: _emailController,
@@ -150,7 +150,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
         ),
         FilledButton.icon(
           onPressed: _isSubmitting ? null : _submit,
-          icon: _isSubmitting 
+          icon: _isSubmitting
               ? const SizedBox(
                   width: 16,
                   height: 16,

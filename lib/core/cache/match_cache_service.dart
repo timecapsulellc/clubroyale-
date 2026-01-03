@@ -1,5 +1,5 @@
 // Match Cache Service
-// 
+//
 // Client-side caching for match data with offline resilience.
 // Reduces Firestore reads and provides better UX during network issues.
 
@@ -30,10 +30,10 @@ class MatchCacheService {
 
   // In-memory cache
   final Map<String, CachedMatch> _cache = {};
-  
+
   // Active subscriptions
   final Map<String, StreamSubscription> _subscriptions = {};
-  
+
   // Firestore reference
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -102,19 +102,22 @@ class MatchCacheService {
         .collection('matches')
         .doc(matchId)
         .snapshots()
-        .listen((doc) {
-      if (doc.exists) {
-        _updateCache(matchId, doc.data()!);
-        controller.add(doc.data());
-      } else {
-        controller.add(null);
-      }
-    }, onError: (error) {
-      // On error, keep emitting stale cache
-      if (_cache.containsKey(matchId)) {
-        controller.add(_cache[matchId]!.data);
-      }
-    });
+        .listen(
+          (doc) {
+            if (doc.exists) {
+              _updateCache(matchId, doc.data()!);
+              controller.add(doc.data());
+            } else {
+              controller.add(null);
+            }
+          },
+          onError: (error) {
+            // On error, keep emitting stale cache
+            if (_cache.containsKey(matchId)) {
+              controller.add(_cache[matchId]!.data);
+            }
+          },
+        );
 
     return controller.stream;
   }

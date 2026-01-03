@@ -22,30 +22,48 @@ class GameShortcuts {
   static const playCard = SingleActivator(LogicalKeyboardKey.enter);
   static const playCardAlt = SingleActivator(LogicalKeyboardKey.space);
   static const sortHand = SingleActivator(LogicalKeyboardKey.keyS);
-  static const sortBySuit = SingleActivator(LogicalKeyboardKey.keyS, shift: true);
-  
+  static const sortBySuit = SingleActivator(
+    LogicalKeyboardKey.keyS,
+    shift: true,
+  );
+
   // Navigation
   static const nextCard = SingleActivator(LogicalKeyboardKey.arrowRight);
   static const prevCard = SingleActivator(LogicalKeyboardKey.arrowLeft);
   static const selectCard = SingleActivator(LogicalKeyboardKey.arrowUp);
   static const deselectCard = SingleActivator(LogicalKeyboardKey.arrowDown);
-  
+
   // UI
   static const toggleScores = SingleActivator(LogicalKeyboardKey.tab);
   static const toggleChat = SingleActivator(LogicalKeyboardKey.keyC);
   static const toggleMute = SingleActivator(LogicalKeyboardKey.keyM);
   static const showHelp = SingleActivator(LogicalKeyboardKey.f1);
   static const escape = SingleActivator(LogicalKeyboardKey.escape);
-  
+
   // Quick actions
-  static const quickBid1 = SingleActivator(LogicalKeyboardKey.digit1, control: true);
-  static const quickBid2 = SingleActivator(LogicalKeyboardKey.digit2, control: true);
-  static const quickBid3 = SingleActivator(LogicalKeyboardKey.digit3, control: true);
-  
+  static const quickBid1 = SingleActivator(
+    LogicalKeyboardKey.digit1,
+    control: true,
+  );
+  static const quickBid2 = SingleActivator(
+    LogicalKeyboardKey.digit2,
+    control: true,
+  );
+  static const quickBid3 = SingleActivator(
+    LogicalKeyboardKey.digit3,
+    control: true,
+  );
+
   // Bidding
   static const bidUp = SingleActivator(LogicalKeyboardKey.arrowUp, shift: true);
-  static const bidDown = SingleActivator(LogicalKeyboardKey.arrowDown, shift: true);
-  static const confirmBid = SingleActivator(LogicalKeyboardKey.enter, shift: true);
+  static const bidDown = SingleActivator(
+    LogicalKeyboardKey.arrowDown,
+    shift: true,
+  );
+  static const confirmBid = SingleActivator(
+    LogicalKeyboardKey.enter,
+    shift: true,
+  );
 }
 
 /// Keyboard shortcuts wrapper widget
@@ -86,21 +104,21 @@ class KeyboardShortcutsWrapper extends StatelessWidget {
           GameShortcuts.playCard: onPlayCard!,
           GameShortcuts.playCardAlt: onPlayCard!,
         },
-        
+
         // Sort
         if (onSortHand != null) GameShortcuts.sortHand: onSortHand!,
-        
+
         // UI toggles
         if (onToggleScores != null) GameShortcuts.toggleScores: onToggleScores!,
         if (onToggleChat != null) GameShortcuts.toggleChat: onToggleChat!,
         if (onToggleMute != null) GameShortcuts.toggleMute: onToggleMute!,
         if (onShowHelp != null) GameShortcuts.showHelp: onShowHelp!,
         if (onEscape != null) GameShortcuts.escape: onEscape!,
-        
+
         // Navigation
         if (onNextCard != null) GameShortcuts.nextCard: onNextCard!,
         if (onPrevCard != null) GameShortcuts.prevCard: onPrevCard!,
-        
+
         // Card selection by number
         if (onSelectCard != null) ...<ShortcutActivator, VoidCallback>{
           GameShortcuts.card1: () => onSelectCard!(0),
@@ -114,10 +132,7 @@ class KeyboardShortcutsWrapper extends StatelessWidget {
           GameShortcuts.card9: () => onSelectCard!(8),
         },
       },
-      child: Focus(
-        autofocus: true,
-        child: child,
-      ),
+      child: Focus(autofocus: true, child: child),
     );
   }
 }

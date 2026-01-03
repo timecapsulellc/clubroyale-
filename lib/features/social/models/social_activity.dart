@@ -1,10 +1,10 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Activity model for social feed
 class SocialActivity {
   final String id;
-  final String type; // 'game_won', 'game_lost', 'club_joined', 'friend_added', 'message'
+  final String
+  type; // 'game_won', 'game_lost', 'club_joined', 'friend_added', 'message'
   final String userId;
   final String userName;
   final String? userAvatar;

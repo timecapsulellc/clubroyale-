@@ -1,5 +1,5 @@
 /// Tournament Lobby Screen
-/// 
+///
 /// Displays list of tournaments and join options
 library;
 
@@ -39,15 +39,24 @@ class TournamentLobbyScreen extends ConsumerWidget {
           }
 
           // Group by status
-          final open = tournaments.where((t) => t.status == TournamentStatus.registration).toList();
-          final inProgress = tournaments.where((t) => t.status == TournamentStatus.inProgress).toList();
-          final completed = tournaments.where((t) => t.status == TournamentStatus.completed).toList();
+          final open = tournaments
+              .where((t) => t.status == TournamentStatus.registration)
+              .toList();
+          final inProgress = tournaments
+              .where((t) => t.status == TournamentStatus.inProgress)
+              .toList();
+          final completed = tournaments
+              .where((t) => t.status == TournamentStatus.completed)
+              .toList();
 
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
               if (open.isNotEmpty) ...[
-                _SectionHeader(title: 'Open for Registration', count: open.length),
+                _SectionHeader(
+                  title: 'Open for Registration',
+                  count: open.length,
+                ),
                 ...open.map((t) => _TournamentCard(tournament: t)),
                 const SizedBox(height: 24),
               ],
@@ -57,13 +66,19 @@ class TournamentLobbyScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
               ],
               if (completed.isNotEmpty) ...[
-                _SectionHeader(title: 'Recently Completed', count: completed.length),
+                _SectionHeader(
+                  title: 'Recently Completed',
+                  count: completed.length,
+                ),
                 ...completed.map((t) => _TournamentCard(tournament: t)),
               ],
             ],
           );
         },
-        loading: () => const ContextualLoader(message: 'Loading tournaments...', icon: Icons.emoji_events),
+        loading: () => const ContextualLoader(
+          message: 'Loading tournaments...',
+          icon: Icons.emoji_events,
+        ),
         error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -88,14 +103,29 @@ class TournamentLobbyScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Filter Tournaments', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Filter Tournaments',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 16),
             Wrap(
               spacing: 8,
               children: [
-                FilterChip(label: const Text('Marriage'), selected: true, onSelected: (_) {}),
-                FilterChip(label: const Text('Call Break'), selected: false, onSelected: (_) {}),
-                FilterChip(label: const Text('Teen Patti'), selected: false, onSelected: (_) {}),
+                FilterChip(
+                  label: const Text('Marriage'),
+                  selected: true,
+                  onSelected: (_) {},
+                ),
+                FilterChip(
+                  label: const Text('Call Break'),
+                  selected: false,
+                  onSelected: (_) {},
+                ),
+                FilterChip(
+                  label: const Text('Teen Patti'),
+                  selected: false,
+                  onSelected: (_) {},
+                ),
               ],
             ),
           ],
@@ -119,9 +149,9 @@ class _SectionHeader extends StatelessWidget {
         children: [
           Text(
             title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(width: 8),
           Container(
@@ -161,7 +191,8 @@ class _TournamentCard extends ConsumerWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => TournamentDetailScreen(tournamentId: tournament.id),
+              builder: (_) =>
+                  TournamentDetailScreen(tournamentId: tournament.id),
             ),
           );
         },
@@ -176,7 +207,9 @@ class _TournamentCard extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: _getGameColor(tournament.gameType).withValues(alpha: 0.2),
+                      color: _getGameColor(
+                        tournament.gameType,
+                      ).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -191,9 +224,8 @@ class _TournamentCard extends ConsumerWidget {
                       children: [
                         Text(
                           tournament.name,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           'Hosted by ${tournament.hostName}',
@@ -210,7 +242,8 @@ class _TournamentCard extends ConsumerWidget {
                 children: [
                   _InfoChip(
                     icon: Icons.people,
-                    label: '${tournament.participantIds.length}/${tournament.maxParticipants}',
+                    label:
+                        '${tournament.participantIds.length}/${tournament.maxParticipants}',
                   ),
                   const SizedBox(width: 8),
                   _InfoChip(
@@ -257,11 +290,13 @@ class _TournamentCard extends ConsumerWidget {
     final user = auth.currentUser;
     if (user == null) return;
 
-    final result = await ref.read(tournamentServiceProvider).joinTournament(
-      tournamentId: tournament.id,
-      oderId: user.uid,
-      userName: user.displayName ?? 'Player',
-    );
+    final result = await ref
+        .read(tournamentServiceProvider)
+        .joinTournament(
+          tournamentId: tournament.id,
+          oderId: user.uid,
+          userName: user.displayName ?? 'Player',
+        );
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -308,7 +343,7 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (color, label) = _getStatusInfo();
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -397,7 +432,9 @@ class _EmptyState extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const TournamentCreationScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const TournamentCreationScreen(),
+                ),
               );
             },
             icon: const Icon(Icons.add),

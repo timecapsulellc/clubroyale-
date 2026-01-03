@@ -52,80 +52,81 @@ class BillSplitterService {
     double pointMultiplier,
   ) {
     final transactions = <SettlementTransaction>[];
-    
+
     // Separate winners and losers
     final balances = <String, double>{};
     for (final entry in scores.entries) {
       balances[entry.key] = entry.value * pointMultiplier;
     }
-    
-    final creditors = balances.entries
-        .where((e) => e.value > 0)
-        .toList()
+
+    final creditors = balances.entries.where((e) => e.value > 0).toList()
       ..sort((a, b) => b.value.compareTo(a.value));
-    
-    final debtors = balances.entries
-        .where((e) => e.value < 0)
-        .map((e) => MapEntry(e.key, -e.value))
-        .toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-    
+
+    final debtors =
+        balances.entries
+            .where((e) => e.value < 0)
+            .map((e) => MapEntry(e.key, -e.value))
+            .toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+
     // Match debtors to creditors
     var i = 0;
     var j = 0;
     final creditorBalances = {for (var c in creditors) c.key: c.value};
     final debtorBalances = {for (var d in debtors) d.key: d.value};
-    
+
     while (i < creditors.length && j < debtors.length) {
       final creditor = creditors[i].key;
       final debtor = debtors[j].key;
-      
+
       final creditorNeed = creditorBalances[creditor]!;
       final debtorOwes = debtorBalances[debtor]!;
-      
+
       final payment = creditorNeed < debtorOwes ? creditorNeed : debtorOwes;
-      
+
       if (payment > 0) {
-        transactions.add(SettlementTransaction(
-          from: debtor,
-          to: creditor,
-          points: payment.round(),
-        ));
+        transactions.add(
+          SettlementTransaction(
+            from: debtor,
+            to: creditor,
+            points: payment.round(),
+          ),
+        );
       }
-      
+
       creditorBalances[creditor] = creditorNeed - payment;
       debtorBalances[debtor] = debtorOwes - payment;
-      
+
       if (creditorBalances[creditor]! <= 0.01) i++;
       if (debtorBalances[debtor]! <= 0.01) j++;
     }
-    
+
     return transactions;
   }
 
   /// Generate WhatsApp-friendly text
   static String generateWhatsAppText(SettlementBill bill) {
     final buffer = StringBuffer();
-    
+
     buffer.writeln('🎴 ClubRoyale Settlement');
     buffer.writeln('Room: ${bill.roomCode}');
     buffer.writeln('Game: ${bill.gameType}');
     buffer.writeln('');
     buffer.writeln('📊 Results:');
-    
+
     for (final tx in bill.transactions) {
       buffer.writeln('• ${tx.from} → ${tx.to}: ${tx.points} points');
     }
-    
+
     if (bill.transactions.isEmpty) {
       buffer.writeln('• No settlements needed (tie)');
     }
-    
+
     buffer.writeln('');
     buffer.writeln('Settle via your preferred app');
     buffer.writeln('---');
     buffer.writeln('Powered by ClubRoyale');
-    
+
     return buffer.toString();
   }
 
@@ -168,20 +169,14 @@ class SettlementReceiptWidget extends StatelessWidget {
             const SizedBox(height: 8),
             const Text(
               '🎴 ClubRoyale',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Text(
               'Settlement Receipt',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
             ),
             const SizedBox(height: 16),
-            
+
             // Room info
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -195,45 +190,50 @@ class SettlementReceiptWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // Transactions
-            ...bill.transactions.map((tx) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      tx.from,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  const Icon(Icons.arrow_forward, size: 16),
-                  Expanded(
-                    child: Text(
-                      tx.to,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                      textAlign: TextAlign.right,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurple.shade50,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      '${tx.points} pts',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple.shade700,
+            ...bill.transactions.map(
+              (tx) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        tx.from,
+                        style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ),
-                  ),
-                ],
+                    const Icon(Icons.arrow_forward, size: 16),
+                    Expanded(
+                      child: Text(
+                        tx.to,
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple.shade50,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '${tx.points} pts',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            )),
-            
+            ),
+
             if (bill.transactions.isEmpty)
               const Padding(
                 padding: EdgeInsets.all(16),
@@ -242,17 +242,14 @@ class SettlementReceiptWidget extends StatelessWidget {
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
-            
+
             const SizedBox(height: 16),
             const Divider(),
-            
+
             // Footer
             Text(
               'Generated ${_formatDate(bill.timestamp)}',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade500,
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
             ),
           ],
         ),
@@ -267,9 +264,11 @@ class SettlementReceiptWidget extends StatelessWidget {
   /// Capture widget as image
   Future<Uint8List?> captureAsImage() async {
     try {
-      final boundary = repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      final boundary =
+          repaintKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) return null;
-      
+
       final image = await boundary.toImage(pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       return byteData?.buffer.asUint8List();
@@ -282,14 +281,13 @@ class SettlementReceiptWidget extends StatelessWidget {
   Future<void> shareAsImage() async {
     final bytes = await captureAsImage();
     if (bytes == null) return;
-    
+
     final tempDir = await getTemporaryDirectory();
     final file = File('${tempDir.path}/settlement_${bill.roomCode}.png');
     await file.writeAsBytes(bytes);
-    
-    await Share.shareXFiles(
-      [XFile(file.path)],
-      text: 'ClubRoyale Settlement - Room ${bill.roomCode}',
-    );
+
+    await Share.shareXFiles([
+      XFile(file.path),
+    ], text: 'ClubRoyale Settlement - Room ${bill.roomCode}');
   }
 }

@@ -11,10 +11,7 @@ import 'dart:ui';
 class SocialFeedWidget extends ConsumerWidget {
   final int maxItems;
 
-  const SocialFeedWidget({
-    super.key,
-    this.maxItems = 5,
-  });
+  const SocialFeedWidget({super.key, this.maxItems = 5});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,10 +46,7 @@ class SocialFeedWidget extends ConsumerWidget {
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.1),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.15),
-              width: 1,
-            ),
+            border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.2),
@@ -79,9 +73,8 @@ class SocialFeedWidget extends ConsumerWidget {
                       children: activities.asMap().entries.map((entry) {
                         final index = entry.key;
                         final activity = entry.value;
-                        return _ActivityFeedItem(
-                          activity: activity,
-                        ).animate(delay: (50 * index).ms)
+                        return _ActivityFeedItem(activity: activity)
+                            .animate(delay: (50 * index).ms)
                             .fadeIn()
                             .slideX(begin: -0.05);
                       }).toList(),
@@ -123,8 +116,8 @@ class _ActivityFeedItem extends StatelessWidget {
                   : null,
               child: activity.userAvatar == null
                   ? Text(
-                      activity.userName.isNotEmpty 
-                          ? activity.userName[0].toUpperCase() 
+                      activity.userName.isNotEmpty
+                          ? activity.userName[0].toUpperCase()
                           : '?',
                       style: const TextStyle(
                         color: Colors.white,
@@ -169,7 +162,9 @@ class _ActivityFeedItem extends StatelessWidget {
               foregroundColor: Colors.white,
               side: BorderSide(color: Colors.white.withOpacity(0.3)),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               minimumSize: const Size(0, 32),
             ),
             child: Text(

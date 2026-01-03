@@ -3,7 +3,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 /// Sentry Error Tracking Service
-/// 
+///
 /// Provides comprehensive error tracking across all platforms
 /// including web (which Crashlytics doesn't support).
 class SentryService {
@@ -22,47 +22,47 @@ class SentryService {
       return;
     }
 
-    await SentryFlutter.init(
-      (options) {
-        options.dsn = _dsn;
-        options.tracesSampleRate = kReleaseMode ? 0.2 : 1.0;
-        options.environment = kReleaseMode ? 'production' : 'development';
-        options.sendDefaultPii = false; // GDPR compliance
-        options.attachScreenshot = true;
-        options.attachViewHierarchy = true;
-        
-        // Filter out sensitive data
-        options.beforeSend = (event, hint) {
-          // Remove any PII from breadcrumbs
-          final breadcrumbs = event.breadcrumbs?.map((b) {
-            if (b.data != null) {
-              final filtered = Map<String, dynamic>.from(b.data!);
-              filtered.remove('email');
-              filtered.remove('phone');
-              filtered.remove('password');
-              return b.copyWith(data: filtered);
-            }
-            return b;
-          }).toList();
-          
-          return event.copyWith(breadcrumbs: breadcrumbs);
-        };
-      },
-    );
-    
+    await SentryFlutter.init((options) {
+      options.dsn = _dsn;
+      options.tracesSampleRate = kReleaseMode ? 0.2 : 1.0;
+      options.environment = kReleaseMode ? 'production' : 'development';
+      options.sendDefaultPii = false; // GDPR compliance
+      options.attachScreenshot = true;
+      options.attachViewHierarchy = true;
+
+      // Filter out sensitive data
+      options.beforeSend = (event, hint) {
+        // Remove any PII from breadcrumbs
+        final breadcrumbs = event.breadcrumbs?.map((b) {
+          if (b.data != null) {
+            final filtered = Map<String, dynamic>.from(b.data!);
+            filtered.remove('email');
+            filtered.remove('phone');
+            filtered.remove('password');
+            return b.copyWith(data: filtered);
+          }
+          return b;
+        }).toList();
+
+        return event.copyWith(breadcrumbs: breadcrumbs);
+      };
+    });
+
     debugPrint('✅ Sentry initialized successfully');
   }
 
   /// Set user context for error tracking
   static Future<void> setUser(User? user) async {
     if (!isEnabled) return;
-    
+
     if (user != null) {
       Sentry.configureScope((scope) {
-        scope.setUser(SentryUser(
-          id: user.uid,
-          // Don't include email for privacy
-        ));
+        scope.setUser(
+          SentryUser(
+            id: user.uid,
+            // Don't include email for privacy
+          ),
+        );
       });
     } else {
       Sentry.configureScope((scope) {
@@ -132,13 +132,15 @@ class SentryService {
   }) {
     if (!isEnabled) return;
 
-    Sentry.addBreadcrumb(Breadcrumb(
-      message: message,
-      category: category,
-      data: data,
-      level: level,
-      timestamp: DateTime.now(),
-    ));
+    Sentry.addBreadcrumb(
+      Breadcrumb(
+        message: message,
+        category: category,
+        data: data,
+        level: level,
+        timestamp: DateTime.now(),
+      ),
+    );
   }
 
   /// Start a performance transaction

@@ -8,7 +8,8 @@ class ShareService {
     String referralCode, {
     required BuildContext context,
   }) async {
-    final shareText = '''
+    final shareText =
+        '''
 🎮 Join me on ClubRoyale - The Ultimate Card Gaming App! 🎮
 
 Use my referral code: $referralCode
@@ -25,10 +26,7 @@ See you at the tables! 🃏
 
     try {
       await SharePlus.instance.share(
-        ShareParams(
-          text: shareText,
-          subject: 'Join me on ClubRoyale!',
-        ),
+        ShareParams(text: shareText, subject: 'Join me on ClubRoyale!'),
       );
 
       if (context.mounted) {
@@ -59,10 +57,7 @@ See you at the tables! 🃏
   }) async {
     try {
       await SharePlus.instance.share(
-        ShareParams(
-          text: text,
-          subject: subject ?? 'ClubRoyale',
-        ),
+        ShareParams(text: text, subject: subject ?? 'ClubRoyale'),
       );
     } catch (e) {
       if (context.mounted) {
@@ -82,7 +77,8 @@ See you at the tables! 🃏
     String gameName, {
     required BuildContext context,
   }) async {
-    final shareText = '''
+    final shareText =
+        '''
 🎮 Join my $gameName game on ClubRoyale! 🎮
 
 Room Code: $roomCode
@@ -99,10 +95,7 @@ Let's play! 🃏
 
     try {
       await SharePlus.instance.share(
-        ShareParams(
-          text: shareText,
-          subject: 'Join my $gameName game!',
-        ),
+        ShareParams(text: shareText, subject: 'Join my $gameName game!'),
       );
 
       if (context.mounted) {
@@ -130,7 +123,8 @@ Let's play! 🃏
     required BuildContext context,
     String? customMessage,
   }) async {
-    final shareText = customMessage ??
+    final shareText =
+        customMessage ??
         '''
 🎮 Check out ClubRoyale - Best Card Gaming App! 🎮
 
@@ -169,11 +163,7 @@ Join thousands of players! 🃏
   }) async {
     try {
       await SharePlus.instance.share(
-        ShareParams(
-          files: [file],
-          text: text,
-          subject: 'ClubRoyale',
-        ),
+        ShareParams(files: [file], text: text, subject: 'ClubRoyale'),
       );
     } catch (e) {
       if (context.mounted) {

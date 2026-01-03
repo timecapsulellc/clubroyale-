@@ -44,7 +44,7 @@ class BotService {
     if (currentTurnId == null) return;
 
     // Check if current turn belongs to a bot
-    // We identify bots by a specific prefix or flag. 
+    // We identify bots by a specific prefix or flag.
     // For simplicity, let's assume any player ID starting with 'bot_' is a bot.
     if (!currentTurnId.startsWith('bot_')) return;
 
@@ -72,27 +72,34 @@ class BotService {
 
     final suggestedBid = CardValidationService.suggestBid(hand);
     // Add some randomness? No, stick to logic for now.
-    
+
     debugPrint('BotService: $botId bidding $suggestedBid');
-    await _ref.read(callBreakServiceProvider).placeBid(game.id!, botId, suggestedBid);
+    await _ref
+        .read(callBreakServiceProvider)
+        .placeBid(game.id!, botId, suggestedBid);
   }
 
   Future<void> _handleBotPlay(GameRoom game, String botId) async {
     final hand = game.playerHands[botId];
     if (hand == null || hand.isEmpty) return;
 
-    final validCards = CardValidationService.getValidCards(hand, game.currentTrick);
+    final validCards = CardValidationService.getValidCards(
+      hand,
+      game.currentTrick,
+    );
     if (validCards.isEmpty) return;
 
-    // Simple strategy: 
+    // Simple strategy:
     // 1. If leading, play random (or highest?)
     // 2. If following, try to win if possible, else play low.
-    
+
     // For testing, just pick the first valid card (random-ish)
     // Or pick a random one from valid cards to vary gameplay
     final cardToPlay = validCards[Random().nextInt(validCards.length)];
 
     debugPrint('BotService: $botId playing $cardToPlay');
-    await _ref.read(callBreakServiceProvider).playCard(game.id!, botId, cardToPlay);
+    await _ref
+        .read(callBreakServiceProvider)
+        .playCard(game.id!, botId, cardToPlay);
   }
 }

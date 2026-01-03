@@ -1,5 +1,5 @@
 /// Nepali Rules Overlay - Marriage Game Status Display
-/// 
+///
 /// Features:
 /// - Tiplu indicator with glow
 /// - Visit status (visited/not visited)
@@ -40,9 +40,7 @@ class NepaliRulesOverlay extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.75),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -60,10 +58,7 @@ class NepaliRulesOverlay extends StatelessWidget {
           ],
 
           // Visit status
-          _VisitStatus(
-            isVisited: isVisited,
-            onTap: onVisitTap,
-          ),
+          _VisitStatus(isVisited: isVisited, onTap: onVisitTap),
 
           const SizedBox(width: 12),
 
@@ -190,10 +185,7 @@ class _VisitStatus extends StatelessWidget {
   final bool isVisited;
   final VoidCallback? onTap;
 
-  const _VisitStatus({
-    required this.isVisited,
-    this.onTap,
-  });
+  const _VisitStatus({required this.isVisited, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -286,36 +278,36 @@ class _MarriageBonusIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFD4AF37), Color(0xFFF7E7CE)],
-        ),
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFD4AF37).withValues(alpha: 0.6),
-            blurRadius: 12,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('💍', style: TextStyle(fontSize: 14)),
-          SizedBox(width: 4),
-          Text(
-            '+100',
-            style: TextStyle(
-              color: Color(0xFF1a0a2e),
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFD4AF37), Color(0xFFF7E7CE)],
             ),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFD4AF37).withValues(alpha: 0.6),
+                blurRadius: 12,
+                spreadRadius: 2,
+              ),
+            ],
           ),
-        ],
-      ),
-    )
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('💍', style: TextStyle(fontSize: 14)),
+              SizedBox(width: 4),
+              Text(
+                '+100',
+                style: TextStyle(
+                  color: Color(0xFF1a0a2e),
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        )
         .animate(onPlay: (c) => c.repeat(reverse: true))
         .shimmer(duration: 1500.ms, color: Colors.white.withValues(alpha: 0.3))
         .scale(
@@ -385,10 +377,7 @@ class NepaliRulesCompact extends StatelessWidget {
           // Maal
           Text(
             '💎$maalPoints',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-            ),
+            style: const TextStyle(color: Colors.white, fontSize: 11),
           ),
         ],
       ),

@@ -20,7 +20,7 @@ class NotificationService {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       debugPrint('🔔 Notification permission granted');
-      
+
       // 2. Get Token
       String? token = await _fcm.getToken();
       if (token != null) {
@@ -40,8 +40,11 @@ class NotificationService {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   Text(message.notification!.title ?? 'New Notification', style: const TextStyle(fontWeight: FontWeight.bold)),
-                   Text(message.notification!.body ?? ''),
+                  Text(
+                    message.notification!.title ?? 'New Notification',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(message.notification!.body ?? ''),
                 ],
               ),
               backgroundColor: const Color(0xFF2d1b4e),

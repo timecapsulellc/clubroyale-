@@ -8,7 +8,7 @@ class AiService {
   final FirebaseFunctions _functions;
 
   AiService({FirebaseFunctions? functions})
-      : _functions = functions ?? FirebaseFunctions.instance;
+    : _functions = functions ?? FirebaseFunctions.instance;
 
   /// Get AI-powered game tip for optimal card play
   Future<GameTipResult> getGameTip({
@@ -127,12 +127,12 @@ class AiService {
     try {
       final request = AIDecisionRequest(
         gameType: 'marriage',
-        phase: gameState['phase'] ?? 'playing', 
+        phase: gameState['phase'] ?? 'playing',
         hand: hand,
         gameState: gameState,
         difficulty: difficulty,
       );
-      
+
       final data = await HybridAIService.getMove(request);
 
       return MarriageBotPlayResult(
@@ -143,7 +143,7 @@ class AiService {
     } catch (e) {
       // If local AI fails, try cloud (or just return fallback)
       AppLogger.warning('Local AI failed, falling back to cloud', tag: 'AI');
-      
+
       final callable = _functions.httpsCallable('marriageBotPlay');
       final result = await callable.call<Map<String, dynamic>>({
         'difficulty': difficulty,
@@ -183,10 +183,7 @@ class BotPlayResult {
   final String selectedCard;
   final String strategy;
 
-  BotPlayResult({
-    required this.selectedCard,
-    required this.strategy,
-  });
+  BotPlayResult({required this.selectedCard, required this.strategy});
 }
 
 class ModerationResult {
@@ -226,11 +223,7 @@ class MarriageBotPlayResult {
   final String? card;
   final String? reasoning;
 
-  MarriageBotPlayResult({
-    required this.action,
-    this.card,
-    this.reasoning,
-  });
+  MarriageBotPlayResult({required this.action, this.card, this.reasoning});
 }
 
 // =====================================================
@@ -243,31 +236,34 @@ final aiServiceProvider = Provider<AiService>((ref) {
 });
 
 /// Provider for game tip (async)
-final gameTipProvider = FutureProvider.family<GameTipResult, GameTipParams>(
-  (ref, params) async {
-    final aiService = ref.read(aiServiceProvider);
-    return aiService.getGameTip(
-      hand: params.hand,
-      trickCards: params.trickCards,
-      tricksNeeded: params.tricksNeeded,
-      tricksWon: params.tricksWon,
-      bid: params.bid,
-      ledSuit: params.ledSuit,
-    );
-  },
-);
+final gameTipProvider = FutureProvider.family<GameTipResult, GameTipParams>((
+  ref,
+  params,
+) async {
+  final aiService = ref.read(aiServiceProvider);
+  return aiService.getGameTip(
+    hand: params.hand,
+    trickCards: params.trickCards,
+    tricksNeeded: params.tricksNeeded,
+    tricksWon: params.tricksWon,
+    bid: params.bid,
+    ledSuit: params.ledSuit,
+  );
+});
 
 /// Provider for bid suggestion
-final bidSuggestionProvider = FutureProvider.family<BidSuggestionResult, BidSuggestionParams>(
-  (ref, params) async {
-    final aiService = ref.read(aiServiceProvider);
-    return aiService.getBidSuggestion(
-      hand: params.hand,
-      position: params.position,
-      previousBids: params.previousBids,
-    );
-  },
-);
+final bidSuggestionProvider =
+    FutureProvider.family<BidSuggestionResult, BidSuggestionParams>((
+      ref,
+      params,
+    ) async {
+      final aiService = ref.read(aiServiceProvider);
+      return aiService.getBidSuggestion(
+        hand: params.hand,
+        position: params.position,
+        previousBids: params.previousBids,
+      );
+    });
 
 // =====================================================
 // PARAMETER CLASSES

@@ -52,10 +52,7 @@ class _BidInputWidgetState extends State<BidInputWidget> {
             // Title
             Row(
               children: [
-                Icon(
-                  Icons.gavel,
-                  color: theme.colorScheme.primary,
-                ),
+                Icon(Icons.gavel, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
                   'Bidding Phase',
@@ -66,7 +63,7 @@ class _BidInputWidgetState extends State<BidInputWidget> {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Existing bids
             if (widget.existingBids.isNotEmpty) ...[
               Text(

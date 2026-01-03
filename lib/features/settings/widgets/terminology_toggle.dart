@@ -5,16 +5,13 @@ import 'package:clubroyale/core/config/game_settings.dart';
 import 'package:clubroyale/core/config/club_royale_theme.dart';
 
 /// Terminology Toggle Widget for Settings Screen
-/// 
-/// Allows users to switch between Global (ClubRoyale) 
+///
+/// Allows users to switch between Global (ClubRoyale)
 /// and South Asian (Marriage) terminology
 class TerminologyToggle extends ConsumerStatefulWidget {
   final VoidCallback? onChanged;
-  
-  const TerminologyToggle({
-    this.onChanged,
-    super.key,
-  });
+
+  const TerminologyToggle({this.onChanged, super.key});
 
   @override
   ConsumerState<TerminologyToggle> createState() => _TerminologyToggleState();
@@ -24,24 +21,28 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
   @override
   Widget build(BuildContext context) {
     final settingsState = ref.watch(gameSettingsProvider);
-    
+
     if (!settingsState.isInitialized) {
-       return const ListTile(
+      return const ListTile(
         leading: Icon(Icons.language, color: ClubRoyaleTheme.gold),
         title: Text('Game Terminology'),
-        trailing: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)),
+        trailing: SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
       );
     }
-    
+
     return _buildToggle(settingsState.region);
   }
-  
+
   Widget _buildToggle(GameRegion region) {
     final isSouthAsian = region == GameRegion.southAsia;
-    final regionDisplayName = isSouthAsian 
-        ? 'Marriage (दक्षिण एशिया)' 
+    final regionDisplayName = isSouthAsian
+        ? 'Marriage (दक्षिण एशिया)'
         : 'ClubRoyale (International)';
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
@@ -62,7 +63,8 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Game Terminology',
+                    const Text(
+                      'Game Terminology',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -71,16 +73,19 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
                     ),
                     Text(
                       regionDisplayName,
-                      style: const TextStyle(color: ClubRoyaleTheme.textMuted, fontSize: 12),
+                      style: const TextStyle(
+                        color: ClubRoyaleTheme.textMuted,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Toggle Switch
           Container(
             padding: const EdgeInsets.all(4),
@@ -111,16 +116,16 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Preview
           _buildTerminologyPreview(isSouthAsian),
         ],
       ),
     );
   }
-  
+
   Widget _buildRegionButton({
     required String emoji,
     required String label,
@@ -152,7 +157,9 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
             Text(
               subtitle,
               style: TextStyle(
-                color: isSelected ? ClubRoyaleTheme.deepPurple.withValues(alpha: 0.7) : Colors.white38,
+                color: isSelected
+                    ? ClubRoyaleTheme.deepPurple.withValues(alpha: 0.7)
+                    : Colors.white38,
                 fontSize: 10,
               ),
             ),
@@ -161,7 +168,7 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
       ),
     );
   }
-  
+
   Widget _buildTerminologyPreview(bool isSouthAsian) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -172,8 +179,13 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Preview',
-            style: TextStyle(color: ClubRoyaleTheme.gold, fontSize: 12, fontWeight: FontWeight.bold),
+          const Text(
+            'Preview',
+            style: TextStyle(
+              color: ClubRoyaleTheme.gold,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           _buildTermRow(
@@ -192,7 +204,7 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
       ),
     );
   }
-  
+
   Widget _buildTermRow(String term, String emoji) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -200,12 +212,15 @@ class _TerminologyToggleState extends ConsumerState<TerminologyToggle> {
         children: [
           Text(emoji, style: const TextStyle(fontSize: 14)),
           const SizedBox(width: 8),
-          Text(term, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+          Text(
+            term,
+            style: const TextStyle(color: Colors.white70, fontSize: 13),
+          ),
         ],
       ),
     );
   }
-  
+
   Future<void> _setRegion(GameRegion region) async {
     await ref.read(gameSettingsProvider.notifier).setRegion(region);
     widget.onChanged?.call();

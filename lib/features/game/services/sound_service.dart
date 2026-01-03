@@ -16,11 +16,14 @@ class SoundService {
 
   Future<void> playCardSlide() async {
     try {
-      // Create a new player for overlapping sounds if needed, 
+      // Create a new player for overlapping sounds if needed,
       // but for simple card slides, one player might suffice or be reset.
       // For better responsiveness with rapid clicks, we might want a pool,
       // but let's start simple.
-      await _player.play(AssetSource('sounds/card_slide.mp3'), mode: PlayerMode.lowLatency);
+      await _player.play(
+        AssetSource('sounds/card_slide.mp3'),
+        mode: PlayerMode.lowLatency,
+      );
     } catch (e) {
       // Ignore errors (e.g. if asset not found or audio disabled)
       AppLogger.error('Error playing sound', error: e, tag: 'Sound');

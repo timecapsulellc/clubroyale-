@@ -6,10 +6,7 @@ import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Voice room service provider
 final voiceRoomServiceProvider = Provider<VoiceRoomService>((ref) {
-  return VoiceRoomService(
-    firestore: FirebaseFirestore.instance,
-    ref: ref,
-  );
+  return VoiceRoomService(firestore: FirebaseFirestore.instance, ref: ref);
 });
 
 /// Stream of active voice rooms
@@ -29,10 +26,7 @@ class VoiceRoomService {
   final FirebaseFirestore firestore;
   final Ref ref;
 
-  VoiceRoomService({
-    required this.firestore,
-    required this.ref,
-  });
+  VoiceRoomService({required this.firestore, required this.ref});
 
   CollectionReference<Map<String, dynamic>> get _roomsRef =>
       firestore.collection('voice_rooms');
@@ -150,9 +144,7 @@ class VoiceRoomService {
 
   /// Close a voice room (host only)
   Future<void> closeRoom(String roomId) async {
-    await _roomsRef.doc(roomId).update({
-      'isActive': false,
-    });
+    await _roomsRef.doc(roomId).update({'isActive': false});
   }
 
   /// Toggle mute for current user
@@ -217,25 +209,26 @@ class VoiceRoomService {
         .orderBy('createdAt', descending: true)
         .limit(20)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => _roomFromFirestore(doc)).toList());
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => _roomFromFirestore(doc)).toList(),
+        );
   }
 
   /// Get current user's voice room
   Stream<VoiceRoom?> getCurrentRoom(String userId) {
-    return _roomsRef
-        .where('isActive', isEqualTo: true)
-        .snapshots()
-        .map((snapshot) {
-          for (final doc in snapshot.docs) {
-            final data = doc.data();
-            final participants = data['participants'] as Map<String, dynamic>?;
-            if (participants != null && participants.containsKey(userId)) {
-              return _roomFromFirestore(doc);
-            }
-          }
-          return null;
-        });
+    return _roomsRef.where('isActive', isEqualTo: true).snapshots().map((
+      snapshot,
+    ) {
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final participants = data['participants'] as Map<String, dynamic>?;
+        if (participants != null && participants.containsKey(userId)) {
+          return _roomFromFirestore(doc);
+        }
+      }
+      return null;
+    });
   }
 
   /// Get voice room by ID
@@ -249,7 +242,8 @@ class VoiceRoomService {
   /// Convert Firestore doc to VoiceRoom
   VoiceRoom _roomFromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
-    final participantsData = data['participants'] as Map<String, dynamic>? ?? {};
+    final participantsData =
+        data['participants'] as Map<String, dynamic>? ?? {};
 
     final participants = <String, VoiceParticipant>{};
     participantsData.forEach((key, value) {

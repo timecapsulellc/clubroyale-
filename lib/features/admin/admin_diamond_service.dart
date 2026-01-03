@@ -29,7 +29,9 @@ class AdminDiamondService {
     // Sub-admins have limits
     if (AdminConfig.getRole(adminEmail) == AdminRole.sub &&
         amount > AdminConfig.subAdminMaxGrant) {
-      throw Exception('Sub-admins can only grant up to ${AdminConfig.subAdminMaxGrant} diamonds');
+      throw Exception(
+        'Sub-admins can only grant up to ${AdminConfig.subAdminMaxGrant} diamonds',
+      );
     }
 
     final docRef = await _db.collection('diamond_requests').add({
@@ -59,7 +61,7 @@ class AdminDiamondService {
 
   String _getInitialStatus(String adminEmail, int amount) {
     final requiredApprovals = AdminConfig.getRequiredApprovals(amount);
-    
+
     if (requiredApprovals == 1 && AdminConfig.isPrimaryAdmin(adminEmail)) {
       return 'approved';
     }
@@ -81,7 +83,8 @@ class AdminDiamondService {
     final requestedBy = data['requestedBy'] as String;
 
     // Cannot approve own request for dual-approval amounts
-    if (AdminConfig.getRequiredApprovals(amount) > 1 && requestedBy == adminEmail) {
+    if (AdminConfig.getRequiredApprovals(amount) > 1 &&
+        requestedBy == adminEmail) {
       throw Exception('Cannot approve your own request for this amount');
     }
 
@@ -92,9 +95,10 @@ class AdminDiamondService {
 
     approvals.add(adminEmail);
 
-    final isFullyApproved = approvals.length >= AdminConfig.getRequiredApprovals(amount);
+    final isFullyApproved =
+        approvals.length >= AdminConfig.getRequiredApprovals(amount);
     final hasCoolingPeriod = AdminConfig.requiresCoolingPeriod(amount);
-    
+
     String newStatus = 'pending';
     if (isFullyApproved) {
       newStatus = hasCoolingPeriod ? 'cooling_period' : 'approved';
@@ -114,7 +118,11 @@ class AdminDiamondService {
   }
 
   /// Reject a grant request
-  Future<bool> rejectRequest(String requestId, String adminEmail, String reason) async {
+  Future<bool> rejectRequest(
+    String requestId,
+    String adminEmail,
+    String reason,
+  ) async {
     if (!AdminConfig.isAdmin(adminEmail)) {
       throw Exception('Not authorized as admin');
     }
@@ -136,17 +144,25 @@ class AdminDiamondService {
         .where('status', whereIn: ['pending', 'cooling_period'])
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => DiamondRequest.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => DiamondRequest.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   /// Get requests that a specific admin can approve
   Stream<List<DiamondRequest>> watchRequestsForAdmin(String adminEmail) {
-    return watchPendingRequests().map((requests) => requests
-        .where((r) => !r.approvals.contains(adminEmail))
-        .where((r) => r.requestedBy != adminEmail || 
-                      AdminConfig.getRequiredApprovals(r.amount) == 1)
-        .toList());
+    return watchPendingRequests().map(
+      (requests) => requests
+          .where((r) => !r.approvals.contains(adminEmail))
+          .where(
+            (r) =>
+                r.requestedBy != adminEmail ||
+                AdminConfig.getRequiredApprovals(r.amount) == 1,
+          )
+          .toList(),
+    );
   }
 
   /// Execute a grant (credit diamonds to user)
@@ -204,6 +220,7 @@ class AdminDiamondService {
       await _executeGrant(doc.id);
     }
   }
+
   /// Watch full grant history (executed or rejected)
   Stream<List<DiamondRequest>> watchGrantHistory() {
     return _db
@@ -212,40 +229,53 @@ class AdminDiamondService {
         .orderBy('createdAt', descending: true)
         .limit(50)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => DiamondRequest.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => DiamondRequest.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   /// Lookup user by Email, ID or Name
   Future<List<SocialUser>> lookupUser(String query) async {
     if (query.isEmpty) return [];
-    
+
     // Check if query is an email
     if (query.contains('@')) {
-      final emailSnapshot = await _db.collection('users')
+      final emailSnapshot = await _db
+          .collection('users')
           .where('email', isEqualTo: query.trim())
           .limit(1)
           .get();
       if (emailSnapshot.docs.isNotEmpty) {
-        return emailSnapshot.docs.map((doc) => SocialUser.fromJson({...doc.data(), 'id': doc.id})).toList();
+        return emailSnapshot.docs
+            .map((doc) => SocialUser.fromJson({...doc.data(), 'id': doc.id}))
+            .toList();
       }
     }
-    
+
     // Check if query is an Exact ID (len > 20)
     if (query.length > 20) {
       final doc = await _db.collection('users').doc(query.trim()).get();
       if (doc.exists) {
-        return [SocialUser.fromJson({...doc.data()!, 'id': doc.id})];
+        return [
+          SocialUser.fromJson({...doc.data()!, 'id': doc.id}),
+        ];
       }
     }
-    
+
     // Fallback: Name Search (Prefix)
-    return _db.collection('users')
+    return _db
+        .collection('users')
         .where('displayName', isGreaterThanOrEqualTo: query)
         .where('displayName', isLessThan: '${query}z')
         .limit(10)
         .get()
-        .then((s) => s.docs.map((doc) => SocialUser.fromJson({...doc.data(), 'id': doc.id})).toList());
+        .then(
+          (s) => s.docs
+              .map((doc) => SocialUser.fromJson({...doc.data(), 'id': doc.id}))
+              .toList(),
+        );
   }
 }
 

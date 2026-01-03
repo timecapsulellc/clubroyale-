@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class GameTimerWidget extends StatelessWidget {
   final int totalSeconds;
   final int remainingSeconds;
-  
+
   const GameTimerWidget({
     super.key,
     required this.totalSeconds,
@@ -13,7 +13,7 @@ class GameTimerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = remainingSeconds / totalSeconds;
-    
+
     Color color = Colors.green;
     if (progress < 0.5) color = Colors.orange;
     if (progress < 0.2) color = Colors.red;

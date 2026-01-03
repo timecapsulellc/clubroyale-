@@ -55,7 +55,7 @@ class _ConnectorPainter extends CustomPainter {
       final y1 = (i * (itemHeight + gap)) + (itemHeight / 2);
       // Bottom match center Y
       final y2 = ((i + 1) * (itemHeight + gap)) + (itemHeight / 2);
-      
+
       // Destination match center Y (midpoint)
       final yDest = (y1 + y2) / 2;
 
@@ -63,7 +63,7 @@ class _ConnectorPainter extends CustomPainter {
       //  |
       //  +----
       //  |
-      
+
       const double xStart = 0;
       final double xEnd = size.width;
       const double xMid = 12; // bend point
@@ -72,20 +72,19 @@ class _ConnectorPainter extends CustomPainter {
       final path1 = Path();
       path1.moveTo(xStart, y1);
       path1.cubicTo(
-        xMid, y1, // control 1
-        xMid, yDest, // control 2
-        xEnd, yDest, // end
+        xMid,
+        y1, // control 1
+        xMid,
+        yDest, // control 2
+        xEnd,
+        yDest, // end
       );
       canvas.drawPath(path1, paint);
 
       // Bottom line
       final path2 = Path();
       path2.moveTo(xStart, y2);
-      path2.cubicTo(
-        xMid, y2,
-        xMid, yDest,
-        xEnd, yDest,
-      );
+      path2.cubicTo(xMid, y2, xMid, yDest, xEnd, yDest);
       canvas.drawPath(path2, paint);
     }
   }

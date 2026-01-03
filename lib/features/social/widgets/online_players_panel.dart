@@ -1,5 +1,5 @@
 /// Online Players Panel
-/// 
+///
 /// Shows list of online players in the lobby with invite/friend actions.
 library;
 
@@ -43,7 +43,9 @@ class OnlinePlayersPanel extends ConsumerWidget {
               gradient: LinearGradient(
                 colors: [Colors.deepPurple.shade800, Colors.purple.shade600],
               ),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
             ),
             child: Row(
               children: [
@@ -73,7 +75,10 @@ class OnlinePlayersPanel extends ConsumerWidget {
                 const Spacer(),
                 onlineUsersAsync.when(
                   data: (users) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
@@ -103,7 +108,11 @@ class OnlinePlayersPanel extends ConsumerWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.person_search, size: 48, color: Colors.grey.shade600),
+                        Icon(
+                          Icons.person_search,
+                          size: 48,
+                          color: Colors.grey.shade600,
+                        ),
                         const SizedBox(height: 8),
                         Text(
                           'No other players online',
@@ -120,21 +129,23 @@ class OnlinePlayersPanel extends ConsumerWidget {
                   itemBuilder: (context, index) {
                     final user = users[index];
                     return _OnlinePlayerTile(
-                      user: user,
-                      currentRoomId: currentRoomId,
-                      roomCode: roomCode,
-                      gameType: gameType,
-                    ).animate(delay: Duration(milliseconds: index * 50))
-                     .fadeIn(duration: 200.ms)
-                     .slideX(begin: 0.1, end: 0);
+                          user: user,
+                          currentRoomId: currentRoomId,
+                          roomCode: roomCode,
+                          gameType: gameType,
+                        )
+                        .animate(delay: Duration(milliseconds: index * 50))
+                        .fadeIn(duration: 200.ms)
+                        .slideX(begin: 0.1, end: 0);
                   },
                 );
               },
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(
-                child: Text('Error: $e', style: TextStyle(color: Colors.red.shade300)),
+                child: Text(
+                  'Error: $e',
+                  style: TextStyle(color: Colors.red.shade300),
+                ),
               ),
             ),
           ),
@@ -160,9 +171,11 @@ class _OnlinePlayerTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final myFriendsAsync = ref.watch(myFriendsProvider);
-    final isFriend = myFriendsAsync.whenOrNull(
-      data: (friends) => friends.any((f) => f.userId == user.userId),
-    ) ?? false;
+    final isFriend =
+        myFriendsAsync.whenOrNull(
+          data: (friends) => friends.any((f) => f.userId == user.userId),
+        ) ??
+        false;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -171,7 +184,9 @@ class _OnlinePlayerTile extends ConsumerWidget {
         color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isFriend ? Colors.amber.withValues(alpha: 0.5) : Colors.transparent,
+          color: isFriend
+              ? Colors.amber.withValues(alpha: 0.5)
+              : Colors.transparent,
           width: isFriend ? 1.5 : 0,
         ),
       ),
@@ -183,8 +198,8 @@ class _OnlinePlayerTile extends ConsumerWidget {
               CircleAvatar(
                 radius: 20,
                 backgroundColor: Colors.deepPurple.shade400,
-                backgroundImage: user.avatarUrl != null 
-                    ? NetworkImage(user.avatarUrl!) 
+                backgroundImage: user.avatarUrl != null
+                    ? NetworkImage(user.avatarUrl!)
                     : null,
                 child: user.avatarUrl == null
                     ? Text(
@@ -234,13 +249,10 @@ class _OnlinePlayerTile extends ConsumerWidget {
                   ],
                 ),
                 Text(
-                  user.currentGameType != null 
+                  user.currentGameType != null
                       ? 'Playing ${user.currentGameType}'
                       : 'In Lobby',
-                  style: TextStyle(
-                    color: Colors.grey.shade400,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
                 ),
               ],
             ),
@@ -338,9 +350,9 @@ class _InviteButtonState extends ConsumerState<_InviteButton> {
       });
 
       if (!success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invite already sent')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Invite already sent')));
       }
     }
   }
@@ -362,7 +374,11 @@ class _AddFriendButtonState extends ConsumerState<_AddFriendButton> {
   @override
   Widget build(BuildContext context) {
     if (_sent) {
-      return const Icon(Icons.person_add_disabled, size: 20, color: Colors.grey);
+      return const Icon(
+        Icons.person_add_disabled,
+        size: 20,
+        color: Colors.grey,
+      );
     }
 
     return IconButton(
@@ -392,7 +408,9 @@ class _AddFriendButtonState extends ConsumerState<_AddFriendButton> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success ? 'Friend request sent!' : 'Request already sent'),
+          content: Text(
+            success ? 'Friend request sent!' : 'Request already sent',
+          ),
           backgroundColor: success ? Colors.green : Colors.orange,
         ),
       );

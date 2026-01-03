@@ -15,7 +15,8 @@ class SignalingService {
   // Callbacks for signaling events
   Function(Map<String, dynamic> offer, String fromUserId)? onOfferReceived;
   Function(Map<String, dynamic> answer, String fromUserId)? onAnswerReceived;
-  Function(Map<String, dynamic> candidate, String fromUserId)? onCandidateReceived;
+  Function(Map<String, dynamic> candidate, String fromUserId)?
+  onCandidateReceived;
   Function(String peerId)? onPeerJoined;
   Function(String peerId)? onPeerLeft;
 
@@ -26,12 +27,19 @@ class SignalingService {
   }) : _firestore = firestore ?? FirebaseFirestore.instance;
 
   /// Get the signaling document reference for this room
-  DocumentReference get _roomSignalingRef =>
-      _firestore.collection('game_rooms').doc(roomId).collection('webrtc').doc('signaling');
+  DocumentReference get _roomSignalingRef => _firestore
+      .collection('game_rooms')
+      .doc(roomId)
+      .collection('webrtc')
+      .doc('signaling');
 
   /// Get collection for ICE candidates
-  CollectionReference get _candidatesRef =>
-      _firestore.collection('game_rooms').doc(roomId).collection('webrtc').doc('signaling').collection('candidates');
+  CollectionReference get _candidatesRef => _firestore
+      .collection('game_rooms')
+      .doc(roomId)
+      .collection('webrtc')
+      .doc('signaling')
+      .collection('candidates');
 
   /// Initialize signaling and start listening
   Future<void> initialize() async {
@@ -52,12 +60,15 @@ class SignalingService {
     required String toPeerId,
     required Map<String, dynamic> offer,
   }) async {
-    await _roomSignalingRef.collection('offers').doc('${localUserId}_to_$toPeerId').set({
-      'from': localUserId,
-      'to': toPeerId,
-      'offer': offer,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
+    await _roomSignalingRef
+        .collection('offers')
+        .doc('${localUserId}_to_$toPeerId')
+        .set({
+          'from': localUserId,
+          'to': toPeerId,
+          'offer': offer,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
   }
 
   /// Send an answer to a specific peer
@@ -65,12 +76,15 @@ class SignalingService {
     required String toPeerId,
     required Map<String, dynamic> answer,
   }) async {
-    await _roomSignalingRef.collection('answers').doc('${localUserId}_to_$toPeerId').set({
-      'from': localUserId,
-      'to': toPeerId,
-      'answer': answer,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
+    await _roomSignalingRef
+        .collection('answers')
+        .doc('${localUserId}_to_$toPeerId')
+        .set({
+          'from': localUserId,
+          'to': toPeerId,
+          'answer': answer,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
   }
 
   /// Send ICE candidate to a specific peer
@@ -93,18 +107,18 @@ class SignalingService {
         .where('to', isEqualTo: localUserId)
         .snapshots()
         .listen((snapshot) {
-      for (var change in snapshot.docChanges) {
-        if (change.type == DocumentChangeType.added) {
-          final data = change.doc.data();
-          if (data != null) {
-            onOfferReceived?.call(
-              data['offer'] as Map<String, dynamic>,
-              data['from'] as String,
-            );
+          for (var change in snapshot.docChanges) {
+            if (change.type == DocumentChangeType.added) {
+              final data = change.doc.data();
+              if (data != null) {
+                onOfferReceived?.call(
+                  data['offer'] as Map<String, dynamic>,
+                  data['from'] as String,
+                );
+              }
+            }
           }
-        }
-      }
-    });
+        });
   }
 
   /// Listen for incoming answers
@@ -114,18 +128,18 @@ class SignalingService {
         .where('to', isEqualTo: localUserId)
         .snapshots()
         .listen((snapshot) {
-      for (var change in snapshot.docChanges) {
-        if (change.type == DocumentChangeType.added) {
-          final data = change.doc.data();
-          if (data != null) {
-            onAnswerReceived?.call(
-              data['answer'] as Map<String, dynamic>,
-              data['from'] as String,
-            );
+          for (var change in snapshot.docChanges) {
+            if (change.type == DocumentChangeType.added) {
+              final data = change.doc.data();
+              if (data != null) {
+                onAnswerReceived?.call(
+                  data['answer'] as Map<String, dynamic>,
+                  data['from'] as String,
+                );
+              }
+            }
           }
-        }
-      }
-    });
+        });
   }
 
   /// Listen for incoming ICE candidates
@@ -134,18 +148,18 @@ class SignalingService {
         .where('to', isEqualTo: localUserId)
         .snapshots()
         .listen((snapshot) {
-      for (var change in snapshot.docChanges) {
-        if (change.type == DocumentChangeType.added) {
-          final data = change.doc.data() as Map<String, dynamic>?;
-          if (data != null) {
-            onCandidateReceived?.call(
-              data['candidate'] as Map<String, dynamic>,
-              data['from'] as String,
-            );
+          for (var change in snapshot.docChanges) {
+            if (change.type == DocumentChangeType.added) {
+              final data = change.doc.data() as Map<String, dynamic>?;
+              if (data != null) {
+                onCandidateReceived?.call(
+                  data['candidate'] as Map<String, dynamic>,
+                  data['from'] as String,
+                );
+              }
+            }
           }
-        }
-      }
-    });
+        });
   }
 
   /// Leave the room and clean up
@@ -162,28 +176,33 @@ class SignalingService {
 
     // Delete our offers/answers/candidates
     final batch = _firestore.batch();
-    
+
     // Delete offers from this user
-    final offers = await _roomSignalingRef.collection('offers')
-        .where('from', isEqualTo: localUserId).get();
+    final offers = await _roomSignalingRef
+        .collection('offers')
+        .where('from', isEqualTo: localUserId)
+        .get();
     for (var doc in offers.docs) {
       batch.delete(doc.reference);
     }
-    
+
     // Delete answers from this user
-    final answers = await _roomSignalingRef.collection('answers')
-        .where('from', isEqualTo: localUserId).get();
+    final answers = await _roomSignalingRef
+        .collection('answers')
+        .where('from', isEqualTo: localUserId)
+        .get();
     for (var doc in answers.docs) {
       batch.delete(doc.reference);
     }
-    
+
     // Delete candidates from this user
     final candidates = await _candidatesRef
-        .where('from', isEqualTo: localUserId).get();
+        .where('from', isEqualTo: localUserId)
+        .get();
     for (var doc in candidates.docs) {
       batch.delete(doc.reference);
     }
-    
+
     await batch.commit();
   }
 
@@ -204,12 +223,13 @@ class SignalingService {
 }
 
 /// Provider for signaling service
-final signalingServiceProvider = Provider.family<SignalingService, SignalingParams>(
-  (ref, params) => SignalingService(
-    roomId: params.roomId,
-    localUserId: params.localUserId,
-  ),
-);
+final signalingServiceProvider =
+    Provider.family<SignalingService, SignalingParams>(
+      (ref, params) => SignalingService(
+        roomId: params.roomId,
+        localUserId: params.localUserId,
+      ),
+    );
 
 /// Parameters for signaling service provider
 class SignalingParams {

@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,8 +20,9 @@ class GameService {
     try {
       final doc = await _gamesRef.doc(gameId).get();
       if (doc.exists) {
-        return GameRoom.fromJson(doc.data() as Map<String, dynamic>)
-            .copyWith(id: doc.id);
+        return GameRoom.fromJson(
+          doc.data() as Map<String, dynamic>,
+        ).copyWith(id: doc.id);
       }
       return null;
     } catch (e) {
@@ -35,8 +35,9 @@ class GameService {
   Stream<GameRoom?> getGameStream(String gameId) {
     return _gamesRef.doc(gameId).snapshots().map((snapshot) {
       if (snapshot.exists) {
-        return GameRoom.fromJson(snapshot.data() as Map<String, dynamic>)
-            .copyWith(id: snapshot.id);
+        return GameRoom.fromJson(
+          snapshot.data() as Map<String, dynamic>,
+        ).copyWith(id: snapshot.id);
       }
       return null;
     });
@@ -49,11 +50,12 @@ class GameService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return GameRoom.fromJson(doc.data() as Map<String, dynamic>)
-            .copyWith(id: doc.id);
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            return GameRoom.fromJson(
+              doc.data() as Map<String, dynamic>,
+            ).copyWith(id: doc.id);
+          }).toList();
+        });
   }
 
   // Aggregates player stats across all finished games for leaderboard.
@@ -67,8 +69,9 @@ class GameService {
       final Map<String, _PlayerStats> playerStats = {};
 
       for (final doc in snapshot.docs) {
-        final game = GameRoom.fromJson(doc.data() as Map<String, dynamic>)
-            .copyWith(id: doc.id);
+        final game = GameRoom.fromJson(
+          doc.data() as Map<String, dynamic>,
+        ).copyWith(id: doc.id);
 
         // Find winner (highest score)
         String? winnerId;
@@ -103,14 +106,16 @@ class GameService {
 
       // Convert to list and sort by total score
       final entries = playerStats.values
-          .map((stats) => LeaderboardEntry(
-                odayerId: stats.playerId,
-                playerName: stats.playerName,
-                avatarUrl: stats.avatarUrl,
-                totalScore: stats.totalScore,
-                gamesPlayed: stats.gamesPlayed,
-                gamesWon: stats.gamesWon,
-              ))
+          .map(
+            (stats) => LeaderboardEntry(
+              odayerId: stats.playerId,
+              playerName: stats.playerName,
+              avatarUrl: stats.avatarUrl,
+              totalScore: stats.totalScore,
+              gamesPlayed: stats.gamesPlayed,
+              gamesWon: stats.gamesWon,
+            ),
+          )
           .toList();
 
       entries.sort((a, b) => b.totalScore.compareTo(a.totalScore));
@@ -125,7 +130,10 @@ class GameService {
 
   // Updates the score of a player in a game.
   Future<void> updatePlayerScore(
-      String gameId, String playerId, int increment) async {
+    String gameId,
+    String playerId,
+    int increment,
+  ) async {
     try {
       await _gamesRef.doc(gameId).update({
         'scores.$playerId': FieldValue.increment(increment),
@@ -185,5 +193,3 @@ class _PlayerStats {
     this.avatarUrl,
   });
 }
-
-

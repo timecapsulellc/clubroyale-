@@ -10,7 +10,7 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeColors = ref.watch(themeColorsProvider);
-    
+
     return Scaffold(
       backgroundColor: themeColors.background,
       appBar: AppBar(
@@ -22,7 +22,10 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
         ),
         title: Text(
           'How to Play Marriage',
-          style: TextStyle(color: themeColors.gold, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: themeColors.gold,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
@@ -34,20 +37,22 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
             // Game Header
             _buildGameHeader(themeColors),
             const SizedBox(height: 24),
-            
+
             // Overview
             _buildSection(
               title: '📋 Overview',
-              content: 'Marriage (Royal Meld in ClubRoyale) is a popular rummy-style card game '
+              content:
+                  'Marriage (Royal Meld in ClubRoyale) is a popular rummy-style card game '
                   'from Nepal and South Asia. The goal is to form valid melds (sets and sequences) '
                   'and reduce your points to zero.',
               themeColors: themeColors,
             ),
-            
+
             // Players & Deck
             _buildSection(
               title: '👥 Players & Deck',
-              content: '• 2-8 players\n'
+              content:
+                  '• 2-8 players\n'
                   '• Uses multiple decks based on player count:\n'
                   '  - 2-5 players: 3 decks (156 cards)\n'
                   '  - 6 players: 4 decks (208 cards)\n'
@@ -55,11 +60,12 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
                   '• Each player gets 21 cards',
               themeColors: themeColors,
             ),
-            
+
             // Wild Cards
             _buildSection(
               title: '🃏 Wild Cards (Tiplu System)',
-              content: 'Wild cards are determined by the card shown beneath the closed deck:\n\n'
+              content:
+                  'Wild cards are determined by the card shown beneath the closed deck:\n\n'
                   '• **Tiplu (Wild)**: The shown card\'s value\n'
                   '• **Poplu (High Wild)**: One rank above Tiplu\n'
                   '• **Jhiplu (Low Wild)**: One rank below Tiplu\n\n'
@@ -70,11 +76,12 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
                   'Wild cards can substitute any card in melds.',
               themeColors: themeColors,
             ),
-            
+
             // Types of Melds
             _buildSection(
               title: '🎯 Types of Melds',
-              content: '**1. Pure Sequence (Tunnela)**\n'
+              content:
+                  '**1. Pure Sequence (Tunnela)**\n'
                   '3+ consecutive cards of same suit, NO wildcards\n'
                   'Example: 4♥ 5♥ 6♥ 7♥\n\n'
                   '**2. Sequence (Dirty)**\n'
@@ -89,32 +96,35 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
                   'Example: K♠ Q♠ 7♠ (if 7 is Tiplu)',
               themeColors: themeColors,
             ),
-            
+
             // Gameplay
             _buildSection(
               title: '▶️ Gameplay',
-              content: '1. **Draw Phase**: Pick from closed deck OR open deck\n\n'
+              content:
+                  '1. **Draw Phase**: Pick from closed deck OR open deck\n\n'
                   '2. **Optional Meld**: Lay down valid melds\n\n'
                   '3. **Discard Phase**: Discard one card to open deck\n\n'
                   'Play continues clockwise until someone declares.',
               themeColors: themeColors,
             ),
-            
+
             // Declaring
             _buildSection(
               title: '🏆 Winning (Declaring)',
-              content: 'To declare, you need:\n\n'
+              content:
+                  'To declare, you need:\n\n'
                   '✅ At least 1 Pure Sequence (Tunnela)\n'
                   '✅ All remaining cards in valid melds\n'
                   '✅ 0 points in hand\n\n'
                   'Tap "Go Royale" (Declare) when ready!',
               themeColors: themeColors,
             ),
-            
+
             // Scoring
             _buildSection(
               title: '📊 Scoring',
-              content: '**Card Values:**\n'
+              content:
+                  '**Card Values:**\n'
                   '• Ace, K, Q, J, 10 = 10 points each\n'
                   '• 2-9 = Face value\n'
                   '• Joker = 0 points\n'
@@ -124,23 +134,24 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
                   'Winner gets sum of all other players\' points.',
               themeColors: themeColors,
             ),
-            
+
             // Tips
             _buildSection(
               title: '💡 Pro Tips',
-              content: '1. **Prioritize Pure Sequences** - You need at least one!\n\n'
+              content:
+                  '1. **Prioritize Pure Sequences** - You need at least one!\n\n'
                   '2. **Remember Wilds** - Track Tiplu, Poplu, Jhiplu\n\n'
                   '3. **Watch Discards** - Note what opponents pick\n\n'
                   '4. **Marriage Bonus** - Aim for the K-Q-Tiplu combo\n\n'
                   '5. **Reduce Points** - Even if you can\'t win, minimize score',
               themeColors: themeColors,
             ),
-            
+
             // Terminology
             _buildTerminologyTable(themeColors),
-            
+
             const SizedBox(height: 40),
-            
+
             // Play Now Button
             _buildPlayButton(context, themeColors),
           ],
@@ -148,13 +159,16 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildGameHeader(ThemeColors themeColors) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [themeColors.surface, themeColors.surfaceLight.withValues(alpha: 0.5)],
+          colors: [
+            themeColors.surface,
+            themeColors.surfaceLight.withValues(alpha: 0.5),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -215,7 +229,7 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildBadge(String text, ThemeColors themeColors) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -229,7 +243,7 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildSection({
     required String title,
     required String content,
@@ -256,16 +270,13 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           Text(
             content,
-            style: TextStyle(
-              color: themeColors.textPrimary,
-              height: 1.6,
-            ),
+            style: TextStyle(color: themeColors.textPrimary, height: 1.6),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildTerminologyTable(ThemeColors themeColors) {
     final terms = [
       ['Term', 'Global', 'Traditional'],
@@ -276,7 +287,7 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
       ['Pure Sequence', 'Tunnela', 'Tunnela'],
       ['Declare', 'Go Royale', 'Declare'],
     ];
-    
+
     return Container(
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.all(16),
@@ -302,20 +313,28 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
               final isHeader = entry.key == 0;
               return TableRow(
                 decoration: BoxDecoration(
-                  color: isHeader 
-                      ? themeColors.gold.withValues(alpha: 0.2) 
+                  color: isHeader
+                      ? themeColors.gold.withValues(alpha: 0.2)
                       : Colors.transparent,
                 ),
-                children: entry.value.map((cell) => Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(
-                    cell,
-                    style: TextStyle(
-                      color: isHeader ? themeColors.gold : themeColors.textPrimary,
-                      fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-                    ),
-                  ),
-                )).toList(),
+                children: entry.value
+                    .map(
+                      (cell) => Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Text(
+                          cell,
+                          style: TextStyle(
+                            color: isHeader
+                                ? themeColors.gold
+                                : themeColors.textPrimary,
+                            fontWeight: isHeader
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
               );
             }).toList(),
           ),
@@ -323,7 +342,7 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildPlayButton(BuildContext context, ThemeColors themeColors) {
     return ElevatedButton(
       onPressed: () => context.go('/marriage'),
@@ -331,16 +350,17 @@ class HowToPlayMarriageScreen extends ConsumerWidget {
         backgroundColor: themeColors.gold,
         foregroundColor: themeColors.background,
         padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.play_arrow),
           SizedBox(width: 8),
-          Text('Play Royal Meld Now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(
+            'Play Royal Meld Now',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );

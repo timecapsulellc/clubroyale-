@@ -46,25 +46,31 @@ class PrizeDistributionCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _PrizeRow(
-            rank: 1, 
-            amount: first, 
+            rank: 1,
+            amount: first,
             color: const Color(0xFFFFD700), // Gold
             label: 'Winner',
           ),
           if (participantCount > 2) ...[
-            const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Divider(height: 1, color: Colors.white12)),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Divider(height: 1, color: Colors.white12),
+            ),
             _PrizeRow(
-              rank: 2, 
-              amount: second, 
+              rank: 2,
+              amount: second,
               color: const Color(0xFFC0C0C0), // Silver
               label: 'Runner-up',
             ),
           ],
           if (participantCount > 4) ...[
-            const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Divider(height: 1, color: Colors.white12)),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Divider(height: 1, color: Colors.white12),
+            ),
             _PrizeRow(
-              rank: 3, 
-              amount: third, 
+              rank: 3,
+              amount: third,
               color: const Color(0xFFCD7F32), // Bronze
               label: '3rd Place',
             ),
@@ -103,7 +109,11 @@ class _PrizeRow extends StatelessWidget {
           ),
           child: Text(
             '$rank',
-            style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
           ),
         ),
         const SizedBox(width: 12),

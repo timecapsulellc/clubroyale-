@@ -31,7 +31,8 @@ class RoomReconnectionService {
 
     final roomData = roomDoc.data()!;
     final players = roomData['players'] as Map<String, dynamic>? ?? {};
-    final disconnectedPlayers = roomData['disconnectedPlayers'] as Map<String, dynamic>? ?? {};
+    final disconnectedPlayers =
+        roomData['disconnectedPlayers'] as Map<String, dynamic>? ?? {};
 
     // Check if user was previously in this room
     if (players.containsKey(userId)) {
@@ -48,7 +49,8 @@ class RoomReconnectionService {
 
     // Check if user was disconnected and bot replaced them
     if (disconnectedPlayers.containsKey(userId)) {
-      final disconnectedData = disconnectedPlayers[userId] as Map<String, dynamic>;
+      final disconnectedData =
+          disconnectedPlayers[userId] as Map<String, dynamic>;
       final seat = disconnectedData['seat'] as int;
       final botId = disconnectedData['replacedBy'] as String?;
 
@@ -70,10 +72,7 @@ class RoomReconnectionService {
         });
       }
 
-      return ReconnectionResult.success(
-        seat: seat,
-        wasReplaced: true,
-      );
+      return ReconnectionResult.success(seat: seat, wasReplaced: true);
     }
 
     // User was never in this room
@@ -126,11 +125,13 @@ class RoomReconnectionService {
     if (!roomDoc.exists) return;
 
     final roomData = roomDoc.data()!;
-    final disconnectedPlayers = roomData['disconnectedPlayers'] as Map<String, dynamic>? ?? {};
+    final disconnectedPlayers =
+        roomData['disconnectedPlayers'] as Map<String, dynamic>? ?? {};
 
     if (!disconnectedPlayers.containsKey(disconnectedUserId)) return;
 
-    final disconnectedData = disconnectedPlayers[disconnectedUserId] as Map<String, dynamic>;
+    final disconnectedData =
+        disconnectedPlayers[disconnectedUserId] as Map<String, dynamic>;
     final botId = 'bot_${DateTime.now().millisecondsSinceEpoch}';
 
     // Create bot player with same cards
@@ -177,10 +178,7 @@ class ReconnectionResult {
   }
 
   factory ReconnectionResult.roomNotFound() {
-    return ReconnectionResult._(
-      success: false,
-      error: 'Room not found',
-    );
+    return ReconnectionResult._(success: false, error: 'Room not found');
   }
 
   factory ReconnectionResult.notInRoom() {

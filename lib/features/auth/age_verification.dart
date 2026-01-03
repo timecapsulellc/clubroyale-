@@ -15,31 +15,37 @@ class AgeVerificationService {
   static const String _ageVerifiedKey = 'age_verified';
   static const String _disclaimerAcceptedKey = 'disclaimer_accepted';
   static const String _verifiedAtKey = 'verified_at';
-  
+
   final SharedPreferences _prefs;
-  
+
   AgeVerificationService(this._prefs);
-  
+
   bool get isAgeVerified => _prefs.getBool(_ageVerifiedKey) ?? false;
-  bool get isDisclaimerAccepted => _prefs.getBool(_disclaimerAcceptedKey) ?? false;
+  bool get isDisclaimerAccepted =>
+      _prefs.getBool(_disclaimerAcceptedKey) ?? false;
   bool get canProceed => isAgeVerified && isDisclaimerAccepted;
-  
+
   DateTime? get verifiedAt {
     final timestamp = _prefs.getInt(_verifiedAtKey);
-    return timestamp != null ? DateTime.fromMillisecondsSinceEpoch(timestamp) : null;
+    return timestamp != null
+        ? DateTime.fromMillisecondsSinceEpoch(timestamp)
+        : null;
   }
-  
+
   Future<void> setAgeVerified(bool value) async {
     await _prefs.setBool(_ageVerifiedKey, value);
     if (value) {
-      await _prefs.setInt(_verifiedAtKey, DateTime.now().millisecondsSinceEpoch);
+      await _prefs.setInt(
+        _verifiedAtKey,
+        DateTime.now().millisecondsSinceEpoch,
+      );
     }
   }
-  
+
   Future<void> setDisclaimerAccepted(bool value) async {
     await _prefs.setBool(_disclaimerAcceptedKey, value);
   }
-  
+
   Future<void> reset() async {
     await _prefs.remove(_ageVerifiedKey);
     await _prefs.remove(_disclaimerAcceptedKey);
@@ -57,13 +63,13 @@ class AgeVerificationService {
 class AgeVerificationDialog extends StatefulWidget {
   final VoidCallback onVerified;
   final VoidCallback onDeclined;
-  
+
   const AgeVerificationDialog({
     super.key,
     required this.onVerified,
     required this.onDeclined,
   });
-  
+
   @override
   State<AgeVerificationDialog> createState() => _AgeVerificationDialogState();
 }
@@ -72,9 +78,10 @@ class _AgeVerificationDialogState extends State<AgeVerificationDialog> {
   bool _isOver18 = false;
   bool _acceptedTerms = false;
   bool _understandsNoRealMoney = false;
-  
-  bool get _canContinue => _isOver18 && _acceptedTerms && _understandsNoRealMoney;
-  
+
+  bool get _canContinue =>
+      _isOver18 && _acceptedTerms && _understandsNoRealMoney;
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -100,16 +107,13 @@ class _AgeVerificationDialogState extends State<AgeVerificationDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               const Text(
                 'Age Verification Required',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              
+
               // Disclaimer box
               Container(
                 padding: const EdgeInsets.all(16),
@@ -124,7 +128,7 @@ class _AgeVerificationDialogState extends State<AgeVerificationDialog> {
                 ),
               ),
               const SizedBox(height: 20),
-              
+
               // Checkboxes
               _buildCheckbox(
                 value: _isOver18,
@@ -140,13 +144,14 @@ class _AgeVerificationDialogState extends State<AgeVerificationDialog> {
               ),
               _buildCheckbox(
                 value: _understandsNoRealMoney,
-                onChanged: (v) => setState(() => _understandsNoRealMoney = v ?? false),
+                onChanged: (v) =>
+                    setState(() => _understandsNoRealMoney = v ?? false),
                 title: 'I understand this app does not process real money',
                 icon: Icons.money_off,
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Buttons
               Row(
                 children: [
@@ -163,10 +168,12 @@ class _AgeVerificationDialogState extends State<AgeVerificationDialog> {
                   Expanded(
                     flex: 2,
                     child: FilledButton(
-                      onPressed: _canContinue ? () {
-                        HapticHelper.success();
-                        widget.onVerified();
-                      } : null,
+                      onPressed: _canContinue
+                          ? () {
+                              HapticHelper.success();
+                              widget.onVerified();
+                            }
+                          : null,
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         backgroundColor: Colors.deepPurple,
@@ -235,12 +242,9 @@ class _AgeVerificationDialogState extends State<AgeVerificationDialog> {
 /// Wrapper widget that shows age gate on app start
 class AgeGateWrapper extends StatefulWidget {
   final Widget child;
-  
-  const AgeGateWrapper({
-    super.key,
-    required this.child,
-  });
-  
+
+  const AgeGateWrapper({super.key, required this.child});
+
   @override
   State<AgeGateWrapper> createState() => _AgeGateWrapperState();
 }
@@ -249,13 +253,13 @@ class _AgeGateWrapperState extends State<AgeGateWrapper> {
   AgeVerificationService? _service;
   bool _loading = true;
   bool _canProceed = false;
-  
+
   @override
   void initState() {
     super.initState();
     _initService();
   }
-  
+
   Future<void> _initService() async {
     _service = await AgeVerificationService.create();
     setState(() {
@@ -263,7 +267,7 @@ class _AgeGateWrapperState extends State<AgeGateWrapper> {
       _loading = false;
     });
   }
-  
+
   Future<void> _onVerified() async {
     await _service?.setAgeVerified(true);
     await _service?.setDisclaimerAccepted(true);
@@ -271,7 +275,7 @@ class _AgeGateWrapperState extends State<AgeGateWrapper> {
       _canProceed = true;
     });
   }
-  
+
   void _onDeclined() {
     // Show message and close app
     showDialog(
@@ -291,7 +295,7 @@ class _AgeGateWrapperState extends State<AgeGateWrapper> {
       ),
     );
   }
-  
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -302,11 +306,11 @@ class _AgeGateWrapperState extends State<AgeGateWrapper> {
         ),
       );
     }
-    
+
     if (_canProceed) {
       return widget.child;
     }
-    
+
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       body: Center(

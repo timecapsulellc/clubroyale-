@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/features/game/game_room.dart';
-import 'package:clubroyale/features/game/game_config.dart';
 import 'package:clubroyale/features/profile/user_profile.dart';
 
 void main() {

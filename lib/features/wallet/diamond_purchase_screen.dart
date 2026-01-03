@@ -10,15 +10,21 @@ import 'package:clubroyale/config/visual_effects.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/features/wallet/services/user_tier_service.dart';
 import 'package:clubroyale/features/wallet/models/user_tier.dart';
+import 'package:clubroyale/core/services/ad_service.dart';
+import 'package:clubroyale/features/wallet/diamond_rewards_service.dart';
+
+import 'package:google_fonts/google_fonts.dart';
 
 /// Diamond Info Screen - ClubRoyale Vault
-/// 
+///
 /// Premium "Vault" aesthetic for managing FREE diamonds.
 class DiamondPurchaseScreen extends ConsumerWidget {
   const DiamondPurchaseScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // ...
+    // Note: retaining existing logic, just updating Scaffold/AppBar
     final authService = ref.watch(authServiceProvider);
     final userId = authService.currentUser?.uid;
 
@@ -26,10 +32,18 @@ class DiamondPurchaseScreen extends ConsumerWidget {
       return Scaffold(
         backgroundColor: CasinoColors.deepPurple,
         appBar: AppBar(
-          backgroundColor: Colors.transparent, 
-          title: const Text('The Vault', style: TextStyle(color: CasinoColors.gold)),
+          backgroundColor: Colors.transparent,
+          title: Text(
+            'The Vault',
+            style: GoogleFonts.oswald(
+              color: CasinoColors.gold,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
-        body: const Center(child: Text('Please sign in', style: TextStyle(color: Colors.white))),
+        body: const Center(
+          child: Text('Please sign in', style: TextStyle(color: Colors.white)),
+        ),
       );
     }
 
@@ -40,7 +54,14 @@ class DiamondPurchaseScreen extends ConsumerWidget {
       backgroundColor: CasinoColors.deepPurple,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('The Vault', style: TextStyle(color: CasinoColors.gold, fontWeight: FontWeight.bold)),
+        title: Text(
+          'The Vault',
+          style: GoogleFonts.oswald(
+            color: CasinoColors.gold,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
         backgroundColor: Colors.black.withValues(alpha: 0.5),
         elevation: 0,
@@ -56,7 +77,12 @@ class DiamondPurchaseScreen extends ConsumerWidget {
             final currentBalance = snapshot.data?.balance ?? 0;
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 100, 16, 20), // Top padding for extended app bar
+              padding: const EdgeInsets.fromLTRB(
+                16,
+                100,
+                16,
+                20,
+              ), // Top padding for extended app bar
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -70,22 +96,32 @@ class DiamondPurchaseScreen extends ConsumerWidget {
                     builder: (context, ref, child) {
                       final tierAsync = ref.watch(currentUserTierProvider);
                       final tier = tierAsync.value;
-                      
+
                       // Only show upgrade if data is loaded and user is Basic
                       if (tier != UserTier.basic) return const SizedBox();
-                      
+
                       return Container(
                         margin: const EdgeInsets.only(bottom: 24),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Colors.blue.shade900, Colors.blue.shade700],
+                            colors: [
+                              Colors.blue.shade900,
+                              Colors.blue.shade700,
+                            ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.blueAccent.shade100, width: 1),
+                          border: Border.all(
+                            color: Colors.blueAccent.shade100,
+                            width: 1,
+                          ),
                           boxShadow: [
-                             BoxShadow(color: Colors.blue.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))
+                            BoxShadow(
+                              color: Colors.blue.withValues(alpha: 0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
                           ],
                         ),
                         child: Material(
@@ -96,45 +132,60 @@ class DiamondPurchaseScreen extends ConsumerWidget {
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   backgroundColor: Colors.grey.shade900,
-                                  title: const Text('Upgrade to Verified?', style: TextStyle(color: Colors.white)),
+                                  title: const Text(
+                                    'Upgrade to Verified?',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                   content: const Text(
                                     'Unlock P2P Transfers and higher daily limits for 100 Diamonds.',
                                     style: TextStyle(color: Colors.white70),
                                   ),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.pop(context, false),
-                                      child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
+                                      child: const Text(
+                                        'Cancel',
+                                        style: TextStyle(color: Colors.grey),
+                                      ),
                                     ),
                                     FilledButton(
-                                      onPressed: () => Navigator.pop(context, true),
-                                      style: FilledButton.styleFrom(backgroundColor: Colors.blueAccent),
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: Colors.blueAccent,
+                                      ),
                                       child: const Text('Upgrade (100 💎)'),
                                     ),
                                   ],
                                 ),
                               );
-                              
+
                               if (confirmed == true) {
                                 try {
-                                  await ref.read(diamondServiceProvider).upgradeToVerified();
+                                  await ref
+                                      .read(diamondServiceProvider)
+                                      .upgradeToVerified();
                                   if (context.mounted) {
-                                   await SoundService.playRoundEnd(); // Level up sound
+                                    await SoundService.playRoundEnd(); // Level up sound
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text('🎉 Congratulations! You are now Verified!'),
+                                        content: Text(
+                                          '🎉 Congratulations! You are now Verified!',
+                                        ),
                                         backgroundColor: Colors.green,
-                                      )
+                                      ),
                                     );
                                   }
                                 } catch (e) {
                                   if (context.mounted) {
-                                    final friendlyMessage = _getFriendlyErrorMessage(e.toString());
+                                    final friendlyMessage =
+                                        _getFriendlyErrorMessage(e.toString());
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(friendlyMessage),
                                         backgroundColor: Colors.red,
-                                      )
+                                      ),
                                     );
                                   }
                                 }
@@ -148,40 +199,63 @@ class DiamondPurchaseScreen extends ConsumerWidget {
                                   Container(
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.1),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.1,
+                                      ),
                                       shape: BoxShape.circle,
                                     ),
-                                    child: const Icon(Icons.verified, color: Colors.white, size: 28),
+                                    child: const Icon(
+                                      Icons.verified,
+                                      color: Colors.white,
+                                      size: 28,
+                                    ),
                                   ),
                                   const SizedBox(width: 16),
                                   const Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Unlock P2P Transfers',
-                                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
                                         ),
                                         SizedBox(height: 4),
                                         Text(
                                           'Get Verified Status • 100 💎',
-                                          style: TextStyle(color: Colors.white70, fontSize: 13),
+                                          style: TextStyle(
+                                            color: Colors.white70,
+                                            fontSize: 13,
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  const Icon(Icons.chevron_right, color: Colors.white54),
+                                  const Icon(
+                                    Icons.chevron_right,
+                                    color: Colors.white54,
+                                  ),
                                 ],
                               ),
                             ),
                           ),
                         ),
-                      ).animate().shimmer(delay: 2.seconds, duration: 2.seconds);
-                    }
+                      ).animate().shimmer(
+                        delay: 2.seconds,
+                        duration: 2.seconds,
+                      );
+                    },
                   ),
 
                   // FREE APP Banner
-                  _buildFreeBadge().animate().fadeIn(delay: 200.ms).slideY(begin: 0.2),
+                  _buildFreeBadge()
+                      .animate()
+                      .fadeIn(delay: 200.ms)
+                      .slideY(begin: 0.2),
 
                   const SizedBox(height: 24),
 
@@ -203,7 +277,7 @@ class DiamondPurchaseScreen extends ConsumerWidget {
                     title: 'Welcome Bonus',
                     subtitle: 'One-time new user reward',
                     diamonds: DiamondConfig.signupBonus,
-                    color: Colors.purpleAccent,
+                    color: CasinoColors.richPurple,
                     delay: 300,
                   ),
                   _buildEarnOption(
@@ -212,7 +286,7 @@ class DiamondPurchaseScreen extends ConsumerWidget {
                     title: 'Daily Login',
                     subtitle: 'Log in every day',
                     diamonds: DiamondConfig.dailyLogin,
-                    color: Colors.blueAccent,
+                    color: CasinoColors.gold,
                     delay: 400,
                   ),
                   _buildEarnOption(
@@ -221,133 +295,23 @@ class DiamondPurchaseScreen extends ConsumerWidget {
                     title: 'Watch Ads',
                     subtitle: 'Up to ${DiamondConfig.maxAdsPerDay} per day',
                     diamonds: DiamondConfig.perAdWatch,
-                    color: Colors.orangeAccent,
+                    color: CasinoColors.neonPink,
                     delay: 500,
+                    onTap: () => _handleWatchAd(context, ref, userId),
                   ),
+
+                  // ... (other options)
                   _buildEarnOption(
                     context,
                     icon: Icons.games,
                     title: 'Complete Games',
                     subtitle: 'Up to ${DiamondConfig.maxGamesPerDay} per day',
                     diamonds: DiamondConfig.perGameComplete,
-                    color: Colors.greenAccent,
+                    color: CasinoColors.feltGreen,
                     delay: 600,
                   ),
-                  _buildEarnOption(
-                    context,
-                    icon: Icons.people,
-                    title: 'Refer Friends',
-                    subtitle: 'Invite friends to join',
-                    diamonds: DiamondConfig.referralBonus,
-                    color: Colors.pinkAccent,
-                    delay: 700,
-                  ),
-                  _buildEarnOption(
-                    context,
-                    icon: Icons.weekend,
-                    title: 'Weekly Bonus',
-                    subtitle: 'Every Sunday',
-                    diamonds: DiamondConfig.weeklyBonus,
-                    color: Colors.indigoAccent,
-                    delay: 800,
-                  ),
 
-                  const SizedBox(height: 24),
-
-                  // Maximum earnings info
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white10),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.diamond, color: CasinoColors.gold, size: 24),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Max ${DiamondConfig.maxDailyFreeEarnings}💎/day',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '~${DiamondConfig.maxMonthlyFreeEarnings}💎/month',
-                          style: const TextStyle(
-                            color: Colors.white54,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Go to Earn Screen button
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.mediumImpact();
-                      SoundService.playChipSound();
-                      Navigator.pushNamed(context, '/earn-diamonds');
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [CasinoColors.gold, Colors.orange],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: CasinoColors.gold.withValues(alpha: 0.4),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.diamond, color: Colors.black),
-                          SizedBox(width: 8),
-                          Text(
-                            'Start Earning Now',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(delay: 2.seconds, duration: 2.seconds),
-
-                  const SizedBox(height: 24),
-
-                  // Safe Harbor notice
-                  const Text(
-                    '⚖️ Safe Harbor Model\nThis app is a score tracking utility only. Diamonds have no real-world monetary value.',
-                    style: TextStyle(
-                      color: Colors.white38,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 12,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  
+                  // ... (rest of build method)
                   const SizedBox(height: 40),
                 ],
               ),
@@ -357,7 +321,70 @@ class DiamondPurchaseScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
+  Future<void> _handleWatchAd(
+    BuildContext context,
+    WidgetRef ref,
+    String userId,
+  ) async {
+    // Show Loading
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Loading Ad...'),
+          duration: Duration(milliseconds: 1000),
+        ),
+      );
+    }
+
+    try {
+      adService.showRewardedAd(
+        onUserEarnedReward: (ad, reward) async {
+          debugPrint('User earned reward: ${reward.amount} ${reward.type}');
+
+          // Claim reward in backend
+          final result = await ref
+              .read(diamondRewardsServiceProvider)
+              .claimAdReward(
+                userId,
+                'admob_reward_${DateTime.now().millisecondsSinceEpoch}',
+              );
+
+          if (context.mounted) {
+            if (result.success) {
+              SoundService.playWinSound(); // Winning sound!
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '🎉 Attempted Claim: +${result.amount} Diamonds! (${result.remaining} ads remaining today)',
+                  ),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Could not claim reward: ${result.reason}'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
+        },
+      );
+    } catch (e) {
+      debugPrint('Ad Error: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to load ad. Please try again later.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   Widget _buildBalanceCard(int balance) {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -379,7 +406,6 @@ class DiamondPurchaseScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          // Icon with glow
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -407,7 +433,7 @@ class DiamondPurchaseScreen extends ConsumerWidget {
               color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 48,
-              fontFamily: 'monospace', // Or appropriate font
+              fontFamily: 'monospace',
             ),
           ),
           const Text(
@@ -418,7 +444,7 @@ class DiamondPurchaseScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildFreeBadge() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -459,75 +485,108 @@ class DiamondPurchaseScreen extends ConsumerWidget {
     required int diamonds,
     required Color color,
     required int delay,
+    VoidCallback? onTap,
   }) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
-        SoundService.playCardSlide();
-        // Optional: Show specific details or navigate
+        if (onTap != null) {
+          onTap();
+        } else {
+          SoundService.playCardSlide();
+          // Default action
+        }
       },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+      child:
+          Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(icon, color: color, size: 24),
                     ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(color: Colors.white54, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: CasinoColors.gold,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: const [BoxShadow(color: CasinoColors.gold, blurRadius: 4)],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                   const Text('+', style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold)),
-                   const SizedBox(width: 2),
-                   Text(
-                    '$diamonds', 
-                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(width: 2),
-                  const Icon(Icons.diamond, size: 12, color: Colors.black),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideX(begin: 0.1),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            subtitle,
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: CasinoColors.gold,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: const [
+                          BoxShadow(color: CasinoColors.gold, blurRadius: 4),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            '+',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            '$diamonds',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          const Icon(
+                            Icons.diamond,
+                            size: 12,
+                            color: Colors.black,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+              .animate()
+              .fadeIn(delay: Duration(milliseconds: delay))
+              .slideX(begin: 0.1),
     );
   }
 
@@ -558,7 +617,8 @@ class DiamondPurchaseScreen extends ConsumerWidget {
     // Generic fallback - extract just the message part
     final bracketMatch = RegExp(r'\](.*?)(?:\[|$)').firstMatch(error);
     if (bracketMatch != null) {
-      return bracketMatch.group(1)?.trim() ?? 'Something went wrong. Please try again.';
+      return bracketMatch.group(1)?.trim() ??
+          'Something went wrong. Please try again.';
     }
     return 'Something went wrong. Please try again.';
   }

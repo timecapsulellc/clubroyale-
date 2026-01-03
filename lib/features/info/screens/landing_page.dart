@@ -12,10 +12,11 @@ class LandingPage extends ConsumerStatefulWidget {
   ConsumerState<LandingPage> createState() => _LandingPageState();
 }
 
-class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProviderStateMixin {
+class _LandingPageState extends ConsumerState<LandingPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
-  
+
   @override
   void initState() {
     super.initState();
@@ -23,12 +24,13 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     _controller.forward();
   }
-  
+
   @override
   void dispose() {
     _controller.dispose();
@@ -39,7 +41,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
   Widget build(BuildContext context) {
     final themeColors = ref.watch(themeColorsProvider);
     final screenSize = MediaQuery.of(context).size;
-    
+
     return Scaffold(
       backgroundColor: themeColors.background,
       body: Container(
@@ -49,22 +51,22 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
             children: [
               // Hero Section
               _buildHeroSection(themeColors, screenSize),
-              
+
               // Games Section
               _buildGamesSection(themeColors),
-              
+
               // Features Section
               _buildFeaturesSection(themeColors),
-              
+
               // Architecture Section
               _buildArchitectureSection(themeColors),
-              
+
               // Roadmap Section
               _buildRoadmapSection(themeColors),
-              
+
               // CTA Section
               _buildCTASection(themeColors),
-              
+
               // Footer
               _buildFooter(themeColors),
             ],
@@ -73,7 +75,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
       ),
     );
   }
-  
+
   Widget _buildHeroSection(ThemeColors themeColors, Size screenSize) {
     return FadeTransition(
       opacity: _fadeAnimation,
@@ -96,28 +98,25 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
         child: Column(
           children: [
             // Logo
-              Container(
-                width: 140,
-                height: 140,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: themeColors.accentGradient,
-                  borderRadius: BorderRadius.circular(40),
-                  boxShadow: [
-                    BoxShadow(
-                      color: themeColors.gold.withValues(alpha: 0.4),
-                      blurRadius: 30,
-                      spreadRadius: 5,
-                    ),
-                  ],
-                ),
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  fit: BoxFit.contain,
-                ),
+            Container(
+              width: 140,
+              height: 140,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: themeColors.accentGradient,
+                borderRadius: BorderRadius.circular(40),
+                boxShadow: [
+                  BoxShadow(
+                    color: themeColors.gold.withValues(alpha: 0.4),
+                    blurRadius: 30,
+                    spreadRadius: 5,
+                  ),
+                ],
               ),
+              child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+            ),
             const SizedBox(height: 32),
-            
+
             // Title
             ShaderMask(
               shaderCallback: (bounds) => LinearGradient(
@@ -134,7 +133,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Tagline
             Text(
               'Your Private Card Club',
@@ -145,7 +144,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
               ),
             ),
             const SizedBox(height: 32),
-            
+
             // Description
             Container(
               constraints: const BoxConstraints(maxWidth: 600),
@@ -161,7 +160,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
               ),
             ),
             const SizedBox(height: 40),
-            
+
             // CTA Buttons
             Wrap(
               spacing: 16,
@@ -173,7 +172,10 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
                   style: ElevatedButton.styleFrom(
                     backgroundColor: themeColors.gold,
                     foregroundColor: themeColors.background,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -183,27 +185,46 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
                     children: [
                       Icon(Icons.play_arrow),
                       SizedBox(width: 8),
-                      Text('Play Now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text(
+                        'Play Now',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () => launchUrl(Uri.parse('https://clubroyale-app.web.app/app-release.apk')),
+                  onPressed: () => launchUrl(
+                    Uri.parse('https://clubroyale-app.web.app/app-release.apk'),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF3DDC84),
                     foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                   icon: const Icon(Icons.android),
-                  label: const Text('Download APK', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  label: const Text(
+                    'Download APK',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 OutlinedButton(
                   onPressed: () => context.push('/about'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: themeColors.gold,
                     side: BorderSide(color: themeColors.gold),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -220,7 +241,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
               ],
             ),
             const SizedBox(height: 40),
-            
+
             // Stats Row
             Wrap(
               spacing: 40,
@@ -238,7 +259,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
       ),
     );
   }
-  
+
   Widget _buildStatItem(String value, String label, ThemeColors themeColors) {
     return Column(
       children: [
@@ -252,40 +273,63 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
         ),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 14,
-            color: themeColors.textSecondary,
-          ),
+          style: TextStyle(fontSize: 14, color: themeColors.textSecondary),
         ),
       ],
     );
   }
-  
+
   Widget _buildGamesSection(ThemeColors themeColors) {
     final games = [
-      {'name': 'Royal Meld', 'subtitle': 'Marriage', 'players': '2-8', 'icon': '♦️'},
-      {'name': 'Call Break', 'subtitle': 'Trick Taking', 'players': '4', 'icon': '♠️'},
-      {'name': 'Teen Patti', 'subtitle': '3-Card Poker', 'players': '2-8', 'icon': '♥️'},
-      {'name': 'In-Between', 'subtitle': 'Quick Bet', 'players': '2-6', 'icon': '♣️'},
+      {
+        'name': 'Royal Meld',
+        'subtitle': 'Marriage',
+        'players': '2-8',
+        'icon': '♦️',
+      },
+      {
+        'name': 'Call Break',
+        'subtitle': 'Trick Taking',
+        'players': '4',
+        'icon': '♠️',
+      },
+      {
+        'name': 'Teen Patti',
+        'subtitle': '3-Card Poker',
+        'players': '2-8',
+        'icon': '♥️',
+      },
+      {
+        'name': 'In-Between',
+        'subtitle': 'Quick Bet',
+        'players': '2-6',
+        'icon': '♣️',
+      },
     ];
-    
+
     return Container(
       padding: const EdgeInsets.all(40),
       child: Column(
         children: [
-          _buildSectionTitle('🎮 Games', 'Four complete card games with AI opponents', themeColors),
+          _buildSectionTitle(
+            '🎮 Games',
+            'Four complete card games with AI opponents',
+            themeColors,
+          ),
           const SizedBox(height: 32),
           Wrap(
             spacing: 20,
             runSpacing: 20,
             alignment: WrapAlignment.center,
-            children: games.map((game) => _buildGameCard(game, themeColors)).toList(),
+            children: games
+                .map((game) => _buildGameCard(game, themeColors))
+                .toList(),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildGameCard(Map<String, String> game, ThemeColors themeColors) {
     return Container(
       width: 180,
@@ -315,10 +359,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
           ),
           Text(
             game['subtitle']!,
-            style: TextStyle(
-              fontSize: 12,
-              color: themeColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 12, color: themeColors.textSecondary),
           ),
           const SizedBox(height: 8),
           Container(
@@ -336,36 +377,69 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
       ),
     );
   }
-  
+
   Widget _buildFeaturesSection(ThemeColors themeColors) {
     final features = [
-      {'icon': Icons.palette, 'title': '5 Themes', 'desc': 'Beautiful color presets with day/night mode'},
-      {'icon': Icons.smart_toy, 'title': 'AI Bots', 'desc': 'GenKit-powered intelligent opponents'},
-      {'icon': Icons.videocam, 'title': 'Voice & Video', 'desc': 'Real-time chat with LiveKit'},
-      {'icon': Icons.diamond, 'title': 'Free Diamonds', 'desc': 'Earn daily rewards without purchases'},
-      {'icon': Icons.share, 'title': 'Settlement', 'desc': 'Auto-calculate and share to WhatsApp'},
-      {'icon': Icons.install_mobile, 'title': 'PWA', 'desc': 'Install on any device'},
+      {
+        'icon': Icons.palette,
+        'title': '5 Themes',
+        'desc': 'Beautiful color presets with day/night mode',
+      },
+      {
+        'icon': Icons.smart_toy,
+        'title': 'AI Bots',
+        'desc': 'GenKit-powered intelligent opponents',
+      },
+      {
+        'icon': Icons.videocam,
+        'title': 'Voice & Video',
+        'desc': 'Real-time chat with LiveKit',
+      },
+      {
+        'icon': Icons.diamond,
+        'title': 'Free Diamonds',
+        'desc': 'Earn daily rewards without purchases',
+      },
+      {
+        'icon': Icons.share,
+        'title': 'Settlement',
+        'desc': 'Auto-calculate and share to WhatsApp',
+      },
+      {
+        'icon': Icons.install_mobile,
+        'title': 'PWA',
+        'desc': 'Install on any device',
+      },
     ];
-    
+
     return Container(
       padding: const EdgeInsets.all(40),
       color: themeColors.surface.withValues(alpha: 0.2),
       child: Column(
         children: [
-          _buildSectionTitle('✨ Features', 'Everything you need for the ultimate card experience', themeColors),
+          _buildSectionTitle(
+            '✨ Features',
+            'Everything you need for the ultimate card experience',
+            themeColors,
+          ),
           const SizedBox(height: 32),
           Wrap(
             spacing: 20,
             runSpacing: 20,
             alignment: WrapAlignment.center,
-            children: features.map((f) => _buildFeatureCard(f, themeColors)).toList(),
+            children: features
+                .map((f) => _buildFeatureCard(f, themeColors))
+                .toList(),
           ),
         ],
       ),
     );
   }
-  
-  Widget _buildFeatureCard(Map<String, dynamic> feature, ThemeColors themeColors) {
+
+  Widget _buildFeatureCard(
+    Map<String, dynamic> feature,
+    ThemeColors themeColors,
+  ) {
     return Container(
       width: 200,
       padding: const EdgeInsets.all(20),
@@ -397,23 +471,24 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
           const SizedBox(height: 4),
           Text(
             feature['desc'] as String,
-            style: TextStyle(
-              fontSize: 12,
-              color: themeColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 12, color: themeColors.textSecondary),
             textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildArchitectureSection(ThemeColors themeColors) {
     return Container(
       padding: const EdgeInsets.all(40),
       child: Column(
         children: [
-          _buildSectionTitle('🏗️ Architecture', 'Built with modern tech for scale and performance', themeColors),
+          _buildSectionTitle(
+            '🏗️ Architecture',
+            'Built with modern tech for scale and performance',
+            themeColors,
+          ),
           const SizedBox(height: 32),
           Container(
             constraints: const BoxConstraints(maxWidth: 700),
@@ -421,15 +496,42 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
             decoration: BoxDecoration(
               color: themeColors.surface.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: themeColors.gold.withValues(alpha: 0.3)),
+              border: Border.all(
+                color: themeColors.gold.withValues(alpha: 0.3),
+              ),
             ),
             child: Column(
               children: [
-                _buildArchRow('PRESENTATION', 'Flutter 3.38 • 30+ Screens • 5 Themes', themeColors, true),
-                _buildArchRow('STATE', 'Riverpod 3.x • NotifierProvider Pattern', themeColors, false),
-                _buildArchRow('BUSINESS', '22 Services • 4 Game Engines', themeColors, true),
-                _buildArchRow('BACKEND', 'Firebase • 12 Cloud Functions', themeColors, false),
-                _buildArchRow('AI', 'GenKit + Gemini Pro • 6 Flows', themeColors, true),
+                _buildArchRow(
+                  'PRESENTATION',
+                  'Flutter 3.38 • 30+ Screens • 5 Themes',
+                  themeColors,
+                  true,
+                ),
+                _buildArchRow(
+                  'STATE',
+                  'Riverpod 3.x • NotifierProvider Pattern',
+                  themeColors,
+                  false,
+                ),
+                _buildArchRow(
+                  'BUSINESS',
+                  '22 Services • 4 Game Engines',
+                  themeColors,
+                  true,
+                ),
+                _buildArchRow(
+                  'BACKEND',
+                  'Firebase • 12 Cloud Functions',
+                  themeColors,
+                  false,
+                ),
+                _buildArchRow(
+                  'AI',
+                  'GenKit + Gemini Pro • 6 Flows',
+                  themeColors,
+                  true,
+                ),
               ],
             ),
           ),
@@ -437,16 +539,25 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
       ),
     );
   }
-  
-  Widget _buildArchRow(String layer, String desc, ThemeColors themeColors, bool highlight) {
+
+  Widget _buildArchRow(
+    String layer,
+    String desc,
+    ThemeColors themeColors,
+    bool highlight,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: highlight ? themeColors.gold.withValues(alpha: 0.1) : Colors.transparent,
+        color: highlight
+            ? themeColors.gold.withValues(alpha: 0.1)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: highlight ? themeColors.gold.withValues(alpha: 0.3) : Colors.transparent,
+          color: highlight
+              ? themeColors.gold.withValues(alpha: 0.3)
+              : Colors.transparent,
         ),
       ),
       child: Row(
@@ -465,56 +576,94 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
           Expanded(
             child: Text(
               desc,
-              style: TextStyle(
-                color: themeColors.textSecondary,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: themeColors.textSecondary, fontSize: 14),
             ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildRoadmapSection(ThemeColors themeColors) {
     final roadmap = [
-      {'phase': 'Now', 'title': 'Current', 'items': ['4 Games', '5 Themes', 'AI Bots', 'Voice/Video'], 'done': true},
-      {'phase': 'Q1', 'title': '2025', 'items': ['Tournaments', 'Clubs/Guilds', 'Season Pass', 'Spectator Mode'], 'done': false},
-      {'phase': 'Q2', 'title': '2025', 'items': ['AI Coach', 'Replay System', 'Video Highlights', 'Creator Economy'], 'done': false},
-      {'phase': 'Q3', 'title': '2025', 'items': ['eSports', 'Multi-Region', '1M MAU', 'Poker/Rummy'], 'done': false},
+      {
+        'phase': 'Now',
+        'title': 'Current',
+        'items': ['4 Games', '5 Themes', 'AI Bots', 'Voice/Video'],
+        'done': true,
+      },
+      {
+        'phase': 'Q1',
+        'title': '2025',
+        'items': [
+          'Tournaments',
+          'Clubs/Guilds',
+          'Season Pass',
+          'Spectator Mode',
+        ],
+        'done': false,
+      },
+      {
+        'phase': 'Q2',
+        'title': '2025',
+        'items': [
+          'AI Coach',
+          'Replay System',
+          'Video Highlights',
+          'Creator Economy',
+        ],
+        'done': false,
+      },
+      {
+        'phase': 'Q3',
+        'title': '2025',
+        'items': ['eSports', 'Multi-Region', '1M MAU', 'Poker/Rummy'],
+        'done': false,
+      },
     ];
-    
+
     return Container(
       padding: const EdgeInsets.all(40),
       color: themeColors.surface.withValues(alpha: 0.2),
       child: Column(
         children: [
-          _buildSectionTitle('🗺️ Roadmap', 'Our vision for the future of ClubRoyale', themeColors),
+          _buildSectionTitle(
+            '🗺️ Roadmap',
+            'Our vision for the future of ClubRoyale',
+            themeColors,
+          ),
           const SizedBox(height: 32),
           Wrap(
             spacing: 20,
             runSpacing: 20,
             alignment: WrapAlignment.center,
-            children: roadmap.map((r) => _buildRoadmapCard(r, themeColors)).toList(),
+            children: roadmap
+                .map((r) => _buildRoadmapCard(r, themeColors))
+                .toList(),
           ),
         ],
       ),
     );
   }
-  
-  Widget _buildRoadmapCard(Map<String, dynamic> phase, ThemeColors themeColors) {
+
+  Widget _buildRoadmapCard(
+    Map<String, dynamic> phase,
+    ThemeColors themeColors,
+  ) {
     final isDone = phase['done'] as bool;
-    
+
     return Container(
       width: 200,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDone 
-            ? themeColors.gold.withValues(alpha: 0.1) 
+        color: isDone
+            ? themeColors.gold.withValues(alpha: 0.1)
             : themeColors.background.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDone ? themeColors.gold : themeColors.gold.withValues(alpha: 0.3),
+          color: isDone
+              ? themeColors.gold
+              : themeColors.gold.withValues(alpha: 0.3),
           width: isDone ? 2 : 1,
         ),
       ),
@@ -546,31 +695,35 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
             ],
           ),
           const SizedBox(height: 16),
-          ...(phase['items'] as List).map((item) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              children: [
-                Icon(
-                  isDone ? Icons.check : Icons.arrow_right,
-                  size: 14,
-                  color: isDone ? themeColors.gold : themeColors.textSecondary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  item,
-                  style: TextStyle(
-                    color: themeColors.textPrimary,
-                    fontSize: 13,
+          ...(phase['items'] as List).map(
+            (item) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  Icon(
+                    isDone ? Icons.check : Icons.arrow_right,
+                    size: 14,
+                    color: isDone
+                        ? themeColors.gold
+                        : themeColors.textSecondary,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Text(
+                    item,
+                    style: TextStyle(
+                      color: themeColors.textPrimary,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );
   }
-  
+
   Widget _buildCTASection(ThemeColors themeColors) {
     return Container(
       padding: const EdgeInsets.all(60),
@@ -587,10 +740,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
           const SizedBox(height: 16),
           Text(
             'Join thousands of players enjoying ClubRoyale',
-            style: TextStyle(
-              fontSize: 16,
-              color: themeColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 16, color: themeColors.textSecondary),
           ),
           const SizedBox(height: 32),
           ElevatedButton(
@@ -612,7 +762,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
       ),
     );
   }
-  
+
   Widget _buildFooter(ThemeColors themeColors) {
     return Container(
       padding: const EdgeInsets.all(32),
@@ -626,23 +776,38 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
             children: [
               TextButton(
                 onPressed: () => context.push('/faq'),
-                child: Text('FAQ', style: TextStyle(color: themeColors.textSecondary)),
+                child: Text(
+                  'FAQ',
+                  style: TextStyle(color: themeColors.textSecondary),
+                ),
               ),
               TextButton(
                 onPressed: () => context.push('/how-to-play'),
-                child: Text('How to Play', style: TextStyle(color: themeColors.textSecondary)),
+                child: Text(
+                  'How to Play',
+                  style: TextStyle(color: themeColors.textSecondary),
+                ),
               ),
               TextButton(
                 onPressed: () => context.push('/terms'),
-                child: Text('Terms', style: TextStyle(color: themeColors.textSecondary)),
+                child: Text(
+                  'Terms',
+                  style: TextStyle(color: themeColors.textSecondary),
+                ),
               ),
               TextButton(
                 onPressed: () => context.push('/privacy'),
-                child: Text('Privacy', style: TextStyle(color: themeColors.textSecondary)),
+                child: Text(
+                  'Privacy',
+                  style: TextStyle(color: themeColors.textSecondary),
+                ),
               ),
               TextButton(
                 onPressed: () => context.push('/about'),
-                child: Text('About', style: TextStyle(color: themeColors.textSecondary)),
+                child: Text(
+                  'About',
+                  style: TextStyle(color: themeColors.textSecondary),
+                ),
               ),
             ],
           ),
@@ -655,8 +820,12 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
       ),
     );
   }
-  
-  Widget _buildSectionTitle(String title, String subtitle, ThemeColors themeColors) {
+
+  Widget _buildSectionTitle(
+    String title,
+    String subtitle,
+    ThemeColors themeColors,
+  ) {
     return Column(
       children: [
         Text(
@@ -670,10 +839,7 @@ class _LandingPageState extends ConsumerState<LandingPage> with SingleTickerProv
         const SizedBox(height: 8),
         Text(
           subtitle,
-          style: TextStyle(
-            fontSize: 14,
-            color: themeColors.textSecondary,
-          ),
+          style: TextStyle(fontSize: 14, color: themeColors.textSecondary),
           textAlign: TextAlign.center,
         ),
       ],

@@ -208,7 +208,9 @@ class BottomNavController extends ChangeNotifier {
       _currentIndex = 0;
     } else if (route.startsWith('/games') || route.startsWith('/lobby')) {
       _currentIndex = 1;
-    } else if (route.startsWith('/social') || route.startsWith('/chat') || route.startsWith('/friends')) {
+    } else if (route.startsWith('/social') ||
+        route.startsWith('/chat') ||
+        route.startsWith('/friends')) {
       _currentIndex = 2;
     } else if (route.startsWith('/profile') || route.startsWith('/account')) {
       _currentIndex = 3;

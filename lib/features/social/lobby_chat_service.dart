@@ -1,5 +1,5 @@
 /// Global Lobby Chat Service
-/// 
+///
 /// Chat for users in the lobby area (not in a game room).
 /// Uses GenKit moderation for content filtering.
 library;
@@ -11,12 +11,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/chat/chat_message.dart';
 
 /// Provider for lobby chat service
-final lobbyChatServiceProvider = Provider.family<LobbyChatService, LobbyChatParams>(
-  (ref, params) => LobbyChatService(
-    userId: params.userId,
-    userName: params.userName,
-  ),
-);
+final lobbyChatServiceProvider =
+    Provider.family<LobbyChatService, LobbyChatParams>(
+      (ref, params) =>
+          LobbyChatService(userId: params.userId, userName: params.userName),
+    );
 
 /// Provider for lobby chat messages
 final lobbyChatMessagesProvider = StreamProvider<List<ChatMessage>>((ref) {
@@ -33,8 +32,7 @@ class LobbyChatParams {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is LobbyChatParams &&
-          userId == other.userId;
+      other is LobbyChatParams && userId == other.userId;
 
   @override
   int get hashCode => userId.hashCode;
@@ -47,10 +45,7 @@ class LobbyChatService {
   final String userId;
   final String userName;
 
-  LobbyChatService({
-    required this.userId,
-    required this.userName,
-  });
+  LobbyChatService({required this.userId, required this.userName});
 
   /// Reference to lobby chat collection
   CollectionReference<Map<String, dynamic>> get _chatRef =>
@@ -62,11 +57,13 @@ class LobbyChatService {
         .orderBy('timestamp', descending: true)
         .limit(50)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => ChatMessage.fromFirestore(doc))
-            .toList()
-            .reversed
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => ChatMessage.fromFirestore(doc))
+              .toList()
+              .reversed
+              .toList(),
+        );
   }
 
   /// Send a message to lobby chat

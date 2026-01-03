@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,7 +25,8 @@ class GameModesSection extends ConsumerWidget {
           child: Row(
             children: [
               Container(
-                width: 3, height: 16,
+                width: 3,
+                height: 16,
                 decoration: BoxDecoration(
                   color: const Color(0xFFD4AF37),
                   borderRadius: BorderRadius.circular(2),
@@ -126,7 +126,10 @@ class GameModesSection extends ConsumerWidget {
         padding: const EdgeInsets.all(24),
         decoration: const BoxDecoration(
           color: Color(0xFF1a0a2e),
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+          ),
           border: Border(top: BorderSide(color: Color(0xFFD4AF37), width: 2)),
         ),
         child: SafeArea(
@@ -137,47 +140,54 @@ class GameModesSection extends ConsumerWidget {
               children: [
                 const Text(
                   'Select Game (Practice)',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 // Visual Card Grid
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
 
-              childAspectRatio: 0.85,
-              children: [
-                _GameCardTile(
-                  gameType: 'marriage',
-                  name: 'Marriage',
-                  accentColor: const Color(0xFFE74C3C),
-                  onTap: () => _startPracticeGame(context, ref, 'marriage'),
+                  childAspectRatio: 0.85,
+                  children: [
+                    _GameCardTile(
+                      gameType: 'marriage',
+                      name: 'Marriage',
+                      accentColor: const Color(0xFFE74C3C),
+                      onTap: () => _startPracticeGame(context, ref, 'marriage'),
+                    ),
+                    _GameCardTile(
+                      gameType: 'call_break',
+                      name: 'Call Break',
+                      accentColor: const Color(0xFFD4AF37),
+                      onTap: () =>
+                          _startPracticeGame(context, ref, 'call_break'),
+                    ),
+                    _GameCardTile(
+                      gameType: 'teen_patti',
+                      name: 'Teen Patti',
+                      accentColor: const Color(0xFFE91E63),
+                      onTap: () =>
+                          _startPracticeGame(context, ref, 'teen_patti'),
+                    ),
+                    _GameCardTile(
+                      gameType: 'in_between',
+                      name: 'In-Between',
+                      accentColor: const Color(0xFF9B59B6),
+                      onTap: () =>
+                          _startPracticeGame(context, ref, 'in_between'),
+                    ),
+                  ],
                 ),
-                _GameCardTile(
-                  gameType: 'call_break',
-                  name: 'Call Break',
-                  accentColor: const Color(0xFFD4AF37),
-                  onTap: () => _startPracticeGame(context, ref, 'call_break'),
-                ),
-                _GameCardTile(
-                  gameType: 'teen_patti',
-                  name: 'Teen Patti',
-                  accentColor: const Color(0xFFE91E63),
-                  onTap: () => _startPracticeGame(context, ref, 'teen_patti'),
-                ),
-                _GameCardTile(
-                  gameType: 'in_between',
-                  name: 'In-Between',
-                  accentColor: const Color(0xFF9B59B6),
-                  onTap: () => _startPracticeGame(context, ref, 'in_between'),
-                ),
+                const SizedBox(height: 16),
               ],
-            ),
-            const SizedBox(height: 16),
-          ],
             ),
           ),
         ),
@@ -185,13 +195,17 @@ class GameModesSection extends ConsumerWidget {
     );
   }
 
-  Future<void> _startPracticeGame(BuildContext context, WidgetRef ref, String gameType) async {
+  Future<void> _startPracticeGame(
+    BuildContext context,
+    WidgetRef ref,
+    String gameType,
+  ) async {
     Navigator.pop(context); // Close sheet
-    
+
     // Store navigator before async gaps
     final navigator = Navigator.of(context);
     final router = GoRouter.of(context);
-    
+
     // Show loading indicator
     showDialog(
       context: context,
@@ -206,7 +220,7 @@ class GameModesSection extends ConsumerWidget {
       final lobbyService = ref.read(lobbyServiceProvider);
       final authService = ref.read(authServiceProvider);
       final userId = authService.currentUser?.uid;
-      
+
       if (userId == null) throw Exception('User not logged in');
       debugPrint('🎮 [Practice] User: $userId');
 
@@ -216,13 +230,9 @@ class GameModesSection extends ConsumerWidget {
         hostId: userId,
         name: 'Practice Match',
         gameType: gameType,
-        players: [
-          Player(id: userId, name: 'You', isReady: true),
-        ],
+        players: [Player(id: userId, name: 'You', isReady: true)],
         scores: {userId: 0},
-        config: const GameConfig(
-          maxPlayers: 4,
-        ),
+        config: const GameConfig(maxPlayers: 4),
       );
 
       final roomId = await lobbyService.createGame(room);
@@ -246,7 +256,7 @@ class GameModesSection extends ConsumerWidget {
       debugPrint('🎮 [Practice] Step 3: Initializing game engine...');
       final fullRoom = await lobbyService.getGame(roomId);
       if (fullRoom == null) throw Exception('Failed to fetch game room');
-      
+
       final playerIds = fullRoom.players.map((p) => p.id).toList();
       debugPrint('🎮 [Practice] Players: ${playerIds.join(', ')}');
 
@@ -260,7 +270,9 @@ class GameModesSection extends ConsumerWidget {
         debugPrint('🎮 [Practice] Starting In-Between engine...');
         await ref.read(inBetweenServiceProvider).startGame(roomId, playerIds);
       } else if (gameType == 'call_break') {
-        debugPrint('🎮 [Practice] Call Break engine will init in lobbyService.startGame');
+        debugPrint(
+          '🎮 [Practice] Call Break engine will init in lobbyService.startGame',
+        );
       }
       debugPrint('🎮 [Practice] Game engine initialized');
 
@@ -272,7 +284,7 @@ class GameModesSection extends ConsumerWidget {
       // 5. Navigate (use stored references)
       debugPrint('🎮 [Practice] Step 5: Navigating to game screen...');
       navigator.pop(); // Close loading dialog
-      
+
       if (gameType == 'marriage') {
         router.push('/marriage/$roomId');
       } else if (gameType == 'teen_patti') {
@@ -283,7 +295,6 @@ class GameModesSection extends ConsumerWidget {
         router.push('/game/$roomId/play');
       }
       debugPrint('🎮 [Practice] Navigation complete!');
-
     } catch (e, stackTrace) {
       debugPrint('❌ [Practice] Error starting practice game: $e');
       debugPrint('❌ [Practice] Stack trace: $stackTrace');
@@ -309,8 +320,8 @@ class GameModesSection extends ConsumerWidget {
         backgroundColor: const Color(0xFF1a0a2e),
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(color: Color(0xFFD4AF37), width: 1)
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFFD4AF37), width: 1),
         ),
         title: const Row(
           children: [
@@ -324,25 +335,34 @@ class GameModesSection extends ConsumerWidget {
           children: [
             Text(
               'Enter the code shared by your friend to join their table.',
-              style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13),
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 13,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: controller,
-              style: const TextStyle(color: Colors.white, fontSize: 18, letterSpacing: 2),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                letterSpacing: 2,
+              ),
               textAlign: TextAlign.center,
               decoration: InputDecoration(
                 hintText: 'CODE',
-                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.3),
+                ),
                 filled: true,
                 fillColor: const Color(0xFF2d1b4e),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFD4AF37))
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFD4AF37)),
                 ),
               ),
             ),
@@ -356,15 +376,18 @@ class GameModesSection extends ConsumerWidget {
           FilledButton(
             onPressed: () {
               if (controller.text.isNotEmpty) {
-                 Navigator.pop(context);
-                 context.push('/lobby/${controller.text}');
+                Navigator.pop(context);
+                context.push('/lobby/${controller.text}');
               }
             },
             style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFFD4AF37),
-                foregroundColor: Colors.black,
+              backgroundColor: const Color(0xFFD4AF37),
+              foregroundColor: Colors.black,
             ),
-            child: const Text('Join Table', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Join Table',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -397,7 +420,10 @@ class _GameCardTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: const Color(0xFF2d1b4e).withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: accentColor.withValues(alpha: 0.5), width: 2),
+            border: Border.all(
+              color: accentColor.withValues(alpha: 0.5),
+              width: 2,
+            ),
             boxShadow: [
               BoxShadow(
                 color: accentColor.withValues(alpha: 0.2),
@@ -409,15 +435,18 @@ class _GameCardTile extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-                GameCardGraphic(
-                  gameType: gameType,
-                  size: 40, // Reduced further to 40 to ensure no overflow
-                  animate: true,
-                ),
+              GameCardGraphic(
+                gameType: gameType,
+                size: 40, // Reduced further to 40 to ensure no overflow
+                animate: true,
+              ),
               const SizedBox(height: 12),
               // Game name label
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: accentColor,
                   borderRadius: BorderRadius.circular(12),
@@ -471,7 +500,9 @@ class _ModeCard extends StatelessWidget {
             gradient: bgGradient,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: isFeatured ? const Color(0xFFD4AF37) : Colors.white.withValues(alpha: 0.1),
+              color: isFeatured
+                  ? const Color(0xFFD4AF37)
+                  : Colors.white.withValues(alpha: 0.1),
               width: isFeatured ? 1.5 : 1,
             ),
             boxShadow: [
@@ -503,7 +534,7 @@ class _ModeCard extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               // Main Content
               Padding(
                 padding: const EdgeInsets.all(16),
@@ -519,19 +550,34 @@ class _ModeCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: accentColor.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
-                            border: Border.all(color: accentColor.withValues(alpha: 0.3), width: 1),
+                            border: Border.all(
+                              color: accentColor.withValues(alpha: 0.3),
+                              width: 1,
+                            ),
                           ),
                           child: Icon(icon, color: accentColor, size: 22),
                         ),
                         if (isFeatured)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFD4AF37),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Text('LIVE', style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold)),
-                          ).animate(onPlay: (c) => c.repeat()).shimmer(duration: 2.seconds, delay: 1.seconds),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFD4AF37),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Text(
+                                  'LIVE',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              )
+                              .animate(onPlay: (c) => c.repeat())
+                              .shimmer(duration: 2.seconds, delay: 1.seconds),
                       ],
                     ),
                     Column(
@@ -540,7 +586,9 @@ class _ModeCard extends StatelessWidget {
                         Text(
                           title,
                           style: TextStyle(
-                            color: isFeatured ? const Color(0xFFD4AF37) : Colors.white,
+                            color: isFeatured
+                                ? const Color(0xFFD4AF37)
+                                : Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1,
@@ -559,14 +607,16 @@ class _ModeCard extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               // Animated Shimmer Overlay (Glass Effect)
               AnimatedCardCover(
                 borderRadius: BorderRadius.circular(24),
-                // Randomize intervals slightly or use standard? 
+                // Randomize intervals slightly or use standard?
                 // Using different intervals makes them feel independent and organic.
                 // We can't easily randomize purely inside stateless, but we can base it on title length or hashcode.
-                interval: Duration(milliseconds: 3000 + (title.hashCode % 3000)),
+                interval: Duration(
+                  milliseconds: 3000 + (title.hashCode % 3000),
+                ),
               ),
             ],
           ),

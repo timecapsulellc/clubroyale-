@@ -17,7 +17,7 @@ import 'package:clubroyale/features/lobby/lobby_service.dart'; // Import LobbySe
 import 'package:clubroyale/features/game/game_room.dart'; // Import GameRoom
 
 /// HomeScreen - Nanobanana Dashboard Design
-/// 
+///
 /// Layout:
 /// 1. CompactHeader (Avatar + Name + Diamond Balance + Settings)
 /// 2. StoryBar (Colored rings: gold/teal/purple)
@@ -36,7 +36,7 @@ class HomeScreen extends ConsumerWidget {
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 600;
         final contentMaxWidth = 800.0;
-        
+
         return Scaffold(
           backgroundColor: const Color(0xFF1a0a2e),
           body: Stack(
@@ -47,11 +47,15 @@ class HomeScreen extends ConsumerWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Color(0xFF1a0a2e), Color(0xFF2d1b4e), Color(0xFF1a0a2e)],
+                    colors: [
+                      Color(0xFF1a0a2e),
+                      Color(0xFF2d1b4e),
+                      Color(0xFF1a0a2e),
+                    ],
                   ),
                 ),
               ),
-              
+
               // Main Content
               Align(
                 alignment: Alignment.topCenter,
@@ -61,7 +65,7 @@ class HomeScreen extends ConsumerWidget {
                     children: [
                       // 1. Compact Header (Avatar + Name + Diamond + Settings)
                       const CompactHeader(),
-                      
+
                       // 2. Scrollable Content
                       Expanded(
                         child: RefreshIndicator(
@@ -77,40 +81,54 @@ class HomeScreen extends ConsumerWidget {
                           color: const Color(0xFFD4AF37),
                           backgroundColor: const Color(0xFF1a0a2e),
                           child: SingleChildScrollView(
-                            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                            padding: EdgeInsets.only(bottom: isDesktop ? 120 : 100),
+                            physics: const BouncingScrollPhysics(
+                              parent: AlwaysScrollableScrollPhysics(),
+                            ),
+                            padding: EdgeInsets.only(
+                              bottom: isDesktop ? 120 : 100,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 // Story Bar (Feature Flagged)
                                 if (featureFlags.storiesEnabled)
-                                  const StoryBar().animate().fadeIn(delay: 100.ms),
-                                
+                                  const StoryBar().animate().fadeIn(
+                                    delay: 100.ms,
+                                  ),
+
                                 const SizedBox(height: 16),
-                                
+
                                 // Personal Stats (Premium Feature)
-                                const PersonalStatsCard().animate().fadeIn(delay: 150.ms),
-                                
+                                const PersonalStatsCard().animate().fadeIn(
+                                  delay: 150.ms,
+                                ),
+
                                 // Quick Match Banner - Real Data
                                 Consumer(
                                   builder: (context, ref, child) {
-                                    final publicRoomsStream = ref.watch(lobbyServiceProvider).watchPublicRooms();
-                                    
+                                    final publicRoomsStream = ref
+                                        .watch(lobbyServiceProvider)
+                                        .watchPublicRooms();
+
                                     return StreamBuilder<List<GameRoom>>(
                                       stream: publicRoomsStream,
                                       builder: (context, snapshot) {
                                         final rooms = snapshot.data ?? [];
-                                        
+
                                         if (rooms.isEmpty) {
-                                          return const NoQuickMatchBanner().animate().fadeIn(delay: 200.ms);
+                                          return const NoQuickMatchBanner()
+                                              .animate()
+                                              .fadeIn(delay: 200.ms);
                                         }
 
                                         // Find the best room (e.g., most players but not full)
-                                        final bestRoom = rooms.first; 
-                                        final playersWaiting = bestRoom.players.length;
-                                        
+                                        final bestRoom = rooms.first;
+                                        final playersWaiting =
+                                            bestRoom.players.length;
+
                                         return QuickMatchBanner(
-                                          gameType: bestRoom.gameType, // Use actual game type
+                                          gameType: bestRoom
+                                              .gameType, // Use actual game type
                                           playersWaiting: playersWaiting,
                                           roomId: bestRoom.id ?? '',
                                         ).animate().fadeIn(delay: 200.ms);
@@ -118,31 +136,40 @@ class HomeScreen extends ConsumerWidget {
                                     );
                                   },
                                 ),
-                                
-                                const SizedBox(height: 16),
-                                
-                                // Game Modes (Solo, Public, Private, Local)
-                                const GameModesSection().animate().slideY(begin: 0.2, end: 0, delay: 150.ms).fadeIn(),
 
                                 const SizedBox(height: 16),
-                                
+
+                                // Game Modes (Solo, Public, Private, Local)
+                                const GameModesSection()
+                                    .animate()
+                                    .slideY(begin: 0.2, end: 0, delay: 150.ms)
+                                    .fadeIn(),
+
+                                const SizedBox(height: 16),
+
                                 const SizedBox(height: 8),
-                                
+
                                 // Live Activity Section
-                                const LiveActivitySection().animate().fadeIn(delay: 150.ms),
-                                
+                                const LiveActivitySection().animate().fadeIn(
+                                  delay: 150.ms,
+                                ),
+
                                 const SizedBox(height: 8),
-                                
+
                                 // Quick Actions (Feature Flagged)
                                 if (featureFlags.socialEnabled)
-                                  const QuickSocialActions().animate().fadeIn(delay: 200.ms),
-                                
+                                  const QuickSocialActions().animate().fadeIn(
+                                    delay: 200.ms,
+                                  ),
+
                                 const SizedBox(height: 8),
-                                
+
                                 // Activity Feed (Feature Flagged)
                                 if (featureFlags.feedEnabled)
-                                  const SocialFeedWidget(maxItems: 5).animate().fadeIn(delay: 250.ms),
-                                
+                                  const SocialFeedWidget(
+                                    maxItems: 5,
+                                  ).animate().fadeIn(delay: 250.ms),
+
                                 const SizedBox(height: 24),
                               ],
                             ),
@@ -153,7 +180,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              
+
               // 3. Bottom Navigation with Gold Play Button
               Align(
                 alignment: Alignment.bottomCenter,

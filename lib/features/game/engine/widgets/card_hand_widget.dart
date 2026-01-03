@@ -22,9 +22,7 @@ class CardHandWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (cards.isEmpty) {
-      return const Center(
-        child: Text('No cards'),
-      );
+      return const Center(child: Text('No cards'));
     }
 
     final cardWidth = isCompact ? 50.0 : 60.0;
@@ -38,31 +36,29 @@ class CardHandWidget extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: List.generate(
-              cards.length,
-              (index) {
-                final card = cards[index];
-                final isPlayable = playableCards.isEmpty ||
-                    playableCards.any((c) => c.id == card.id);
-                final isSelected = selectedCard?.id == card.id;
+            children: List.generate(cards.length, (index) {
+              final card = cards[index];
+              final isPlayable =
+                  playableCards.isEmpty ||
+                  playableCards.any((c) => c.id == card.id);
+              final isSelected = selectedCard?.id == card.id;
 
-                return Container(
-                  margin: EdgeInsets.only(
-                    right: index < cards.length - 1 ? -overlap : 0,
-                    top: isSelected ? 0 : 10,
-                    bottom: isSelected ? 10 : 0,
-                  ),
-                  child: PlayingCardWidget(
-                    card: card,
-                    width: cardWidth,
-                    height: cardHeight,
-                    isPlayable: isPlayable,
-                    isSelected: isSelected,
-                    onTap: () => onCardTap(card),
-                  ),
-                );
-              },
-            ),
+              return Container(
+                margin: EdgeInsets.only(
+                  right: index < cards.length - 1 ? -overlap : 0,
+                  top: isSelected ? 0 : 10,
+                  bottom: isSelected ? 10 : 0,
+                ),
+                child: PlayingCardWidget(
+                  card: card,
+                  width: cardWidth,
+                  height: cardHeight,
+                  isPlayable: isPlayable,
+                  isSelected: isSelected,
+                  onTap: () => onCardTap(card),
+                ),
+              );
+            }),
           ),
         ),
       ),
@@ -117,10 +113,7 @@ class OpponentHandWidget extends StatelessWidget {
           ),
         ),
         if (cardCount > 0)
-          Text(
-            '$cardCount cards',
-            style: theme.textTheme.bodySmall,
-          ),
+          Text('$cardCount cards', style: theme.textTheme.bodySmall),
       ],
     );
   }

@@ -1,5 +1,5 @@
 /// Club Detail Screen
-/// 
+///
 /// Shows club info, members, and leaderboard
 library;
 
@@ -43,27 +43,31 @@ class ClubDetailScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            floatingActionButton: club.memberIds.contains(ref.read(authServiceProvider).currentUser?.uid)
-              ? FloatingActionButton.extended(
-                  onPressed: () {
-                    if (club.chatId != null) {
-                      context.push('/social/chat/${club.chatId}');
-                    } else {
-                       ScaffoldMessenger.of(context).showSnackBar(
-                         const SnackBar(content: Text('Chat not available for this club'))
-                       );
-                    }
-                  },
-                  label: const Text('Club Chat'),
-                  icon: const Icon(Icons.forum),
+            floatingActionButton:
+                club.memberIds.contains(
+                  ref.read(authServiceProvider).currentUser?.uid,
                 )
-              : null,
+                ? FloatingActionButton.extended(
+                    onPressed: () {
+                      if (club.chatId != null) {
+                        context.push('/social/chat/${club.chatId}');
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Chat not available for this club'),
+                          ),
+                        );
+                      }
+                    },
+                    label: const Text('Club Chat'),
+                    icon: const Icon(Icons.forum),
+                  )
+                : null,
           ),
         );
       },
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(
         appBar: AppBar(),
         body: Center(child: Text('Error: $e')),
@@ -113,24 +117,17 @@ class _ClubHeader extends ConsumerWidget {
       ),
       actions: [
         if (isOwner)
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {},
-          ),
+          IconButton(icon: const Icon(Icons.settings), onPressed: () {}),
         if (isMember && !isOwner)
           PopupMenuButton(
             itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'leave',
-                child: Text('Leave Club'),
-              ),
+              const PopupMenuItem(value: 'leave', child: Text('Leave Club')),
             ],
             onSelected: (value) async {
               if (value == 'leave') {
-                await ref.read(clubServiceProvider).leaveClub(
-                  clubId: club.id,
-                  oderId: auth.currentUser!.uid,
-                );
+                await ref
+                    .read(clubServiceProvider)
+                    .leaveClub(clubId: club.id, oderId: auth.currentUser!.uid);
                 if (context.mounted) Navigator.pop(context);
               }
             },
@@ -197,11 +194,16 @@ class _LeaderboardTab extends ConsumerWidget {
                   backgroundColor: _getRankColor(entry.rank),
                   child: Text(
                     '${entry.rank}',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 title: Text(entry.userName),
-                subtitle: Text('${entry.games} games • ${(entry.winRate! * 100).toStringAsFixed(0)}% win rate'),
+                subtitle: Text(
+                  '${entry.games} games • ${(entry.winRate! * 100).toStringAsFixed(0)}% win rate',
+                ),
                 trailing: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -212,7 +214,10 @@ class _LeaderboardTab extends ConsumerWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text('points', style: Theme.of(context).textTheme.bodySmall),
+                    Text(
+                      'points',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ],
                 ),
               ),
@@ -225,10 +230,14 @@ class _LeaderboardTab extends ConsumerWidget {
 
   Color _getRankColor(int rank) {
     switch (rank) {
-      case 1: return Colors.amber;
-      case 2: return Colors.grey.shade400;
-      case 3: return Colors.brown.shade300;
-      default: return Colors.blueGrey;
+      case 1:
+        return Colors.amber;
+      case 2:
+        return Colors.grey.shade400;
+      case 3:
+        return Colors.brown.shade300;
+      default:
+        return Colors.blueGrey;
     }
   }
 }

@@ -12,46 +12,46 @@ abstract class ChatMessage with _$ChatMessage {
   const factory ChatMessage({
     /// Firestore document ID
     String? id,
-    
+
     /// Sender user ID
     required String senderId,
-    
+
     /// Sender display name
     required String senderName,
-    
+
     /// Message content
     required String content,
-    
+
     /// Message type
     @Default(MessageType.text) MessageType type,
-    
+
     /// Emoji reactions (userId -> emoji)
     @Default({}) Map<String, String> reactions,
-    
+
     /// Whether message was moderated/blocked
     @Default(false) bool isModerated,
-    
+
     /// Moderation reason if blocked
     String? moderationReason,
-    
+
     /// Timestamp when sent
     DateTime? timestamp,
-    
+
     /// Whether message is deleted (soft delete)
     @Default(false) bool isDeleted,
-    
+
     /// ID of message being replied to
     String? replyToId,
-    
+
     /// Preview of replied message
     String? replyPreview,
-    
+
     /// List of user IDs who have read this message
     @Default([]) List<String> readBy,
-    
+
     /// Whether message was edited
     @Default(false) bool isEdited,
-    
+
     /// Original sender photo URL for display
     String? senderPhotoUrl,
   }) = _ChatMessage;
@@ -107,23 +107,44 @@ abstract class ChatMessage with _$ChatMessage {
 
 /// Type of chat message
 enum MessageType {
-  text,       // Regular text message
-  emoji,      // Single emoji (quick emoji)
-  system,     // System message (player joined, etc.)
-  gameEvent,  // Game event (trick won, round started)
+  text, // Regular text message
+  emoji, // Single emoji (quick emoji)
+  system, // System message (player joined, etc.)
+  gameEvent, // Game event (trick won, round started)
 }
 
 /// Quick emoji reactions available in chat
 class QuickEmojis {
   static const List<String> reactions = [
-    '👍', '👎', '😂', '😮', '😢', '🔥', '💯', '🎉',
+    '👍',
+    '👎',
+    '😂',
+    '😮',
+    '😢',
+    '🔥',
+    '💯',
+    '🎉',
   ];
 
   static const List<String> quickPlay = [
-    '🃏', '♠️', '♥️', '♦️', '♣️', '🏆', '💪', '🤔',
+    '🃏',
+    '♠️',
+    '♥️',
+    '♦️',
+    '♣️',
+    '🏆',
+    '💪',
+    '🤔',
   ];
 
   static const List<String> taunts = [
-    '😏', '🎯', '💣', '🔥', '😎', '🤣', '😱', '👀',
+    '😏',
+    '🎯',
+    '💣',
+    '🔥',
+    '😎',
+    '🤣',
+    '😱',
+    '👀',
   ];
 }

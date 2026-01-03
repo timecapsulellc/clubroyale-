@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,7 +25,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     super.initState();
     // Initialize presence system (idempotent listener)
     ref.read(presenceServiceProvider).initialize();
-    
+
     // Check for updates (Daily OTA) based on Beta Launch Strategy
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(updateServiceProvider).checkForUpdate(context);
@@ -51,12 +50,16 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         return StreamBuilder<User?>(
           stream: authService.authStateChanges,
           builder: (context, snapshot) {
-            debugPrint('📍 StreamBuilder: connectionState=${snapshot.connectionState}, hasData=${snapshot.hasData}, hasError=${snapshot.hasError}');
+            debugPrint(
+              '📍 StreamBuilder: connectionState=${snapshot.connectionState}, hasData=${snapshot.hasData}, hasError=${snapshot.hasError}',
+            );
             if (snapshot.hasError) {
               debugPrint('⚠️ AuthGate StreamBuilder error: ${snapshot.error}');
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
             }
 
             if (snapshot.hasData) {

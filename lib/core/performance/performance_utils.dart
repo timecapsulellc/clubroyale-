@@ -72,8 +72,7 @@ class ThrottledAction {
 
   void call(VoidCallback action) {
     final now = DateTime.now();
-    if (_lastExecution == null ||
-        now.difference(_lastExecution!) >= interval) {
+    if (_lastExecution == null || now.difference(_lastExecution!) >= interval) {
       _lastExecution = now;
       action();
     }
@@ -108,16 +107,12 @@ class PerformanceOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!enabled) return child;
-    
+
     return Stack(
       children: [
         child,
         if (kDebugMode)
-          const Positioned(
-            top: 50,
-            right: 10,
-            child: _RebuildIndicator(),
-          ),
+          const Positioned(top: 50, right: 10, child: _RebuildIndicator()),
       ],
     );
   }
@@ -207,9 +202,7 @@ class _SelectBuilderState<T, S> extends State<SelectBuilder<T, S>> {
 Widget cachedImagePlaceholder() {
   return Container(
     color: Colors.grey[900],
-    child: const Center(
-      child: Icon(Icons.image, color: Colors.grey, size: 32),
-    ),
+    child: const Center(child: Icon(Icons.image, color: Colors.grey, size: 32)),
   );
 }
 

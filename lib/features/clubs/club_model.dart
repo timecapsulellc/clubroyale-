@@ -1,5 +1,5 @@
 /// Club Models
-/// 
+///
 /// Models for gaming clubs/groups feature
 library;
 
@@ -10,16 +10,16 @@ part 'club_model.g.dart';
 
 /// Club membership role
 enum ClubRole {
-  owner,    // Created the club
-  admin,    // Can manage members
-  member,   // Regular member
+  owner, // Created the club
+  admin, // Can manage members
+  member, // Regular member
 }
 
 /// Club privacy setting
 enum ClubPrivacy {
-  public,     // Anyone can join
-  private,    // Invite only
-  hidden,     // Not visible in search
+  public, // Anyone can join
+  private, // Invite only
+  hidden, // Not visible in search
 }
 
 /// Gaming club model
@@ -151,9 +151,9 @@ abstract class ClubActivity with _$ClubActivity {
 
 /// Club activity type
 enum ClubActivityType {
-  gameResult,     // Member finished a game
-  memberJoined,   // New member joined
-  announcement,   // Admin announcement
-  achievement,    // Member earned achievement
-  milestone,      // Club milestone (e.g., 100 games)
+  gameResult, // Member finished a game
+  memberJoined, // New member joined
+  announcement, // Admin announcement
+  achievement, // Member earned achievement
+  milestone, // Club milestone (e.g., 100 games)
 }

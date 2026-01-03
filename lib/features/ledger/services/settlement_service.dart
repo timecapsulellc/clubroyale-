@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 class SettlementTransaction {
   final String fromPlayerId;
   final String toPlayerId;
@@ -33,10 +32,10 @@ final settlementServiceProvider = Provider((ref) => SettlementService());
 
 class SettlementService {
   /// Calculates the minimum number of transactions to settle debts based on scores.
-  /// 
+  ///
   /// [scores]: Map of playerId -> score
   /// [pointValue]: Value of 1 point in currency (default 1)
-  /// 
+  ///
   /// Returns a list of transactions (Who pays Whom and How much).
   List<SettlementTransaction> calculateSettlements(
     Map<String, int> scores, {
@@ -45,23 +44,23 @@ class SettlementService {
     // 1. Calculate net balances
     // In Call Break, scores can be positive or negative.
     // We need to normalize them so sum is 0 for settlement?
-    // Actually, Call Break is usually zero-sum if played with fixed stakes, 
+    // Actually, Call Break is usually zero-sum if played with fixed stakes,
     // but raw scores aren't necessarily zero-sum.
-    // 
-    // Standard approach: 
-    // Calculate average score. 
+    //
+    // Standard approach:
+    // Calculate average score.
     // Balance = (Score - Average) * PointValue.
-    // 
+    //
     // However, if we just want to settle based on raw points:
-    // Let's assume we are settling the *difference* from the average, 
+    // Let's assume we are settling the *difference* from the average,
     // or if it's a "winner takes all" or "pay per point difference".
     //
     // Common Call Break betting:
     // Everyone pays the winner? Or pay based on difference?
-    // 
+    //
     // Let's implement the "Pay based on difference from average" model which is fair.
     // If sum of scores is not 0, we center them around the average.
-    
+
     if (scores.isEmpty) return [];
 
     double totalScore = scores.values.fold(0, (sum, score) => sum + score);
@@ -70,7 +69,7 @@ class SettlementService {
     // Calculate net amount for each player
     // Rounding to nearest integer for simplicity in currency
     Map<String, int> netBalances = {};
-    
+
     scores.forEach((playerId, score) {
       int balance = ((score - averageScore) * pointValue).round();
       netBalances[playerId] = balance;
@@ -99,7 +98,7 @@ class SettlementService {
 
     // 3. Greedy settlement algorithm
     List<SettlementTransaction> transactions = [];
-    
+
     int i = 0; // debtor index
     int j = 0; // creditor index
 
@@ -111,13 +110,17 @@ class SettlementService {
       int creditorAmount = creditors[j].value; // Positive
 
       // The amount to settle is the minimum of absolute debt and credit
-      int amount = (-debtorAmount < creditorAmount) ? -debtorAmount : creditorAmount;
+      int amount = (-debtorAmount < creditorAmount)
+          ? -debtorAmount
+          : creditorAmount;
 
-      transactions.add(SettlementTransaction(
-        fromPlayerId: debtorId,
-        toPlayerId: creditorId,
-        amount: amount,
-      ));
+      transactions.add(
+        SettlementTransaction(
+          fromPlayerId: debtorId,
+          toPlayerId: creditorId,
+          amount: amount,
+        ),
+      );
 
       // Update balances
       debtors[i] = MapEntry(debtorId, debtorAmount + amount);

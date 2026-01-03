@@ -1,5 +1,5 @@
 /// Activity Feed Model and Provider
-/// 
+///
 /// Displays friends' game results, achievements, and activity
 library;
 
@@ -35,24 +35,25 @@ abstract class FeedItem with _$FeedItem {
     required String description,
     String? imageUrl,
     required DateTime createdAt,
-    
+
     // Game result specific
     String? gameType,
     int? score,
     bool? isWin,
     Map<String, int>? gameScores,
-    
+
     // Achievement specific
     String? achievementId,
     String? achievementRarity,
-    
+
     // Reactions
     @Default([]) List<String> likedBy,
     @Default(0) int likesCount,
     @Default(0) int commentsCount,
   }) = _FeedItem;
 
-  factory FeedItem.fromJson(Map<String, dynamic> json) => _$FeedItemFromJson(json);
+  factory FeedItem.fromJson(Map<String, dynamic> json) =>
+      _$FeedItemFromJson(json);
 
   /// Check if current user liked this item
   bool isLikedBy(String oderId) => likedBy.contains(oderId);
@@ -73,9 +74,11 @@ class ActivityFeedService {
         .orderBy('createdAt', descending: true)
         .limit(limit)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => FeedItem.fromJson({...doc.data(), 'id': doc.id}))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => FeedItem.fromJson({...doc.data(), 'id': doc.id}))
+              .toList(),
+        );
   }
 
   /// Post a game result to the feed
@@ -89,8 +92,10 @@ class ActivityFeedService {
     Map<String, int>? allScores,
   }) async {
     final gameDisplayName = _getGameDisplayName(gameType);
-    final title = isWin ? '🏆 Won a $gameDisplayName game!' : 'Played $gameDisplayName';
-    
+    final title = isWin
+        ? '🏆 Won a $gameDisplayName game!'
+        : 'Played $gameDisplayName';
+
     await _feedRef.add({
       'oderId': oderId,
       'userName': userName,
@@ -137,20 +142,20 @@ class ActivityFeedService {
   /// Toggle like on a feed item
   Future<void> toggleLike(String feedItemId, String oderId) async {
     final docRef = _feedRef.doc(feedItemId);
-    
+
     await _firestore.runTransaction((transaction) async {
       final doc = await transaction.get(docRef);
       if (!doc.exists) return;
-      
+
       final data = doc.data()!;
       final likedBy = List<String>.from(data['likedBy'] ?? []);
-      
+
       if (likedBy.contains(oderId)) {
         likedBy.remove(oderId);
       } else {
         likedBy.add(oderId);
       }
-      
+
       transaction.update(docRef, {
         'likedBy': likedBy,
         'likesCount': likedBy.length,
@@ -180,6 +185,9 @@ final activityFeedServiceProvider = Provider<ActivityFeedService>((ref) {
 });
 
 /// Provider for feed items stream
-final activityFeedProvider = StreamProvider.family<List<FeedItem>, String>((ref, oderId) {
+final activityFeedProvider = StreamProvider.family<List<FeedItem>, String>((
+  ref,
+  oderId,
+) {
   return ref.watch(activityFeedServiceProvider).watchFeed(oderId);
 });

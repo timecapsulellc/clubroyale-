@@ -1,5 +1,5 @@
 /// Tournament Service
-/// 
+///
 /// Manages tournament creation, registration, and bracket management
 library;
 
@@ -34,7 +34,7 @@ class TournamentService {
     DateTime? startTime,
   }) async {
     final doc = _tournamentsRef.doc();
-    
+
     await doc.set({
       'id': doc.id,
       'name': name,
@@ -84,7 +84,7 @@ class TournamentService {
         (s) => s.name == data['status'],
         orElse: () => TournamentStatus.cancelled,
       );
-      
+
       if (status != TournamentStatus.registration) {
         debugPrint('Tournament not accepting registrations');
         return false;
@@ -106,7 +106,9 @@ class TournamentService {
         'participantIds': FieldValue.arrayUnion([oderId]),
       });
 
-      await _tournamentDoc(tournamentId).collection('participants').doc(oderId).set({
+      await _tournamentDoc(
+        tournamentId,
+      ).collection('participants').doc(oderId).set({
         'oderId': oderId,
         'userName': userName,
         'avatarUrl': avatarUrl,
@@ -134,7 +136,9 @@ class TournamentService {
         'participantIds': FieldValue.arrayRemove([oderId]),
       });
 
-      await _tournamentDoc(tournamentId).collection('participants').doc(oderId).delete();
+      await _tournamentDoc(
+        tournamentId,
+      ).collection('participants').doc(oderId).delete();
 
       return true;
     } catch (e) {
@@ -158,10 +162,10 @@ class TournamentService {
       }
 
       // Get participant details
-      final participantsSnapshot = await _tournamentDoc(tournamentId)
-          .collection('participants')
-          .get();
-      
+      final participantsSnapshot = await _tournamentDoc(
+        tournamentId,
+      ).collection('participants').get();
+
       final participants = participantsSnapshot.docs
           .map((d) => MapEntry(d.id, d.data()['userName'] as String))
           .toList();
@@ -187,7 +191,9 @@ class TournamentService {
   }
 
   /// Generate single elimination brackets
-  List<TournamentBracket> _generateBrackets(List<MapEntry<String, String>> participants) {
+  List<TournamentBracket> _generateBrackets(
+    List<MapEntry<String, String>> participants,
+  ) {
     final brackets = <TournamentBracket>[];
     var round = 1;
     var matchNumber = 1;
@@ -197,17 +203,21 @@ class TournamentService {
       final player1 = participants[i];
       final player2 = i + 1 < participants.length ? participants[i + 1] : null;
 
-      brackets.add(TournamentBracket(
-        id: 'r${round}_m$matchNumber',
-        round: round,
-        matchNumber: matchNumber,
-        player1Id: player1.key,
-        player1Name: player1.value,
-        player2Id: player2?.key,
-        player2Name: player2?.value,
-        status: player2 == null ? BracketStatus.completed : BracketStatus.pending,
-        winnerId: player2 == null ? player1.key : null, // Bye
-      ));
+      brackets.add(
+        TournamentBracket(
+          id: 'r${round}_m$matchNumber',
+          round: round,
+          matchNumber: matchNumber,
+          player1Id: player1.key,
+          player1Name: player1.value,
+          player2Id: player2?.key,
+          player2Name: player2?.value,
+          status: player2 == null
+              ? BracketStatus.completed
+              : BracketStatus.pending,
+          winnerId: player2 == null ? player1.key : null, // Bye
+        ),
+      );
       matchNumber++;
     }
 
@@ -249,19 +259,21 @@ class TournamentService {
       await _updateParticipantStats(
         tournamentId: tournamentId,
         winnerId: winnerId,
-        loserId: winnerId == updatedBracket.player1Id 
-            ? updatedBracket.player2Id 
+        loserId: winnerId == updatedBracket.player1Id
+            ? updatedBracket.player2Id
             : updatedBracket.player1Id,
-        winnerPoints: winnerId == updatedBracket.player1Id 
-            ? player1Score 
+        winnerPoints: winnerId == updatedBracket.player1Id
+            ? player1Score
             : player2Score,
-        loserPoints: winnerId == updatedBracket.player1Id 
-            ? player2Score 
+        loserPoints: winnerId == updatedBracket.player1Id
+            ? player2Score
             : player1Score,
       );
 
       // Check if tournament is complete
-      final allComplete = brackets.every((b) => b.status == BracketStatus.completed);
+      final allComplete = brackets.every(
+        (b) => b.status == BracketStatus.completed,
+      );
 
       await _tournamentDoc(tournamentId).update({
         'brackets': brackets.map((b) => b.toJson()).toList(),
@@ -283,14 +295,18 @@ class TournamentService {
   }) async {
     final batch = _firestore.batch();
 
-    final winnerRef = _tournamentDoc(tournamentId).collection('participants').doc(winnerId);
+    final winnerRef = _tournamentDoc(
+      tournamentId,
+    ).collection('participants').doc(winnerId);
     batch.update(winnerRef, {
       'wins': FieldValue.increment(1),
       'pointsScored': FieldValue.increment(winnerPoints),
     });
 
     if (loserId != null) {
-      final loserRef = _tournamentDoc(tournamentId).collection('participants').doc(loserId);
+      final loserRef = _tournamentDoc(
+        tournamentId,
+      ).collection('participants').doc(loserId);
       batch.update(loserRef, {
         'losses': FieldValue.increment(1),
         'pointsScored': FieldValue.increment(loserPoints),
@@ -311,14 +327,18 @@ class TournamentService {
 
   /// Get all tournaments (for lobby)
   Stream<List<Tournament>> watchAllTournaments({TournamentStatus? status}) {
-    var query = _tournamentsRef.orderBy('createdAt', descending: true).limit(50);
-    
+    var query = _tournamentsRef
+        .orderBy('createdAt', descending: true)
+        .limit(50);
+
     if (status != null) {
       query = query.where('status', isEqualTo: status.name);
     }
 
     return query.snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => Tournament.fromJson(doc.data())).toList();
+      return snapshot.docs
+          .map((doc) => Tournament.fromJson(doc.data()))
+          .toList();
     });
   }
 
@@ -351,7 +371,10 @@ final tournamentServiceProvider = Provider<TournamentService>((ref) {
 });
 
 /// Provider for watching a specific tournament
-final tournamentProvider = StreamProvider.family<Tournament?, String>((ref, id) {
+final tournamentProvider = StreamProvider.family<Tournament?, String>((
+  ref,
+  id,
+) {
   return ref.watch(tournamentServiceProvider).watchTournament(id);
 });
 
@@ -362,7 +385,7 @@ final allTournamentsProvider = StreamProvider<List<Tournament>>((ref) {
 
 /// Provider for open tournaments (registration phase)
 final openTournamentsProvider = StreamProvider<List<Tournament>>((ref) {
-  return ref.watch(tournamentServiceProvider).watchAllTournaments(
-    status: TournamentStatus.registration,
-  );
+  return ref
+      .watch(tournamentServiceProvider)
+      .watchAllTournaments(status: TournamentStatus.registration);
 });

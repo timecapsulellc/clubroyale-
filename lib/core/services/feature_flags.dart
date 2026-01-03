@@ -1,10 +1,9 @@
 /// Feature Flags Service
-/// 
+///
 /// Centralized feature flag management for Gaming-First strategy.
 /// Allows features to be enabled/disabled without code changes.
 library;
 
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:clubroyale/core/services/app_logger.dart';
 
@@ -16,7 +15,7 @@ enum Feature {
   contentCreation,
   clubPosts,
   activityFeed,
-  
+
   // Gaming Features (ENABLED)
   liveAudioVideo,
   spectatorMode,
@@ -27,7 +26,7 @@ enum Feature {
 }
 
 /// Feature Flags Service
-/// 
+///
 /// Controls which features are enabled in the app.
 /// Default values implement Gaming-First strategy.
 class FeatureFlags {
@@ -36,7 +35,7 @@ class FeatureFlags {
   FeatureFlags._internal();
 
   SharedPreferences? _prefs;
-  
+
   /// Default feature states (Gaming-First Strategy)
   static const Map<Feature, bool> _defaults = {
     // Social Features - DISABLED by default
@@ -45,7 +44,7 @@ class FeatureFlags {
     Feature.contentCreation: false,
     Feature.clubPosts: false,
     Feature.activityFeed: false,
-    
+
     // Gaming Features - ENABLED by default
     Feature.liveAudioVideo: true,
     Feature.spectatorMode: true,
@@ -97,7 +96,8 @@ class FeatureFlags {
   // ========================================
 
   /// Social features enabled
-  bool get socialEnabled => isEnabled(Feature.socialFeed) || isEnabled(Feature.stories);
+  bool get socialEnabled =>
+      isEnabled(Feature.socialFeed) || isEnabled(Feature.stories);
 
   /// Stories feature enabled
   bool get storiesEnabled => isEnabled(Feature.stories);

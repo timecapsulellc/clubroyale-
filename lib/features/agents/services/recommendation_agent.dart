@@ -7,7 +7,7 @@ final recommendationAgentProvider = Provider<RecommendationAgent>((ref) {
 });
 
 /// Recommendation Agent - Personalized Content & Discovery
-/// 
+///
 /// Features:
 /// - Feed ranking
 /// - Friend suggestions
@@ -36,11 +36,16 @@ class RecommendationAgent {
     } catch (e) {
       // Return default ranking
       return FeedRankingResult(
-        rankedContent: contentItems.take(limit).map((c) => RankedContent(
-          contentId: c.id,
-          score: c.engagementScore,
-          reason: 'Default ranking',
-        )).toList(),
+        rankedContent: contentItems
+            .take(limit)
+            .map(
+              (c) => RankedContent(
+                contentId: c.id,
+                score: c.engagementScore,
+                reason: 'Default ranking',
+              ),
+            )
+            .toList(),
         trendingTopics: [],
         suggestedCreators: [],
       );
@@ -63,8 +68,9 @@ class RecommendationAgent {
         'limit': limit,
       });
       return (result.data['suggestions'] as List<dynamic>?)
-          ?.map((s) => FriendSuggestion.fromJson(s))
-          .toList() ?? [];
+              ?.map((s) => FriendSuggestion.fromJson(s))
+              .toList() ??
+          [];
     } catch (e) {
       return [];
     }
@@ -86,10 +92,17 @@ class RecommendationAgent {
         if (availableTime != null) 'availableTime': availableTime,
       });
       return (result.data['recommendations'] as List<dynamic>?)
-          ?.map((r) => GameRecommendation.fromJson(r))
-          .toList() ?? [];
+              ?.map((r) => GameRecommendation.fromJson(r))
+              .toList() ??
+          [];
     } catch (e) {
-      return [GameRecommendation(game: 'Call Break', reason: 'Popular choice!', matchScore: 0.8)];
+      return [
+        GameRecommendation(
+          game: 'Call Break',
+          reason: 'Popular choice!',
+          matchScore: 0.8,
+        ),
+      ];
     }
   }
 }
@@ -161,9 +174,11 @@ class FeedRankingResult {
 
   factory FeedRankingResult.fromJson(Map<String, dynamic> json) {
     return FeedRankingResult(
-      rankedContent: (json['rankedContent'] as List<dynamic>?)
-          ?.map((r) => RankedContent.fromJson(r))
-          .toList() ?? [],
+      rankedContent:
+          (json['rankedContent'] as List<dynamic>?)
+              ?.map((r) => RankedContent.fromJson(r))
+              .toList() ??
+          [],
       trendingTopics: List<String>.from(json['trendingTopics'] ?? []),
       suggestedCreators: List<String>.from(json['suggestedCreators'] ?? []),
     );
@@ -175,7 +190,11 @@ class RankedContent {
   final double score;
   final String reason;
 
-  RankedContent({required this.contentId, required this.score, required this.reason});
+  RankedContent({
+    required this.contentId,
+    required this.score,
+    required this.reason,
+  });
 
   factory RankedContent.fromJson(Map<String, dynamic> json) {
     return RankedContent(
@@ -191,7 +210,11 @@ class UserGameProfile {
   final String skillLevel;
   final String? location;
 
-  UserGameProfile({required this.games, required this.skillLevel, this.location});
+  UserGameProfile({
+    required this.games,
+    required this.skillLevel,
+    this.location,
+  });
 
   Map<String, dynamic> toJson() => {
     'games': games,
@@ -240,7 +263,8 @@ class FriendSuggestion {
   factory FriendSuggestion.fromJson(Map<String, dynamic> json) {
     return FriendSuggestion(
       userId: json['userId'] as String? ?? '',
-      compatibilityScore: (json['compatibilityScore'] as num?)?.toDouble() ?? 0.0,
+      compatibilityScore:
+          (json['compatibilityScore'] as num?)?.toDouble() ?? 0.0,
       reason: json['reason'] as String? ?? '',
       commonInterests: List<String>.from(json['commonInterests'] ?? []),
     );
@@ -252,7 +276,11 @@ class GameHistory {
   final int timesPlayed;
   final double winRate;
 
-  GameHistory({required this.game, required this.timesPlayed, required this.winRate});
+  GameHistory({
+    required this.game,
+    required this.timesPlayed,
+    required this.winRate,
+  });
 
   Map<String, dynamic> toJson() => {
     'game': game,

@@ -80,16 +80,16 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
               const SizedBox(height: 16),
               Text(
                 'Create Story',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
                 'Take a photo or select from gallery',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[600],
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
               ),
               const SizedBox(height: 16),
               // Gallery option first
@@ -117,9 +117,9 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                   child: const Icon(Icons.camera_alt, color: Colors.blue),
                 ),
                 title: const Text('Use Camera'),
-                subtitle: Text(kIsWeb 
-                    ? 'Opens camera capture dialog' 
-                    : 'Take a new photo'),
+                subtitle: Text(
+                  kIsWeb ? 'Opens camera capture dialog' : 'Take a new photo',
+                ),
                 onTap: () => Navigator.pop(context, 'camera_photo'),
               ),
               // Video option (mobile only - web video capture is complex)
@@ -155,7 +155,7 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
   Future<void> _pickMedia(String source) async {
     final picker = ImagePicker();
     XFile? file;
-    
+
     setState(() {
       _errorMessage = null;
     });
@@ -202,26 +202,29 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
       }
     } catch (e) {
       String errorMsg = 'Failed to access media';
-      
+
       // Check for common error types
       final errorString = e.toString().toLowerCase();
-      
-      if (errorString.contains('camera') || 
+
+      if (errorString.contains('camera') ||
           errorString.contains('notallowederror') ||
           errorString.contains('permission')) {
         if (kIsWeb) {
-          errorMsg = 'Camera not available on this browser. Please use "Choose from Gallery" instead, or try on a mobile device.';
+          errorMsg =
+              'Camera not available on this browser. Please use "Choose from Gallery" instead, or try on a mobile device.';
         } else {
-          errorMsg = 'Camera access denied. Please enable camera permission in Settings.';
+          errorMsg =
+              'Camera access denied. Please enable camera permission in Settings.';
         }
       } else if (errorString.contains('notfounderror')) {
-        errorMsg = 'No camera found on this device. Please use "Choose from Gallery" instead.';
+        errorMsg =
+            'No camera found on this device. Please use "Choose from Gallery" instead.';
       }
-      
+
       setState(() {
         _errorMessage = errorMsg;
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -276,19 +279,22 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
     });
 
     try {
-      await ref.read(storyServiceProvider).createStory(
-        mediaBytes: _selectedMediaBytes!,
-        mediaType: _mediaType,
-        caption: _captionController.text.isNotEmpty
-            ? _captionController.text
-            : null,
-        textOverlay: _showTextOverlay && _textOverlayController.text.isNotEmpty
-            ? _textOverlayController.text
-            : null,
-        textColor: _showTextOverlay
-            ? _textColor.value.toRadixString(16).substring(2)
-            : null,
-      );
+      await ref
+          .read(storyServiceProvider)
+          .createStory(
+            mediaBytes: _selectedMediaBytes!,
+            mediaType: _mediaType,
+            caption: _captionController.text.isNotEmpty
+                ? _captionController.text
+                : null,
+            textOverlay:
+                _showTextOverlay && _textOverlayController.text.isNotEmpty
+                ? _textOverlayController.text
+                : null,
+            textColor: _showTextOverlay
+                ? _textColor.value.toRadixString(16).substring(2)
+                : null,
+          );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -326,16 +332,16 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
 
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: _selectedMediaBytes == null 
-        ? AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white),
-              onPressed: () => context.pop(),
-            ),
-          )
-        : null,
+      appBar: _selectedMediaBytes == null
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => context.pop(),
+              ),
+            )
+          : null,
       body: _selectedMediaBytes == null
           ? Center(
               child: Column(
@@ -369,7 +375,10 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                         OutlinedButton.icon(
                           onPressed: _showMediaPicker,
                           icon: const Icon(Icons.refresh, color: Colors.white),
-                          label: const Text('Try Again', style: TextStyle(color: Colors.white)),
+                          label: const Text(
+                            'Try Again',
+                            style: TextStyle(color: Colors.white),
+                          ),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: Colors.white54),
                           ),
@@ -391,9 +400,16 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.videocam, size: 80, color: Colors.white54),
+                              Icon(
+                                Icons.videocam,
+                                size: 80,
+                                color: Colors.white54,
+                              ),
                               SizedBox(height: 16),
-                              Text('Video selected', style: TextStyle(color: Colors.white54)),
+                              Text(
+                                'Video selected',
+                                style: TextStyle(color: Colors.white54),
+                              ),
                             ],
                           ),
                         ),
@@ -404,7 +420,11 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: Colors.grey[900],
                           child: const Center(
-                            child: Icon(Icons.broken_image, size: 64, color: Colors.white54),
+                            child: Icon(
+                              Icons.broken_image,
+                              size: 64,
+                              color: Colors.white54,
+                            ),
                           ),
                         ),
                       ),
@@ -420,13 +440,18 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                           color: _textColor,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          shadows: const [Shadow(blurRadius: 4, color: Colors.black54)],
+                          shadows: const [
+                            Shadow(blurRadius: 4, color: Colors.black54),
+                          ],
                         ),
                         textAlign: TextAlign.center,
                         maxLines: null,
                         decoration: InputDecoration(
                           hintText: 'Type your text...',
-                          hintStyle: TextStyle(color: _textColor.withValues(alpha: 0.5), fontSize: 24),
+                          hintStyle: TextStyle(
+                            color: _textColor.withValues(alpha: 0.5),
+                            fontSize: 24,
+                          ),
                           border: InputBorder.none,
                         ),
                         autofocus: true,
@@ -442,13 +467,18 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                   child: Container(
                     padding: EdgeInsets.only(
                       top: MediaQuery.of(context).padding.top + 8,
-                      left: 8, right: 8, bottom: 8,
+                      left: 8,
+                      right: 8,
+                      bottom: 8,
                     ),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Colors.black.withValues(alpha: 0.6), Colors.transparent],
+                        colors: [
+                          Colors.black.withValues(alpha: 0.6),
+                          Colors.transparent,
+                        ],
                       ),
                     ),
                     child: Row(
@@ -460,10 +490,16 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                         const Spacer(),
                         IconButton(
                           icon: Icon(
-                            _showTextOverlay ? Icons.text_fields : Icons.text_fields_outlined,
-                            color: _showTextOverlay ? colorScheme.primary : Colors.white,
+                            _showTextOverlay
+                                ? Icons.text_fields
+                                : Icons.text_fields_outlined,
+                            color: _showTextOverlay
+                                ? colorScheme.primary
+                                : Colors.white,
                           ),
-                          onPressed: () => setState(() => _showTextOverlay = !_showTextOverlay),
+                          onPressed: () => setState(
+                            () => _showTextOverlay = !_showTextOverlay,
+                          ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.refresh, color: Colors.white),
@@ -478,7 +514,9 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                 if (_showTextOverlay)
                   Positioned(
                     top: MediaQuery.of(context).padding.top + 60,
-                    left: 0, right: 0, height: 50,
+                    left: 0,
+                    right: 0,
+                    height: 50,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -489,13 +527,16 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                         return GestureDetector(
                           onTap: () => setState(() => _textColor = color),
                           child: Container(
-                            width: 36, height: 36,
+                            width: 36,
+                            height: 36,
                             margin: const EdgeInsets.symmetric(horizontal: 4),
                             decoration: BoxDecoration(
                               color: color,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: isSelected ? colorScheme.primary : Colors.white,
+                                color: isSelected
+                                    ? colorScheme.primary
+                                    : Colors.white,
                                 width: isSelected ? 3 : 2,
                               ),
                             ),
@@ -508,24 +549,33 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                 // Bottom bar
                 Positioned(
                   bottom: 0,
-                  left: 0, right: 0,
+                  left: 0,
+                  right: 0,
                   child: Container(
                     padding: EdgeInsets.only(
-                      left: 16, right: 16, top: 16,
+                      left: 16,
+                      right: 16,
+                      top: 16,
                       bottom: MediaQuery.of(context).padding.bottom + 16,
                     ),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
-                        colors: [Colors.black.withValues(alpha: 0.8), Colors.transparent],
+                        colors: [
+                          Colors.black.withValues(alpha: 0.8),
+                          Colors.transparent,
+                        ],
                       ),
                     ),
                     child: Row(
                       children: [
                         Expanded(
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(24),
@@ -546,24 +596,44 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                         GestureDetector(
                           onTap: _isUploading ? null : _postStory,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [colorScheme.primary, colorScheme.secondary],
+                                colors: [
+                                  colorScheme.primary,
+                                  colorScheme.secondary,
+                                ],
                               ),
                               borderRadius: BorderRadius.circular(24),
                             ),
                             child: _isUploading
                                 ? const SizedBox(
-                                    width: 20, height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
                                   )
                                 : const Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text('Post', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                      Text(
+                                        'Post',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                       SizedBox(width: 4),
-                                      Icon(Icons.send, color: Colors.white, size: 18),
+                                      Icon(
+                                        Icons.send,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
                                     ],
                                   ),
                           ),
@@ -583,7 +653,10 @@ class _StoryCreatorScreenState extends ConsumerState<StoryCreatorScreen> {
                         children: [
                           CircularProgressIndicator(color: Colors.white),
                           SizedBox(height: 16),
-                          Text('Posting story...', style: TextStyle(color: Colors.white)),
+                          Text(
+                            'Posting story...',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ],
                       ),
                     ),

@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:math';
 
 /// A/B Testing Service
 ///
@@ -21,12 +20,15 @@ class ABTestingService {
 
   FirebaseRemoteConfig? _remoteConfig;
   FirebaseFirestore? _firestoreInstance;
-  
+
   FirebaseFirestore get _firestore {
-    if (isTestMode) throw StateError('ABTestingService used in test mode without proper setup');
+    if (isTestMode)
+      throw StateError(
+        'ABTestingService used in test mode without proper setup',
+      );
     return _firestoreInstance ??= FirebaseFirestore.instance;
   }
-  
+
   // Cache for experiment assignments
   final Map<String, String> _assignments = {};
   bool _initialized = false;
@@ -34,17 +36,19 @@ class ABTestingService {
   /// Initialize the A/B testing service
   Future<void> init() async {
     if (_initialized || isTestMode) return;
-    
+
     try {
       _remoteConfig = FirebaseRemoteConfig.instance;
-      
-      await _remoteConfig!.setConfigSettings(RemoteConfigSettings(
-        fetchTimeout: const Duration(minutes: 1),
-        minimumFetchInterval: kReleaseMode 
-            ? const Duration(hours: 1) 
-            : const Duration(minutes: 5),
-      ));
-      
+
+      await _remoteConfig!.setConfigSettings(
+        RemoteConfigSettings(
+          fetchTimeout: const Duration(minutes: 1),
+          minimumFetchInterval: kReleaseMode
+              ? const Duration(hours: 1)
+              : const Duration(minutes: 5),
+        ),
+      );
+
       // Set defaults for experiments
       await _remoteConfig!.setDefaults({
         'exp_onboarding_flow': 'control',
@@ -53,10 +57,10 @@ class ABTestingService {
         'exp_bot_difficulty': 'control',
         'exp_social_features': 'control',
       });
-      
+
       await _remoteConfig!.fetchAndActivate();
       _initialized = true;
-      
+
       debugPrint('✅ A/B Testing Service initialized');
     } catch (e) {
       debugPrint('⚠️ A/B Testing init failed: $e');
@@ -65,7 +69,7 @@ class ABTestingService {
   }
 
   /// Get the variant for an experiment
-  /// 
+  ///
   /// Uses consistent bucketing based on user ID to ensure
   /// the same user always sees the same variant.
   String getVariant(String experimentName) {
@@ -73,25 +77,27 @@ class ABTestingService {
     if (_assignments.containsKey(experimentName)) {
       return _assignments[experimentName]!;
     }
-    
+
     // In test mode, return default control
     if (isTestMode || _remoteConfig == null) {
       _assignments[experimentName] = 'control';
       return 'control';
     }
-    
+
     // Get from Remote Config
     final configValue = _remoteConfig!.getString('exp_$experimentName');
-    
+
     // If config specifies a distribution (e.g., "control:50,variant_a:50")
     if (configValue.contains(':') && configValue.contains(',')) {
       final variant = _assignVariant(experimentName, configValue);
       _assignments[experimentName] = variant;
       return variant;
     }
-    
+
     // Direct variant assignment
-    _assignments[experimentName] = configValue.isNotEmpty ? configValue : 'control';
+    _assignments[experimentName] = configValue.isNotEmpty
+        ? configValue
+        : 'control';
     return _assignments[experimentName]!;
   }
 
@@ -99,11 +105,11 @@ class ABTestingService {
   String _assignVariant(String experimentName, String distribution) {
     final userId = FirebaseAuth.instance.currentUser?.uid ?? 'anonymous';
     final bucket = _getBucket(userId, experimentName);
-    
+
     // Parse distribution: "control:50,variant_a:30,variant_b:20"
     final variants = <String, int>{};
     int totalWeight = 0;
-    
+
     for (final part in distribution.split(',')) {
       final kv = part.split(':');
       if (kv.length == 2) {
@@ -112,20 +118,20 @@ class ABTestingService {
         totalWeight += weight;
       }
     }
-    
+
     if (totalWeight == 0) return 'control';
-    
+
     // Map bucket (0-99) to variant based on weights
     int cumulative = 0;
     final threshold = bucket % totalWeight;
-    
+
     for (final entry in variants.entries) {
       cumulative += entry.value;
       if (threshold < cumulative) {
         return entry.key;
       }
     }
-    
+
     return 'control';
   }
 
@@ -148,9 +154,9 @@ class ABTestingService {
   }) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return;
-    
+
     final variant = getVariant(experimentName);
-    
+
     try {
       await _firestore.collection('experiment_events').add({
         'experimentName': experimentName,
@@ -167,10 +173,7 @@ class ABTestingService {
 
   /// Track when a user is exposed to an experiment
   Future<void> trackExposure(String experimentName) async {
-    await trackEvent(
-      experimentName: experimentName,
-      eventName: 'exposure',
-    );
+    await trackEvent(experimentName: experimentName, eventName: 'exposure');
   }
 
   /// Track a conversion event
@@ -192,7 +195,7 @@ class ABTestingService {
   /// Get all active experiments for the current user
   Map<String, String> getActiveExperiments() {
     final experiments = <String, String>{};
-    
+
     final experimentKeys = [
       'onboarding_flow',
       'game_lobby_layout',
@@ -200,11 +203,11 @@ class ABTestingService {
       'bot_difficulty',
       'social_features',
     ];
-    
+
     for (final key in experimentKeys) {
       experiments[key] = getVariant(key);
     }
-    
+
     return experiments;
   }
 

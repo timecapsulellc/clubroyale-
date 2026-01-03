@@ -28,102 +28,91 @@ class GameStatusConverter implements JsonConverter<GameStatus, String> {
 @freezed
 abstract class GameRoom with _$GameRoom {
   const GameRoom._();
-  
+
   const factory GameRoom({
     /// Firestore document ID
     String? id,
-    
+
     /// Room name/title
     @Default('Game Room') String name,
-    
+
     /// Host user ID (creator of the room)
     @Default('') String hostId,
-    
+
     /// 6-digit room code for joining
     String? roomCode,
-    
+
     /// Current game status
     @GameStatusConverter() @Default(GameStatus.waiting) GameStatus status,
-    
+
     /// Type of game (call_break, marriage, teen_patti, etc.)
     @Default('call_break') String gameType,
-    
+
     /// Game configuration (point value, rounds, etc.)
     @Default(GameConfig()) GameConfig config,
-    
+
     /// List of players in the room
     required List<Player> players,
-    
+
     /// Player scores map (playerId -> score)
     required Map<String, int> scores,
-    
+
     /// Whether game is finished (legacy, use status instead)
     @Default(false) bool isFinished,
-    
+
     /// Whether room is public (visible in lobby) or private (code-only)
     @Default(false) bool isPublic,
-    
+
     /// When the room was created
-    @JsonKey(
-      fromJson: _dateTimeFromJson,
-      toJson: _dateTimeToJson,
-    )
+    @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)
     DateTime? createdAt,
-    
+
     /// When the game finished
-    @JsonKey(
-      fromJson: _dateTimeFromJson,
-      toJson: _dateTimeToJson,
-    )
+    @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)
     DateTime? finishedAt,
-    
+
     // ===== Call Break Game Fields =====
-    
+
     /// Current round number (1-indexed)
     @Default(1) int currentRound,
-    
+
     /// Current phase of the game
-    @JsonKey(
-      fromJson: _gamePhaseFromJson,
-      toJson: _gamePhaseToJson,
-    )
+    @JsonKey(fromJson: _gamePhaseFromJson, toJson: _gamePhaseToJson)
     GamePhase? gamePhase,
-    
+
     /// Player hands (playerId -> cards)
-    @JsonKey(
-      fromJson: _playerHandsFromJson,
-      toJson: _playerHandsToJson,
-    )
-    @Default({}) Map<String, List<PlayingCard>> playerHands,
-    
+    @JsonKey(fromJson: _playerHandsFromJson, toJson: _playerHandsToJson)
+    @Default({})
+    Map<String, List<PlayingCard>> playerHands,
+
     /// Player bids for current round
     @Default({}) Map<String, Bid> bids,
-    
+
     /// Current trick in progress
     Trick? currentTrick,
-    
+
     /// History of completed tricks in current round
     @Default([]) List<Trick> trickHistory,
-    
+
     /// Tricks won by each player in current round
     @Default({}) Map<String, int> tricksWon,
-    
+
     /// Round scores (playerId -> list of scores per round)
-    @JsonKey(
-      fromJson: _roundScoresFromJson,
-      toJson: _roundScoresToJson,
-    )
-    @Default({}) Map<String, List<double>> roundScores,
-    
+    @JsonKey(fromJson: _roundScoresFromJson, toJson: _roundScoresToJson)
+    @Default({})
+    Map<String, List<double>> roundScores,
+
     /// Current turn (player ID whose turn it is)
     String? currentTurn,
   }) = _GameRoom;
 
-  factory GameRoom.fromJson(Map<String, dynamic> json) => _$GameRoomFromJson(json);
-  
+  factory GameRoom.fromJson(Map<String, dynamic> json) =>
+      _$GameRoomFromJson(json);
+
   /// Check if all players in the room are ready
-  bool get allPlayersReady => players.isNotEmpty && players.every((p) => p.isReady);
-  
+  bool get allPlayersReady =>
+      players.isNotEmpty && players.every((p) => p.isReady);
+
   /// Check if game can start (minimum players and all ready)
   bool get canStart => players.length >= 2 && allPlayersReady;
 }
@@ -131,8 +120,10 @@ abstract class GameRoom with _$GameRoom {
 @freezed
 abstract class Player with _$Player {
   const factory Player({
-    @Default('') String id, // Default to empty string to prevent null type errors
-    @Default('Player') String name, // Default to 'Player' if null from Firestore
+    @Default('')
+    String id, // Default to empty string to prevent null type errors
+    @Default('Player')
+    String name, // Default to 'Player' if null from Firestore
     UserProfile? profile,
     @Default(false) bool isReady,
     @Default(false) bool isBot,
@@ -156,9 +147,11 @@ GamePhase? _gamePhaseFromJson(String? json) {
 String? _gamePhaseToJson(GamePhase? phase) => phase?.name;
 
 /// Convert player hands from JSON
-Map<String, List<PlayingCard>> _playerHandsFromJson(Map<String, dynamic>? json) {
+Map<String, List<PlayingCard>> _playerHandsFromJson(
+  Map<String, dynamic>? json,
+) {
   if (json == null) return {};
-  
+
   final hands = <String, List<PlayingCard>>{};
   json.forEach((playerId, cardsJson) {
     if (cardsJson is List) {
@@ -180,7 +173,7 @@ Map<String, dynamic> _playerHandsToJson(Map<String, List<PlayingCard>> hands) {
 /// Convert round scores from JSON
 Map<String, List<double>> _roundScoresFromJson(Map<String, dynamic>? json) {
   if (json == null) return {};
-  
+
   final scores = <String, List<double>>{};
   json.forEach((playerId, scoresJson) {
     if (scoresJson is List) {

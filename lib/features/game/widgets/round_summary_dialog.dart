@@ -47,8 +47,11 @@ class RoundSummaryDialog extends StatelessWidget {
 
     // Sort players by cumulative score
     final sortedPlayers = List<Player>.from(players)
-      ..sort((a, b) => (cumulativeScores[b.id] ?? 0)
-          .compareTo(cumulativeScores[a.id] ?? 0));
+      ..sort(
+        (a, b) => (cumulativeScores[b.id] ?? 0).compareTo(
+          cumulativeScores[a.id] ?? 0,
+        ),
+      );
 
     return Dialog(
       child: Container(
@@ -82,15 +85,19 @@ class RoundSummaryDialog extends StatelessWidget {
             // Player scores table
             Container(
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 children: [
                   // Header row
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     child: Row(
                       children: [
                         const Expanded(flex: 2, child: Text('Player')),
@@ -149,7 +156,9 @@ class RoundSummaryDialog extends StatelessWidget {
                           ? Colors.amber.withValues(alpha: 0.2)
                           : null,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       child: Row(
                         children: [
                           // Player name with position indicator
@@ -158,8 +167,11 @@ class RoundSummaryDialog extends StatelessWidget {
                             child: Row(
                               children: [
                                 if (index == 0 && isFinalRound) ...[
-                                  const Icon(Icons.emoji_events,
-                                      size: 16, color: Colors.amber),
+                                  const Icon(
+                                    Icons.emoji_events,
+                                    size: 16,
+                                    color: Colors.amber,
+                                  ),
                                   const SizedBox(width: 4),
                                 ],
                                 Flexible(
@@ -191,9 +203,7 @@ class RoundSummaryDialog extends StatelessWidget {
                                 Text('$tricks'),
                                 const SizedBox(width: 4),
                                 Icon(
-                                  madeBid
-                                      ? Icons.check_circle
-                                      : Icons.cancel,
+                                  madeBid ? Icons.check_circle : Icons.cancel,
                                   size: 14,
                                   color: madeBid ? Colors.green : Colors.red,
                                 ),
@@ -208,8 +218,9 @@ class RoundSummaryDialog extends StatelessWidget {
                                   : roundScore.toStringAsFixed(1),
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color:
-                                    roundScore >= 0 ? Colors.green : Colors.red,
+                                color: roundScore >= 0
+                                    ? Colors.green
+                                    : Colors.red,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -246,7 +257,8 @@ class RoundSummaryDialog extends StatelessWidget {
                 FilledButton.icon(
                   onPressed: isFinalRound ? onEndGame : onNextRound,
                   icon: Icon(
-                      isFinalRound ? Icons.emoji_events : Icons.arrow_forward),
+                    isFinalRound ? Icons.emoji_events : Icons.arrow_forward,
+                  ),
                   label: Text(isFinalRound ? 'View Results' : 'Next Round'),
                 ),
               ],

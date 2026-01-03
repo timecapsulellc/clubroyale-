@@ -23,11 +23,9 @@ class DiamondStoreScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authService = ref.watch(authServiceProvider);
     final currentUser = authService.currentUser;
-    
+
     if (currentUser == null) {
-      return const Scaffold(
-        body: Center(child: Text('Please sign in')),
-      );
+      return const Scaffold(body: Center(child: Text('Please sign in')));
     }
 
     final diamondService = ref.watch(diamondServiceProvider);
@@ -46,7 +44,10 @@ class DiamondStoreScreen extends ConsumerWidget {
               final balance = snapshot.data?.balance ?? 0;
               return Container(
                 margin: const EdgeInsets.only(right: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: CasinoColors.gold.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
@@ -55,7 +56,11 @@ class DiamondStoreScreen extends ConsumerWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.diamond, size: 18, color: CasinoColors.gold),
+                    const Icon(
+                      Icons.diamond,
+                      size: 18,
+                      color: CasinoColors.gold,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '$balance',
@@ -75,7 +80,7 @@ class DiamondStoreScreen extends ConsumerWidget {
         children: [
           // Compliance disclaimer banner
           const LegalDisclaimerBanner(type: DisclaimerType.store),
-          
+
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -83,9 +88,9 @@ class DiamondStoreScreen extends ConsumerWidget {
                 children: [
                   // What are diamonds?
                   _buildInfoCard(context),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Ways to get diamonds
                   const Text(
                     'Ways to Get Diamonds',
@@ -96,7 +101,7 @@ class DiamondStoreScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Free methods first
                   _buildMethodCard(
                     context,
@@ -107,7 +112,7 @@ class DiamondStoreScreen extends ConsumerWidget {
                     onTap: () => context.push('/earn-diamonds'),
                     isPrimary: true,
                   ),
-                  
+
                   _buildMethodCard(
                     context,
                     icon: Icons.people,
@@ -116,7 +121,7 @@ class DiamondStoreScreen extends ConsumerWidget {
                     buttonText: 'Invite',
                     onTap: () => context.push('/referral'),
                   ),
-                  
+
                   _buildMethodCard(
                     context,
                     icon: Icons.emoji_events,
@@ -125,14 +130,14 @@ class DiamondStoreScreen extends ConsumerWidget {
                     buttonText: 'View',
                     onTap: () => context.push('/tournaments'),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Contact admin option (no prices!)
                   _buildContactAdminCard(context),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Disclaimer
                   DisclaimerText(text: Disclaimers.diamondsDisclaimer),
                 ],
@@ -230,7 +235,7 @@ class DiamondStoreScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isPrimary 
+        color: isPrimary
             ? CasinoColors.gold.withValues(alpha: 0.15)
             : Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
@@ -243,10 +248,15 @@ class DiamondStoreScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isPrimary ? CasinoColors.gold.withValues(alpha: 0.3) : Colors.white12,
+              color: isPrimary
+                  ? CasinoColors.gold.withValues(alpha: 0.3)
+                  : Colors.white12,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: isPrimary ? CasinoColors.gold : Colors.white70),
+            child: Icon(
+              icon,
+              color: isPrimary ? CasinoColors.gold : Colors.white70,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -326,7 +336,10 @@ class DiamondStoreScreen extends ConsumerWidget {
                 foregroundColor: Colors.amber.shade800,
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: const Text('Contact Admin', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text(
+                'Contact Admin',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ],

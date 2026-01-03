@@ -1,5 +1,5 @@
 /// Game Design System - Premium Gaming UI Components
-/// 
+///
 /// Barrel export for all game-related design system components.
 /// Import this file to use premium gaming widgets.
 library;

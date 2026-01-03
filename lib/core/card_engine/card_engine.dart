@@ -1,5 +1,5 @@
 /// Card Engine - Barrel export for core card game classes
-/// 
+///
 /// Based on gin_rummy architecture patterns
 library;
 

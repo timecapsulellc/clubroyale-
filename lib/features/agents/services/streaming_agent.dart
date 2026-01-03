@@ -7,7 +7,7 @@ final streamingAgentProvider = Provider<StreamingAgent>((ref) {
 });
 
 /// Streaming Agent - Live Content Management
-/// 
+///
 /// Features:
 /// - Stream enhancement
 /// - Highlight detection
@@ -69,7 +69,11 @@ class GameEvent {
   final String event;
   final double significance;
 
-  GameEvent({required this.timestamp, required this.event, required this.significance});
+  GameEvent({
+    required this.timestamp,
+    required this.event,
+    required this.significance,
+  });
 
   Map<String, dynamic> toJson() => {
     'timestamp': timestamp,
@@ -83,7 +87,11 @@ class ViewerReaction {
   final String type;
   final int count;
 
-  ViewerReaction({required this.timestamp, required this.type, required this.count});
+  ViewerReaction({
+    required this.timestamp,
+    required this.type,
+    required this.count,
+  });
 
   Map<String, dynamic> toJson() => {
     'timestamp': timestamp,
@@ -107,13 +115,17 @@ class StreamEnhancement {
 
   factory StreamEnhancement.fromJson(Map<String, dynamic> json) {
     return StreamEnhancement(
-      overlays: (json['overlays'] as List<dynamic>?)
-          ?.map((o) => StreamOverlay.fromJson(o))
-          .toList() ?? [],
+      overlays:
+          (json['overlays'] as List<dynamic>?)
+              ?.map((o) => StreamOverlay.fromJson(o))
+              .toList() ??
+          [],
       interactionPrompts: List<String>.from(json['interactionPrompts'] ?? []),
-      suggestedPolls: (json['suggestedPolls'] as List<dynamic>?)
-          ?.map((p) => SuggestedPoll.fromJson(p))
-          .toList() ?? [],
+      suggestedPolls:
+          (json['suggestedPolls'] as List<dynamic>?)
+              ?.map((p) => SuggestedPoll.fromJson(p))
+              .toList() ??
+          [],
       engagementTips: List<String>.from(json['engagementTips'] ?? []),
     );
   }
@@ -122,7 +134,12 @@ class StreamEnhancement {
     return StreamEnhancement(
       overlays: [],
       interactionPrompts: ['Type your predictions in chat!'],
-      suggestedPolls: [SuggestedPoll(question: 'Who will win?', options: ['Streamer', 'Opponent'])],
+      suggestedPolls: [
+        SuggestedPoll(
+          question: 'Who will win?',
+          options: ['Streamer', 'Opponent'],
+        ),
+      ],
       engagementTips: ['Acknowledge viewers by name', 'React to chat messages'],
     );
   }
@@ -173,11 +190,13 @@ class HighlightResult {
 
   factory HighlightResult.fromJson(Map<String, dynamic> json) {
     return HighlightResult(
-      highlights: (json['highlights'] as List<dynamic>?)
-          ?.map((h) => Highlight.fromJson(h))
-          .toList() ?? [],
-      bestMoment: json['bestMoment'] != null 
-          ? BestMoment.fromJson(json['bestMoment']) 
+      highlights:
+          (json['highlights'] as List<dynamic>?)
+              ?.map((h) => Highlight.fromJson(h))
+              .toList() ??
+          [],
+      bestMoment: json['bestMoment'] != null
+          ? BestMoment.fromJson(json['bestMoment'])
           : null,
     );
   }

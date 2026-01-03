@@ -6,13 +6,13 @@ import 'package:clubroyale/features/game/game_config.dart';
 
 /// Demo data for Nanobanana UI visualization
 class DemoData {
-  
   // 1. Stories
   static List<UserStories> get stories => [
     UserStories(
       userId: 'demo_1',
       userName: 'Gold_Queen',
-      userPhotoUrl: 'https://ui-avatars.com/api/?name=Gold+Queen&background=FFD700&color=fff&size=150',
+      userPhotoUrl:
+          'https://ui-avatars.com/api/?name=Gold+Queen&background=FFD700&color=fff&size=150',
       hasUnviewed: true,
       stories: [
         Story(
@@ -28,11 +28,12 @@ class DemoData {
     UserStories(
       userId: 'demo_2',
       userName: 'Teal_Jack',
-      userPhotoUrl: 'https://ui-avatars.com/api/?name=Teal+Jack&background=008080&color=fff&size=150',
+      userPhotoUrl:
+          'https://ui-avatars.com/api/?name=Teal+Jack&background=008080&color=fff&size=150',
       hasUnviewed: true,
       stories: [
         Story(
-          id: 's2', 
+          id: 's2',
           userId: 'demo_2',
           userName: 'Teal_Jack',
           mediaUrl: 'https://picsum.photos/400/801',
@@ -44,7 +45,8 @@ class DemoData {
     UserStories(
       userId: 'demo_3',
       userName: 'Purple_Ace',
-      userPhotoUrl: 'https://ui-avatars.com/api/?name=Purple+Ace&background=7B68EE&color=fff&size=150',
+      userPhotoUrl:
+          'https://ui-avatars.com/api/?name=Purple+Ace&background=7B68EE&color=fff&size=150',
       hasUnviewed: true,
       stories: [
         Story(
@@ -66,7 +68,9 @@ class DemoData {
       name: 'AI Music Station 🎵',
       hostName: 'DJ_AI',
       hostId: 'host_1',
-      participants: { 'p1': const VoiceParticipant(id: 'p1', name: 'P1') }, // Simplified
+      participants: {
+        'p1': const VoiceParticipant(id: 'p1', name: 'P1'),
+      }, // Simplified
       createdAt: DateTime.now(),
     ),
     VoiceRoom(
@@ -74,7 +78,12 @@ class DemoData {
       name: 'Tech Podcast 🎙️',
       hostName: 'Elon_M',
       hostId: 'host_2',
-      participants: Map.fromEntries(List.generate(50, (i) => MapEntry('p$i', VoiceParticipant(id: 'p$i', name: 'P$i')))),
+      participants: Map.fromEntries(
+        List.generate(
+          50,
+          (i) => MapEntry('p$i', VoiceParticipant(id: 'p$i', name: 'P$i')),
+        ),
+      ),
       createdAt: DateTime.now(),
     ),
     VoiceRoom(
@@ -92,7 +101,7 @@ class DemoData {
     GameRoom(
       id: 'demo_game_1',
       name: 'High Stakes #1',
-      gameType: 'BlackJack Pro', 
+      gameType: 'BlackJack Pro',
       hostId: 'host_g1',
       status: GameStatus.playing,
       config: const GameConfig(maxPlayers: 5, bootAmount: 100),
@@ -102,7 +111,7 @@ class DemoData {
     GameRoom(
       id: 'demo_game_2',
       name: 'Royal Table',
-      gameType: 'Poker Texas', 
+      gameType: 'Poker Texas',
       hostId: 'host_g2',
       status: GameStatus.playing,
       config: const GameConfig(maxPlayers: 8, bootAmount: 5000),
@@ -117,7 +126,8 @@ class DemoData {
       id: 'a1',
       userId: 'u1',
       userName: 'Luna_Win',
-      userAvatar: 'https://ui-avatars.com/api/?name=Luna+Win&background=E91E63&color=fff&size=150',
+      userAvatar:
+          'https://ui-avatars.com/api/?name=Luna+Win&background=E91E63&color=fff&size=150',
       type: 'game_won', // String type based on model review
       content: 'won 10k coins in Roulette!',
       timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
@@ -125,9 +135,10 @@ class DemoData {
     ),
     SocialActivity(
       id: 'a2',
-      userId: 'u2', 
+      userId: 'u2',
       userName: 'Max_Bet',
-      userAvatar: 'https://ui-avatars.com/api/?name=Max+Bet&background=4CAF50&color=fff&size=150',
+      userAvatar:
+          'https://ui-avatars.com/api/?name=Max+Bet&background=4CAF50&color=fff&size=150',
       type: 'club_joined',
       content: "joined the 'High Rollers' Club",
       timestamp: DateTime.now().subtract(const Duration(minutes: 45)),

@@ -1,5 +1,5 @@
 /// Premium Marriage Game Screen
-/// 
+///
 /// Enhanced version using premium gaming UI components:
 /// - PremiumGameTable with felt texture
 /// - PremiumHandWidget with expand/collapse
@@ -32,16 +32,15 @@ import 'package:clubroyale/core/services/game_audio_mixin.dart';
 class PremiumMarriageScreen extends ConsumerStatefulWidget {
   final String roomId;
 
-  const PremiumMarriageScreen({
-    required this.roomId,
-    super.key,
-  });
+  const PremiumMarriageScreen({required this.roomId, super.key});
 
   @override
-  ConsumerState<PremiumMarriageScreen> createState() => _PremiumMarriageScreenState();
+  ConsumerState<PremiumMarriageScreen> createState() =>
+      _PremiumMarriageScreenState();
 }
 
-class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> with GameAudioMixin {
+class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen>
+    with GameAudioMixin {
   String? _selectedCardId;
   bool _isProcessing = false;
   bool _isChatExpanded = false;
@@ -77,9 +76,7 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
     final currentUser = authService.currentUser;
 
     if (currentUser == null) {
-      return const Scaffold(
-        body: Center(child: Text('Please sign in')),
-      );
+      return const Scaffold(body: Center(child: Text('Please sign in')));
     }
 
     return StreamBuilder<MarriageGameState?>(
@@ -96,7 +93,9 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
 
         final myHand = state.playerHands[currentUser.uid] ?? [];
         final isMyTurn = state.currentPlayerId == currentUser.uid;
-        final tiplu = state.tipluCardId.isNotEmpty ? _getCard(state.tipluCardId) : null;
+        final tiplu = state.tipluCardId.isNotEmpty
+            ? _getCard(state.tipluCardId)
+            : null;
         final topDiscard = state.discardPile.isNotEmpty
             ? _getCard(state.discardPile.last)
             : null;
@@ -118,7 +117,12 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
                   roundNumber: state.currentRound,
                   onRulesTap: () => _showRulesDialog(context),
                 ),
-                centerContent: _buildCenterArea(state, tiplu, topDiscard, isMyTurn),
+                centerContent: _buildCenterArea(
+                  state,
+                  tiplu,
+                  topDiscard,
+                  isMyTurn,
+                ),
                 opponents: _buildOpponents(state, currentUser.uid),
                 playerHand: _buildPlayerHand(myHand, isMyTurn, tiplu, state),
                 actionBar: _buildActionBar(isMyTurn, state, currentUser.uid),
@@ -156,7 +160,8 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
                   userId: currentUser.uid,
                   userName: currentUser.displayName ?? 'Player',
                   isExpanded: _isChatExpanded,
-                  onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
+                  onToggle: () =>
+                      setState(() => _isChatExpanded = !_isChatExpanded),
                 ),
               ),
 
@@ -164,7 +169,8 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
               if (_showConfetti)
                 Positioned.fill(
                   child: GestureDetector(
-                    onTap: () => setState(() => _showConfetti = false), // Tap to dismiss
+                    onTap: () =>
+                        setState(() => _showConfetti = false), // Tap to dismiss
                     child: const RiveConfetti(play: true),
                   ),
                 ),
@@ -235,10 +241,7 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
             ),
             child: Text(
               'Round ${state.currentRound}',
-              style: const TextStyle(
-                color: Color(0xFFD4AF37),
-                fontSize: 12,
-              ),
+              style: const TextStyle(color: Color(0xFFD4AF37), fontSize: 12),
             ),
           ),
         ],
@@ -252,10 +255,7 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
         ),
 
         // Audio Controls
-        AudioFloatingButton(
-          roomId: widget.roomId,
-          userId: currentUser.uid,
-        ),
+        AudioFloatingButton(roomId: widget.roomId, userId: currentUser.uid),
       ],
     );
   }
@@ -273,7 +273,7 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
       children: [
         // Phase indicator
         if (isMyTurn) _buildPhaseIndicator(state),
-        
+
         const SizedBox(height: 16),
 
         // Deck, Tiplu, Discard
@@ -295,11 +295,7 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
                 )
               : null,
           discardWidget: topDiscard != null
-              ? PremiumCardWidget(
-                  card: topDiscard,
-                  width: 70,
-                  height: 100,
-                )
+              ? PremiumCardWidget(card: topDiscard, width: 70, height: 100)
               : null,
           onDiscardTap: canDraw && topDiscard != null ? _drawFromDiscard : null,
         ),
@@ -307,7 +303,11 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
         const SizedBox(height: 8),
 
         // Meld suggestions
-        _buildMeldSuggestions(state.playerHands[ref.read(authServiceProvider).currentUser?.uid] ?? [], tiplu),
+        _buildMeldSuggestions(
+          state.playerHands[ref.read(authServiceProvider).currentUser?.uid] ??
+              [],
+          tiplu,
+        ),
       ],
     );
   }
@@ -324,7 +324,9 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: (isDrawing ? Colors.blue : Colors.orange).withValues(alpha: 0.4),
+            color: (isDrawing ? Colors.blue : Colors.orange).withValues(
+              alpha: 0.4,
+            ),
             blurRadius: 12,
             spreadRadius: 2,
           ),
@@ -361,28 +363,33 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
       final cardCount = state.playerHands[playerId]?.length ?? 0;
       final isVisited = state.hasVisited(playerId);
       final maalPoints = state.getMaalPoints(playerId);
-      
+
       // Reconstruct melds from JSON
       final melds = <Meld>[];
       if (isVisited) {
-         final declaredJson = state.playerDeclaredMelds[playerId] ?? [];
-         final tiplu = state.tipluCardId.isNotEmpty ? _getCard(state.tipluCardId) : null;
-         
-         for (final json in declaredJson) {
-            try {
-              final typeName = json['type'] as String;
-              final type = MeldType.values.firstWhere(
-                (e) => e.name == typeName, 
-                orElse: () => MeldType.set
-              );
-              final cardIds = List<String>.from(json['cardIds'] ?? []);
-              final cards = cardIds.map((id) => _getCard(id)).whereType<Card>().toList();
-              
-              melds.add(Meld.fromTypeAndCards(type, cards, tiplu: tiplu));
-            } catch (e) {
-              debugPrint('Error parsing meld: $e');
-            }
-         }
+        final declaredJson = state.playerDeclaredMelds[playerId] ?? [];
+        final tiplu = state.tipluCardId.isNotEmpty
+            ? _getCard(state.tipluCardId)
+            : null;
+
+        for (final json in declaredJson) {
+          try {
+            final typeName = json['type'] as String;
+            final type = MeldType.values.firstWhere(
+              (e) => e.name == typeName,
+              orElse: () => MeldType.set,
+            );
+            final cardIds = List<String>.from(json['cardIds'] ?? []);
+            final cards = cardIds
+                .map((id) => _getCard(id))
+                .whereType<Card>()
+                .toList();
+
+            melds.add(Meld.fromTypeAndCards(type, cards, tiplu: tiplu));
+          } catch (e) {
+            debugPrint('Error parsing meld: $e');
+          }
+        }
       }
 
       return OpponentData(
@@ -409,7 +416,10 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
       mainAxisSize: MainAxisSize.min,
       children: [
         // Turn indicator
-        _buildTurnIndicator(state, ref.read(authServiceProvider).currentUser?.uid ?? ''),
+        _buildTurnIndicator(
+          state,
+          ref.read(authServiceProvider).currentUser?.uid ?? '',
+        ),
 
         // Premium hand widget
         PremiumHandWidget(
@@ -443,9 +453,7 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
             ? Colors.green.withValues(alpha: 0.3)
             : Colors.black.withValues(alpha: 0.3),
         border: Border(
-          bottom: BorderSide(
-            color: isMyTurn ? Colors.green : Colors.white24,
-          ),
+          bottom: BorderSide(color: isMyTurn ? Colors.green : Colors.white24),
         ),
       ),
       child: Row(
@@ -476,7 +484,11 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
   Widget _buildTimer(int remaining, int total) {
     final progress = remaining / total;
     final isCritical = remaining <= 5;
-    final color = isCritical ? Colors.red : remaining <= 10 ? Colors.orange : Colors.green;
+    final color = isCritical
+        ? Colors.red
+        : remaining <= 10
+        ? Colors.orange
+        : Colors.green;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -513,7 +525,8 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
   }
 
   Widget _buildActionBar(bool isMyTurn, MarriageGameState state, String myId) {
-    final canDiscard = isMyTurn && state.isDiscardingPhase && _selectedCardId != null;
+    final canDiscard =
+        isMyTurn && state.isDiscardingPhase && _selectedCardId != null;
     final canDeclare = isMyTurn && state.isDiscardingPhase;
     final hasVisited = state.hasVisited(myId);
     final canVisit = isMyTurn && !hasVisited;
@@ -565,7 +578,11 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.check_circle, color: Colors.purple, size: 16),
+                  const Icon(
+                    Icons.check_circle,
+                    color: Colors.purple,
+                    size: 16,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     'Visited (💎${state.getMaalPoints(myId)})',
@@ -630,16 +647,20 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
                   ),
                 ),
                 const SizedBox(width: 8),
-                ...meld.cards.take(3).map((c) => Padding(
-                  padding: const EdgeInsets.only(right: 2),
-                  child: Text(
-                    c.displayString,
-                    style: TextStyle(
-                      color: c.suit.isRed ? Colors.red : Colors.white,
-                      fontWeight: FontWeight.bold,
+                ...meld.cards
+                    .take(3)
+                    .map(
+                      (c) => Padding(
+                        padding: const EdgeInsets.only(right: 2),
+                        child: Text(
+                          c.displayString,
+                          style: TextStyle(
+                            color: c.suit.isRed ? Colors.red : Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                )),
               ],
             ),
           );
@@ -701,26 +722,37 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('👑 Tiplu: Main wild card (3 pts)',
-                  style: TextStyle(color: Colors.purple)),
+              Text(
+                '👑 Tiplu: Main wild card (3 pts)',
+                style: TextStyle(color: Colors.purple),
+              ),
               SizedBox(height: 4),
-              Text('⬆️ Poplu: Rank +1 of Tiplu suit (2 pts)',
-                  style: TextStyle(color: Colors.blue)),
+              Text(
+                '⬆️ Poplu: Rank +1 of Tiplu suit (2 pts)',
+                style: TextStyle(color: Colors.blue),
+              ),
               SizedBox(height: 4),
-              Text('⬇️ Jhiplu: Rank -1 of Tiplu suit (2 pts)',
-                  style: TextStyle(color: Colors.cyan)),
+              Text(
+                '⬇️ Jhiplu: Rank -1 of Tiplu suit (2 pts)',
+                style: TextStyle(color: Colors.cyan),
+              ),
               SizedBox(height: 4),
-              Text('💎 Alter: Same rank & color (5 pts)',
-                  style: TextStyle(color: Colors.orange)),
+              Text(
+                '💎 Alter: Same rank & color (5 pts)',
+                style: TextStyle(color: Colors.orange),
+              ),
               SizedBox(height: 4),
-              Text('🃏 Man: Joker card',
-                  style: TextStyle(color: Colors.green)),
+              Text('🃏 Man: Joker card', style: TextStyle(color: Colors.green)),
               SizedBox(height: 16),
-              Text('🔒 Visit: Required to declare (3 pts min)',
-                  style: TextStyle(color: Colors.white70)),
+              Text(
+                '🔒 Visit: Required to declare (3 pts min)',
+                style: TextStyle(color: Colors.white70),
+              ),
               SizedBox(height: 4),
-              Text('💍 Marriage: K-Q of same suit (+100 pts)',
-                  style: TextStyle(color: Colors.pink)),
+              Text(
+                '💍 Marriage: K-Q of same suit (+100 pts)',
+                style: TextStyle(color: Colors.pink),
+              ),
             ],
           ),
         ),
@@ -771,13 +803,16 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
       final marriageService = ref.read(marriageServiceProvider);
       final currentUser = ref.read(authServiceProvider).currentUser;
       if (currentUser == null) return;
-      await marriageService.discardCard(widget.roomId, currentUser.uid, _selectedCardId!);
+      await marriageService.discardCard(
+        widget.roomId,
+        currentUser.uid,
+        _selectedCardId!,
+      );
       setState(() => _selectedCardId = null);
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
   }
-
 
   Future<void> _discardSpecificCard(String cardId) async {
     if (_isProcessing) return;
@@ -790,7 +825,7 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
       await marriageService.discardCard(widget.roomId, currentUser.uid, cardId);
       // Clear selection if the discarded card was selected
       if (_selectedCardId == cardId) {
-         setState(() => _selectedCardId = null);
+        setState(() => _selectedCardId = null);
       }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
@@ -820,26 +855,26 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
       final currentUser = ref.read(authServiceProvider).currentUser;
       if (currentUser == null) return;
       await marriageService.declare(widget.roomId, currentUser.uid);
-      
+
       // Success! Show effects
       if (mounted) {
         playMarriageDeclare(); // Play declare sound
         playWin(); // Play win sound
         setState(() => _showConfetti = true);
-        
+
         // Hide confetti after 5 seconds
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) setState(() => _showConfetti = false);
         });
-        
+
         // Show winner dialog
         _showWinnerDialog(context, currentUser.displayName ?? 'You');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to declare: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to declare: $e')));
       }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
@@ -853,8 +888,8 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1a0a2e),
         shape: RoundedRectangleBorder(
-           borderRadius: BorderRadius.circular(20),
-           side: const BorderSide(color: Color(0xFFD4AF37), width: 2),
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFFD4AF37), width: 2),
         ),
         title: Column(
           children: [
@@ -897,5 +932,5 @@ class _PremiumMarriageScreenState extends ConsumerState<PremiumMarriageScreen> w
         ],
       ),
     );
-}
+  }
 }

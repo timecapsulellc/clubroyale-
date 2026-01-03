@@ -1,5 +1,5 @@
 /// Tournament Detail Screen
-/// 
+///
 /// Shows tournament info, bracket, and participants
 library;
 
@@ -29,7 +29,12 @@ class TournamentDetailScreen extends ConsumerWidget {
         if (tournament == null) {
           return const Scaffold(
             backgroundColor: CasinoColors.deepPurple,
-            body: Center(child: Text('Tournament not found', style: TextStyle(color: Colors.white))),
+            body: Center(
+              child: Text(
+                'Tournament not found',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           );
         }
 
@@ -40,7 +45,13 @@ class TournamentDetailScreen extends ConsumerWidget {
             appBar: AppBar(
               backgroundColor: Colors.black.withValues(alpha: 0.8),
               iconTheme: const IconThemeData(color: CasinoColors.gold),
-              title: Text(tournament.name, style: const TextStyle(color: CasinoColors.gold, fontWeight: FontWeight.bold)),
+              title: Text(
+                tournament.name,
+                style: const TextStyle(
+                  color: CasinoColors.gold,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               bottom: const TabBar(
                 labelColor: CasinoColors.gold,
                 unselectedLabelColor: Colors.white54,
@@ -64,12 +75,16 @@ class TournamentDetailScreen extends ConsumerWidget {
       },
       loading: () => const Scaffold(
         backgroundColor: CasinoColors.deepPurple,
-        body: Center(child: CircularProgressIndicator(color: CasinoColors.gold)),
+        body: Center(
+          child: CircularProgressIndicator(color: CasinoColors.gold),
+        ),
       ),
       error: (e, _) => Scaffold(
         backgroundColor: CasinoColors.deepPurple,
         appBar: AppBar(backgroundColor: Colors.transparent),
-        body: Center(child: Text('Error: $e', style: const TextStyle(color: Colors.red))),
+        body: Center(
+          child: Text('Error: $e', style: const TextStyle(color: Colors.red)),
+        ),
       ),
     );
   }
@@ -117,9 +132,15 @@ class _InfoTab extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.5)),
+                      border: Border.all(
+                        color: CasinoColors.gold.withValues(alpha: 0.5),
+                      ),
                     ),
-                    child: const Icon(Icons.emoji_events, size: 32, color: CasinoColors.gold),
+                    child: const Icon(
+                      Icons.emoji_events,
+                      size: 32,
+                      color: CasinoColors.gold,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -162,7 +183,8 @@ class _InfoTab extends ConsumerWidget {
               child: _StatCard(
                 icon: Icons.people,
                 label: 'Players',
-                value: '${tournament.participantIds.length}/${tournament.maxParticipants}',
+                value:
+                    '${tournament.participantIds.length}/${tournament.maxParticipants}',
               ),
             ),
             const SizedBox(width: 8),
@@ -185,7 +207,7 @@ class _InfoTab extends ConsumerWidget {
             ],
           ],
         ).animate().fadeIn(delay: 100.ms),
-        
+
         if (tournament.prizePool != null) ...[
           const SizedBox(height: 16),
           PrizeDistributionCard(
@@ -200,7 +222,7 @@ class _InfoTab extends ConsumerWidget {
         if (tournament.status == TournamentStatus.registration) ...[
           if (!isJoined && !isHost)
             _buildActionButton(
-              context, 
+              context,
               label: 'Join Tournament',
               icon: Icons.add,
               color: CasinoColors.gold,
@@ -231,7 +253,11 @@ class _InfoTab extends ConsumerWidget {
         // Participants list
         const Text(
           'Participants',
-          style: TextStyle(color: CasinoColors.gold, fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: CasinoColors.gold,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         ...tournament.participantIds.asMap().entries.map((entry) {
@@ -246,7 +272,10 @@ class _InfoTab extends ConsumerWidget {
               leading: CircleAvatar(
                 backgroundColor: CasinoColors.gold,
                 foregroundColor: Colors.black,
-                child: Text('${entry.key + 1}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(
+                  '${entry.key + 1}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               title: Text(
                 'Player ${entry.key + 1}',
@@ -254,33 +283,49 @@ class _InfoTab extends ConsumerWidget {
               ),
               trailing: entry.value == tournament.hostId
                   ? Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: CasinoColors.richPurple,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: CasinoColors.gold),
                       ),
-                      child: const Text('HOST', style: TextStyle(color: CasinoColors.gold, fontSize: 10, fontWeight: FontWeight.bold)),
+                      child: const Text(
+                        'HOST',
+                        style: TextStyle(
+                          color: CasinoColors.gold,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     )
                   : null,
             ),
-          ).animate().fadeIn(delay: Duration(milliseconds: 200 + (entry.key * 50)));
+          ).animate().fadeIn(
+            delay: Duration(milliseconds: 200 + (entry.key * 50)),
+          );
         }),
       ],
     );
   }
-  
-  Widget _buildActionButton(BuildContext context, {
-    required String label, 
-    required IconData icon, 
-    required Color color, 
+
+  Widget _buildActionButton(
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required Color color,
     required Color textColor,
     required VoidCallback onPressed,
   }) {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: Icon(icon, color: textColor),
-      label: Text(label, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+      label: Text(
+        label,
+        style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+      ),
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -294,25 +339,29 @@ class _InfoTab extends ConsumerWidget {
   Future<void> _joinTournament(BuildContext context, WidgetRef ref) async {
     HapticFeedback.mediumImpact();
     SoundService.playChipSound();
-    
+
     final auth = ref.read(authServiceProvider);
     final user = auth.currentUser;
     if (user == null) return;
 
-    await ref.read(tournamentServiceProvider).joinTournament(
-      tournamentId: tournament.id,
-      oderId: user.uid,
-      userName: user.displayName ?? 'Player',
-    );
+    await ref
+        .read(tournamentServiceProvider)
+        .joinTournament(
+          tournamentId: tournament.id,
+          oderId: user.uid,
+          userName: user.displayName ?? 'Player',
+        );
   }
 
   Future<void> _leaveTournament(BuildContext context, WidgetRef ref) async {
     HapticFeedback.lightImpact();
     final auth = ref.read(authServiceProvider);
-    await ref.read(tournamentServiceProvider).leaveTournament(
-      tournamentId: tournament.id,
-      oderId: auth.currentUser!.uid,
-    );
+    await ref
+        .read(tournamentServiceProvider)
+        .leaveTournament(
+          tournamentId: tournament.id,
+          oderId: auth.currentUser!.uid,
+        );
   }
 
   Future<void> _startTournament(BuildContext context, WidgetRef ref) async {
@@ -321,7 +370,10 @@ class _InfoTab extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: CasinoColors.deepPurple,
-        title: const Text('Start Tournament?', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Start Tournament?',
+          style: TextStyle(color: Colors.white),
+        ),
         content: const Text(
           'This will generate brackets and begin matches.',
           style: TextStyle(color: Colors.white70),
@@ -329,10 +381,16 @@ class _InfoTab extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white54),
+            ),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: CasinoColors.gold, foregroundColor: Colors.black),
+            style: FilledButton.styleFrom(
+              backgroundColor: CasinoColors.gold,
+              foregroundColor: Colors.black,
+            ),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Start'),
           ),
@@ -348,10 +406,14 @@ class _InfoTab extends ConsumerWidget {
 
   String _getGameName(String type) {
     switch (type) {
-      case 'marriage': return 'Marriage';
-      case 'call_break': return 'Call Break';
-      case 'teen_patti': return 'Teen Patti';
-      default: return type;
+      case 'marriage':
+        return 'Marriage';
+      case 'call_break':
+        return 'Call Break';
+      case 'teen_patti':
+        return 'Teen Patti';
+      default:
+        return type;
     }
   }
 }
@@ -403,12 +465,19 @@ class _StandingsTab extends ConsumerWidget {
       future: ref.read(tournamentServiceProvider).getStandings(tournamentId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: CasinoColors.gold));
+          return const Center(
+            child: CircularProgressIndicator(color: CasinoColors.gold),
+          );
         }
 
         final standings = snapshot.data ?? [];
         if (standings.isEmpty) {
-          return const Center(child: Text('No standings yet', style: TextStyle(color: Colors.white54)));
+          return const Center(
+            child: Text(
+              'No standings yet',
+              style: TextStyle(color: Colors.white54),
+            ),
+          );
         }
 
         return ListView.builder(
@@ -432,11 +501,21 @@ class _StandingsTab extends ConsumerWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
-                title: Text(standing.userName, style: const TextStyle(color: Colors.white)),
-                subtitle: Text('${standing.wins}W - ${standing.losses}L', style: const TextStyle(color: Colors.white54)),
+                title: Text(
+                  standing.userName,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                subtitle: Text(
+                  '${standing.wins}W - ${standing.losses}L',
+                  style: const TextStyle(color: Colors.white54),
+                ),
                 trailing: Text(
                   '${standing.totalPoints} pts',
-                  style: const TextStyle(color: CasinoColors.gold, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                    color: CasinoColors.gold,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ).animate().slideX(delay: Duration(milliseconds: index * 100));
@@ -448,10 +527,14 @@ class _StandingsTab extends ConsumerWidget {
 
   Color _getRankColor(int rank) {
     switch (rank) {
-      case 1: return CasinoColors.gold;
-      case 2: return Colors.grey.shade400;
-      case 3: return Colors.brown.shade300;
-      default: return Colors.blueGrey;
+      case 1:
+        return CasinoColors.gold;
+      case 2:
+        return Colors.grey.shade400;
+      case 3:
+        return Colors.brown.shade300;
+      default:
+        return Colors.blueGrey;
     }
   }
 }
@@ -482,10 +565,17 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
-          Text(label, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white54, fontSize: 12),
+          ),
         ],
       ),
     );

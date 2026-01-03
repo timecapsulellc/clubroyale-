@@ -6,9 +6,9 @@ class CallBreakLogic {
   /// Determine who wins the trick
   static String determineTrickWinner(Trick trick) {
     if (trick.cards.isEmpty) throw Exception('Trick cannot be empty');
-    
+
     PlayedCard winningCard = trick.cards.first;
-    
+
     for (var playedCard in trick.cards.skip(1)) {
       final comparison = playedCard.card.compareTo(
         winningCard.card,
@@ -19,7 +19,7 @@ class CallBreakLogic {
         winningCard = playedCard;
       }
     }
-    
+
     return winningCard.playerId;
   }
 
@@ -30,7 +30,7 @@ class CallBreakLogic {
     required double pointValue,
   }) {
     final roundScores = <String, double>{};
-    
+
     bids.forEach((playerId, bidAmount) {
       final tricksActual = tricksWon[playerId] ?? 0;
 
@@ -44,7 +44,7 @@ class CallBreakLogic {
       }
       roundScores[playerId] = score;
     });
-    
+
     return roundScores;
   }
 

@@ -10,7 +10,7 @@ class AboutScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeColors = ref.watch(themeColorsProvider);
-    
+
     return Scaffold(
       backgroundColor: themeColors.background,
       appBar: AppBar(
@@ -22,7 +22,10 @@ class AboutScreen extends ConsumerWidget {
         ),
         title: Text(
           'About ClubRoyale',
-          style: TextStyle(color: themeColors.gold, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: themeColors.gold,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
@@ -34,26 +37,28 @@ class AboutScreen extends ConsumerWidget {
             // App Logo & Version
             _buildAppHeader(themeColors),
             const SizedBox(height: 32),
-            
+
             // About App
             _buildInfoCard(
               icon: Icons.info_outline,
               title: 'About',
-              content: 'ClubRoyale is your private card club - a premium multiplayer card game platform '
+              content:
+                  'ClubRoyale is your private card club - a premium multiplayer card game platform '
                   'that digitizes the "Home Game" experience. Host private rooms, play popular card games '
                   'with friends, and settle scores seamlessly.\n\n'
                   'Built with ❤️ for card game enthusiasts worldwide.',
               themeColors: themeColors,
             ),
-            
+
             // Stats Card
             _buildStatsCard(themeColors),
-            
+
             // Features
             _buildInfoCard(
               icon: Icons.star_outline,
               title: 'Features',
-              content: '🃏 4 Card Games: Marriage, Call Break, Teen Patti, In-Between\n'
+              content:
+                  '🃏 4 Card Games: Marriage, Call Break, Teen Patti, In-Between\n'
                   '👥 2-8 Players per room\n'
                   '🤖 AI-Powered Bots (GenKit + Gemini)\n'
                   '💬 Real-time Chat, Voice & Video\n'
@@ -64,32 +69,35 @@ class AboutScreen extends ConsumerWidget {
                   '📱 PWA - Install on any device',
               themeColors: themeColors,
             ),
-            
+
             // Tech Stack
             _buildTechStackCard(themeColors),
-            
+
             // Architecture
             _buildArchitectureCard(themeColors),
-            
+
             // Legal Links
             _buildLegalCard(context, themeColors),
-            
+
             // Credits
             _buildCreditsCard(themeColors),
-            
+
             const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
-  
+
   Widget _buildAppHeader(ThemeColors themeColors) {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [themeColors.surface, themeColors.surfaceLight.withValues(alpha: 0.5)],
+          colors: [
+            themeColors.surface,
+            themeColors.surfaceLight.withValues(alpha: 0.5),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -123,10 +131,7 @@ class AboutScreen extends ConsumerWidget {
             child: Center(
               child: Text(
                 '♠',
-                style: TextStyle(
-                  fontSize: 48,
-                  color: themeColors.background,
-                ),
+                style: TextStyle(fontSize: 48, color: themeColors.background),
               ),
             ),
           ),
@@ -144,10 +149,7 @@ class AboutScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             'Your Private Card Club',
-            style: TextStyle(
-              fontSize: 16,
-              color: themeColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 16, color: themeColors.textSecondary),
           ),
           const SizedBox(height: 16),
           // Version
@@ -169,7 +171,7 @@ class AboutScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildStatsCard(ThemeColors themeColors) {
     final stats = [
       {'label': 'Games', 'value': '4', 'icon': Icons.games},
@@ -177,7 +179,7 @@ class AboutScreen extends ConsumerWidget {
       {'label': 'Files', 'value': '222', 'icon': Icons.folder},
       {'label': 'Score', 'value': '99', 'icon': Icons.star},
     ];
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
@@ -205,41 +207,48 @@ class AboutScreen extends ConsumerWidget {
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: stats.map((stat) => Column(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: themeColors.gold.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
+            children: stats
+                .map(
+                  (stat) => Column(
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: themeColors.gold.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          stat['icon'] as IconData,
+                          color: themeColors.gold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        stat['value'] as String,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: themeColors.gold,
+                        ),
+                      ),
+                      Text(
+                        stat['label'] as String,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: themeColors.textSecondary,
+                        ),
+                      ),
+                    ],
                   ),
-                  child: Icon(stat['icon'] as IconData, color: themeColors.gold),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  stat['value'] as String,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: themeColors.gold,
-                  ),
-                ),
-                Text(
-                  stat['label'] as String,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: themeColors.textSecondary,
-                  ),
-                ),
-              ],
-            )).toList(),
+                )
+                .toList(),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildInfoCard({
     required IconData icon,
     required String title,
@@ -273,16 +282,13 @@ class AboutScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             content,
-            style: TextStyle(
-              color: themeColors.textSecondary,
-              height: 1.6,
-            ),
+            style: TextStyle(color: themeColors.textSecondary, height: 1.6),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildTechStackCard(ThemeColors themeColors) {
     final techs = [
       {'name': 'Flutter', 'version': '3.38.4'},
@@ -292,7 +298,7 @@ class AboutScreen extends ConsumerWidget {
       {'name': 'GenKit', 'version': 'Gemini Pro'},
       {'name': 'LiveKit', 'version': 'Video'},
     ];
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
@@ -321,40 +327,49 @@ class AboutScreen extends ConsumerWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: techs.map((tech) => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: themeColors.gold.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: themeColors.gold.withValues(alpha: 0.3)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    tech['name']!,
-                    style: TextStyle(
-                      color: themeColors.textPrimary,
-                      fontWeight: FontWeight.w500,
+            children: techs
+                .map(
+                  (tech) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: themeColors.gold.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: themeColors.gold.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          tech['name']!,
+                          style: TextStyle(
+                            color: themeColors.textPrimary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          tech['version']!,
+                          style: TextStyle(
+                            color: themeColors.gold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    tech['version']!,
-                    style: TextStyle(
-                      color: themeColors.gold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            )).toList(),
+                )
+                .toList(),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildArchitectureCard(ThemeColors themeColors) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -381,14 +396,22 @@ class AboutScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 16),
-          _buildArchLayer('PRESENTATION', '30+ Screens • 5 Themes • PWA', themeColors),
-          _buildArchLayer('BUSINESS LOGIC', '22 Services • 4 Game Engines', themeColors),
+          _buildArchLayer(
+            'PRESENTATION',
+            '30+ Screens • 5 Themes • PWA',
+            themeColors,
+          ),
+          _buildArchLayer(
+            'BUSINESS LOGIC',
+            '22 Services • 4 Game Engines',
+            themeColors,
+          ),
           _buildArchLayer('DATA', 'Firestore • 12 Functions • AI', themeColors),
         ],
       ),
     );
   }
-  
+
   Widget _buildArchLayer(String name, String details, ThemeColors themeColors) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -415,17 +438,14 @@ class AboutScreen extends ConsumerWidget {
             flex: 3,
             child: Text(
               details,
-              style: TextStyle(
-                color: themeColors.textSecondary,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: themeColors.textSecondary, fontSize: 12),
             ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildLegalCard(BuildContext context, ThemeColors themeColors) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -452,15 +472,27 @@ class AboutScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 16),
-          _buildLegalLink('Terms & Conditions', () => context.push('/terms'), themeColors),
-          _buildLegalLink('Privacy Policy', () => context.push('/privacy'), themeColors),
+          _buildLegalLink(
+            'Terms & Conditions',
+            () => context.push('/terms'),
+            themeColors,
+          ),
+          _buildLegalLink(
+            'Privacy Policy',
+            () => context.push('/privacy'),
+            themeColors,
+          ),
           _buildLegalLink('FAQ', () => context.push('/faq'), themeColors),
         ],
       ),
     );
   }
-  
-  Widget _buildLegalLink(String title, VoidCallback onTap, ThemeColors themeColors) {
+
+  Widget _buildLegalLink(
+    String title,
+    VoidCallback onTap,
+    ThemeColors themeColors,
+  ) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(title, style: TextStyle(color: themeColors.textPrimary)),
@@ -468,7 +500,7 @@ class AboutScreen extends ConsumerWidget {
       onTap: onTap,
     );
   }
-  
+
   Widget _buildCreditsCard(ThemeColors themeColors) {
     return Container(
       padding: const EdgeInsets.all(24),

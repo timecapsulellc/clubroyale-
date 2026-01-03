@@ -1,5 +1,5 @@
 /// Contact Admin Screen
-/// 
+///
 /// Informational screen for diamond acquisition via admin channel.
 /// No in-app transactions - redirects to external channels only.
 library;
@@ -15,7 +15,8 @@ class ContactAdminScreen extends StatelessWidget {
   const ContactAdminScreen({super.key});
 
   // External contact channels (no in-app transactions)
-  static const String _whatsappNumber = '+918000000000'; // Replace with real number
+  static const String _whatsappNumber =
+      '+918000000000'; // Replace with real number
   static const String _telegramUsername = 'ClubRoyaleSupport';
   static const String _supportEmail = 'support@clubroyale.app';
 
@@ -31,7 +32,7 @@ class ContactAdminScreen extends StatelessWidget {
         children: [
           // Compliance disclaimer
           const LegalDisclaimerBanner(type: DisclaimerType.store),
-          
+
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -42,15 +43,22 @@ class ContactAdminScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [CasinoColors.gold.withValues(alpha: 0.3), Colors.amber.withValues(alpha: 0.1)],
+                        colors: [
+                          CasinoColors.gold.withValues(alpha: 0.3),
+                          Colors.amber.withValues(alpha: 0.1),
+                        ],
                       ),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.diamond, size: 64, color: CasinoColors.gold),
+                    child: const Icon(
+                      Icons.diamond,
+                      size: 64,
+                      color: CasinoColors.gold,
+                    ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   const Text(
                     'Diamond Acquisition',
                     style: TextStyle(
@@ -59,9 +67,9 @@ class ContactAdminScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   Text(
                     'Contact our team through the channels below '
                     'to learn about acquiring entertainment tokens.',
@@ -71,9 +79,9 @@ class ContactAdminScreen extends StatelessWidget {
                       fontSize: 14,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Available packs (no prices!)
                   const Text(
                     'Available Packs',
@@ -84,14 +92,31 @@ class ContactAdminScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
-                  _buildPackCard('Starter Pack', '50 Diamonds', Icons.diamond_outlined),
-                  _buildPackCard('Player Pack', '100 Diamonds + 10 Bonus', Icons.diamond),
-                  _buildPackCard('Pro Pack', '500 Diamonds + 75 Bonus', Icons.star, isBest: true),
-                  _buildPackCard('Champion Pack', '1000 Diamonds + 200 Bonus', Icons.emoji_events),
-                  
+
+                  _buildPackCard(
+                    'Starter Pack',
+                    '50 Diamonds',
+                    Icons.diamond_outlined,
+                  ),
+                  _buildPackCard(
+                    'Player Pack',
+                    '100 Diamonds + 10 Bonus',
+                    Icons.diamond,
+                  ),
+                  _buildPackCard(
+                    'Pro Pack',
+                    '500 Diamonds + 75 Bonus',
+                    Icons.star,
+                    isBest: true,
+                  ),
+                  _buildPackCard(
+                    'Champion Pack',
+                    '1000 Diamonds + 200 Bonus',
+                    Icons.emoji_events,
+                  ),
+
                   const SizedBox(height: 32),
-                  
+
                   // Contact channels
                   const Text(
                     'Contact Admin',
@@ -102,7 +127,7 @@ class ContactAdminScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   _buildContactButton(
                     context,
                     icon: Icons.message,
@@ -110,9 +135,9 @@ class ContactAdminScreen extends StatelessWidget {
                     color: Colors.green,
                     onTap: () => _launchWhatsApp(),
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   _buildContactButton(
                     context,
                     icon: Icons.send,
@@ -120,9 +145,9 @@ class ContactAdminScreen extends StatelessWidget {
                     color: Colors.blue,
                     onTap: () => _launchTelegram(),
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   _buildContactButton(
                     context,
                     icon: Icons.email,
@@ -130,9 +155,9 @@ class ContactAdminScreen extends StatelessWidget {
                     color: Colors.orange,
                     onTap: () => _launchEmail(),
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Disclaimer
                   DisclaimerText(text: Disclaimers.diamondsDisclaimer),
                 ],
@@ -144,14 +169,19 @@ class ContactAdminScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPackCard(String name, String diamonds, IconData icon, {bool isBest = false}) {
+  Widget _buildPackCard(
+    String name,
+    String diamonds,
+    IconData icon, {
+    bool isBest = false,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: isBest 
+        border: isBest
             ? Border.all(color: CasinoColors.gold, width: 2)
             : Border.all(color: Colors.white24),
       ),
@@ -160,10 +190,15 @@ class ContactAdminScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isBest ? CasinoColors.gold.withValues(alpha: 0.2) : Colors.white12,
+              color: isBest
+                  ? CasinoColors.gold.withValues(alpha: 0.2)
+                  : Colors.white12,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: isBest ? CasinoColors.gold : Colors.white70),
+            child: Icon(
+              icon,
+              color: isBest ? CasinoColors.gold : Colors.white70,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -182,14 +217,21 @@ class ContactAdminScreen extends StatelessWidget {
                     if (isBest) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: CasinoColors.gold,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Text(
                           'POPULAR',
-                          style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -198,7 +240,10 @@ class ContactAdminScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   diamonds,
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
@@ -225,14 +270,18 @@ class ContactAdminScreen extends StatelessWidget {
           backgroundColor: color,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );
   }
 
   Future<void> _launchWhatsApp() async {
-    final uri = Uri.parse('https://wa.me/$_whatsappNumber?text=Hi, I want to learn about ClubRoyale diamonds');
+    final uri = Uri.parse(
+      'https://wa.me/$_whatsappNumber?text=Hi, I want to learn about ClubRoyale diamonds',
+    );
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }

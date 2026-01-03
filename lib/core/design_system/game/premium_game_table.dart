@@ -1,5 +1,5 @@
 /// Premium Game Table - Full casino-style table layout
-/// 
+///
 /// Features:
 /// - Felt texture background
 /// - Ambient lighting effects
@@ -66,10 +66,7 @@ class PremiumGameTable extends StatelessWidget {
                 ),
 
               // Opponents area
-              Expanded(
-                flex: 3,
-                child: _buildOpponentsArea(),
-              ),
+              Expanded(flex: 3, child: _buildOpponentsArea()),
 
               // Center area (deck, discard, tiplu)
               Expanded(
@@ -78,10 +75,12 @@ class PremiumGameTable extends StatelessWidget {
                   child: TableCenterArea(
                     deckWidget: (centerContent as TableCenterArea).deckWidget,
                     tipluWidget: (centerContent as TableCenterArea).tipluWidget,
-                    discardWidget: (centerContent as TableCenterArea).discardWidget,
+                    discardWidget:
+                        (centerContent as TableCenterArea).discardWidget,
                     deckCount: (centerContent as TableCenterArea).deckCount,
                     onDeckTap: (centerContent as TableCenterArea).onDeckTap,
-                    onDiscardTap: (centerContent as TableCenterArea).onDiscardTap,
+                    onDiscardTap:
+                        (centerContent as TableCenterArea).onDiscardTap,
                     onCardDroppedOnDiscard: onCardDroppedOnDiscard,
                   ),
                 ),
@@ -145,35 +144,79 @@ class PremiumGameTable extends StatelessWidget {
 
     final widgets = <Widget>[];
     final count = opponents.length;
+    final aspectRatio = width / height;
+    final isLandscape = aspectRatio > 1.2;
 
-    // Ellipse parameters
+    // Responsive Ellipse Parameters
     final centerX = width / 2;
-    final centerY = height * 0.65;
-    final radiusX = width * 0.42;
-    final radiusY = height * 0.5;
+    // Push center up slightly to make room for player hand
+    final centerY = height * (isLandscape ? 0.6 : 0.55);
 
-    // Step calculation - distribute evenly from left to right through top
-    final step = math.pi / (count + 1);
+    // Adjust radius based on screen shape and player count
+    // Tighter ellipse for more players to fit them in view
+    double radiusX = width * (isLandscape ? 0.4 : 0.45);
+    double radiusY = height * (isLandscape ? 0.4 : 0.35);
+
+    // Dynamic scale factor for opponent widgets based on count
+    // 8 players needs slightly smaller widgets or tighter packing
+    // But we'll keep widget size fixed for consistency and adjust position
+
+    // Distribution logic:
+    // We want to distribute players along the top arc of the ellipse
+    // From angle PI (left) to 0 (right), but represented as 0 to PI in math terms usually.
+    // Let's use standard unit circle: 0 is right, PI is left.
+    // We want them from PI (left) to 0 (right).
+    // Actually, let's use a range from PI - margin to 0 + margin
+
+    // Define the visible arc for opponents (excluding self at bottom)
+    // We want roughly 180 degrees (PI) coverage at the top
+    const startAngle = math.pi; // Left
+    const endAngle = 0.0; // Right
+    final totalSweep = startAngle - endAngle;
+
+    // Evenly distribute
+    // If we have N opponents, we have N+1 gaps if we want padding on sides
+    // Or we can distribute them at specific points
 
     for (int i = 0; i < count; i++) {
-      // Calculate angle (from left π to right 0)
-      final angle = math.pi - (step * (i + 1));
+      // Linear interpolation for angle
+      // i=0 -> left-most, i=count-1 -> right-most
+      double t;
+      if (count == 1) {
+        t = 0.5; // Single opponent at top center
+      } else {
+        t = i / (count - 1);
+      }
 
-      // Calculate position on ellipse
+      // Calculate angle
+      // We add some padding at edges so players aren't exactly at 0 and PI (hard edges)
+      // 10% padding on each side of the arc
+      final padding = totalSweep * 0.1;
+      final effectiveSweep = totalSweep - (2 * padding);
+      final angle = startAngle - padding - (t * effectiveSweep);
+
+      // Positioning
       final x = centerX + radiusX * math.cos(angle);
-      final y = centerY - radiusY * math.sin(angle).abs();
+      // For Y, we want the top half of ellipse, so -sin(angle)
+      // Since screen Y grows downwards, center - (radius * sin) is correct for top arc
+      final y = centerY - radiusY * math.sin(angle);
 
       final opponent = opponents[i];
       final isCurrentTurn = opponent.playerId == currentTurnPlayerId;
 
+      // For 8 players (7 opponents), use compact widget on smaller screens
+      final bool useCompact = count > 5 && width < 600;
+
       widgets.add(
         Positioned(
-          left: x - 45,
-          top: y - 35,
-          child: OpponentWidget(
-            data: opponent,
-            isCurrentTurn: isCurrentTurn,
-          ),
+          left: x - (useCompact ? 40 : 45), // center align fix approx
+          top: y - (useCompact ? 25 : 35),
+          child: useCompact
+              ? OpponentWidgetCompact(
+                  data: opponent,
+                  isCurrentTurn: isCurrentTurn,
+                )
+              : OpponentWidget(data: opponent, isCurrentTurn: isCurrentTurn),
         ),
       );
     }
@@ -183,19 +226,16 @@ class PremiumGameTable extends StatelessWidget {
 
   Widget _buildMyTurnIndicator() {
     return Positioned.fill(
-      child: IgnorePointer(
-        child: Container(
-          margin: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: const Color(0xFFD4AF37),
-              width: 3,
+          child: IgnorePointer(
+            child: Container(
+              margin: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFD4AF37), width: 3),
+              ),
             ),
           ),
-        ),
-      ),
-    )
+        )
         .animate(onPlay: (c) => c.repeat())
         .shimmer(
           duration: 2000.ms,
@@ -349,10 +389,7 @@ class TableCenterArea extends StatelessWidget {
                         ),
                         child: const Text(
                           'DISCARD',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 9,
-                          ),
+                          style: TextStyle(color: Colors.white70, fontSize: 9),
                         ),
                       ),
                     ],

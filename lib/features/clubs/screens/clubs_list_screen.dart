@@ -1,5 +1,5 @@
 /// Clubs List Screen
-/// 
+///
 /// Shows user's clubs and discovery
 library;
 
@@ -20,11 +20,9 @@ class ClubsListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authServiceProvider);
     final userId = auth.currentUser?.uid;
-    
+
     if (userId == null) {
-      return const Scaffold(
-        body: Center(child: Text('Please sign in')),
-      );
+      return const Scaffold(body: Center(child: Text('Please sign in')));
     }
 
     final myClubsAsync = ref.watch(userClubsProvider(userId));
@@ -49,7 +47,8 @@ class ClubsListScreen extends ConsumerWidget {
                       label: Text('${invites.length}'),
                       child: IconButton(
                         icon: const Icon(Icons.mail),
-                        onPressed: () => _showInvitesSheet(context, invites, ref),
+                        onPressed: () =>
+                            _showInvitesSheet(context, invites, ref),
                       ),
                     )
                   : IconButton(
@@ -70,10 +69,15 @@ class ClubsListScreen extends ConsumerWidget {
                   : ListView.builder(
                       padding: const EdgeInsets.all(16),
                       itemCount: clubs.length,
-                      itemBuilder: (context, index) => _ClubCard(club: clubs[index]),
+                      itemBuilder: (context, index) =>
+                          _ClubCard(club: clubs[index]),
                     ),
-              loading: () => const ContextualLoader(message: 'Loading clubs...', icon: Icons.groups),
-              error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
+              loading: () => const ContextualLoader(
+                message: 'Loading clubs...',
+                icon: Icons.groups,
+              ),
+              error: (e, _) =>
+                  Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
             ),
             // Discover Tab
             const _DiscoverTab(),
@@ -93,7 +97,11 @@ class ClubsListScreen extends ConsumerWidget {
     );
   }
 
-  void _showInvitesSheet(BuildContext context, List<ClubInvite> invites, WidgetRef ref) {
+  void _showInvitesSheet(
+    BuildContext context,
+    List<ClubInvite> invites,
+    WidgetRef ref,
+  ) {
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
@@ -104,32 +112,37 @@ class ClubsListScreen extends ConsumerWidget {
           children: [
             Text('Club Invites', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-            ...invites.map((invite) => ListTile(
-              leading: const CircleAvatar(child: Icon(Icons.groups)),
-              title: Text(invite.clubName),
-              subtitle: Text('From ${invite.inviterName}'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.red),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.check, color: Colors.green),
-                    onPressed: () async {
-                      final auth = ref.read(authServiceProvider);
-                      await ref.read(clubServiceProvider).acceptInvite(
-                        inviteId: invite.id,
-                        oderId: auth.currentUser!.uid,
-                        userName: auth.currentUser!.displayName ?? 'Player',
-                      );
-                      if (context.mounted) Navigator.pop(context);
-                    },
-                  ),
-                ],
+            ...invites.map(
+              (invite) => ListTile(
+                leading: const CircleAvatar(child: Icon(Icons.groups)),
+                title: Text(invite.clubName),
+                subtitle: Text('From ${invite.inviterName}'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.red),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.check, color: Colors.green),
+                      onPressed: () async {
+                        final auth = ref.read(authServiceProvider);
+                        await ref
+                            .read(clubServiceProvider)
+                            .acceptInvite(
+                              inviteId: invite.id,
+                              oderId: auth.currentUser!.uid,
+                              userName:
+                                  auth.currentUser!.displayName ?? 'Player',
+                            );
+                        if (context.mounted) Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
               ),
-            )),
+            ),
           ],
         ),
       ),
@@ -150,7 +163,9 @@ class _ClubCard extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => ClubDetailScreen(clubId: club.id)),
+            MaterialPageRoute(
+              builder: (_) => ClubDetailScreen(clubId: club.id),
+            ),
           );
         },
         borderRadius: BorderRadius.circular(12),
@@ -161,9 +176,14 @@ class _ClubCard extends StatelessWidget {
               CircleAvatar(
                 radius: 28,
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                backgroundImage: club.avatarUrl != null ? NetworkImage(club.avatarUrl!) : null,
+                backgroundImage: club.avatarUrl != null
+                    ? NetworkImage(club.avatarUrl!)
+                    : null,
                 child: club.avatarUrl == null
-                    ? Text(club.name[0].toUpperCase(), style: const TextStyle(fontSize: 24))
+                    ? Text(
+                        club.name[0].toUpperCase(),
+                        style: const TextStyle(fontSize: 24),
+                      )
                     : null,
               ),
               const SizedBox(width: 16),
@@ -175,14 +195,17 @@ class _ClubCard extends StatelessWidget {
                       children: [
                         Text(
                           club.name,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         if (club.isVerified)
                           const Padding(
                             padding: EdgeInsets.only(left: 4),
-                            child: Icon(Icons.verified, color: Colors.blue, size: 18),
+                            child: Icon(
+                              Icons.verified,
+                              color: Colors.blue,
+                              size: 18,
+                            ),
                           ),
                       ],
                     ),
@@ -217,7 +240,10 @@ class _EmptyMyClubs extends StatelessWidget {
             color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 24),
-          Text('No Clubs Yet', style: Theme.of(context).textTheme.headlineSmall),
+          Text(
+            'No Clubs Yet',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
           const SizedBox(height: 8),
           const Text('Join or create a club to play with friends!'),
         ],
@@ -242,9 +268,24 @@ class _DiscoverTabState extends ConsumerState<_DiscoverTab> {
   Widget build(BuildContext context) {
     // Featured Bot Clubs for instant discovery
     final featuredClubs = [
-      {'name': '🏆 ClubRoyale Academy', 'desc': 'Learn from AI coaches', 'members': 1247, 'color': Colors.blue},
-      {'name': '⚔️ Pro Arena', 'desc': 'Competitive matches, hard bots', 'members': 892, 'color': Colors.red},
-      {'name': '🎉 Casual Lounge', 'desc': 'Relaxed games, easy bots', 'members': 2103, 'color': Colors.green},
+      {
+        'name': '🏆 ClubRoyale Academy',
+        'desc': 'Learn from AI coaches',
+        'members': 1247,
+        'color': Colors.blue,
+      },
+      {
+        'name': '⚔️ Pro Arena',
+        'desc': 'Competitive matches, hard bots',
+        'members': 892,
+        'color': Colors.red,
+      },
+      {
+        'name': '🎉 Casual Lounge',
+        'desc': 'Relaxed games, easy bots',
+        'members': 2103,
+        'color': Colors.green,
+      },
     ];
 
     return SingleChildScrollView(
@@ -288,7 +329,9 @@ class _DiscoverTabState extends ConsumerState<_DiscoverTab> {
                 ],
               ),
             ),
-            ...featuredClubs.map((club) => _buildFeaturedClubTile(context, club)),
+            ...featuredClubs.map(
+              (club) => _buildFeaturedClubTile(context, club),
+            ),
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -300,21 +343,31 @@ class _DiscoverTabState extends ConsumerState<_DiscoverTab> {
           ],
           // Search Results
           if (_isSearching)
-            const Center(child: Padding(
-              padding: EdgeInsets.all(32),
-              child: ContextualLoader(message: 'Searching...', icon: Icons.search),
-            ))
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32),
+                child: ContextualLoader(
+                  message: 'Searching...',
+                  icon: Icons.search,
+                ),
+              ),
+            )
           else if (_searchResults.isNotEmpty)
-            ...(_searchResults.map((club) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _ClubCard(club: club),
-            ))),
+            ...(_searchResults.map(
+              (club) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _ClubCard(club: club),
+              ),
+            )),
         ],
       ),
     );
   }
 
-  Widget _buildFeaturedClubTile(BuildContext context, Map<String, dynamic> club) {
+  Widget _buildFeaturedClubTile(
+    BuildContext context,
+    Map<String, dynamic> club,
+  ) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: ListTile(
@@ -331,8 +384,14 @@ class _DiscoverTabState extends ConsumerState<_DiscoverTab> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text('${club['members']}', style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text('members', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+            Text(
+              '${club['members']}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'members',
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+            ),
           ],
         ),
         onTap: () {
@@ -350,9 +409,9 @@ class _DiscoverTabState extends ConsumerState<_DiscoverTab> {
 
   Future<void> _search(String query) async {
     if (query.isEmpty) return;
-    
+
     setState(() => _isSearching = true);
-    
+
     try {
       final results = await ref.read(clubServiceProvider).searchClubs(query);
       setState(() => _searchResults = results);

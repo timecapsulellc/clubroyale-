@@ -8,10 +8,14 @@ import 'package:clubroyale/features/game/services/card_validation_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 
 // Re-export the callBreakServiceProvider from call_break_service.dart
-export 'package:clubroyale/features/game/call_break_service.dart' show callBreakServiceProvider;
+export 'package:clubroyale/features/game/call_break_service.dart'
+    show callBreakServiceProvider;
 
 /// Stream provider for the current game room
-final currentGameProvider = StreamProvider.family<GameRoom?, String>((ref, gameId) {
+final currentGameProvider = StreamProvider.family<GameRoom?, String>((
+  ref,
+  gameId,
+) {
   final gameService = ref.watch(gameServiceProvider);
   return gameService.getGameStream(gameId);
 });
@@ -23,10 +27,13 @@ final currentUserIdProvider = Provider<String?>((ref) {
 });
 
 /// Provider for the current player's hand
-final playerHandProvider = Provider.family<List<PlayingCard>, String>((ref, gameId) {
+final playerHandProvider = Provider.family<List<PlayingCard>, String>((
+  ref,
+  gameId,
+) {
   final game = ref.watch(currentGameProvider(gameId)).value;
   final userId = ref.watch(currentUserIdProvider);
-  
+
   if (game == null || userId == null) return [];
   return game.playerHands[userId] ?? [];
 });
@@ -35,27 +42,27 @@ final playerHandProvider = Provider.family<List<PlayingCard>, String>((ref, game
 final isMyTurnProvider = Provider.family<bool, String>((ref, gameId) {
   final game = ref.watch(currentGameProvider(gameId)).value;
   final userId = ref.watch(currentUserIdProvider);
-  
+
   if (game == null || userId == null) return false;
   return game.currentTurn == userId;
 });
 
 /// Provider for cards the current player can legally play
-final playableCardsProvider = Provider.family<List<PlayingCard>, String>((ref, gameId) {
+final playableCardsProvider = Provider.family<List<PlayingCard>, String>((
+  ref,
+  gameId,
+) {
   final game = ref.watch(currentGameProvider(gameId)).value;
   final userId = ref.watch(currentUserIdProvider);
-  
+
   if (game == null || userId == null) return [];
   if (game.gamePhase != GamePhase.playing) return [];
   if (game.currentTurn != userId) return [];
-  
+
   final hand = game.playerHands[userId] ?? [];
   if (hand.isEmpty) return [];
-  
-  return CardValidationService.getValidCards(
-    hand,
-    game.currentTrick,
-  );
+
+  return CardValidationService.getValidCards(hand, game.currentTrick);
 });
 
 /// Provider for the current game phase
@@ -75,7 +82,7 @@ final isCallBreakModeProvider = Provider.family<bool, String>((ref, gameId) {
 /// Provider for current round info
 final currentRoundProvider = Provider.family<RoundInfo, String>((ref, gameId) {
   final game = ref.watch(currentGameProvider(gameId)).value;
-  
+
   return RoundInfo(
     currentRound: game?.currentRound ?? 1,
     totalRounds: game?.config.totalRounds ?? 5,
@@ -84,15 +91,21 @@ final currentRoundProvider = Provider.family<RoundInfo, String>((ref, gameId) {
 });
 
 /// Provider for player bids in current round
-final playerBidsProvider = Provider.family<Map<String, int>, String>((ref, gameId) {
+final playerBidsProvider = Provider.family<Map<String, int>, String>((
+  ref,
+  gameId,
+) {
   final game = ref.watch(currentGameProvider(gameId)).value;
   if (game == null) return {};
-  
+
   return game.bids.map((key, bid) => MapEntry(key, bid.amount));
 });
 
 /// Provider for tricks won in current round
-final tricksWonProvider = Provider.family<Map<String, int>, String>((ref, gameId) {
+final tricksWonProvider = Provider.family<Map<String, int>, String>((
+  ref,
+  gameId,
+) {
   final game = ref.watch(currentGameProvider(gameId)).value;
   return game?.tricksWon ?? {};
 });
@@ -103,7 +116,7 @@ class GameActionsNotifier extends Notifier<AsyncValue<void>> {
   AsyncValue<void> build() {
     return const AsyncValue.data(null);
   }
-  
+
   /// Submit a bid
   Future<void> submitBid(String gameId, String playerId, int bidAmount) async {
     state = const AsyncValue.loading();
@@ -115,9 +128,13 @@ class GameActionsNotifier extends Notifier<AsyncValue<void>> {
       state = AsyncValue.error(e, st);
     }
   }
-  
+
   /// Play a card
-  Future<void> playCard(String gameId, String playerId, PlayingCard card) async {
+  Future<void> playCard(
+    String gameId,
+    String playerId,
+    PlayingCard card,
+  ) async {
     state = const AsyncValue.loading();
     try {
       final service = ref.read(callBreakServiceProvider);
@@ -127,7 +144,7 @@ class GameActionsNotifier extends Notifier<AsyncValue<void>> {
       state = AsyncValue.error(e, st);
     }
   }
-  
+
   /// Start next round
   Future<void> startNextRound(String gameId, List<String> playerIds) async {
     state = const AsyncValue.loading();
@@ -141,22 +158,23 @@ class GameActionsNotifier extends Notifier<AsyncValue<void>> {
   }
 }
 
-final gameActionsProvider = NotifierProvider<GameActionsNotifier, AsyncValue<void>>(
-  GameActionsNotifier.new,
-);
+final gameActionsProvider =
+    NotifierProvider<GameActionsNotifier, AsyncValue<void>>(
+      GameActionsNotifier.new,
+    );
 
 /// Helper class for round info
 class RoundInfo {
   final int currentRound;
   final int totalRounds;
   final int tricksPlayed;
-  
+
   const RoundInfo({
     required this.currentRound,
     required this.totalRounds,
     required this.tricksPlayed,
   });
-  
+
   int get totalTricks => 13;
   int get tricksRemaining => totalTricks - tricksPlayed;
   bool get isRoundComplete => tricksPlayed >= totalTricks;

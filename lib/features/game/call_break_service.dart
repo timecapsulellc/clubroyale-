@@ -23,7 +23,7 @@ class CallBreakService {
   Future<void> startNewRound(String gameId, List<String> playerIds) async {
     // Deal hands
     final hands = Deck.dealHands(playerIds);
-    
+
     // Update game room
     await _db.collection('games').doc(gameId).update({
       'gamePhase': GamePhase.bidding.name,
@@ -45,7 +45,9 @@ class CallBreakService {
     final gameDoc = await _db.collection('games').doc(gameId).get();
     final gameData = gameDoc.data()!;
     final bids = Map<String, dynamic>.from(gameData['bids'] ?? {});
-    final playerIds = (gameData['players'] as List).map((p) => p['id'] as String).toList();
+    final playerIds = (gameData['players'] as List)
+        .map((p) => p['id'] as String)
+        .toList();
 
     // Add bid
     bids[playerId] = {'playerId': playerId, 'amount': bidAmount};
@@ -56,22 +58,30 @@ class CallBreakService {
     await _db.collection('games').doc(gameId).update({
       'bids': bids,
       'gamePhase': allBid ? GamePhase.playing.name : GamePhase.bidding.name,
-      'currentTurn': allBid ? playerIds.first : _getNextPlayer(playerIds, playerId),
+      'currentTurn': allBid
+          ? playerIds.first
+          : _getNextPlayer(playerIds, playerId),
     });
   }
 
   /// Validate a move before playing
-  Future<void> validateMove(String gameId, String playerId, PlayingCard card) async {
+  Future<void> validateMove(
+    String gameId,
+    String playerId,
+    PlayingCard card,
+  ) async {
     final gameDoc = await _db.collection('games').doc(gameId).get();
     final gameData = gameDoc.data()!;
-    
+
     // 1. Check if it's player's turn
     if (gameData['currentTurn'] != playerId) {
       throw Exception('Not your turn');
     }
 
     // 2. Check if player has the card
-    final hands = _deserializeHands(gameData['playerHands'] as Map<String, dynamic>);
+    final hands = _deserializeHands(
+      gameData['playerHands'] as Map<String, dynamic>,
+    );
     final playerHand = hands[playerId]!;
     if (!playerHand.any((c) => c.suit == card.suit && c.rank == card.rank)) {
       throw Exception('You do not have this card');
@@ -79,9 +89,11 @@ class CallBreakService {
 
     // 3. Check rules if trick is in progress
     if (gameData['currentTrick'] != null) {
-      final currentTrick = Trick.fromJson(gameData['currentTrick'] as Map<String, dynamic>);
+      final currentTrick = Trick.fromJson(
+        gameData['currentTrick'] as Map<String, dynamic>,
+      );
       final ledSuit = currentTrick.ledSuit;
-      
+
       // Rule: Must follow suit if possible
       final hasLedSuit = playerHand.any((c) => c.suit == ledSuit);
       if (hasLedSuit && card.suit != ledSuit) {
@@ -94,11 +106,13 @@ class CallBreakService {
             .where((c) => c.card.suit == ledSuit)
             .map((c) => c.card.rank.value)
             .fold(0, (max, val) => val > max ? val : max);
-            
-        final hasHigher = playerHand.any((c) => c.suit == ledSuit && c.rank.value > highestInSuit);
-        
+
+        final hasHigher = playerHand.any(
+          (c) => c.suit == ledSuit && c.rank.value > highestInSuit,
+        );
+
         if (hasHigher && card.rank.value <= highestInSuit) {
-          // Note: Some variations allow playing any card of suit. 
+          // Note: Some variations allow playing any card of suit.
           // Enforcing "must win if possible" is stricter.
           // We'll leave this as a warning or strict rule depending on config.
           // For now, let's be lenient on "must win" but strict on "must follow suit".
@@ -109,23 +123,29 @@ class CallBreakService {
       if (!hasLedSuit) {
         final hasSpade = playerHand.any((c) => c.suit == CardSuit.spades);
         if (hasSpade && card.suit != CardSuit.spades) {
-           // Exception: If another player already played a Spade, 
-           // you only HAVE to play a Spade if you can beat it?
-           // Standard rule: Must play trump if you can't follow suit.
-           throw Exception('Must play Spade if you cannot follow suit');
+          // Exception: If another player already played a Spade,
+          // you only HAVE to play a Spade if you can beat it?
+          // Standard rule: Must play trump if you can't follow suit.
+          throw Exception('Must play Spade if you cannot follow suit');
         }
       }
     }
   }
 
   /// Play a card in the current trick
-  Future<void> playCard(String gameId, String playerId, PlayingCard card) async {
+  Future<void> playCard(
+    String gameId,
+    String playerId,
+    PlayingCard card,
+  ) async {
     // Validate move first
     await validateMove(gameId, playerId, card);
 
     final gameDoc = await _db.collection('games').doc(gameId).get();
     final gameData = gameDoc.data()!;
-    final playerIds = (gameData['players'] as List).map((p) => p['id'] as String).toList();
+    final playerIds = (gameData['players'] as List)
+        .map((p) => p['id'] as String)
+        .toList();
 
     // Get current trick or create new one
     Trick currentTrick;
@@ -136,15 +156,24 @@ class CallBreakService {
         cards: [PlayedCard(playerId: playerId, card: card)],
       );
     } else {
-      currentTrick = Trick.fromJson(gameData['currentTrick'] as Map<String, dynamic>);
+      currentTrick = Trick.fromJson(
+        gameData['currentTrick'] as Map<String, dynamic>,
+      );
       currentTrick = currentTrick.copyWith(
-        cards: [...currentTrick.cards, PlayedCard(playerId: playerId, card: card)],
+        cards: [
+          ...currentTrick.cards,
+          PlayedCard(playerId: playerId, card: card),
+        ],
       );
     }
 
     // Remove card from player's hand
-    final hands = _deserializeHands(gameData['playerHands'] as Map<String, dynamic>);
-    hands[playerId]!.removeWhere((c) => c.suit == card.suit && c.rank == card.rank);
+    final hands = _deserializeHands(
+      gameData['playerHands'] as Map<String, dynamic>,
+    );
+    hands[playerId]!.removeWhere(
+      (c) => c.suit == card.suit && c.rank == card.rank,
+    );
 
     // Play sound
     _soundService.playCardSlide();
@@ -153,16 +182,18 @@ class CallBreakService {
     if (currentTrick.isComplete) {
       // Determine winner using Logic class
       final winnerId = CallBreakLogic.determineTrickWinner(currentTrick);
-      
+
       // Play win sound
       _soundService.playTrickWin();
-      
+
       // Update tricks won
       final tricksWon = Map<String, int>.from(gameData['tricksWon'] ?? {});
       tricksWon[winnerId] = (tricksWon[winnerId] ?? 0) + 1;
 
       // Add to history
-      final trickHistory = List<Map<String, dynamic>>.from(gameData['trickHistory'] ?? []);
+      final trickHistory = List<Map<String, dynamic>>.from(
+        gameData['trickHistory'] ?? [],
+      );
       trickHistory.add(currentTrick.copyWith(winnerId: winnerId).toJson());
 
       // Check if round is complete (13 tricks)
@@ -191,13 +222,18 @@ class CallBreakService {
   }
 
   /// Complete the round and calculate scores
-  Future<void> _completeRound(String gameId, Map<String, int> tricksWon, Map<String, dynamic> gameData) async {
+  Future<void> _completeRound(
+    String gameId,
+    Map<String, int> tricksWon,
+    Map<String, dynamic> gameData,
+  ) async {
     final bidsData = Map<String, dynamic>.from(gameData['bids'] ?? {});
     final bids = bidsData.map((k, v) => MapEntry(k, v['amount'] as int));
-    
+
     final currentRound = gameData['currentRound'] as int? ?? 1;
     final totalRounds = gameData['config']['totalRounds'] as int? ?? 5;
-    final pointValue = (gameData['config']['pointValue'] as num?)?.toDouble() ?? 10.0;
+    final pointValue =
+        (gameData['config']['pointValue'] as num?)?.toDouble() ?? 10.0;
 
     // Calculate round scores using Logic class
     final roundScores = CallBreakLogic.calculateRoundScores(
@@ -209,14 +245,16 @@ class CallBreakService {
     // Update cumulative scores
     final currentScores = Map<String, int>.from(gameData['scores'] ?? {});
     roundScores.forEach((playerId, roundScore) {
-      currentScores[playerId] = (currentScores[playerId] ?? 0) + roundScore.toInt();
+      currentScores[playerId] =
+          (currentScores[playerId] ?? 0) + roundScore.toInt();
     });
 
     // Save round scores history
     final allRoundScores = Map<String, List<double>>.from(
       (gameData['roundScores'] as Map<String, dynamic>?)?.map(
-        (k, v) => MapEntry(k, (v as List).cast<double>()),
-      ) ?? {},
+            (k, v) => MapEntry(k, (v as List).cast<double>()),
+          ) ??
+          {},
     );
     roundScores.forEach((playerId, score) {
       allRoundScores.putIfAbsent(playerId, () => []);
@@ -230,7 +268,9 @@ class CallBreakService {
       'currentRound': currentRound + 1,
       'scores': currentScores,
       'roundScores': allRoundScores,
-      'gamePhase': gameFinished ? GamePhase.gameFinished.name : GamePhase.roundEnd.name,
+      'gamePhase': gameFinished
+          ? GamePhase.gameFinished.name
+          : GamePhase.roundEnd.name,
       'status': gameFinished ? 'settled' : 'playing',
       'finishedAt': gameFinished ? FieldValue.serverTimestamp() : null,
     });
@@ -243,14 +283,16 @@ class CallBreakService {
 
   /// Serialize hands to JSON
   Map<String, dynamic> _serializeHands(Map<String, List<PlayingCard>> hands) {
-    return hands.map((playerId, cards) => MapEntry(playerId, Deck.serializeHand(cards)));
+    return hands.map(
+      (playerId, cards) => MapEntry(playerId, Deck.serializeHand(cards)),
+    );
   }
 
   /// Deserialize hands from JSON
   Map<String, List<PlayingCard>> _deserializeHands(Map<String, dynamic> json) {
-    return json.map((playerId, cardsJson) => MapEntry(
-      playerId,
-      Deck.deserializeHand(cardsJson as List),
-    ));
+    return json.map(
+      (playerId, cardsJson) =>
+          MapEntry(playerId, Deck.deserializeHand(cardsJson as List)),
+    );
   }
 }

@@ -1,5 +1,5 @@
 /// Theme Store Providers
-/// 
+///
 /// Riverpod providers for managing selected theme and card skin state.
 library;
 
@@ -72,6 +72,7 @@ class ThemeSelectionNotifier extends Notifier<AsyncValue<void>> {
 }
 
 /// Provider for theme selection actions
-final themeSelectionProvider = NotifierProvider<ThemeSelectionNotifier, AsyncValue<void>>(
-  ThemeSelectionNotifier.new,
-);
+final themeSelectionProvider =
+    NotifierProvider<ThemeSelectionNotifier, AsyncValue<void>>(
+      ThemeSelectionNotifier.new,
+    );

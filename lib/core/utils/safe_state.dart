@@ -1,5 +1,5 @@
 /// Base Safe State
-/// 
+///
 /// Base class for StatefulWidget states with proper lifecycle management.
 /// Provides mounted checks, dispose handlers, and safe setState.
 library;
@@ -14,14 +14,14 @@ mixin SafeSetStateMixin<T extends StatefulWidget> on State<T> {
       setState(fn);
     }
   }
-  
+
   /// Execute a callback only if mounted
   void ifMounted(VoidCallback fn) {
     if (mounted) {
       fn();
     }
   }
-  
+
   /// Execute an async callback and update state only if mounted
   Future<void> safeAsync(Future<void> Function() fn) async {
     await fn();
@@ -30,34 +30,35 @@ mixin SafeSetStateMixin<T extends StatefulWidget> on State<T> {
 }
 
 /// Base state class that tracks disposal and provides safe setState
-abstract class SafeState<T extends StatefulWidget> extends State<T> with SafeSetStateMixin<T> {
+abstract class SafeState<T extends StatefulWidget> extends State<T>
+    with SafeSetStateMixin<T> {
   bool _isDisposed = false;
-  
+
   /// Whether this state has been disposed
   bool get isDisposed => _isDisposed;
-  
+
   /// List of disposable resources to clean up
   final List<ChangeNotifier> _disposables = [];
-  
+
   /// Register a disposable resource for automatic cleanup
   void registerDisposable(ChangeNotifier disposable) {
     _disposables.add(disposable);
   }
-  
+
   /// Register a TextEditingController for auto-disposal
   TextEditingController createTextController([String? text]) {
     final controller = TextEditingController(text: text);
     _disposables.add(controller);
     return controller;
   }
-  
+
   /// Register a ScrollController for auto-disposal
   ScrollController createScrollController() {
     final controller = ScrollController();
     _disposables.add(controller);
     return controller;
   }
-  
+
   @override
   void dispose() {
     _isDisposed = true;

@@ -8,7 +8,11 @@ import 'package:share_plus/share_plus.dart';
 
 class ReceiptServiceImpl implements ReceiptService {
   @override
-  Future<void> shareReceiptImage(Uint8List imageBytes, String fileName, String title) async {
+  Future<void> shareReceiptImage(
+    Uint8List imageBytes,
+    String fileName,
+    String title,
+  ) async {
     // On web, we can share directly from bytes using XFile.fromData
     await Share.shareXFiles(
       [XFile.fromData(imageBytes, name: fileName, mimeType: 'image/png')],

@@ -1,5 +1,5 @@
 /// Marriage Game Settings Widget
-/// 
+///
 /// Toggle switches for configuring Marriage game rules
 /// Used in room creation flow
 library;
@@ -12,38 +12,38 @@ import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart
 class MarriageSettingsWidget extends StatefulWidget {
   final MarriageGameConfig initialConfig;
   final ValueChanged<MarriageGameConfig> onConfigChanged;
-  
+
   const MarriageSettingsWidget({
     super.key,
     this.initialConfig = const MarriageGameConfig(),
     required this.onConfigChanged,
   });
-  
+
   @override
   State<MarriageSettingsWidget> createState() => _MarriageSettingsWidgetState();
 }
 
 class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
   late MarriageGameConfig _config;
-  
+
   @override
   void initState() {
     super.initState();
     _config = widget.initialConfig;
   }
-  
+
   void _updateConfig(MarriageGameConfig Function(MarriageGameConfig) updater) {
     setState(() {
       _config = updater(_config);
     });
     widget.onConfigChanged(_config);
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -53,86 +53,93 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const MarriageGuidebookScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const MarriageGuidebookScreen(),
+                ),
               );
             },
             icon: const Icon(Icons.menu_book, size: 18),
             label: const Text('Read Full Rules & FAQ'),
             style: TextButton.styleFrom(
               foregroundColor: colorScheme.primary,
-              backgroundColor: colorScheme.surfaceVariant,
+              backgroundColor: colorScheme.surfaceContainerHighest,
             ),
           ),
         ),
         const SizedBox(height: 12),
-        
+
         // Preset selector
         _buildPresetSelector(colorScheme),
-        
+
         const SizedBox(height: 16),
         const Divider(),
-        
+
         // Section: Core Rules
         _buildSectionHeader('Core Rules', Icons.gavel),
-        
+
         _buildToggle(
           title: 'Joker Blocks Discard',
           subtitle: 'Cannot start discard pile with Joker / Man',
           value: _config.jokerBlocksDiscard,
-          onChanged: (v) => _updateConfig((c) => c.copyWith(jokerBlocksDiscard: v)),
+          onChanged: (v) =>
+              _updateConfig((c) => c.copyWith(jokerBlocksDiscard: v)),
           icon: Icons.block,
         ),
-        
+
         _buildToggle(
           title: 'Allow Wild Card Pickup',
           subtitle: 'Can pick Tiplu/Jhiplu/Poplu from discard pile',
           value: _config.canPickupWildFromDiscard,
-          onChanged: (v) => _updateConfig((c) => c.copyWith(canPickupWildFromDiscard: v)),
+          onChanged: (v) =>
+              _updateConfig((c) => c.copyWith(canPickupWildFromDiscard: v)),
           icon: Icons.visibility,
         ),
-        
+
         _buildToggle(
           title: 'Pure Sequence Required',
           subtitle: 'Pure sequence needed to "Visit" (unlock Maal)',
           value: _config.requirePureSequence,
-          onChanged: (v) => _updateConfig((c) => c.copyWith(requirePureSequence: v)),
+          onChanged: (v) =>
+              _updateConfig((c) => c.copyWith(requirePureSequence: v)),
           icon: Icons.check_circle,
         ),
-        
+
         const Divider(),
-        
+
         // Section: Visiting & Advanced (NEW)
         _buildSectionHeader('Visiting & Advanced', Icons.lock_open),
-        
+
         _buildToggle(
           title: 'Must Visit to Pick',
           subtitle: 'Cannot pick from discard pile until Visited',
           value: _config.mustVisitToPickDiscard,
-          onChanged: (v) => _updateConfig((c) => c.copyWith(mustVisitToPickDiscard: v)),
+          onChanged: (v) =>
+              _updateConfig((c) => c.copyWith(mustVisitToPickDiscard: v)),
           icon: Icons.lock_clock,
         ),
-        
+
         _buildToggle(
           title: 'Kidnap Rule',
-          subtitle: 'Unvisited player gets 0 Maal points (Winner takes advantage)',
+          subtitle:
+              'Unvisited player gets 0 Maal points (Winner takes advantage)',
           value: _config.enableKidnap,
           onChanged: (v) => _updateConfig((c) => c.copyWith(enableKidnap: v)),
           icon: Icons.person_off,
         ),
-        
-         _buildToggle(
+
+        _buildToggle(
           title: 'Murder Rule',
           subtitle: 'Unvisited player loses ALL Maal cards to winner (Strict)',
           value: _config.enableMurder,
           onChanged: (v) => _updateConfig((c) => c.copyWith(enableMurder: v)),
           icon: Icons.dangerous,
         ),
-        
+
         const Divider(),
-        
+
         // Section: Bonus Rules
         _buildSectionHeader('Bonus Points', Icons.star),
-        
+
         _buildToggle(
           title: 'Dublee Bonus',
           subtitle: '+25 points for two sequences of same suit',
@@ -140,7 +147,7 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
           onChanged: (v) => _updateConfig((c) => c.copyWith(dubleeBonus: v)),
           icon: Icons.looks_two,
         ),
-        
+
         _buildToggle(
           title: 'Tunnel Bonus',
           subtitle: '+50 points for 3 identical cards (same suit from 3 decks)',
@@ -148,7 +155,7 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
           onChanged: (v) => _updateConfig((c) => c.copyWith(tunnelBonus: v)),
           icon: Icons.filter_3,
         ),
-        
+
         _buildToggle(
           title: 'Marriage Bonus',
           subtitle: '+100 points for K+Q pair in melds',
@@ -156,12 +163,12 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
           onChanged: (v) => _updateConfig((c) => c.copyWith(marriageBonus: v)),
           icon: Icons.favorite_border,
         ),
-        
+
         const Divider(),
-        
+
         // Section: Game Settings
         _buildSectionHeader('Game Settings', Icons.settings),
-        
+
         _buildSlider(
           title: 'Turn Timeout',
           subtitle: '${_config.turnTimeoutSeconds} seconds per turn',
@@ -169,10 +176,11 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
           min: 15,
           max: 120,
           divisions: 7,
-          onChanged: (v) => _updateConfig((c) => c.copyWith(turnTimeoutSeconds: v.round())),
+          onChanged: (v) =>
+              _updateConfig((c) => c.copyWith(turnTimeoutSeconds: v.round())),
           icon: Icons.timer,
         ),
-        
+
         _buildSlider(
           title: 'Max Wilds in Meld',
           subtitle: '${_config.maxWildsInMeld} wild cards per meld',
@@ -180,10 +188,11 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
           min: 1,
           max: 4,
           divisions: 3,
-          onChanged: (v) => _updateConfig((c) => c.copyWith(maxWildsInMeld: v.round())),
+          onChanged: (v) =>
+              _updateConfig((c) => c.copyWith(maxWildsInMeld: v.round())),
           icon: Icons.style,
         ),
-        
+
         _buildSlider(
           title: 'Total Rounds',
           subtitle: '${_config.totalRounds} rounds per game',
@@ -191,15 +200,16 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
           min: 1,
           max: 10,
           divisions: 9,
-          onChanged: (v) => _updateConfig((c) => c.copyWith(totalRounds: v.round())),
+          onChanged: (v) =>
+              _updateConfig((c) => c.copyWith(totalRounds: v.round())),
           icon: Icons.repeat,
         ),
-        
+
         const Divider(),
-        
+
         // Section: Penalties
         _buildSectionHeader('Penalties', Icons.warning_amber),
-        
+
         _buildSlider(
           title: 'No Life Penalty',
           subtitle: '${_config.noLifePenalty} points for no pure sequence',
@@ -207,13 +217,14 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
           min: 50,
           max: 200,
           divisions: 6,
-          onChanged: (v) => _updateConfig((c) => c.copyWith(noLifePenalty: v.round())),
+          onChanged: (v) =>
+              _updateConfig((c) => c.copyWith(noLifePenalty: v.round())),
           icon: Icons.heart_broken,
         ),
       ],
     );
   }
-  
+
   Widget _buildPresetSelector(ColorScheme colorScheme) {
     return Row(
       children: [
@@ -254,7 +265,7 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
       ],
     );
   }
-  
+
   Widget _buildSectionHeader(String title, IconData icon) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -264,15 +275,15 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
           const SizedBox(width: 8),
           Text(
             title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildToggle({
     required String title,
     required String subtitle,
@@ -281,17 +292,17 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
     required IconData icon,
   }) {
     return ListTile(
-      leading: Icon(icon, color: value ? Theme.of(context).colorScheme.primary : Colors.grey),
+      leading: Icon(
+        icon,
+        color: value ? Theme.of(context).colorScheme.primary : Colors.grey,
+      ),
       title: Text(title),
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-      trailing: Switch(
-        value: value,
-        onChanged: onChanged,
-      ),
+      trailing: Switch(value: value, onChanged: onChanged),
       contentPadding: EdgeInsets.zero,
     );
   }
-  
+
   Widget _buildSlider({
     required String title,
     required String subtitle,
@@ -327,13 +338,13 @@ class _MarriageSettingsWidgetState extends State<MarriageSettingsWidget> {
 class MarriageSettingsCompact extends StatelessWidget {
   final MarriageGameConfig config;
   final VoidCallback onEditPressed;
-  
+
   const MarriageSettingsCompact({
     super.key,
     required this.config,
     required this.onEditPressed,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -358,16 +369,13 @@ class MarriageSettingsCompact extends StatelessWidget {
                 ],
               ),
             ),
-            TextButton(
-              onPressed: onEditPressed,
-              child: const Text('Edit'),
-            ),
+            TextButton(onPressed: onEditPressed, child: const Text('Edit')),
           ],
         ),
       ),
     );
   }
-  
+
   String _getRuleSummary() {
     final rules = <String>[];
     if (config.jokerBlocksDiscard) rules.add('Joker Block');

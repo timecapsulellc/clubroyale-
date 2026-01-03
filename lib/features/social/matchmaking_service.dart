@@ -1,5 +1,5 @@
 /// Matchmaking Service
-/// 
+///
 /// ELO-based matchmaking with Quick Match functionality.
 /// Uses GenKit for intelligent player grouping.
 library;
@@ -44,7 +44,7 @@ class PlayerRating {
   factory PlayerRating.initial(String userId) {
     return PlayerRating(
       userId: userId,
-      elo: 1000,  // Starting ELO
+      elo: 1000, // Starting ELO
       gamesPlayed: 0,
       wins: 0,
       losses: 0,
@@ -61,7 +61,8 @@ class PlayerRating {
       wins: json['wins'] ?? 0,
       losses: json['losses'] ?? 0,
       rank: json['rank'] ?? 'Bronze',
-      lastPlayed: (json['lastPlayed'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      lastPlayed:
+          (json['lastPlayed'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
@@ -148,7 +149,7 @@ class MatchmakingService {
     final playerDoc = await _db.collection('ratings').doc(userId).get();
     final opponentDoc = await _db.collection('ratings').doc(opponentId).get();
 
-    final playerRating = playerDoc.exists 
+    final playerRating = playerDoc.exists
         ? PlayerRating.fromJson(playerDoc.data()!, userId)
         : PlayerRating.initial(userId);
     final opponentRating = opponentDoc.exists
@@ -157,9 +158,15 @@ class MatchmakingService {
 
     // Calculate new ELO
     final newPlayerElo = calculateNewElo(
-        playerRating.elo, opponentRating.elo, won);
+      playerRating.elo,
+      opponentRating.elo,
+      won,
+    );
     final newOpponentElo = calculateNewElo(
-        opponentRating.elo, playerRating.elo, !won);
+      opponentRating.elo,
+      playerRating.elo,
+      !won,
+    );
 
     // Update player rating
     await _db.collection('ratings').doc(userId).set({
@@ -186,13 +193,13 @@ class MatchmakingService {
   int calculateNewElo(int playerElo, int opponentElo, bool won) {
     // Expected score
     final double expected = 1 / (1 + pow(10, (opponentElo - playerElo) / 400));
-    
+
     // Actual score
     final double actual = won ? 1.0 : 0.0;
-    
+
     // New rating
     final newElo = playerElo + (kFactor * (actual - expected)).round();
-    
+
     // Don't go below 100
     return max(100, newElo);
   }
@@ -243,14 +250,15 @@ class MatchmakingService {
     final now = DateTime.now();
     for (final entry in entries) {
       final waitTime = now.difference(entry.joinedAt).inSeconds;
-      final eloRange = initialRatingRange + (waitTime * rangeExpansionPerSecond);
-      
+      final eloRange =
+          initialRatingRange + (waitTime * rangeExpansionPerSecond);
+
       if ((entry.elo - elo).abs() <= eloRange) {
         // Found a match! Create room
-        final roomId = await _createMatchedRoom(
-          [userId, entry.userId],
-          gameType,
-        );
+        final roomId = await _createMatchedRoom([
+          userId,
+          entry.userId,
+        ], gameType);
 
         // Remove both from queue
         await _db.collection('matchmaking_queue').doc(userId).delete();
@@ -265,15 +273,22 @@ class MatchmakingService {
   }
 
   /// Create room for matched players
-  Future<String> _createMatchedRoom(List<String> playerIds, String gameType) async {
+  Future<String> _createMatchedRoom(
+    List<String> playerIds,
+    String gameType,
+  ) async {
     final currentUser = _authService.currentUser;
     if (currentUser == null) throw Exception('Not authenticated');
 
-    final players = playerIds.map((id) => Player(
-      id: id,
-      name: 'Player ${playerIds.indexOf(id) + 1}',
-      isReady: true,
-    )).toList();
+    final players = playerIds
+        .map(
+          (id) => Player(
+            id: id,
+            name: 'Player ${playerIds.indexOf(id) + 1}',
+            isReady: true,
+          ),
+        )
+        .toList();
 
     final room = GameRoom(
       name: 'Ranked Match',

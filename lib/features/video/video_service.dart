@@ -9,7 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class LiveKitConfig {
   /// Your LiveKit server URL (replace with your self-hosted server)
   static const String serverUrl = 'wss://your-livekit-server.com';
-  
+
   /// Room options for video calls
   static RoomOptions get roomOptions => const RoomOptions(
     adaptiveStream: true,
@@ -34,7 +34,7 @@ enum VideoConnectionState {
 
 /// Participant role in video room
 enum ParticipantRole {
-  player,    // Can publish video/audio
+  player, // Can publish video/audio
   spectator, // Can only subscribe
   pendingApproval, // Waiting for admin approval
 }
@@ -69,11 +69,11 @@ class VideoService extends ChangeNotifier {
   final String roomId;
   final String localUserId;
   final String localUserName;
-  
+
   Room? _room;
   LocalParticipant? _localParticipant;
   final Map<String, RemoteParticipant> _remoteParticipants = {};
-  
+
   VideoConnectionState _state = VideoConnectionState.disconnected;
   bool _isCameraEnabled = false;
   bool _isMicEnabled = false;
@@ -98,29 +98,32 @@ class VideoService extends ChangeNotifier {
   ParticipantRole get localRole => _localRole;
   Room? get room => _room;
   LocalParticipant? get localParticipant => _localParticipant;
-  List<RemoteParticipant> get remoteParticipants => _remoteParticipants.values.toList();
+  List<RemoteParticipant> get remoteParticipants =>
+      _remoteParticipants.values.toList();
 
   /// Join the video room
   Future<void> joinRoom({bool asSpectator = false}) async {
-    if (_state == VideoConnectionState.connecting || 
+    if (_state == VideoConnectionState.connecting ||
         _state == VideoConnectionState.connected) {
       return;
     }
 
     _state = VideoConnectionState.connecting;
-    _localRole = asSpectator ? ParticipantRole.spectator : ParticipantRole.player;
+    _localRole = asSpectator
+        ? ParticipantRole.spectator
+        : ParticipantRole.player;
     notifyListeners();
 
     try {
       // Get token from Cloud Function
       final token = await _getToken(isSpectator: asSpectator);
-      
+
       // Create and connect to room
       _room = Room();
-      
+
       // Set up event listeners
       _setupRoomListeners();
-      
+
       // Connect to LiveKit server
       await _room!.connect(
         LiveKitConfig.serverUrl,
@@ -130,13 +133,13 @@ class VideoService extends ChangeNotifier {
 
       _localParticipant = _room!.localParticipant;
       _state = VideoConnectionState.connected;
-      
+
       // Auto-enable camera and mic for players
       if (!asSpectator) {
         await enableCamera();
         await enableMicrophone();
       }
-      
+
       notifyListeners();
     } catch (e) {
       debugPrint('Failed to join video room: $e');
@@ -168,8 +171,9 @@ class VideoService extends ChangeNotifier {
   }
 
   Future<void> enableCamera() async {
-    if (_localParticipant == null || _localRole == ParticipantRole.spectator) return;
-    
+    if (_localParticipant == null || _localRole == ParticipantRole.spectator)
+      return;
+
     try {
       await _localParticipant!.setCameraEnabled(true);
       _isCameraEnabled = true;
@@ -181,7 +185,7 @@ class VideoService extends ChangeNotifier {
 
   Future<void> disableCamera() async {
     if (_localParticipant == null) return;
-    
+
     try {
       await _localParticipant!.setCameraEnabled(false);
       _isCameraEnabled = false;
@@ -201,8 +205,9 @@ class VideoService extends ChangeNotifier {
   }
 
   Future<void> enableMicrophone() async {
-    if (_localParticipant == null || _localRole == ParticipantRole.spectator) return;
-    
+    if (_localParticipant == null || _localRole == ParticipantRole.spectator)
+      return;
+
     try {
       await _localParticipant!.setMicrophoneEnabled(true);
       _isMicEnabled = true;
@@ -214,7 +219,7 @@ class VideoService extends ChangeNotifier {
 
   Future<void> disableMicrophone() async {
     if (_localParticipant == null) return;
-    
+
     try {
       await _localParticipant!.setMicrophoneEnabled(false);
       _isMicEnabled = false;
@@ -227,11 +232,12 @@ class VideoService extends ChangeNotifier {
   /// Switch camera (front/back)
   Future<void> switchCamera() async {
     if (_localParticipant == null) return;
-    
-    final videoTrack = _localParticipant!.videoTrackPublications.firstOrNull?.track;
+
+    final videoTrack =
+        _localParticipant!.videoTrackPublications.firstOrNull?.track;
     if (videoTrack is LocalVideoTrack) {
-        // await videoTrack.switchCamera();
-        debugPrint('Switch camera not implemented');
+      // await videoTrack.switchCamera();
+      debugPrint('Switch camera not implemented');
     }
   }
 
@@ -244,7 +250,7 @@ class VideoService extends ChangeNotifier {
       'participantId': localUserId,
       'isSpectator': isSpectator,
     });
-    
+
     return result.data['token'] as String;
   }
 
@@ -301,10 +307,8 @@ class SpectatorApprovalService {
   final FirebaseFirestore _firestore;
   final String roomId;
 
-  SpectatorApprovalService({
-    required this.roomId,
-    FirebaseFirestore? firestore,
-  }) : _firestore = firestore ?? FirebaseFirestore.instance;
+  SpectatorApprovalService({required this.roomId, FirebaseFirestore? firestore})
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   /// Get stream of pending approvals
   Stream<List<SpectatorRequest>> get pendingApprovals {
@@ -313,9 +317,11 @@ class SpectatorApprovalService {
         .doc(roomId)
         .collection('pending_spectators')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => SpectatorRequest.fromFirestore(doc))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => SpectatorRequest.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   /// Request to join as spectator
@@ -329,23 +335,25 @@ class SpectatorApprovalService {
         .collection('pending_spectators')
         .doc(userId)
         .set({
-      'userId': userId,
-      'displayName': displayName,
-      'requestedAt': FieldValue.serverTimestamp(),
-    });
+          'userId': userId,
+          'displayName': displayName,
+          'requestedAt': FieldValue.serverTimestamp(),
+        });
   }
 
   /// Approve a spectator request (admin only)
   Future<void> approveRequest(String userId) async {
     final batch = _firestore.batch();
-    
+
     // Remove from pending
-    batch.delete(_firestore
-        .collection('game_rooms')
-        .doc(roomId)
-        .collection('pending_spectators')
-        .doc(userId));
-    
+    batch.delete(
+      _firestore
+          .collection('game_rooms')
+          .doc(roomId)
+          .collection('pending_spectators')
+          .doc(userId),
+    );
+
     // Add to approved spectators
     batch.set(
       _firestore
@@ -353,11 +361,9 @@ class SpectatorApprovalService {
           .doc(roomId)
           .collection('approved_spectators')
           .doc(userId),
-      {
-        'approvedAt': FieldValue.serverTimestamp(),
-      },
+      {'approvedAt': FieldValue.serverTimestamp()},
     );
-    
+
     await batch.commit();
   }
 
@@ -432,19 +438,19 @@ class VideoServiceParams {
   int get hashCode => roomId.hashCode ^ userId.hashCode;
 }
 
-final videoServiceProvider = Provider.family.autoDispose<VideoService, VideoServiceParams>(
-  (ref, params) {
-    final service = VideoService(
-      roomId: params.roomId,
-      localUserId: params.userId,
-      localUserName: params.userName,
-    );
-    ref.onDispose(() => service.dispose());
-    return service;
-  },
-);
+final videoServiceProvider = Provider.family
+    .autoDispose<VideoService, VideoServiceParams>((ref, params) {
+      final service = VideoService(
+        roomId: params.roomId,
+        localUserId: params.userId,
+        localUserName: params.userName,
+      );
+      ref.onDispose(() => service.dispose());
+      return service;
+    });
 
 /// Provider for spectator approval service
-final spectatorApprovalProvider = Provider.family<SpectatorApprovalService, String>(
-  (ref, roomId) => SpectatorApprovalService(roomId: roomId),
-);
+final spectatorApprovalProvider =
+    Provider.family<SpectatorApprovalService, String>(
+      (ref, roomId) => SpectatorApprovalService(roomId: roomId),
+    );

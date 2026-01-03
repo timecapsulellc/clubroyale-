@@ -11,56 +11,59 @@ import 'package:clubroyale/features/game/services/sound_service.dart';
 import 'package:clubroyale/core/services/share_service.dart';
 import 'package:clubroyale/core/design_system/animations/game_animations.dart';
 import 'package:clubroyale/core/error/error_display.dart';
+import 'package:clubroyale/features/game/widgets/victory_celebration.dart';
+import 'package:clubroyale/features/auth/auth_service.dart';
 
 class GameSettlementScreen extends ConsumerStatefulWidget {
   final String gameId;
 
-  const GameSettlementScreen({
-    super.key,
-    required this.gameId,
-  });
+  const GameSettlementScreen({super.key, required this.gameId});
 
   @override
-  ConsumerState<GameSettlementScreen> createState() => _GameSettlementScreenState();
+  ConsumerState<GameSettlementScreen> createState() =>
+      _GameSettlementScreenState();
 }
 
 class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
     with TickerProviderStateMixin {
   late AnimationController _confettiController;
   final List<_ConfettiParticle> _confetti = [];
-  
+  bool _showCelebration = true;
+
   @override
   void initState() {
     super.initState();
     ref.read(soundServiceProvider).playGameWin();
     HapticHelper.winCelebration();
-    
+
     // Initialize confetti
     _confettiController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
     );
-    
+
     // Create confetti particles
     final random = Random();
     for (int i = 0; i < 50; i++) {
-      _confetti.add(_ConfettiParticle(
-        x: random.nextDouble(),
-        y: -0.1 - random.nextDouble() * 0.3,
-        size: 8 + random.nextDouble() * 8,
-        color: [
-          Colors.amber,
-          Colors.red,
-          Colors.blue,
-          Colors.green,
-          Colors.purple,
-          Colors.orange,
-        ][random.nextInt(6)],
-        speed: 0.3 + random.nextDouble() * 0.5,
-        rotation: random.nextDouble() * 360,
-      ));
+      _confetti.add(
+        _ConfettiParticle(
+          x: random.nextDouble(),
+          y: -0.1 - random.nextDouble() * 0.3,
+          size: 8 + random.nextDouble() * 8,
+          color: [
+            Colors.amber,
+            Colors.red,
+            Colors.blue,
+            Colors.green,
+            Colors.purple,
+            Colors.orange,
+          ][random.nextInt(6)],
+          speed: 0.3 + random.nextDouble() * 0.5,
+          rotation: random.nextDouble() * 360,
+        ),
+      );
     }
-    
+
     _confettiController.repeat();
   }
 
@@ -109,7 +112,7 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
                   ),
                 ),
               ),
-              
+
               // Confetti overlay (Custom painter)
               AnimatedBuilder(
                 animation: _confettiController,
@@ -123,49 +126,67 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
                   );
                 },
               ),
-              
+
               // Lottie Confetti Animation (enhanced celebration)
               const Positioned.fill(
-                child: IgnorePointer(
-                  child: ConfettiAnimation(repeat: true),
-                ),
+                child: IgnorePointer(child: ConfettiAnimation(repeat: true)),
               ),
-              
+
               // Main content
               SafeArea(
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
                       const SizedBox(height: 40),
-                      
+
                       // Trophy with glow effect
                       _buildTrophySection(theme, colorScheme),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       // Winner announcement
-                      _buildWinnerAnnouncement(theme, colorScheme, winner, winnerScore),
-                      
+                      _buildWinnerAnnouncement(
+                        theme,
+                        colorScheme,
+                        winner,
+                        winnerScore,
+                      ),
+
                       const SizedBox(height: 32),
-                      
+
                       // Leaderboard
-                      _buildLeaderboard(theme, colorScheme, sortedPlayers, game),
-                      
+                      _buildLeaderboard(
+                        theme,
+                        colorScheme,
+                        sortedPlayers,
+                        game,
+                      ),
+
                       const SizedBox(height: 24),
-                      
+
                       // Settlement section
                       _buildSettlementSection(theme, colorScheme, game),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Action buttons
                       _buildActionButtons(context, colorScheme),
-                      
+
                       const SizedBox(height: 40),
                     ],
                   ),
                 ),
               ),
+
+              // Victory Celebration Overlay
+              if (_showCelebration &&
+                  winner.id == ref.watch(authServiceProvider).currentUser?.uid)
+                VictoryCelebration(
+                  isWinner: true,
+                  score: winnerScore,
+                  reward: 100, // Placeholder
+                  onDismiss: () => setState(() => _showCelebration = false),
+                ),
             ],
           );
         },
@@ -181,22 +202,22 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
 
   Widget _buildTrophySection(ThemeData theme, ColorScheme colorScheme) {
     return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            Colors.amber.shade200.withValues(alpha: 0.4),
-            Colors.transparent,
-          ],
-        ),
-      ),
-      child: Icon(
-        Icons.emoji_events_rounded,
-        size: 100,
-        color: Colors.amber.shade600,
-      ),
-    )
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [
+                Colors.amber.shade200.withValues(alpha: 0.4),
+                Colors.transparent,
+              ],
+            ),
+          ),
+          child: Icon(
+            Icons.emoji_events_rounded,
+            size: 100,
+            color: Colors.amber.shade600,
+          ),
+        )
         .animate()
         .scale(
           duration: 600.ms,
@@ -204,10 +225,7 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
           begin: const Offset(0.3, 0.3),
         )
         .then()
-        .shimmer(
-          duration: 1500.ms,
-          color: Colors.amber.shade200,
-        );
+        .shimmer(duration: 1500.ms, color: Colors.amber.shade200);
   }
 
   Widget _buildWinnerAnnouncement(
@@ -225,9 +243,9 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
             color: colorScheme.primary,
           ),
         ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.3),
-        
+
         const SizedBox(height: 12),
-        
+
         Text(
           winner.name,
           style: theme.textTheme.displaySmall?.copyWith(
@@ -235,9 +253,9 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
             letterSpacing: -0.5,
           ),
         ).animate().fadeIn(delay: 500.ms).scale(begin: const Offset(0.8, 0.8)),
-        
+
         const SizedBox(height: 8),
-        
+
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           decoration: BoxDecoration(
@@ -283,9 +301,7 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
       decoration: BoxDecoration(
         color: colorScheme.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -301,7 +317,9 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: colorScheme.primaryContainer.withValues(alpha: 0.5),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
             ),
             child: Row(
               children: [
@@ -316,7 +334,7 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
               ],
             ),
           ),
-          
+
           // Player list
           ...sortedPlayers.asMap().entries.map((entry) {
             final index = entry.key;
@@ -325,13 +343,16 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
             final isWinner = index == 0;
 
             return _buildPlayerRow(
-              theme,
-              colorScheme,
-              index,
-              player,
-              score,
-              isWinner,
-            ).animate(delay: (800 + index * 100).ms).fadeIn().slideX(begin: -0.1);
+                  theme,
+                  colorScheme,
+                  index,
+                  player,
+                  score,
+                  isWinner,
+                )
+                .animate(delay: (800 + index * 100).ms)
+                .fadeIn()
+                .slideX(begin: -0.1);
           }),
 
           const SizedBox(height: 8),
@@ -358,11 +379,11 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isWinner 
+        color: isWinner
             ? Colors.amber.withValues(alpha: 0.1)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
-        border: isWinner 
+        border: isWinner
             ? Border.all(color: Colors.amber.withValues(alpha: 0.3))
             : null,
       ),
@@ -374,7 +395,7 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
             height: 32,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: index < 3 
+              color: index < 3
                   ? medalColors[index].withValues(alpha: 0.2)
                   : colorScheme.surfaceContainerHighest,
             ),
@@ -394,9 +415,9 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
                     ),
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // Player name
           Expanded(
             child: Text(
@@ -406,7 +427,7 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
               ),
             ),
           ),
-          
+
           // Score
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -414,8 +435,8 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
               color: score > 0
                   ? Colors.green.withValues(alpha: 0.1)
                   : score < 0
-                      ? Colors.red.withValues(alpha: 0.1)
-                      : colorScheme.surfaceContainerHighest,
+                  ? Colors.red.withValues(alpha: 0.1)
+                  : colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -425,8 +446,8 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
                 color: score > 0
                     ? Colors.green.shade700
                     : score < 0
-                        ? Colors.red.shade700
-                        : colorScheme.onSurfaceVariant,
+                    ? Colors.red.shade700
+                    : colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -460,9 +481,9 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           if (transactions.isEmpty)
             _buildAllSettledCard(theme, colorScheme)
           else
@@ -479,12 +500,15 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
               );
 
               return _buildSettlementCard(
-                theme,
-                colorScheme,
-                fromPlayer,
-                toPlayer,
-                tx.amount,
-              ).animate(delay: (1000 + index * 150).ms).fadeIn().slideX(begin: 0.1);
+                    theme,
+                    colorScheme,
+                    fromPlayer,
+                    toPlayer,
+                    tx.amount,
+                  )
+                  .animate(delay: (1000 + index * 150).ms)
+                  .fadeIn()
+                  .slideX(begin: 0.1);
             }),
         ],
       ),
@@ -587,7 +611,7 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
               ],
             ),
           ),
-          
+
           // Arrow and amount
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -614,7 +638,7 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
               ],
             ),
           ),
-          
+
           // To player
           Expanded(
             child: Column(
@@ -663,20 +687,26 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
           // Share button
           OutlinedButton.icon(
             onPressed: () {
-               // Calculate winner details for sharing
-               final gameAsync = ref.read(currentGameProvider(widget.gameId));
-               gameAsync.whenData((game) {
-                 if (game == null) return;
-                 final sorted = List<Player>.from(game.players)..sort((a,b) => (game.scores[b.id]??0).compareTo(game.scores[a.id]??0));
-                 final winner = sorted.first;
-                 final score = game.scores[winner.id];
-                 final message = "🏆 Game Over in ClubRoyale! ${winner.name} won with $score points! 🃏 Play now: https://clubroyale-app.web.app";
-                 
-                 ShareService.shareAppDownload(
-                   context: context,
-                   customMessage: message,
-                 );
-               });
+              // Calculate winner details for sharing
+              final gameAsync = ref.read(currentGameProvider(widget.gameId));
+              gameAsync.whenData((game) {
+                if (game == null) return;
+                final sorted = List<Player>.from(game.players)
+                  ..sort(
+                    (a, b) => (game.scores[b.id] ?? 0).compareTo(
+                      game.scores[a.id] ?? 0,
+                    ),
+                  );
+                final winner = sorted.first;
+                final score = game.scores[winner.id];
+                final message =
+                    "🏆 Game Over in ClubRoyale! ${winner.name} won with $score points! 🃏 Play now: https://clubroyale-app.web.app";
+
+                ShareService.shareAppDownload(
+                  context: context,
+                  customMessage: message,
+                );
+              });
             },
             icon: const Icon(Icons.share),
             label: const Text('Share Results'),
@@ -687,9 +717,9 @@ class _GameSettlementScreenState extends ConsumerState<GameSettlementScreen>
               ),
             ),
           ).animate(delay: 1200.ms).fadeIn().slideY(begin: 0.3),
-          
+
           const SizedBox(height: 12),
-          
+
           // Back to lobby button
           FilledButton.icon(
             onPressed: () => context.go('/'),
@@ -741,17 +771,24 @@ class _ConfettiPainter extends CustomPainter {
       if (currentY > 1.1) continue;
 
       final paint = Paint()
-        ..color = particle.color.withValues(alpha: 1 - (currentY * 0.5).clamp(0, 1))
+        ..color = particle.color.withValues(
+          alpha: 1 - (currentY * 0.5).clamp(0, 1),
+        )
         ..style = PaintingStyle.fill;
 
-      final x = particle.x * size.width + sin(progress * 10 + particle.rotation) * 20;
+      final x =
+          particle.x * size.width + sin(progress * 10 + particle.rotation) * 20;
       final y = currentY * size.height;
 
       canvas.save();
       canvas.translate(x, y);
       canvas.rotate(progress * 5 + particle.rotation);
       canvas.drawRect(
-        Rect.fromCenter(center: Offset.zero, width: particle.size, height: particle.size * 0.6),
+        Rect.fromCenter(
+          center: Offset.zero,
+          width: particle.size,
+          height: particle.size * 0.6,
+        ),
         paint,
       );
       canvas.restore();

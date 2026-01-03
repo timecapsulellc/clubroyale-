@@ -51,21 +51,17 @@ class _AnimatedCardPlayState extends State<AnimatedCardPlay>
       duration: CardAnimations.cardPlayDuration,
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: widget.targetOffset,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: CardAnimations.cardMoveCurve,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: Offset.zero, end: widget.targetOffset).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: CardAnimations.cardMoveCurve,
+          ),
+        );
 
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.8,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: CardAnimations.cardMoveCurve,
-    ));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.8).animate(
+      CurvedAnimation(parent: _controller, curve: CardAnimations.cardMoveCurve),
+    );
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -95,10 +91,7 @@ class _AnimatedCardPlayState extends State<AnimatedCardPlay>
       builder: (context, child) {
         return Transform.translate(
           offset: _slideAnimation.value,
-          child: Transform.scale(
-            scale: _scaleAnimation.value,
-            child: child,
-          ),
+          child: Transform.scale(scale: _scaleAnimation.value, child: child),
         );
       },
       child: widget.child,
@@ -137,10 +130,7 @@ class _TrickCollectionAnimationState extends State<TrickCollectionAnimation>
       duration: CardAnimations.trickCollectDuration,
     );
 
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInBack,
-    );
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInBack);
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -175,20 +165,19 @@ class _TrickCollectionAnimationState extends State<TrickCollectionAnimation>
 
             // Calculate offset toward winner position
             final radius = 60.0 * (1 - _animation.value);
-            final targetRadius =
-                index == widget.winnerIndex ? 0 : 100 * _animation.value;
+            final targetRadius = index == widget.winnerIndex
+                ? 0
+                : 100 * _animation.value;
 
             return Transform.translate(
               offset: Offset(
-                radius * (index == widget.winnerIndex
-                    ? 0
-                    : (index < widget.winnerIndex ? -1 : 1) * targetRadius),
+                radius *
+                    (index == widget.winnerIndex
+                        ? 0
+                        : (index < widget.winnerIndex ? -1 : 1) * targetRadius),
                 radius * (index % 2 == 0 ? -1 : 1) * (1 - _animation.value),
               ),
-              child: Opacity(
-                opacity: 1 - _animation.value * 0.8,
-                child: card,
-              ),
+              child: Opacity(opacity: 1 - _animation.value * 0.8, child: card),
             );
           }).toList(),
         );
@@ -217,10 +206,7 @@ class CardSelectionAnimation extends StatelessWidget {
       builder: (context, value, child) {
         return Transform.translate(
           offset: Offset(0, -20 * value),
-          child: Transform.scale(
-            scale: 1.0 + 0.05 * value,
-            child: child,
-          ),
+          child: Transform.scale(scale: 1.0 + 0.05 * value, child: child),
         );
       },
       child: child,

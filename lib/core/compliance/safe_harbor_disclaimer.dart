@@ -10,10 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SafeHarborDisclaimer extends StatelessWidget {
   final VoidCallback onAccept;
 
-  const SafeHarborDisclaimer({
-    super.key,
-    required this.onAccept,
-  });
+  const SafeHarborDisclaimer({super.key, required this.onAccept});
 
   @override
   Widget build(BuildContext context) {
@@ -39,17 +36,14 @@ class SafeHarborDisclaimer extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // Title
             const Text(
               'Important Notice',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            
+
             // Disclaimer text
             Container(
               padding: const EdgeInsets.all(16),
@@ -63,14 +57,11 @@ class SafeHarborDisclaimer extends StatelessWidget {
                 '• We do not process real-money transactions\n'
                 '• Users are responsible for their own offline settlements\n'
                 '• This app is for entertainment purposes only',
-                style: TextStyle(
-                  fontSize: 14,
-                  height: 1.5,
-                ),
+                style: TextStyle(fontSize: 14, height: 1.5),
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Accept button
             SizedBox(
               width: double.infinity,
@@ -106,7 +97,7 @@ class SafeHarborService {
     final prefs = await SharedPreferences.getInstance();
     final accepted = prefs.getBool(_acceptedKey) ?? false;
     final version = prefs.getInt(_acceptedVersionKey) ?? 0;
-    
+
     // Re-show if version changed
     return accepted && version >= _currentVersion;
   }
@@ -130,10 +121,7 @@ class SafeHarborService {
 class SafeHarborWrapper extends StatefulWidget {
   final Widget child;
 
-  const SafeHarborWrapper({
-    super.key,
-    required this.child,
-  });
+  const SafeHarborWrapper({super.key, required this.child});
 
   @override
   State<SafeHarborWrapper> createState() => _SafeHarborWrapperState();
@@ -167,9 +155,7 @@ class _SafeHarborWrapperState extends State<SafeHarborWrapper> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Stack(
@@ -178,9 +164,7 @@ class _SafeHarborWrapperState extends State<SafeHarborWrapper> {
         if (_showDisclaimer)
           Container(
             color: Colors.black54,
-            child: Center(
-              child: SafeHarborDisclaimer(onAccept: _onAccept),
-            ),
+            child: Center(child: SafeHarborDisclaimer(onAccept: _onAccept)),
           ),
       ],
     );

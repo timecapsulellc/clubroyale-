@@ -1,5 +1,5 @@
 /// Presence Service
-/// 
+///
 /// Tracks user online/offline status in real-time using Firestore.
 /// Uses Firestore's offline capabilities for presence detection.
 library;
@@ -77,13 +77,13 @@ class PresenceService {
   /// Start tracking presence for current user
   Future<void> startTracking() async {
     if (_isTracking) return;
-    
+
     final user = _authService.currentUser;
     if (user == null) return;
 
     _isTracking = true;
     await _setOnline(user.uid, user.displayName ?? 'Player');
-    
+
     // Heartbeat every 30 seconds to maintain online status
     _heartbeatTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       _updateHeartbeat(user.uid);
@@ -148,7 +148,11 @@ class PresenceService {
   }
 
   /// Set current game (when user joins a room)
-  Future<void> setCurrentGame(String userId, String gameId, String gameType) async {
+  Future<void> setCurrentGame(
+    String userId,
+    String gameId,
+    String gameType,
+  ) async {
     try {
       await _db.collection('presence').doc(userId).update({
         'currentGameId': gameId,
@@ -176,7 +180,7 @@ class PresenceService {
   /// Watch all online users (excluding current user)
   Stream<List<UserPresence>> watchOnlineUsers() {
     final currentUserId = _authService.currentUser?.uid;
-    
+
     return _db
         .collection('presence')
         .where('isOnline', isEqualTo: true)
@@ -193,14 +197,10 @@ class PresenceService {
 
   /// Watch specific user's presence
   Stream<UserPresence?> watchUserPresence(String userId) {
-    return _db
-        .collection('presence')
-        .doc(userId)
-        .snapshots()
-        .map((doc) {
-          if (!doc.exists) return null;
-          return UserPresence.fromJson(doc.data()!, doc.id);
-        });
+    return _db.collection('presence').doc(userId).snapshots().map((doc) {
+      if (!doc.exists) return null;
+      return UserPresence.fromJson(doc.data()!, doc.id);
+    });
   }
 
   /// Get online user count
@@ -221,10 +221,10 @@ class PresenceService {
   /// Check if a user is online (with 2-minute timeout)
   bool isUserOnline(UserPresence presence) {
     if (!presence.isOnline) return false;
-    
+
     final now = DateTime.now();
     final diff = now.difference(presence.lastSeen);
-    
+
     // Consider offline if no heartbeat for 2 minutes
     return diff.inMinutes < 2;
   }
@@ -233,7 +233,7 @@ class PresenceService {
   Future<void> cleanupStalePresence() async {
     try {
       final cutoff = DateTime.now().subtract(const Duration(minutes: 5));
-      
+
       final staleUsers = await _db
           .collection('presence')
           .where('isOnline', isEqualTo: true)

@@ -7,7 +7,7 @@ final ideGuideAgentProvider = Provider<IDEGuideAgent>((ref) {
 });
 
 /// IDE Guide Agent - Development Assistant for ClubRoyale
-/// 
+///
 /// Provides AI-powered development assistance:
 /// - Code generation with project context
 /// - Architecture guidance and recommendations
@@ -44,7 +44,10 @@ class IDEGuideAgent {
   }
 
   /// Quick code suggestion without full generation
-  Future<String> quickSuggestion(String prompt, {String language = 'dart'}) async {
+  Future<String> quickSuggestion(
+    String prompt, {
+    String language = 'dart',
+  }) async {
     try {
       final callable = _functions.httpsCallable('quickCodeSuggestion');
       final result = await callable.call<Map<String, dynamic>>({
@@ -72,7 +75,8 @@ class IDEGuideAgent {
         'feature': feature,
         'requirements': requirements,
         if (constraints != null) 'constraints': constraints,
-        if (existingArchitecture != null) 'existingArchitecture': existingArchitecture,
+        if (existingArchitecture != null)
+          'existingArchitecture': existingArchitecture,
       });
 
       return ArchitectureRecommendation.fromJson(result.data);
@@ -135,7 +139,8 @@ class IDEGuideAgent {
         'featureName': featureName,
         'featureDescription': featureDescription,
         if (userStories != null) 'userStories': userStories,
-        if (acceptanceCriteria != null) 'acceptanceCriteria': acceptanceCriteria,
+        if (acceptanceCriteria != null)
+          'acceptanceCriteria': acceptanceCriteria,
         'priority': priority,
       });
 
@@ -152,7 +157,10 @@ class IDEGuideAgent {
   }
 
   /// Explain what a piece of code does
-  Future<CodeExplanation> explainCode(String code, {String language = 'dart'}) async {
+  Future<CodeExplanation> explainCode(
+    String code, {
+    String language = 'dart',
+  }) async {
     try {
       final callable = _functions.httpsCallable('explainCode');
       final result = await callable.call<Map<String, dynamic>>({
@@ -163,7 +171,9 @@ class IDEGuideAgent {
       return CodeExplanation(
         explanation: result.data['explanation'] as String? ?? '',
         keyComponents: List<String>.from(result.data['keyComponents'] ?? []),
-        potentialIssues: List<String>.from(result.data['potentialIssues'] ?? []),
+        potentialIssues: List<String>.from(
+          result.data['potentialIssues'] ?? [],
+        ),
       );
     } catch (e) {
       return CodeExplanation(
@@ -203,11 +213,7 @@ class CodeStyle {
   final bool useRiverpod;
   final bool useFreezed;
 
-  CodeStyle({
-    this.naming,
-    this.useRiverpod = true,
-    this.useFreezed = true,
-  });
+  CodeStyle({this.naming, this.useRiverpod = true, this.useFreezed = true});
 
   Map<String, dynamic> toJson() => {
     if (naming != null) 'naming': naming,
@@ -254,7 +260,11 @@ class FileToCreate {
   final String content;
   final String description;
 
-  FileToCreate({required this.path, required this.content, required this.description});
+  FileToCreate({
+    required this.path,
+    required this.content,
+    required this.description,
+  });
 
   factory FileToCreate.fromJson(Map<String, dynamic> json) {
     return FileToCreate(
@@ -270,7 +280,11 @@ class FileToModify {
   final String changes;
   final String reason;
 
-  FileToModify({required this.path, required this.changes, required this.reason});
+  FileToModify({
+    required this.path,
+    required this.changes,
+    required this.reason,
+  });
 
   factory FileToModify.fromJson(Map<String, dynamic> json) {
     return FileToModify(
@@ -304,11 +318,14 @@ class ArchitectureRecommendation {
     final rec = json['recommendation'] as Map<String, dynamic>? ?? json;
     return ArchitectureRecommendation(
       approach: rec['approach'] as String? ?? '',
-      components: (rec['components'] as List<dynamic>?)
-          ?.map((c) => ComponentSpec.fromJson(c))
-          .toList() ?? [],
+      components:
+          (rec['components'] as List<dynamic>?)
+              ?.map((c) => ComponentSpec.fromJson(c))
+              .toList() ??
+          [],
       dataFlow: rec['dataFlow'] as String? ?? '',
-      integrationPoints: (rec['integrationPoints'] as List<dynamic>?)?.cast<String>() ?? [],
+      integrationPoints:
+          (rec['integrationPoints'] as List<dynamic>?)?.cast<String>() ?? [],
       alternatives: (json['alternatives'] as List<dynamic>?)
           ?.map((a) => AlternativeApproach.fromJson(a))
           .toList(),
@@ -346,7 +363,11 @@ class AlternativeApproach {
   final List<String> pros;
   final List<String> cons;
 
-  AlternativeApproach({required this.approach, required this.pros, required this.cons});
+  AlternativeApproach({
+    required this.approach,
+    required this.pros,
+    required this.cons,
+  });
 
   factory AlternativeApproach.fromJson(Map<String, dynamic> json) {
     return AlternativeApproach(
@@ -379,7 +400,8 @@ class BugAnalysisResult {
       rootCause: json['rootCause'] as String? ?? '',
       explanation: json['explanation'] as String? ?? '',
       suggestedFix: json['suggestedFix'] as String? ?? '',
-      preventionTips: (json['preventionTips'] as List<dynamic>?)?.cast<String>() ?? [],
+      preventionTips:
+          (json['preventionTips'] as List<dynamic>?)?.cast<String>() ?? [],
       relatedIssues: (json['relatedIssues'] as List<dynamic>?)?.cast<String>(),
       confidence: (json['confidence'] as num?)?.toDouble() ?? 0.0,
     );
@@ -403,13 +425,16 @@ class FeatureImplementationPlan {
 
   factory FeatureImplementationPlan.fromJson(Map<String, dynamic> json) {
     return FeatureImplementationPlan(
-      phases: (json['implementationPlan'] as List<dynamic>?)
-          ?.map((p) => ImplementationPhase.fromJson(p))
-          .toList() ?? [],
+      phases:
+          (json['implementationPlan'] as List<dynamic>?)
+              ?.map((p) => ImplementationPhase.fromJson(p))
+              .toList() ??
+          [],
       totalEstimatedTime: json['totalEstimatedTime'] as String? ?? '',
       riskAreas: (json['riskAreas'] as List<dynamic>?)?.cast<String>() ?? [],
       testPlan: (json['testPlan'] as List<dynamic>?)?.cast<String>() ?? [],
-      filesAffected: (json['filesAffected'] as List<dynamic>?)?.cast<String>() ?? [],
+      filesAffected:
+          (json['filesAffected'] as List<dynamic>?)?.cast<String>() ?? [],
     );
   }
 }
@@ -432,9 +457,11 @@ class ImplementationPhase {
       phase: json['phase'] as int? ?? 0,
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
-      tasks: (json['tasks'] as List<dynamic>?)
-          ?.map((t) => ImplementationTask.fromJson(t))
-          .toList() ?? [],
+      tasks:
+          (json['tasks'] as List<dynamic>?)
+              ?.map((t) => ImplementationTask.fromJson(t))
+              .toList() ??
+          [],
     );
   }
 }

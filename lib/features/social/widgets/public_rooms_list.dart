@@ -1,5 +1,5 @@
 /// Public Rooms List
-/// 
+///
 /// Shows list of public game rooms that users can join.
 library;
 
@@ -43,7 +43,9 @@ class PublicRoomsList extends ConsumerWidget {
               gradient: LinearGradient(
                 colors: [Colors.amber.shade800, Colors.orange.shade600],
               ),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
             ),
             child: Row(
               children: [
@@ -60,7 +62,10 @@ class PublicRoomsList extends ConsumerWidget {
                 const Spacer(),
                 publicRoomsAsync.when(
                   data: (rooms) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
@@ -90,7 +95,11 @@ class PublicRoomsList extends ConsumerWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.meeting_room_outlined, size: 48, color: Colors.grey.shade600),
+                        Icon(
+                          Icons.meeting_room_outlined,
+                          size: 48,
+                          color: Colors.grey.shade600,
+                        ),
                         const SizedBox(height: 8),
                         Text(
                           'No public rooms',
@@ -99,7 +108,10 @@ class PublicRoomsList extends ConsumerWidget {
                         const SizedBox(height: 4),
                         Text(
                           'Create one!',
-                          style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
@@ -127,7 +139,10 @@ class PublicRoomsList extends ConsumerWidget {
                 ),
               ),
               error: (e, _) => Center(
-                child: Text(ErrorHelper.getFriendlyMessage(e), style: TextStyle(color: Colors.red.shade300)),
+                child: Text(
+                  ErrorHelper.getFriendlyMessage(e),
+                  style: TextStyle(color: Colors.red.shade300),
+                ),
               ),
             ),
           ),
@@ -189,7 +204,9 @@ class _PublicRoomTile extends ConsumerWidget {
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isFull ? Colors.red.withValues(alpha: 0.3) : Colors.deepPurple.withValues(alpha: 0.5),
+          color: isFull
+              ? Colors.red.withValues(alpha: 0.3)
+              : Colors.deepPurple.withValues(alpha: 0.5),
         ),
       ),
       child: Material(
@@ -263,10 +280,13 @@ class _PublicRoomTile extends ConsumerWidget {
 
                 // Join button
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: isFull 
-                        ? Colors.grey.shade700 
+                    color: isFull
+                        ? Colors.grey.shade700
                         : Colors.green.shade700,
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -295,13 +315,10 @@ class _PublicRoomTile extends ConsumerWidget {
     if (user == null || room.id == null) return;
 
     try {
-      final player = Player(
-        id: user.uid,
-        name: user.displayName ?? 'Player',
-      );
+      final player = Player(id: user.uid, name: user.displayName ?? 'Player');
 
       await lobbyService.joinRoom(room.id!, player);
-      
+
       if (context.mounted) {
         context.go('/lobby/${room.id}');
       }

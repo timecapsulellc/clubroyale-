@@ -1,5 +1,5 @@
 /// Legal Disclaimer Widgets
-/// 
+///
 /// Reusable disclaimer components for app store compliance.
 /// Diamonds are entertainment tokens with no cash value.
 library;
@@ -8,19 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:clubroyale/core/constants/disclaimers.dart';
 
 /// Disclaimer banner types
-enum DisclaimerType {
-  wallet,
-  store,
-  game,
-  loading,
-  settlement,
-}
+enum DisclaimerType { wallet, store, game, loading, settlement }
 
 /// Compact disclaimer banner for screens
 class LegalDisclaimerBanner extends StatelessWidget {
   final DisclaimerType type;
   final bool expanded;
-  
+
   const LegalDisclaimerBanner({
     super.key,
     required this.type,
@@ -34,9 +28,7 @@ class LegalDisclaimerBanner extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.blue.shade50,
-        border: Border(
-          bottom: BorderSide(color: Colors.blue.shade100),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.blue.shade100)),
       ),
       child: Row(
         children: [
@@ -76,11 +68,8 @@ class LegalDisclaimerBanner extends StatelessWidget {
 /// Full-screen entertainment disclaimer overlay
 class EntertainmentNotice extends StatelessWidget {
   final VoidCallback onAccept;
-  
-  const EntertainmentNotice({
-    super.key,
-    required this.onAccept,
-  });
+
+  const EntertainmentNotice({super.key, required this.onAccept});
 
   @override
   Widget build(BuildContext context) {
@@ -129,11 +118,8 @@ class EntertainmentNotice extends StatelessWidget {
 /// Inline disclaimer text for forms/dialogs
 class DisclaimerText extends StatelessWidget {
   final String text;
-  
-  const DisclaimerText({
-    super.key,
-    required this.text,
-  });
+
+  const DisclaimerText({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {

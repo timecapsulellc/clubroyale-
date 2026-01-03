@@ -1,11 +1,10 @@
 /// Call Break Game Screen
-/// 
+///
 /// UI for the Call Break card game
 library;
 
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:clubroyale/core/design_system/game/felt_texture_painter.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/games/call_break/call_break_game.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
@@ -19,7 +18,7 @@ import 'package:go_router/go_router.dart';
 
 class CallBreakGameScreen extends StatefulWidget {
   final String? gameId;
-  
+
   const CallBreakGameScreen({super.key, this.gameId});
 
   @override
@@ -31,34 +30,38 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
   String? _selectedCardId;
   int _selectedBid = 1;
   final String _currentUserId = 'player_0';
-  
+
   // Tutorial state
   bool _showTutorial = true;
   final GlobalKey _handKey = GlobalKey();
   final GlobalKey _trickKey = GlobalKey();
   final GlobalKey _biddingKey = GlobalKey();
   final GlobalKey _rulesKey = GlobalKey();
-  
+
   List<TutorialStep> get _tutorialSteps => [
     TutorialStep(
       title: 'Welcome to Call Break! ♠️',
-      description: 'Win tricks by playing the highest card. Spades are always Trump!',
+      description:
+          'Win tricks by playing the highest card. Spades are always Trump!',
     ),
     TutorialStep(
       title: 'Bidding Phase',
-      description: 'Bid how many tricks you think you can win (1-13). You must make your bid!',
+      description:
+          'Bid how many tricks you think you can win (1-13). You must make your bid!',
       targetKey: _biddingKey,
       tooltipAlignment: Alignment.bottomCenter,
     ),
     TutorialStep(
       title: 'The Trick',
-      description: 'Cards played in this round appear here. Highest card of the lead suit wins, unless trumped.',
+      description:
+          'Cards played in this round appear here. Highest card of the lead suit wins, unless trumped.',
       targetKey: _trickKey,
       tooltipAlignment: Alignment.bottomCenter,
     ),
     TutorialStep(
       title: 'Your Hand',
-      description: 'Select a valid card and tap Play. You must follow suit if you can!',
+      description:
+          'Select a valid card and tap Play. You must follow suit if you can!',
       targetKey: _handKey,
       tooltipAlignment: Alignment.topCenter,
     ),
@@ -69,30 +72,30 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
       tooltipAlignment: Alignment.bottomLeft,
     ),
   ];
-  
+
   @override
   void initState() {
     super.initState();
     _initGame();
   }
-  
+
   void _initGame() async {
     _game = CallBreakGame();
     _game.initialize(['player_0', 'player_1', 'player_2', 'player_3']);
-    
+
     // Load previous scores from persistence
     final savedScores = await GameScorePersistence.loadCallBreakScores();
     // Note: Could restore scores here if implementing multi-session games
-    
+
     _game.startRound();
-    
+
     // Play shuffle sound on deal
     SoundService.playShuffleSound();
-    
+
     // Simulate AI bids for other players
     _simulateAiBids();
   }
-  
+
   void _simulateAiBids() {
     // For testing, auto-bid for AI players
     for (final pid in _game.playerIds) {
@@ -100,9 +103,10 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
         // AI makes a random bid based on hand strength
         final hand = _game.getHand(pid);
         int bid = _calculateAiBid(hand);
-        
+
         // Need to be current player to bid
-        while (_game.currentPlayerId != pid && _game.phase == CallBreakPhase.bidding) {
+        while (_game.currentPlayerId != pid &&
+            _game.phase == CallBreakPhase.bidding) {
           // Skip if it's our turn
           if (_game.currentPlayerId == _currentUserId) break;
           // Submit bid for current AI player
@@ -114,7 +118,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
       }
     }
   }
-  
+
   int _calculateAiBid(List<Card> hand) {
     // Simple AI: count high cards and spades
     int bid = 0;
@@ -124,13 +128,13 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
     }
     return (bid / 3).ceil().clamp(1, 8);
   }
-  
+
   void _submitMyBid() {
     if (_game.submitBid(_currentUserId, _selectedBid)) {
       setState(() {
         // After our bid, let AI players bid
-        while (_game.phase == CallBreakPhase.bidding && 
-               _game.currentPlayerId != _currentUserId) {
+        while (_game.phase == CallBreakPhase.bidding &&
+            _game.currentPlayerId != _currentUserId) {
           final aiPid = _game.currentPlayerId!;
           final aiHand = _game.getHand(aiPid);
           _game.submitBid(aiPid, _calculateAiBid(aiHand));
@@ -138,83 +142,84 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
       });
     }
   }
-  
+
   void _playCard() {
     if (_selectedCardId == null) return;
-    
+
     final hand = _game.getHand(_currentUserId);
     final card = hand.firstWhere(
       (c) => c.id == _selectedCardId,
       orElse: () => hand.first,
     );
-    
+
     try {
       final oldTricks = Map<String, int>.from(_game.tricksWon);
       _game.playCard(_currentUserId, card);
       SoundService.playCardSlide();
-      
+
       // Check for trick win
       for (final pid in _game.playerIds) {
         if ((_game.tricksWon[pid] ?? 0) > (oldTricks[pid] ?? 0)) {
-           SoundService.playTrickWon();
-           break;
+          SoundService.playTrickWon();
+          break;
         }
       }
 
       setState(() {
         _selectedCardId = null;
-        
+
         // Let AI players play their cards
         _playAiCards();
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Invalid move: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Invalid move: $e')));
     }
   }
-  
+
   void _playAiCards() {
-    while (_game.phase == CallBreakPhase.playing && 
-           _game.currentPlayerId != _currentUserId) {
+    while (_game.phase == CallBreakPhase.playing &&
+        _game.currentPlayerId != _currentUserId) {
       final aiPid = _game.currentPlayerId!;
       final validCards = _game.getValidCards(aiPid);
-      
+
       if (validCards.isNotEmpty) {
         // Simple AI: play highest valid card
-        final card = validCards.reduce((a, b) => 
-          a.rank.value > b.rank.value ? a : b);
-        
+        final card = validCards.reduce(
+          (a, b) => a.rank.value > b.rank.value ? a : b,
+        );
+
         final oldTricks = Map<String, int>.from(_game.tricksWon);
         _game.playCard(aiPid, card);
         SoundService.playCardSlide();
-        
+
         // Check for trick win
         for (final pid in _game.playerIds) {
           if ((_game.tricksWon[pid] ?? 0) > (oldTricks[pid] ?? 0)) {
-             SoundService.playTrickWon();
-             break;
+            SoundService.playTrickWon();
+            break;
           }
         }
       }
-      
+
       // Check if round ended
       if (_game.phase != CallBreakPhase.playing) break;
     }
-    
+
     setState(() {});
   }
-  
+
   void _startNewRound() {
     // Save scores before starting new round
     GameScorePersistence.saveCallBreakScores(_game.calculateScores());
     SoundService.playRoundEnd();
-    
+
     setState(() {
       _game.startRound();
     });
   }
-  
+
   void _startNewGame() {
     setState(() {
       _initGame();
@@ -236,26 +241,34 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
             key: _rulesKey,
             child: IconButton(
               icon: const Icon(Icons.help_outline),
-            onPressed: () {
-               // Detailed rules dialog
-               showDialog(
-                 context: context,
-                 builder: (c) => AlertDialog(
-                   backgroundColor: CasinoColors.cardBackground,
-                   title: const Text('Call Break Rules', style: TextStyle(color: CasinoColors.gold)),
-                   content: const Text(
-                     '1. 4 Players, 13 cards each.\n'
-                     '2. Spades ♠️ are always Trump.\n'
-                     '3. Must follow suit. If unable, must play Trump. If unable, play any.\n'
-                     '4. Bid tricks at start. Must win at least bid amount.\n'
-                     '5. 5 Rounds total.',
-                     style: TextStyle(color: Colors.white70),
-                   ),
-                   actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('Got it'))],
-                 ),
-               );
-            },
-            tooltip: 'Rules',
+              onPressed: () {
+                // Detailed rules dialog
+                showDialog(
+                  context: context,
+                  builder: (c) => AlertDialog(
+                    backgroundColor: CasinoColors.cardBackground,
+                    title: const Text(
+                      'Call Break Rules',
+                      style: TextStyle(color: CasinoColors.gold),
+                    ),
+                    content: const Text(
+                      '1. 4 Players, 13 cards each.\n'
+                      '2. Spades ♠️ are always Trump.\n'
+                      '3. Must follow suit. If unable, must play Trump. If unable, play any.\n'
+                      '4. Bid tricks at start. Must win at least bid amount.\n'
+                      '5. 5 Rounds total.',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(c),
+                        child: const Text('Got it'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              tooltip: 'Rules',
             ),
           ),
           IconButton(
@@ -275,8 +288,8 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
             child: SafeArea(
               child: Column(
                 children: [
-                   SizedBox(height: kToolbarHeight), // Spacer for AppBar
-                   // Game mode banner (always AI in local mode)
+                  SizedBox(height: kToolbarHeight), // Spacer for AppBar
+                  // Game mode banner (always AI in local mode)
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),
                     child: GameModeBanner(
@@ -287,15 +300,20 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
                   ),
                   // Score board
                   _buildScoreBoard(),
-                  
+
                   // Game area (Bidding UI, Playing Area, or Results)
                   Expanded(
-                    child: Container(key: _game.phase == CallBreakPhase.bidding ? _biddingKey : _trickKey, child: _buildGameArea()),
+                    child: Container(
+                      key: _game.phase == CallBreakPhase.bidding
+                          ? _biddingKey
+                          : _trickKey,
+                      child: _buildGameArea(),
+                    ),
                   ),
-                  
+
                   // Player's hand
                   Container(key: _handKey, child: _buildMyHand()),
-                  
+
                   // Action buttons
                   _buildActionBar(),
                 ],
@@ -313,7 +331,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
       ),
     );
   }
-  
+
   Widget _buildScoreBoard() {
     return Padding(
       padding: const EdgeInsets.all(8),
@@ -326,7 +344,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
           final bid = _game.bids[pid];
           final won = _game.tricksWon[pid] ?? 0;
           final isBot = pid != _currentUserId;
-          
+
           return GameOpponent(
             id: pid,
             name: isMe ? 'You' : 'Bot ${pid.split('_').last}',
@@ -341,22 +359,22 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
       ),
     );
   }
-  
+
   Widget _buildGameArea() {
     if (_game.phase == CallBreakPhase.bidding) {
       return _buildBiddingUI();
-    } else if (_game.phase == CallBreakPhase.scoring || 
-               _game.phase == CallBreakPhase.finished) {
+    } else if (_game.phase == CallBreakPhase.scoring ||
+        _game.phase == CallBreakPhase.finished) {
       return _buildRoundResults();
     } else {
       return _buildPlayingArea();
     }
   }
-  
+
   Widget _buildBiddingUI() {
     final isMyTurn = _game.currentPlayerId == _currentUserId;
     final myBid = _game.bids[_currentUserId];
-    
+
     return Center(
       child: Container(
         padding: const EdgeInsets.all(24),
@@ -376,7 +394,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             if (myBid != null)
               Text(
                 'Your bid: $myBid',
@@ -393,12 +411,15 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.remove_circle, color: Colors.white),
-                    onPressed: _selectedBid > 1 
-                      ? () => setState(() => _selectedBid--)
-                      : null,
+                    onPressed: _selectedBid > 1
+                        ? () => setState(() => _selectedBid--)
+                        : null,
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: CasinoColors.gold,
                       borderRadius: BorderRadius.circular(8),
@@ -414,8 +435,8 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
                   IconButton(
                     icon: const Icon(Icons.add_circle, color: Colors.white),
                     onPressed: _selectedBid < 13
-                      ? () => setState(() => _selectedBid++)
-                      : null,
+                        ? () => setState(() => _selectedBid++)
+                        : null,
                   ),
                 ],
               ),
@@ -424,7 +445,10 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
                 onPressed: _submitMyBid,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: CasinoColors.gold,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
                 ),
                 child: const Text(
                   'Submit Bid',
@@ -436,20 +460,22 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
                 'Waiting for ${_game.currentPlayerId} to bid...',
                 style: const TextStyle(color: Colors.white70),
               ),
-              
+
             const SizedBox(height: 16),
-            
+
             // Show other bids
-            ...(_game.bids.entries.map((e) => Text(
-              '${e.key == _currentUserId ? "You" : e.key}: ${e.value}',
-              style: const TextStyle(color: Colors.white70),
-            ))),
+            ...(_game.bids.entries.map(
+              (e) => Text(
+                '${e.key == _currentUserId ? "You" : e.key}: ${e.value}',
+                style: const TextStyle(color: Colors.white70),
+              ),
+            )),
           ],
         ),
       ),
     ).animate().fadeIn();
   }
-  
+
   Widget _buildPlayingArea() {
     return Column(
       children: [
@@ -480,7 +506,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
       ],
     );
   }
-  
+
   Widget _buildTrickCards() {
     final trick = _game.currentTrick;
     if (trick == null || trick.cards.isEmpty) {
@@ -489,7 +515,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
         style: TextStyle(color: Colors.white54),
       );
     }
-    
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: trick.cards.map((tc) {
@@ -501,7 +527,9 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
               _buildCardWidget(tc.card, false, isSmall: true),
               const SizedBox(height: 4),
               Text(
-                tc.playerId == _currentUserId ? 'You' : 'P${tc.playerId.split('_').last}',
+                tc.playerId == _currentUserId
+                    ? 'You'
+                    : 'P${tc.playerId.split('_').last}',
                 style: const TextStyle(color: Colors.white70, fontSize: 10),
               ),
             ],
@@ -510,7 +538,7 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
       }).toList(),
     );
   }
-  
+
   Widget _buildRoundResults() {
     return Center(
       child: Container(
@@ -531,13 +559,13 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             ..._game.playerIds.map((pid) {
               final bid = _game.bids[pid] ?? 0;
               final won = _game.tricksWon[pid] ?? 0;
               final score = _game.calculateScores()[pid] ?? 0;
               final made = won >= bid;
-              
+
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
@@ -546,7 +574,9 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
                     SizedBox(
                       width: 80,
                       child: Text(
-                        pid == _currentUserId ? 'You' : 'Player ${pid.split('_').last}',
+                        pid == _currentUserId
+                            ? 'You'
+                            : 'Player ${pid.split('_').last}',
                         style: const TextStyle(color: Colors.white),
                       ),
                     ),
@@ -568,9 +598,9 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
                 ),
               );
             }),
-            
+
             const SizedBox(height: 24),
-            
+
             if (!_game.isFinished)
               ElevatedButton(
                 onPressed: _startNewRound,
@@ -586,12 +616,12 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
       ),
     ).animate().fadeIn();
   }
-  
+
   Widget _buildMyHand() {
     final hand = _game.getHand(_currentUserId);
     final validCards = _game.getValidCards(_currentUserId);
     final isMyTurn = _game.currentPlayerId == _currentUserId;
-    
+
     return Container(
       height: 130,
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -603,13 +633,15 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
             final card = entry.value;
             final isSelected = _selectedCardId == card.id;
             final isValid = validCards.contains(card);
-            
+
             return GestureDetector(
-              onTap: isMyTurn && isValid ? () {
-                setState(() {
-                  _selectedCardId = isSelected ? null : card.id;
-                });
-              } : null,
+              onTap: isMyTurn && isValid
+                  ? () {
+                      setState(() {
+                        _selectedCardId = isSelected ? null : card.id;
+                      });
+                    }
+                  : null,
               child: Transform.translate(
                 offset: Offset(
                   index > 0 ? -20.0 * index : 0,
@@ -626,11 +658,11 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
       ),
     );
   }
-  
+
   Widget _buildCardWidget(Card card, bool isSelected, {bool isSmall = false}) {
     final size = isSmall ? 60.0 : 80.0;
     final height = isSmall ? 84.0 : 112.0;
-    
+
     return Container(
       width: size,
       height: height,
@@ -671,13 +703,14 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
       ),
     );
   }
-  
+
   Widget _buildActionBar() {
     final isMyTurn = _game.currentPlayerId == _currentUserId;
-    final canPlay = _game.phase == CallBreakPhase.playing && 
-                    isMyTurn && 
-                    _selectedCardId != null;
-    
+    final canPlay =
+        _game.phase == CallBreakPhase.playing &&
+        isMyTurn &&
+        _selectedCardId != null;
+
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -691,10 +724,13 @@ class _CallBreakGameScreenState extends State<CallBreakGameScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.amber,
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
             ),
-            
+
           if (!isMyTurn && _game.phase == CallBreakPhase.playing)
             const Text(
               'Waiting for opponent...',

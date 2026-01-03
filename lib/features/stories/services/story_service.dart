@@ -55,7 +55,7 @@ class StoryService {
   }) async {
     final userId = ref.read(currentUserIdProvider);
     final userProfile = ref.read(authStateProvider).value;
-    
+
     if (userId == null) {
       throw Exception('User not authenticated');
     }
@@ -63,18 +63,22 @@ class StoryService {
     // Upload media to Firebase Storage using putData (web compatible)
     final fileName = '${userId}_${DateTime.now().millisecondsSinceEpoch}';
     final extension = mediaType == StoryMediaType.video ? 'mp4' : 'jpg';
-    final storageRef = storage.ref().child('stories/$userId/$fileName.$extension');
-    
+    final storageRef = storage.ref().child(
+      'stories/$userId/$fileName.$extension',
+    );
+
     // Use putData instead of putFile for web compatibility
     final metadata = SettableMetadata(
-      contentType: mediaType == StoryMediaType.video ? 'video/mp4' : 'image/jpeg',
+      contentType: mediaType == StoryMediaType.video
+          ? 'video/mp4'
+          : 'image/jpeg',
     );
     await storageRef.putData(mediaBytes, metadata);
     final mediaUrl = await storageRef.getDownloadURL();
 
     final now = DateTime.now();
     final expiresAt = now.add(storyDuration);
-    
+
     final storyDoc = _storiesRef.doc();
     final story = Story(
       id: storyDoc.id,
@@ -109,14 +113,14 @@ class StoryService {
   }) async {
     final userId = ref.read(currentUserIdProvider);
     final userProfile = ref.read(authStateProvider).value;
-    
+
     if (userId == null) {
       throw Exception('User not authenticated');
     }
 
     final now = DateTime.now();
     final expiresAt = now.add(storyDuration);
-    
+
     final storyDoc = _storiesRef.doc();
     final story = Story(
       id: storyDoc.id,
@@ -151,9 +155,9 @@ class StoryService {
         .orderBy('expiresAt')
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => _storyFromDoc(doc))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs.map((doc) => _storyFromDoc(doc)).toList(),
+        );
   }
 
   /// Get friends' stories aggregated by user
@@ -162,7 +166,7 @@ class StoryService {
     if (userId == null) return Stream.value([]);
 
     final now = DateTime.now();
-    
+
     // Get all non-expired stories from friends
     return firestore
         .collection('users')
@@ -171,7 +175,7 @@ class StoryService {
         .snapshots()
         .asyncMap((friendsSnapshot) async {
           final friendIds = friendsSnapshot.docs.map((d) => d.id).toList();
-          
+
           // Inject Demo Data if no friends
           if (friendIds.isEmpty) return DemoData.stories;
 
@@ -184,10 +188,8 @@ class StoryService {
                 .where('userId', whereIn: chunk)
                 .where('expiresAt', isGreaterThan: Timestamp.fromDate(now))
                 .get();
-            
-            allStories.addAll(
-              snapshot.docs.map((doc) => _storyFromDoc(doc)),
-            );
+
+            allStories.addAll(snapshot.docs.map((doc) => _storyFromDoc(doc)));
           }
 
           // Group by user
@@ -200,8 +202,10 @@ class StoryService {
           return grouped.entries.map((entry) {
             final stories = entry.value
               ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
-            final hasUnviewed = stories.any((s) => !s.viewedBy.contains(userId));
-            
+            final hasUnviewed = stories.any(
+              (s) => !s.viewedBy.contains(userId),
+            );
+
             return UserStories(
               userId: entry.key,
               userName: stories.first.userName,
@@ -210,15 +214,15 @@ class StoryService {
               hasUnviewed: hasUnviewed,
               latestStoryAt: stories.last.createdAt,
             );
-          }).toList()
-            ..sort((a, b) {
-              // Unviewed first, then by latest
-              if (a.hasUnviewed != b.hasUnviewed) {
-                return a.hasUnviewed ? -1 : 1;
-              }
-              return (b.latestStoryAt ?? DateTime(0))
-                  .compareTo(a.latestStoryAt ?? DateTime(0));
-            });
+          }).toList()..sort((a, b) {
+            // Unviewed first, then by latest
+            if (a.hasUnviewed != b.hasUnviewed) {
+              return a.hasUnviewed ? -1 : 1;
+            }
+            return (b.latestStoryAt ?? DateTime(0)).compareTo(
+              a.latestStoryAt ?? DateTime(0),
+            );
+          });
         });
   }
 
@@ -244,12 +248,14 @@ class StoryService {
     for (final viewerId in viewedBy) {
       final userDoc = await firestore.collection('users').doc(viewerId).get();
       if (userDoc.exists) {
-        viewers.add(StoryViewer(
-          id: viewerId,
-          name: userDoc.data()?['displayName'] ?? 'User',
-          photoUrl: userDoc.data()?['photoURL'],
-          viewedAt: DateTime.now(), // Approximate
-        ));
+        viewers.add(
+          StoryViewer(
+            id: viewerId,
+            name: userDoc.data()?['displayName'] ?? 'User',
+            photoUrl: userDoc.data()?['photoURL'],
+            viewedAt: DateTime.now(), // Approximate
+          ),
+        );
       }
     }
 
@@ -262,7 +268,7 @@ class StoryService {
     if (!doc.exists) return;
 
     final story = _storyFromDoc(doc);
-    
+
     // Delete media from storage
     try {
       if (story.mediaUrl != null) {
@@ -291,7 +297,8 @@ class StoryService {
         orElse: () => StoryMediaType.photo,
       ),
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      expiresAt: (data['expiresAt'] as Timestamp?)?.toDate() ?? 
+      expiresAt:
+          (data['expiresAt'] as Timestamp?)?.toDate() ??
           DateTime.now().add(storyDuration),
       viewedBy: List<String>.from(data['viewedBy'] ?? []),
       viewCount: data['viewCount'] as int? ?? 0,
@@ -302,8 +309,8 @@ class StoryService {
       gameType: data['gameType'] as String?,
       winnerId: data['winnerId'] as String?,
       winnerName: data['winnerName'] as String?,
-      scores: data['scores'] != null 
-          ? Map<String, int>.from(data['scores']) 
+      scores: data['scores'] != null
+          ? Map<String, int>.from(data['scores'])
           : null,
     );
   }

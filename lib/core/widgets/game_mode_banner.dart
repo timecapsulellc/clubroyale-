@@ -1,5 +1,5 @@
 /// Game Mode Banner Widget
-/// 
+///
 /// Displays the current game mode prominently:
 /// - 🤖 Practice with AI (solo bot games)
 /// - 👥 Multiplayer (all human players)
@@ -13,25 +13,25 @@ import 'package:flutter_animate/flutter_animate.dart';
 enum GameMode {
   /// Playing against AI bots only
   practiceWithAI,
-  
+
   /// Playing with real human players only
   multiplayer,
-  
+
   /// Playing with a mix of humans and bots
   mixedGame,
 }
 
 /// A banner widget that displays the current game mode
-/// 
+///
 /// Shows a compact, stylish indicator at the top of game screens
 /// to help users understand who they're playing against.
 class GameModeBanner extends StatelessWidget {
   /// Number of bot players in the game
   final int botCount;
-  
+
   /// Number of human players in the game
   final int humanCount;
-  
+
   /// Whether to show a compact version (single line)
   final bool compact;
 
@@ -56,7 +56,7 @@ class GameModeBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final config = _getConfig();
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -79,18 +79,14 @@ class GameModeBanner extends StatelessWidget {
           children: [
             // Icon with animation for AI games
             if (gameMode == GameMode.practiceWithAI)
-              Icon(
-                Icons.smart_toy_rounded,
-                size: 16,
-                color: config.color,
-              ).animate(onPlay: (c) => c.repeat())
-                .shimmer(duration: 2.seconds, color: Colors.white.withValues(alpha: 0.3))
+              Icon(Icons.smart_toy_rounded, size: 16, color: config.color)
+                  .animate(onPlay: (c) => c.repeat())
+                  .shimmer(
+                    duration: 2.seconds,
+                    color: Colors.white.withValues(alpha: 0.3),
+                  )
             else
-              Icon(
-                config.icon,
-                size: 16,
-                color: config.color,
-              ),
+              Icon(config.icon, size: 16, color: config.color),
             const SizedBox(width: 6),
             Text(
               config.label,
@@ -122,19 +118,13 @@ class GameModeBanner extends StatelessWidget {
         children: [
           if (humanCount > 0) ...[
             Icon(Icons.person, size: 12, color: color),
-            Text(
-              '$humanCount',
-              style: TextStyle(color: color, fontSize: 10),
-            ),
+            Text('$humanCount', style: TextStyle(color: color, fontSize: 10)),
           ],
           if (humanCount > 0 && botCount > 0)
             Text(' + ', style: TextStyle(color: color, fontSize: 10)),
           if (botCount > 0) ...[
             Icon(Icons.smart_toy, size: 12, color: color),
-            Text(
-              '$botCount',
-              style: TextStyle(color: color, fontSize: 10),
-            ),
+            Text('$botCount', style: TextStyle(color: color, fontSize: 10)),
           ],
         ],
       ),
@@ -191,11 +181,11 @@ class GameModeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAIGame = humanCount <= 1 && botCount > 0;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isAIGame 
+        color: isAIGame
             ? Colors.purple.withValues(alpha: 0.3)
             : Colors.green.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),

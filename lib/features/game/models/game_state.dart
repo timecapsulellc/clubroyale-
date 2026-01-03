@@ -5,12 +5,7 @@ part 'game_state.freezed.dart';
 part 'game_state.g.dart';
 
 /// Phase of the game
-enum GamePhase {
-  bidding,
-  playing,
-  roundEnd,
-  gameFinished;
-}
+enum GamePhase { bidding, playing, roundEnd, gameFinished }
 
 /// Player's bid for a round
 @freezed

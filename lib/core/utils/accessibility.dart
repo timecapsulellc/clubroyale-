@@ -1,5 +1,5 @@
 /// Accessibility Utilities
-/// 
+///
 /// Helpers for adding semantic labels and accessibility features.
 library;
 
@@ -12,7 +12,7 @@ class AccessibleButton extends StatelessWidget {
   final String? hint;
   final VoidCallback? onTap;
   final bool isButton;
-  
+
   const AccessibleButton({
     super.key,
     required this.child,
@@ -29,10 +29,7 @@ class AccessibleButton extends StatelessWidget {
       hint: hint,
       button: isButton,
       enabled: onTap != null,
-      child: GestureDetector(
-        onTap: onTap,
-        child: child,
-      ),
+      child: GestureDetector(onTap: onTap, child: child),
     );
   }
 }
@@ -43,7 +40,7 @@ class AccessibleCard extends StatelessWidget {
   final String cardDescription;
   final bool isSelected;
   final bool isPlayable;
-  
+
   const AccessibleCard({
     super.key,
     required this.child,
@@ -83,12 +80,12 @@ extension AccessibilityExtension on Widget {
       child: this,
     );
   }
-  
+
   /// Exclude from accessibility tree (for decorative elements)
   Widget excludeFromSemantics() {
     return ExcludeSemantics(child: this);
   }
-  
+
   /// Merge semantics with descendants
   Widget mergeSemantics() {
     return MergeSemantics(child: this);
@@ -98,18 +95,20 @@ extension AccessibilityExtension on Widget {
 /// Semantic labels for common game elements
 class GameSemantics {
   static String card(String rank, String suit) => '$rank of $suit';
-  
+
   static String chipAmount(int amount) => '$amount chips';
-  
+
   static String diamondAmount(int amount) => '$amount diamonds';
-  
+
   static String playerTurn(String playerName) => "$playerName's turn";
-  
+
   static String bidAmount(int amount) => 'Bid $amount';
-  
-  static String score(String playerName, int score) => '$playerName has $score points';
-  
+
+  static String score(String playerName, int score) =>
+      '$playerName has $score points';
+
   static String timer(int seconds) => '$seconds seconds remaining';
-  
-  static String meld(String type, int points) => '$type meld worth $points points';
+
+  static String meld(String type, int points) =>
+      '$type meld worth $points points';
 }

@@ -1,5 +1,5 @@
 /// Premium Hand Widget - Expandable Card Hand Display
-/// 
+///
 /// Features:
 /// - Compact mode with overlapping cards
 /// - Expanded grid view for 21+ cards
@@ -70,7 +70,7 @@ class _PremiumHandWidgetState extends State<PremiumHandWidget> {
 
   List<PlayingCard> get _sortedCards {
     final cards = List<PlayingCard>.from(widget.cards);
-    
+
     switch (_sortMode) {
       case SortMode.suit:
         cards.sort((a, b) {
@@ -89,13 +89,15 @@ class _PremiumHandWidgetState extends State<PremiumHandWidget> {
           cards.sort((a, b) {
             final aMaal = _maalCalculator!.getMaalType(a);
             final bMaal = _maalCalculator!.getMaalType(b);
-            final maalCompare = bMaal.index.compareTo(aMaal.index); // Maal first
+            final maalCompare = bMaal.index.compareTo(
+              aMaal.index,
+            ); // Maal first
             if (maalCompare != 0) return maalCompare;
             return a.suit.index.compareTo(b.suit.index);
           });
         }
     }
-    
+
     return cards;
   }
 
@@ -139,7 +141,7 @@ class _PremiumHandWidgetState extends State<PremiumHandWidget> {
 
   Widget _buildControlsBar() {
     final maalPoints = _maalCalculator?.calculateMaalPoints(widget.cards) ?? 0;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
@@ -212,7 +214,7 @@ class _PremiumHandWidgetState extends State<PremiumHandWidget> {
     final cards = _sortedCards;
     const cardWidth = 55.0;
     const cardHeight = 82.0;
-    
+
     // Calculate overlap based on card count
     final overlap = cards.length > 15 ? 25.0 : 30.0;
     final totalWidth = cardWidth + (cards.length - 1) * overlap;
@@ -280,7 +282,7 @@ class _PremiumHandWidgetState extends State<PremiumHandWidget> {
 
   Widget _buildExpandedHand() {
     final cards = _sortedCards;
-    
+
     return Padding(
       padding: const EdgeInsets.all(12),
       child: ReorderableGridView.count(
@@ -458,15 +460,9 @@ class ReorderableGridDragStartListener extends StatelessWidget {
       data: index,
       feedback: Material(
         color: Colors.transparent,
-        child: Transform.scale(
-          scale: 1.1,
-          child: child,
-        ),
+        child: Transform.scale(scale: 1.1, child: child),
       ),
-      childWhenDragging: Opacity(
-        opacity: 0.3,
-        child: child,
-      ),
+      childWhenDragging: Opacity(opacity: 0.3, child: child),
       child: child,
     );
   }

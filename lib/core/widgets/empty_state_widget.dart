@@ -105,7 +105,7 @@ class EmptyStateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = accentColor ?? CasinoColors.gold;
-    
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -114,33 +114,29 @@ class EmptyStateWidget extends StatelessWidget {
           children: [
             // Animated icon with glow
             Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: color.withValues(alpha: 0.1),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.2),
-                    blurRadius: 30,
-                    spreadRadius: 5,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: color.withValues(alpha: 0.1),
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.2),
+                        blurRadius: 30,
+                        spreadRadius: 5,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: Icon(
-                icon,
-                size: 64,
-                color: color,
-              ),
-            )
-            .animate(onPlay: (c) => c.repeat(reverse: true))
-            .scale(
-              begin: const Offset(1, 1),
-              end: const Offset(1.05, 1.05),
-              duration: 2.seconds,
-            ),
-            
+                  child: Icon(icon, size: 64, color: color),
+                )
+                .animate(onPlay: (c) => c.repeat(reverse: true))
+                .scale(
+                  begin: const Offset(1, 1),
+                  end: const Offset(1.05, 1.05),
+                  duration: 2.seconds,
+                ),
+
             const SizedBox(height: 32),
-            
+
             // Title
             Text(
               title,
@@ -151,9 +147,9 @@ class EmptyStateWidget extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ).animate().fadeIn(delay: 200.ms),
-            
+
             const SizedBox(height: 12),
-            
+
             // Subtitle
             Text(
               subtitle,
@@ -163,14 +159,17 @@ class EmptyStateWidget extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ).animate().fadeIn(delay: 300.ms),
-            
+
             // Action button
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: 32),
               GestureDetector(
                 onTap: onAction,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 28,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [color, color.withValues(alpha: 0.7)],

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:clubroyale/core/utils/haptic_helper.dart';
 import 'package:flutter/services.dart';
@@ -95,7 +94,10 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                     color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.feedback_outlined, color: Colors.white),
+                  child: const Icon(
+                    Icons.feedback_outlined,
+                    color: Colors.white,
+                  ),
                 ),
                 onPressed: () => FeedbackDialog.show(context),
                 tooltip: 'Send Feedback',
@@ -125,54 +127,67 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 ),
               ),
               centerTitle: true,
-                  background: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      // Banner Image
-                      Image.asset(
-                        'assets/images/dashboard_banner.png',
-                        fit: BoxFit.cover,
-                      ),
-                      // Gradient Overlay for text readability
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withValues(alpha: 0.3),
-                              Colors.transparent,
-                              CasinoColors.deepPurple.withValues(alpha: 0.8),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // Center icon - cards (subtle animation)
-                      Center(
-                        child: Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.3),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.5), width: 2),
-                            boxShadow: [
-                              BoxShadow(
-                                color: CasinoColors.gold.withValues(alpha: 0.2),
-                                blurRadius: 20,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.style_rounded, // Card stack icon
-                            size: 48,
-                            color: CasinoColors.gold,
-                          ),
-                        ).animate(onPlay: (c) => c.repeat(reverse: true))
-                         .scale(duration: 2000.ms, begin: const Offset(0.95, 0.95), end: const Offset(1.05, 1.05)),
-                      ),
-                    ],
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Banner Image
+                  Image.asset(
+                    'assets/images/dashboard_banner.png',
+                    fit: BoxFit.cover,
                   ),
+                  // Gradient Overlay for text readability
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.3),
+                          Colors.transparent,
+                          CasinoColors.deepPurple.withValues(alpha: 0.8),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Center icon - cards (subtle animation)
+                  Center(
+                    child:
+                        Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: CasinoColors.gold.withValues(
+                                    alpha: 0.5,
+                                  ),
+                                  width: 2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: CasinoColors.gold.withValues(
+                                      alpha: 0.2,
+                                    ),
+                                    blurRadius: 20,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.style_rounded, // Card stack icon
+                                size: 48,
+                                color: CasinoColors.gold,
+                              ),
+                            )
+                            .animate(onPlay: (c) => c.repeat(reverse: true))
+                            .scale(
+                              duration: 2000.ms,
+                              begin: const Offset(0.95, 0.95),
+                              end: const Offset(1.05, 1.05),
+                            ),
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -184,25 +199,36 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 children: [
                   // INSTANT PLAY - Featured Action
                   Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: FilledButton.icon(
-                      onPressed: () {
-                        HapticHelper.lightTap();
-                        _playNow(context, ref);
-                      },
-                      icon: const Icon(Icons.play_arrow_rounded, size: 28),
-                      label: const Text('⚡ PLAY NOW', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.green.shade600,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        elevation: 8,
-                        shadowColor: Colors.green.shade300,
-                      ),
-                    ),
-                  ).animate(delay: 50.ms).fadeIn().shimmer(duration: 1500.ms, color: Colors.white30),
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: FilledButton.icon(
+                          onPressed: () {
+                            HapticHelper.lightTap();
+                            _playNow(context, ref);
+                          },
+                          icon: const Icon(Icons.play_arrow_rounded, size: 28),
+                          label: const Text(
+                            '⚡ PLAY NOW',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.green.shade600,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 8,
+                            shadowColor: Colors.green.shade300,
+                          ),
+                        ),
+                      )
+                      .animate(delay: 50.ms)
+                      .fadeIn()
+                      .shimmer(duration: 1500.ms, color: Colors.white30),
                   Row(
                     children: [
                       Expanded(
@@ -260,8 +286,16 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   sliver: SliverGrid(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: context.responsive(mobile: 1, tablet: 2, desktop: 4),
-                      childAspectRatio: context.responsive(mobile: 1.1, tablet: 0.9, desktop: 0.85),
+                      crossAxisCount: context.responsive(
+                        mobile: 1,
+                        tablet: 2,
+                        desktop: 4,
+                      ),
+                      childAspectRatio: context.responsive(
+                        mobile: 1.1,
+                        tablet: 0.9,
+                        desktop: 0.85,
+                      ),
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                     ),
@@ -297,41 +331,56 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
               return SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: SliverGrid(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: context.responsive(mobile: 1, tablet: 2, desktop: 4),
-                      childAspectRatio: context.responsive(mobile: 1.1, tablet: 0.9, desktop: 0.85),
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: context.responsive(
+                      mobile: 1,
+                      tablet: 2,
+                      desktop: 4,
                     ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final game = games[index];
-                      final isFinished = game.isFinished || game.status == GameStatus.settled;
-                      final currentUser = authService.currentUser;
-                      final isInGame = game.players.any((p) => p.id == currentUser?.uid);
-                      final isHost = game.hostId == currentUser?.uid;
-
-                      return _EnhancedGameCard(
-                        game: game,
-                        isFinished: isFinished,
-                        isInGame: isInGame,
-                        isHost: isHost,
-                        onTap: () {
-                          if (isFinished) {
-                            context.go('/ledger/${game.id}');
-                          } else if (game.status == GameStatus.waiting) {
-                            context.go('/lobby/${game.id}');
-                          } else {
-                            context.go('/game/${game.id}/play');
-                          }
-                        },
-                        onJoin: isInGame ? null : () => _joinGame(context, ref, game),
-                        onShareCode: game.roomCode != null ? () => _shareRoomCode(context, game) : null,
-                      ).animate(delay: (100 * index).ms).fadeIn().scale(begin: const Offset(0.9, 0.9));
-                    },
-                    childCount: games.length,
+                    childAspectRatio: context.responsive(
+                      mobile: 1.1,
+                      tablet: 0.9,
+                      desktop: 0.85,
+                    ),
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
                   ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final game = games[index];
+                    final isFinished =
+                        game.isFinished || game.status == GameStatus.settled;
+                    final currentUser = authService.currentUser;
+                    final isInGame = game.players.any(
+                      (p) => p.id == currentUser?.uid,
+                    );
+                    final isHost = game.hostId == currentUser?.uid;
+
+                    return _EnhancedGameCard(
+                          game: game,
+                          isFinished: isFinished,
+                          isInGame: isInGame,
+                          isHost: isHost,
+                          onTap: () {
+                            if (isFinished) {
+                              context.go('/ledger/${game.id}');
+                            } else if (game.status == GameStatus.waiting) {
+                              context.go('/lobby/${game.id}');
+                            } else {
+                              context.go('/game/${game.id}/play');
+                            }
+                          },
+                          onJoin: isInGame
+                              ? null
+                              : () => _joinGame(context, ref, game),
+                          onShareCode: game.roomCode != null
+                              ? () => _shareRoomCode(context, game)
+                              : null,
+                        )
+                        .animate(delay: (100 * index).ms)
+                        .fadeIn()
+                        .scale(begin: const Offset(0.9, 0.9));
+                  }, childCount: games.length),
                 ),
               );
             },
@@ -353,9 +402,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   }
 
   /// Shows dialog to join a game by 6-digit code
-  Future<void> _showJoinByCodeDialog(BuildContext context, WidgetRef ref) async {
+  Future<void> _showJoinByCodeDialog(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final codeController = TextEditingController();
-    
+
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
@@ -371,9 +423,16 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             shape: BoxShape.circle,
             border: Border.all(color: Colors.amber.shade600, width: 2),
           ),
-          child: Icon(Icons.pin_rounded, size: 48, color: Colors.amber.shade400),
+          child: Icon(
+            Icons.pin_rounded,
+            size: 48,
+            color: Colors.amber.shade400,
+          ),
         ),
-        title: const Text('Join by Room Code', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Join by Room Code',
+          style: TextStyle(color: Colors.white),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -408,7 +467,10 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.amber.shade600, width: 2),
+                  borderSide: BorderSide(
+                    color: Colors.amber.shade600,
+                    width: 2,
+                  ),
                 ),
               ),
               autofocus: true,
@@ -418,7 +480,10 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+            ),
           ),
           FilledButton(
             onPressed: () {
@@ -442,11 +507,14 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   }
 
   /// Shows dialog to create a game with configuration
-  Future<void> _showCreateGameDialog(BuildContext context, WidgetRef ref) async {
+  Future<void> _showCreateGameDialog(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     double pointValue = 10;
     int totalRounds = 5;
     String gameType = 'call_break';
-    
+
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -463,20 +531,29 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               shape: BoxShape.circle,
               border: Border.all(color: Colors.amber.shade600, width: 2),
             ),
-            child: Icon(Icons.add_rounded, size: 48, color: Colors.amber.shade400),
+            child: Icon(
+              Icons.add_rounded,
+              size: 48,
+              color: Colors.amber.shade400,
+            ),
           ),
-          title: const Text('Create Room', style: TextStyle(color: Colors.white)),
+          title: const Text(
+            'Create Room',
+            style: TextStyle(color: Colors.white),
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Game Type Selection
-                Text('Game Type',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.amber.shade400,
-                    )),
+                Text(
+                  'Game Type',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber.shade400,
+                  ),
+                ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -528,13 +605,15 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Point Value
-                Text('Point Value (Units per point)',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.amber.shade400,
-                    )),
+                Text(
+                  'Point Value (Units per point)',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber.shade400,
+                  ),
+                ),
                 const SizedBox(height: 12),
                 SegmentedButton<double>(
                   segments: const [
@@ -554,13 +633,15 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Rounds
-                Text('Number of Rounds',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.amber.shade400,
-                    )),
+                Text(
+                  'Number of Rounds',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber.shade400,
+                  ),
+                ),
                 const SizedBox(height: 12),
                 SegmentedButton<int>(
                   segments: const [
@@ -579,48 +660,48 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   ),
                 ),
 
-              const SizedBox(height: 16),
-              // Cost indicator
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.amber.shade600),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.diamond, color: Colors.amber.shade400),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Creating a room costs ${DiamondConfig.roomCreationCost} diamonds',
-                        style: TextStyle(color: Colors.amber.shade200),
+                const SizedBox(height: 16),
+                // Cost indicator
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.amber.shade600),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.diamond, color: Colors.amber.shade400),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Creating a room costs ${DiamondConfig.roomCreationCost} diamonds',
+                          style: TextStyle(color: Colors.amber.shade200),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
               ],
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+              ),
             ),
             FilledButton.icon(
               onPressed: () {
-                Navigator.pop(
-                  context,
-                  {
-                    'gameType': gameType,
-                    'config': GameConfig(
-                      pointValue: pointValue,
-                      totalRounds: totalRounds,
-                    ),
-                  },
-                );
+                Navigator.pop(context, {
+                  'gameType': gameType,
+                  'config': GameConfig(
+                    pointValue: pointValue,
+                    totalRounds: totalRounds,
+                  ),
+                });
               },
               icon: const Icon(Icons.add),
               label: const Text('Create'),
@@ -641,7 +722,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     }
   }
 
-  Future<void> _createGame(BuildContext context, WidgetRef ref, GameConfig config, String gameType) async {
+  Future<void> _createGame(
+    BuildContext context,
+    WidgetRef ref,
+    GameConfig config,
+    String gameType,
+  ) async {
     final authService = ref.read(authServiceProvider);
     final lobbyService = ref.read(lobbyServiceProvider);
     final diamondService = ref.read(diamondServiceProvider);
@@ -652,7 +738,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     // Skip diamond check in Test Mode or Debug Mode - allow free room creation for testing
     final isTestMode = TestMode.isEnabled;
     final bypassDiamondCheck = isTestMode || kDebugMode;
-    
+
     if (!bypassDiamondCheck) {
       // Check diamond balance (only for production users)
       final hasEnough = await diamondService.hasEnoughDiamonds(
@@ -671,7 +757,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 color: Colors.amber.shade50,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.diamond, size: 48, color: Colors.amber.shade600),
+              child: Icon(
+                Icons.diamond,
+                size: 48,
+                color: Colors.amber.shade600,
+              ),
             ),
             title: const Text('Insufficient Diamonds'),
             content: Text(
@@ -685,7 +775,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(backgroundColor: Colors.amber.shade700),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.amber.shade700,
+                ),
                 child: const Text('Get Diamonds'),
               ),
             ],
@@ -700,15 +792,15 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     }
 
     // Use GameTerminology for multi-region game name
-    final gameTypeName = gameType == 'marriage' ? GameTerminology.royalMeldGame : 'Call Break';
+    final gameTypeName = gameType == 'marriage'
+        ? GameTerminology.royalMeldGame
+        : 'Call Break';
     final newGameRoom = GameRoom(
       name: '$gameTypeName #${Random().nextInt(1000)}',
       hostId: user.uid,
       config: config,
       gameType: gameType,
-      players: [
-        Player(id: user.uid, name: user.displayName ?? 'Player 1'),
-      ],
+      players: [Player(id: user.uid, name: user.displayName ?? 'Player 1')],
       scores: {user.uid: 0},
       createdAt: DateTime.now(),
     );
@@ -720,9 +812,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       if (!bypassDiamondCheck) {
         final cost = DiamondConfig.roomCreationCost;
         final success = await diamondService.deductDiamonds(
-          user.uid, 
+          user.uid,
           cost,
-          description: 'Created room $gameType'
+          description: 'Created room $gameType',
         );
         if (!success) {
           // This case should ideally not be reached if hasEnoughDiamonds check passed,
@@ -738,14 +830,18 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               children: [
                 const Icon(Icons.check_circle, color: Colors.white),
                 const SizedBox(width: 8),
-                Text(bypassDiamondCheck 
-                  ? 'Room created! (Dev Mode - Free)' 
-                  : 'Room created! ${DiamondConfig.roomCreationCost} diamonds used.'),
+                Text(
+                  bypassDiamondCheck
+                      ? 'Room created! (Dev Mode - Free)'
+                      : 'Room created! ${DiamondConfig.roomCreationCost} diamonds used.',
+                ),
               ],
             ),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
         context.go('/lobby/$newGameId');
@@ -764,7 +860,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             ),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             duration: const Duration(seconds: 5),
           ),
         );
@@ -772,7 +870,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     }
   }
 
-  Future<void> _joinByCode(BuildContext context, WidgetRef ref, String code) async {
+  Future<void> _joinByCode(
+    BuildContext context,
+    WidgetRef ref,
+    String code,
+  ) async {
     final authService = ref.read(authServiceProvider);
     final lobbyService = ref.read(lobbyServiceProvider);
     final user = authService.currentUser;
@@ -796,19 +898,27 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               children: [
                 const Icon(Icons.error_outline, color: Colors.white),
                 const SizedBox(width: 8),
-                Expanded(child: Text(e.toString().replaceAll('Exception: ', ''))),
+                Expanded(
+                  child: Text(e.toString().replaceAll('Exception: ', '')),
+                ),
               ],
             ),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
     }
   }
 
-  Future<void> _joinGame(BuildContext context, WidgetRef ref, GameRoom game) async {
+  Future<void> _joinGame(
+    BuildContext context,
+    WidgetRef ref,
+    GameRoom game,
+  ) async {
     final authService = ref.read(authServiceProvider);
     final lobbyService = ref.read(lobbyServiceProvider);
     final user = authService.currentUser;
@@ -838,7 +948,14 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       SnackBar(
         content: const Row(
           children: [
-            SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            ),
             SizedBox(width: 12),
             Text('Finding a game for you...'),
           ],
@@ -851,19 +968,25 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     try {
       // Get all public waiting games
       final games = await lobbyService.getGames().first;
-      
+
       // Filter for bot rooms first (instant play), then any room with space
-      final botRooms = games.where((g) => 
-        g.status == GameStatus.waiting && 
-        g.players.length < 8 &&
-        g.players.any((p) => p.isBot) // Has at least one bot
-      ).toList();
-      
-      final anyAvailableRoom = games.where((g) =>
-        g.status == GameStatus.waiting && 
-        g.players.length < 8 &&
-        !g.players.any((p) => p.id == user.uid) // Not already in room
-      ).toList();
+      final botRooms = games
+          .where(
+            (g) =>
+                g.status == GameStatus.waiting &&
+                g.players.length < 8 &&
+                g.players.any((p) => p.isBot), // Has at least one bot
+          )
+          .toList();
+
+      final anyAvailableRoom = games
+          .where(
+            (g) =>
+                g.status == GameStatus.waiting &&
+                g.players.length < 8 &&
+                !g.players.any((p) => p.id == user.uid), // Not already in room
+          )
+          .toList();
 
       GameRoom? targetRoom;
       if (botRooms.isNotEmpty) {
@@ -917,9 +1040,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             hostId: user.uid,
             config: botConfig,
             gameType: 'marriage', // Marriage game (supports 2-8 players)
-            players: [
-              Player(id: user.uid, name: user.displayName ?? 'Player'),
-            ],
+            players: [Player(id: user.uid, name: user.displayName ?? 'Player')],
             scores: {user.uid: 0},
             createdAt: DateTime.now(),
           );
@@ -930,7 +1051,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             // Add 7 bots to fill the 8-player room
             for (int i = 0; i < 7; i++) {
               await lobbyService.addBot(gameId);
-              await Future.delayed(const Duration(milliseconds: 50)); // Small delay between adds
+              await Future.delayed(
+                const Duration(milliseconds: 50),
+              ); // Small delay between adds
             }
 
             if (context.mounted) {
@@ -977,7 +1100,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
   void _shareRoomCode(BuildContext context, GameRoom game) {
     if (game.roomCode == null) return;
-    
+
     // ignore: deprecated_member_use
     Share.share(
       'Join my ClubRoyale game! 🎮\n\nRoom Code: ${game.roomCode}\n\nOpen the app and enter this code to join.',
@@ -1060,11 +1183,11 @@ class _EnhancedGameCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final statusColor = isFinished 
-        ? Colors.grey 
-        : game.status == GameStatus.waiting 
-            ? Colors.green 
-            : Colors.orange;
+    final statusColor = isFinished
+        ? Colors.grey
+        : game.status == GameStatus.waiting
+        ? Colors.green
+        : Colors.orange;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -1093,11 +1216,16 @@ class _EnhancedGameCard extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: isFinished 
+                    colors: isFinished
                         ? [Colors.grey.shade400, Colors.grey.shade600]
-                        : [Colors.deepPurple.shade400, Colors.deepPurple.shade600],
+                        : [
+                            Colors.deepPurple.shade400,
+                            Colors.deepPurple.shade600,
+                          ],
                   ),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -1131,7 +1259,10 @@ class _EnhancedGameCard extends StatelessWidget {
                               ),
                               if (isHost)
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.amber,
                                     borderRadius: BorderRadius.circular(8),
@@ -1139,7 +1270,11 @@ class _EnhancedGameCard extends StatelessWidget {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.star, size: 12, color: Colors.white),
+                                      const Icon(
+                                        Icons.star,
+                                        size: 12,
+                                        color: Colors.white,
+                                      ),
                                       const SizedBox(width: 4),
                                       const Text(
                                         'Host',
@@ -1156,7 +1291,10 @@ class _EnhancedGameCard extends StatelessWidget {
                               if (game.players.any((p) => p.isBot))
                                 Container(
                                   margin: const EdgeInsets.only(left: 6),
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.cyan.shade600,
                                     borderRadius: BorderRadius.circular(8),
@@ -1164,7 +1302,11 @@ class _EnhancedGameCard extends StatelessWidget {
                                   child: const Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(Icons.smart_toy, size: 12, color: Colors.white),
+                                      Icon(
+                                        Icons.smart_toy,
+                                        size: 12,
+                                        color: Colors.white,
+                                      ),
                                       SizedBox(width: 4),
                                       Text(
                                         'AI',
@@ -1185,8 +1327,15 @@ class _EnhancedGameCard extends StatelessWidget {
                               Icon(Icons.circle, size: 8, color: statusColor),
                               const SizedBox(width: 6),
                               Text(
-                                isFinished ? 'Finished' : (game.status == GameStatus.waiting ? 'Waiting' : 'In Progress'),
-                                style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12),
+                                isFinished
+                                    ? 'Finished'
+                                    : (game.status == GameStatus.waiting
+                                          ? 'Waiting'
+                                          : 'In Progress'),
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.8),
+                                  fontSize: 12,
+                                ),
                               ),
                             ],
                           ),
@@ -1200,13 +1349,18 @@ class _EnhancedGameCard extends StatelessWidget {
               // Room code banner
               if (game.roomCode != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurple.shade50,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
                   ),
+                  decoration: BoxDecoration(color: Colors.deepPurple.shade50),
                   child: Row(
                     children: [
-                      Icon(Icons.pin, size: 18, color: Colors.deepPurple.shade700),
+                      Icon(
+                        Icons.pin,
+                        size: 18,
+                        color: Colors.deepPurple.shade700,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         'Room Code: ',
@@ -1225,7 +1379,11 @@ class _EnhancedGameCard extends StatelessWidget {
                       const Spacer(),
                       if (onShareCode != null)
                         IconButton(
-                          icon: Icon(Icons.share, size: 20, color: Colors.deepPurple.shade600),
+                          icon: Icon(
+                            Icons.share,
+                            size: 20,
+                            color: Colors.deepPurple.shade600,
+                          ),
                           onPressed: onShareCode,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
@@ -1244,7 +1402,8 @@ class _EnhancedGameCard extends StatelessWidget {
                       children: [
                         _GameStat(
                           icon: Icons.people,
-                          value: '${game.players.length}/${game.config.maxPlayers}',
+                          value:
+                              '${game.players.length}/${game.config.maxPlayers}',
                           label: 'Players',
                         ),
                         const SizedBox(width: 16),
@@ -1262,7 +1421,10 @@ class _EnhancedGameCard extends StatelessWidget {
                         const Spacer(),
                         if (isInGame)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.green.shade100,
                               borderRadius: BorderRadius.circular(20),
@@ -1270,7 +1432,11 @@ class _EnhancedGameCard extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.check, size: 14, color: Colors.green.shade700),
+                                Icon(
+                                  Icons.check,
+                                  size: 14,
+                                  color: Colors.green.shade700,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   'Joined',
@@ -1306,24 +1472,37 @@ class _EnhancedGameCard extends StatelessWidget {
                       children: game.players.take(5).map((p) {
                         final isCurrentHost = p.id == game.hostId;
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
-                            color: isCurrentHost ? Colors.amber.shade50 : Colors.grey.shade100,
+                            color: isCurrentHost
+                                ? Colors.amber.shade50
+                                : Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(20),
-                            border: isCurrentHost ? Border.all(color: Colors.amber) : null,
+                            border: isCurrentHost
+                                ? Border.all(color: Colors.amber)
+                                : null,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               CircleAvatar(
                                 radius: 12,
-                                backgroundColor: isCurrentHost ? Colors.amber : Colors.deepPurple.shade200,
+                                backgroundColor: isCurrentHost
+                                    ? Colors.amber
+                                    : Colors.deepPurple.shade200,
                                 child: Text(
-                                  p.name.isNotEmpty ? p.name[0].toUpperCase() : '?',
+                                  p.name.isNotEmpty
+                                      ? p.name[0].toUpperCase()
+                                      : '?',
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
-                                    color: isCurrentHost ? Colors.white : Colors.deepPurple.shade700,
+                                    color: isCurrentHost
+                                        ? Colors.white
+                                        : Colors.deepPurple.shade700,
                                   ),
                                 ),
                               ),
@@ -1331,12 +1510,18 @@ class _EnhancedGameCard extends StatelessWidget {
                               Text(
                                 p.name,
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  fontWeight: isCurrentHost ? FontWeight.bold : null,
+                                  fontWeight: isCurrentHost
+                                      ? FontWeight.bold
+                                      : null,
                                 ),
                               ),
                               if (isCurrentHost) ...[
                                 const SizedBox(width: 4),
-                                Icon(Icons.star, size: 12, color: Colors.amber.shade700),
+                                Icon(
+                                  Icons.star,
+                                  size: 12,
+                                  color: Colors.amber.shade700,
+                                ),
                               ],
                             ],
                           ),
@@ -1359,7 +1544,11 @@ class _GameStat extends StatelessWidget {
   final String value;
   final String label;
 
-  const _GameStat({required this.icon, required this.value, required this.label});
+  const _GameStat({
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1443,8 +1632,13 @@ class _EmptyState extends StatelessWidget {
                   label: const Text('Create Room'),
                   style: FilledButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                 ).animate().fadeIn(delay: 400.ms).slideX(begin: -0.2),
                 const SizedBox(width: 16),
@@ -1454,8 +1648,13 @@ class _EmptyState extends StatelessWidget {
                   label: const Text('Join by Code'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.deepPurple,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                 ).animate().fadeIn(delay: 400.ms).slideX(begin: 0.2),
               ],
@@ -1468,7 +1667,6 @@ class _EmptyState extends StatelessWidget {
 }
 
 // Error state
-
 
 /// Game type option widget for create dialog
 class _GameTypeOption extends StatelessWidget {
@@ -1524,10 +1722,7 @@ class _GameTypeOption extends StatelessWidget {
                 ),
                 Text(
                   subtitle,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
                 ),
               ],
             ),
@@ -1536,7 +1731,10 @@ class _GameTypeOption extends StatelessWidget {
                 top: -4,
                 right: -4,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.green,
                     borderRadius: BorderRadius.circular(4),

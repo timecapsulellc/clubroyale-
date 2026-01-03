@@ -19,7 +19,7 @@ class SocialBottomNav extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final unreadChats = ref.watch(unreadChatsCountProvider).value ?? 0;
-    
+
     final navContent = ClipRRect(
       borderRadius: isFloating ? BorderRadius.circular(30) : BorderRadius.zero,
       child: BackdropFilter(
@@ -69,9 +69,7 @@ class SocialBottomNav extends ConsumerWidget {
                 ),
 
                 // Center Play Button (Prominent Gold)
-                _CenterPlayButton(
-                  onTap: () => context.go('/lobby'),
-                ),
+                _CenterPlayButton(onTap: () => context.go('/lobby')),
 
                 // Clubs
                 _NavItem(

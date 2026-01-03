@@ -16,7 +16,7 @@ class PipState {
   final List<RemoteParticipant> participants;
   final Offset position;
   final Size size;
-  
+
   const PipState({
     this.isEnabled = false,
     this.isMinimized = false,
@@ -25,9 +25,9 @@ class PipState {
     this.position = const Offset(16, 100),
     this.size = const Size(150, 200),
   });
-  
+
   bool get isPipShowing => isEnabled && isMinimized;
-  
+
   PipState copyWith({
     bool? isEnabled,
     bool? isMinimized,
@@ -51,7 +51,7 @@ class PipState {
 class PipNotifier extends Notifier<PipState> {
   @override
   PipState build() => const PipState();
-  
+
   /// Enable PiP mode with an active video room
   void enablePip(Room room) {
     final participants = room.remoteParticipants.values.toList();
@@ -63,13 +63,13 @@ class PipNotifier extends Notifier<PipState> {
     );
     debugPrint('📺 PiP enabled with ${participants.length} participants');
   }
-  
+
   /// Disable PiP mode
   void disablePip() {
     state = const PipState();
     debugPrint('📺 PiP disabled');
   }
-  
+
   /// Minimize to floating window
   void minimize() {
     if (state.isEnabled) {
@@ -77,7 +77,7 @@ class PipNotifier extends Notifier<PipState> {
       debugPrint('📺 PiP minimized');
     }
   }
-  
+
   /// Maximize back to full screen
   void maximize() {
     if (state.isEnabled) {
@@ -85,7 +85,7 @@ class PipNotifier extends Notifier<PipState> {
       debugPrint('📺 PiP maximized');
     }
   }
-  
+
   /// Toggle between minimized and maximized
   void toggle() {
     if (state.isMinimized) {
@@ -94,37 +94,37 @@ class PipNotifier extends Notifier<PipState> {
       minimize();
     }
   }
-  
+
   /// Update floating window position
   void updatePosition(Offset newPosition) {
     state = state.copyWith(position: newPosition);
   }
-  
+
   /// Snap to nearest corner
   void snapToCorner(Size screenSize) {
     final pos = state.position;
     final pipSize = state.size;
     const padding = 16.0;
-    
+
     // Determine which side is closest
     final centerX = pos.dx + pipSize.width / 2;
     final screenCenterX = screenSize.width / 2;
-    
+
     double newX, newY;
-    
+
     // Horizontal snap
     if (centerX < screenCenterX) {
       newX = padding; // Left side
     } else {
       newX = screenSize.width - pipSize.width - padding; // Right side
     }
-    
+
     // Vertical snap (keep within bounds)
     newY = pos.dy.clamp(padding, screenSize.height - pipSize.height - padding);
-    
+
     state = state.copyWith(position: Offset(newX, newY));
   }
-  
+
   /// Update participants list
   void updateParticipants(List<RemoteParticipant> participants) {
     state = state.copyWith(participants: participants);

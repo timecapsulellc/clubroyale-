@@ -23,12 +23,13 @@ class FriendService {
     if (friends.contains(targetUserId)) throw Exception("Already friends");
 
     // Check if request already exists
-    final existing = await _firestore.collection('friend_requests')
+    final existing = await _firestore
+        .collection('friend_requests')
         .where('from', isEqualTo: uid)
         .where('to', isEqualTo: targetUserId)
         .where('status', isEqualTo: 'pending')
         .get();
-        
+
     if (existing.docs.isNotEmpty) throw Exception("Request already sent");
 
     // Create Request
@@ -45,9 +46,12 @@ class FriendService {
     final uid = currentUserId;
     if (uid == null) throw Exception("Not logged in");
 
-    final requestDoc = await _firestore.collection('friend_requests').doc(requestId).get();
+    final requestDoc = await _firestore
+        .collection('friend_requests')
+        .doc(requestId)
+        .get();
     if (!requestDoc.exists) throw Exception("Request not found");
-    
+
     final data = requestDoc.data()!;
     if (data['to'] != uid) throw Exception("Not authorized");
     if (data['status'] != 'pending') throw Exception("Invalid status");
@@ -61,13 +65,13 @@ class FriendService {
       final reqRef = _firestore.collection('friend_requests').doc(requestId);
 
       transaction.update(reqRef, {'status': 'accepted'});
-      
+
       transaction.update(myRef, {
-        'friendIds': FieldValue.arrayUnion([fromUserId])
+        'friendIds': FieldValue.arrayUnion([fromUserId]),
       });
-      
+
       transaction.update(otherRef, {
-        'friendIds': FieldValue.arrayUnion([uid])
+        'friendIds': FieldValue.arrayUnion([uid]),
       });
     });
   }
@@ -75,7 +79,7 @@ class FriendService {
   /// Reject Friend Request
   Future<void> rejectFriendRequest(String requestId) async {
     await _firestore.collection('friend_requests').doc(requestId).update({
-      'status': 'rejected'
+      'status': 'rejected',
     });
   }
 
@@ -84,20 +88,24 @@ class FriendService {
     final uid = currentUserId;
     if (uid == null) return Stream.value([]);
 
-    return _firestore.collection('friend_requests')
+    return _firestore
+        .collection('friend_requests')
         .where('to', isEqualTo: uid)
         .where('status', isEqualTo: 'pending')
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-           final data = doc.data();
-           return FriendRequest(
-             id: doc.id,
-             from: data['from'],
-             to: data['to'],
-             status: data['status'],
-             createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-           );
-        }).toList());
+        .map(
+          (snapshot) => snapshot.docs.map((doc) {
+            final data = doc.data();
+            return FriendRequest(
+              id: doc.id,
+              from: data['from'],
+              to: data['to'],
+              status: data['status'],
+              createdAt:
+                  (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+            );
+          }).toList(),
+        );
   }
 
   /// Watch My Friends
@@ -113,18 +121,21 @@ class FriendService {
   /// Search Users by Name (Simple)
   Future<List<SocialUser>> searchUsers(String query) async {
     if (query.isEmpty) return [];
-    
+
     // Note: Firestore doesn't do full text search natively.
     // Use a simple prefix search on 'displayName' or similar.
     // Assuming 'searchName' field exists (lowercase)
-    
-    final snapshot = await _firestore.collection('users')
+
+    final snapshot = await _firestore
+        .collection('users')
         .where('displayName', isGreaterThanOrEqualTo: query)
         .where('displayName', isLessThan: '${query}z')
         .limit(20)
         .get();
-        
-    return snapshot.docs.map((doc) => SocialUser.fromJson({...doc.data(), 'id': doc.id})).toList();
+
+    return snapshot.docs
+        .map((doc) => SocialUser.fromJson({...doc.data(), 'id': doc.id}))
+        .toList();
   }
 }
 

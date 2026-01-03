@@ -1,5 +1,5 @@
 /// Direct Messages Service
-/// 
+///
 /// Private 1:1 messaging between friends.
 library;
 
@@ -74,18 +74,26 @@ class Conversation {
     this.unreadCount = 0,
   });
 
-  factory Conversation.fromJson(Map<String, dynamic> json, String id, String currentUserId) {
+  factory Conversation.fromJson(
+    Map<String, dynamic> json,
+    String id,
+    String currentUserId,
+  ) {
     // Determine which user is "other"
     final participants = List<String>.from(json['participants'] ?? []);
-    final otherUserId = participants.firstWhere((p) => p != currentUserId, orElse: () => '');
-    
+    final otherUserId = participants.firstWhere(
+      (p) => p != currentUserId,
+      orElse: () => '',
+    );
+
     return Conversation(
       id: id,
       otherUserId: otherUserId,
       otherUserName: json['participantNames']?[otherUserId] ?? 'Player',
       otherUserAvatar: json['participantAvatars']?[otherUserId],
       lastMessage: json['lastMessage'] ?? '',
-      lastMessageTime: (json['lastMessageTime'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      lastMessageTime:
+          (json['lastMessageTime'] as Timestamp?)?.toDate() ?? DateTime.now(),
       unreadCount: json['unreadCount_$currentUserId'] ?? 0,
     );
   }
@@ -100,7 +108,10 @@ class DirectMessageService {
   DirectMessageService(this._authService);
 
   /// Get or create conversation between two users
-  Future<String> getOrCreateConversation(String otherUserId, String otherUserName) async {
+  Future<String> getOrCreateConversation(
+    String otherUserId,
+    String otherUserName,
+  ) async {
     final currentUser = _authService.currentUser;
     if (currentUser == null) throw Exception('Not authenticated');
 
@@ -152,21 +163,26 @@ class DirectMessageService {
           .doc(conversationId)
           .collection('messages')
           .add({
-        'senderId': currentUser.uid,
-        'senderName': currentUser.displayName ?? 'Player',
-        'content': content,
-        'timestamp': FieldValue.serverTimestamp(),
-        'isRead': false,
-      });
+            'senderId': currentUser.uid,
+            'senderName': currentUser.displayName ?? 'Player',
+            'content': content,
+            'timestamp': FieldValue.serverTimestamp(),
+            'isRead': false,
+          });
 
       // Update conversation metadata
       final docRef = _db.collection('conversations').doc(conversationId);
       final doc = await docRef.get();
       final participants = List<String>.from(doc.data()?['participants'] ?? []);
-      final otherUserId = participants.firstWhere((p) => p != currentUser.uid, orElse: () => '');
+      final otherUserId = participants.firstWhere(
+        (p) => p != currentUser.uid,
+        orElse: () => '',
+      );
 
       await docRef.update({
-        'lastMessage': content.length > 50 ? '${content.substring(0, 50)}...' : content,
+        'lastMessage': content.length > 50
+            ? '${content.substring(0, 50)}...'
+            : content,
         'lastMessageTime': FieldValue.serverTimestamp(),
         'unreadCount_$otherUserId': FieldValue.increment(1),
       });

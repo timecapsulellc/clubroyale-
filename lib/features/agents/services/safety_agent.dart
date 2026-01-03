@@ -7,7 +7,7 @@ final safetyAgentProvider = Provider<SafetyAgent>((ref) {
 });
 
 /// Safety Agent - Enhanced Content Safety
-/// 
+///
 /// Features:
 /// - Content moderation
 /// - Behavior analysis
@@ -77,9 +77,13 @@ class SafetyAgent {
 // ==================== ENUMS ====================
 
 enum ContentType { text, username, bio, story, comment }
+
 enum SeverityLevel { none, low, medium, high, critical }
+
 enum ModerAction { allow, warn, filter, block, escalate }
+
 enum RiskLevel { low, medium, high, critical }
+
 enum MonitoringLevel { normal, increased, strict }
 
 // ==================== DATA MODELS ====================
@@ -102,9 +106,11 @@ class ModerationResult {
   factory ModerationResult.fromJson(Map<String, dynamic> json) {
     return ModerationResult(
       isSafe: json['isSafe'] as bool? ?? true,
-      categories: (json['categories'] as List<dynamic>?)
-          ?.map((c) => ModerationCategory.fromJson(c))
-          .toList() ?? [],
+      categories:
+          (json['categories'] as List<dynamic>?)
+              ?.map((c) => ModerationCategory.fromJson(c))
+              .toList() ??
+          [],
       suggestedAction: ModerAction.values.firstWhere(
         (a) => a.name == json['suggestedAction'],
         orElse: () => ModerAction.allow,
@@ -166,7 +172,11 @@ class ReportRecord {
   final String outcome;
   final String date;
 
-  ReportRecord({required this.reason, required this.outcome, required this.date});
+  ReportRecord({
+    required this.reason,
+    required this.outcome,
+    required this.date,
+  });
 
   Map<String, dynamic> toJson() => {
     'reason': reason,
@@ -195,7 +205,8 @@ class BehaviorAnalysis {
         orElse: () => RiskLevel.low,
       ),
       concerns: List<String>.from(json['concerns'] ?? []),
-      recommendedAction: json['recommendedAction'] as String? ?? 'No action needed',
+      recommendedAction:
+          json['recommendedAction'] as String? ?? 'No action needed',
       monitoringLevel: MonitoringLevel.values.firstWhere(
         (m) => m.name == json['monitoringLevel'],
         orElse: () => MonitoringLevel.normal,

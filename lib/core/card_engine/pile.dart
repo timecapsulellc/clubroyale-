@@ -1,5 +1,5 @@
 /// Pile - Base class for a collection of cards
-/// 
+///
 /// This is the foundation for Deck, Hand, and DiscardPile
 library;
 
@@ -17,28 +17,28 @@ typedef Suit = CardSuit;
 /// Base pile of cards - foundation for Deck, Hand, DiscardPile
 class Pile {
   final List<PlayingCard> _cards = [];
-  
+
   /// Current cards in the pile
   List<PlayingCard> get cards => List.unmodifiable(_cards);
-  
+
   /// Number of cards in the pile
   int get length => _cards.length;
-  
+
   /// Is the pile empty?
   bool get isEmpty => _cards.isEmpty;
-  
+
   /// Is the pile not empty?
   bool get isNotEmpty => _cards.isNotEmpty;
-  
+
   /// Add a card to the top of the pile
   void addCard(PlayingCard card) => _cards.add(card);
-  
+
   /// Add multiple cards to the pile
   void addCards(List<PlayingCard> cards) => _cards.addAll(cards);
-  
+
   /// Remove and return the top card
   PlayingCard? drawCard() => _cards.isNotEmpty ? _cards.removeLast() : null;
-  
+
   /// Draw multiple cards from the top
   List<PlayingCard> drawCards(int count) {
     final drawn = <PlayingCard>[];
@@ -47,16 +47,16 @@ class Pile {
     }
     return drawn;
   }
-  
+
   /// Peek at the top card without removing it
   PlayingCard? get topCard => _cards.isNotEmpty ? _cards.last : null;
-  
+
   /// Remove a specific card from the pile
   bool removeCard(PlayingCard card) => _cards.remove(card);
-  
+
   /// Shuffle the pile using cryptographically secure RNG
-  /// 
-  /// Uses Fisher-Yates algorithm with Random.secure() to ensure 
+  ///
+  /// Uses Fisher-Yates algorithm with Random.secure() to ensure
   /// unpredictable card sequences. Essential for fair gambling games.
   void shuffle() {
     // IMPORTANT: Use secure random for gambling games
@@ -68,7 +68,7 @@ class Pile {
       _cards[j] = temp;
     }
   }
-  
+
   /// Clear all cards from the pile
   void clear() => _cards.clear();
 }

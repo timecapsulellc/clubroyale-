@@ -1,5 +1,5 @@
 /// Diamond Configuration for Economy System
-/// 
+///
 /// All diamond amounts, limits, and costs in one place.
 library;
 
@@ -32,7 +32,7 @@ class DiamondConfig {
 
   /// Weekly bonus (available on Sundays)
   static const int weeklyBonus = 100;
-  
+
   /// Gameplay Rewards Mapping (Backend mirror)
   static const Map<String, int> gameplayRewards = {
     'callbreak_win': 20,
@@ -57,14 +57,10 @@ class DiamondConfig {
   static const int maxReferralsPerMonth = 20; // 1000💎 max
 
   // ============ WIN STREAK REWARDS (V5) ============
-  
+
   /// V5 Streak Bonuses (7, 14, 30 days)
   /// Backend source of truth: 7:50, 14:100, 30:500
-  static const Map<int, int> streakRewards = {
-    7: 50,
-    14: 100,
-    30: 500,
-  };
+  static const Map<int, int> streakRewards = {7: 50, 14: 100, 30: 500};
 
   // ============ SPENDING COSTS ============
 
@@ -86,7 +82,8 @@ class DiamondConfig {
   static const int transferReminderHours = 24;
 
   /// Minimum transfer amount
-  static const int minTransferAmount = 10; // Bumped for V5 to make sense with fees
+  static const int minTransferAmount =
+      10; // Bumped for V5 to make sense with fees
 
   /// Maximum transfer amount per transaction
   static const int maxTransferAmount = 100000;
@@ -95,7 +92,9 @@ class DiamondConfig {
 
   /// Maximum daily free earnings (excluding streaks)
   static int get maxDailyFreeEarnings =>
-      dailyLogin + (maxAdsPerDay * perAdWatch) + (maxGamesPerDay * perGameComplete);
+      dailyLogin +
+      (maxAdsPerDay * perAdWatch) +
+      (maxGamesPerDay * perGameComplete);
   // = 10 + 120 + 75 = 205💎/day
 
   /// Maximum monthly free earnings (approximate)
@@ -121,7 +120,8 @@ class DiamondConfig {
 
   /// Android Ad Unit ID (Rewarded Video - Test ID)
   /// REPLACE with real ID on release: ca-app-pub-xxxxxxxx/yyyyyyyy
-  static const String androidAdUnitId = 'ca-app-pub-3940256099942544/5224354917';
+  static const String androidAdUnitId =
+      'ca-app-pub-3940256099942544/5224354917';
 
   /// iOS Ad Unit ID (Rewarded Video - Test ID)
   /// REPLACE with real ID on release: ca-app-pub-xxxxxxxx/yyyyyyyy
@@ -369,4 +369,3 @@ class EngagementTier {
     this.requiresHelping = false,
   });
 }
-

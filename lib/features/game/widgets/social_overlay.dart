@@ -47,13 +47,13 @@ class _SocialOverlayState extends ConsumerState<SocialOverlay>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _widthAnimation = Tween<double>(
-      begin: _collapsedWidth,
-      end: _expandedWidth,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _widthAnimation = Tween<double>(begin: _collapsedWidth, end: _expandedWidth)
+        .animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeInOut,
+          ),
+        );
     if (_isExpanded) {
       _animationController.forward();
     }
@@ -98,7 +98,9 @@ class _SocialOverlayState extends ConsumerState<SocialOverlay>
               ),
             ],
           ),
-          child: _isExpanded ? _buildExpandedContent() : _buildCollapsedContent(),
+          child: _isExpanded
+              ? _buildExpandedContent()
+              : _buildCollapsedContent(),
         );
       },
     );
@@ -187,7 +189,11 @@ class _SocialOverlayState extends ConsumerState<SocialOverlay>
           _buildTabButton(Icons.visibility, 'Watch', 2),
           const Spacer(),
           IconButton(
-            icon: const Icon(Icons.chevron_right, color: Colors.white54, size: 20),
+            icon: const Icon(
+              Icons.chevron_right,
+              color: Colors.white54,
+              size: 20,
+            ),
             onPressed: _toggleExpanded,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
@@ -299,13 +305,18 @@ class _GameChatPanel extends ConsumerWidget {
                   children: [
                     SkeletonBox(width: 60, height: 12),
                     const SizedBox(width: 8),
-                    Expanded(child: SkeletonBox(width: double.infinity, height: 12)),
+                    Expanded(
+                      child: SkeletonBox(width: double.infinity, height: 12),
+                    ),
                   ],
                 ),
               ),
             ),
             error: (e, _) => Center(
-              child: Text('Error: $e', style: const TextStyle(color: Colors.red, fontSize: 12)),
+              child: Text(
+                'Error: $e',
+                style: const TextStyle(color: Colors.red, fontSize: 12),
+              ),
             ),
           ),
         ),
@@ -361,10 +372,10 @@ class _GameChatPanel extends ConsumerWidget {
 
   void _sendMessage(WidgetRef ref, ChatServiceParams params) {
     if (messageController.text.trim().isEmpty) return;
-    
+
     final text = messageController.text.trim();
     messageController.clear();
-    
+
     ref.read(chatServiceProvider(params)).sendMessage(text);
   }
 }
@@ -395,19 +406,13 @@ class _CompactMessageBubble extends StatelessWidget {
           Expanded(
             child: Text(
               message.content,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 11,
-              ),
+              style: const TextStyle(color: Colors.white70, fontSize: 11),
             ),
           ),
           // Time
           Text(
             DateFormat.Hm().format(message.timestamp ?? DateTime.now()),
-            style: const TextStyle(
-              color: Colors.white38,
-              fontSize: 9,
-            ),
+            style: const TextStyle(color: Colors.white38, fontSize: 9),
           ),
         ],
       ),
@@ -430,7 +435,7 @@ class _VoiceControlPanel extends ConsumerWidget {
 
     return Column(
       children: [
-      // Connected participants
+        // Connected participants
         if (participants.isNotEmpty)
           Container(
             padding: const EdgeInsets.all(8),
@@ -443,12 +448,12 @@ class _VoiceControlPanel extends ConsumerWidget {
                 return Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: isSpeaking 
-                        ? Colors.green.withValues(alpha: 0.3) 
+                    color: isSpeaking
+                        ? Colors.green.withValues(alpha: 0.3)
                         : Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: isSpeaking 
-                        ? Border.all(color: Colors.green, width: 2) 
+                    border: isSpeaking
+                        ? Border.all(color: Colors.green, width: 2)
                         : null,
                   ),
                   child: Column(
@@ -456,18 +461,26 @@ class _VoiceControlPanel extends ConsumerWidget {
                     children: [
                       CircleAvatar(
                         radius: 16,
-                        backgroundColor: isSpeaking ? Colors.green : Colors.purple,
+                        backgroundColor: isSpeaking
+                            ? Colors.green
+                            : Colors.purple,
                         child: Text(
-                          participantName.isNotEmpty 
-                              ? participantName[0].toUpperCase() 
+                          participantName.isNotEmpty
+                              ? participantName[0].toUpperCase()
                               : '?',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         participantName,
-                        style: const TextStyle(color: Colors.white70, fontSize: 10),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 10,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -477,9 +490,9 @@ class _VoiceControlPanel extends ConsumerWidget {
               }).toList(),
             ),
           ),
-        
+
         const Spacer(),
-        
+
         // Main controls
         Center(
           child: Column(
@@ -491,8 +504,8 @@ class _VoiceControlPanel extends ConsumerWidget {
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: isMuted 
-                        ? Colors.red.withValues(alpha: 0.3) 
+                    color: isMuted
+                        ? Colors.red.withValues(alpha: 0.3)
                         : Colors.purple.withValues(alpha: 0.3),
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -537,7 +550,7 @@ class _VoiceControlPanel extends ConsumerWidget {
             ],
           ),
         ),
-        
+
         const Spacer(),
       ],
     );
@@ -636,15 +649,17 @@ class _SpectatorListPanel extends ConsumerWidget {
                     ),
                     subtitle: Text(
                       _formatTime(spectator.joinedAt),
-                      style: const TextStyle(color: Colors.white38, fontSize: 10),
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
+                      ),
                     ),
                   );
                 },
               );
             },
-            loading: () => const Center(
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
+            loading: () =>
+                const Center(child: CircularProgressIndicator(strokeWidth: 2)),
             error: (_, __) => const Center(
               child: Text('Error loading', style: TextStyle(color: Colors.red)),
             ),
@@ -658,7 +673,10 @@ class _SpectatorListPanel extends ConsumerWidget {
             child: ElevatedButton.icon(
               onPressed: () => _shareGame(context, ref),
               icon: const Icon(Icons.share, size: 16),
-              label: const Text('Invite to Watch', style: TextStyle(fontSize: 12)),
+              label: const Text(
+                'Invite to Watch',
+                style: TextStyle(fontSize: 12),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
                 foregroundColor: Colors.white,

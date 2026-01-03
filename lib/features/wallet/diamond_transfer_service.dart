@@ -25,14 +25,16 @@ class DiamondTransferService {
     if (amount < DiamondConfig.minTransferAmount) {
       return TransferResult(
         success: false,
-        reason: 'Minimum transfer is ${DiamondConfig.minTransferAmount} diamonds',
+        reason:
+            'Minimum transfer is ${DiamondConfig.minTransferAmount} diamonds',
       );
     }
 
     if (amount > DiamondConfig.maxTransferAmount) {
       return TransferResult(
         success: false,
-        reason: 'Maximum transfer is ${DiamondConfig.maxTransferAmount} diamonds',
+        reason:
+            'Maximum transfer is ${DiamondConfig.maxTransferAmount} diamonds',
       );
     }
 
@@ -49,7 +51,10 @@ class DiamondTransferService {
 
     // Cannot transfer to self
     if (fromUserId == toUserId) {
-      return TransferResult(success: false, reason: 'Cannot transfer to yourself');
+      return TransferResult(
+        success: false,
+        reason: 'Cannot transfer to yourself',
+      );
     }
 
     // Create transfer and deduct from sender in a batch
@@ -88,16 +93,22 @@ class DiamondTransferService {
   }
 
   /// Confirm receiving a transfer (receiver action)
-  Future<TransferResult> confirmAsReceiver(String transferId, String userId) async {
+  Future<TransferResult> confirmAsReceiver(
+    String transferId,
+    String userId,
+  ) async {
     final doc = await _db.collection('diamond_transfers').doc(transferId).get();
     if (!doc.exists) {
       return TransferResult(success: false, reason: 'Transfer not found');
     }
 
     final data = doc.data()!;
-    
+
     if (data['toUserId'] != userId) {
-      return TransferResult(success: false, reason: 'Not the receiver of this transfer');
+      return TransferResult(
+        success: false,
+        reason: 'Not the receiver of this transfer',
+      );
     }
 
     if (data['status'] != 'pending') {
@@ -175,20 +186,25 @@ class DiamondTransferService {
     });
 
     await batch.commit();
-    debugPrint('Transfer completed: $amount diamonds from $fromUserId to $toUserId');
+    debugPrint(
+      'Transfer completed: $amount diamonds from $fromUserId to $toUserId',
+    );
 
     return TransferResult(success: true, transferId: transferId);
   }
 
   /// Cancel a pending transfer (sender can cancel)
-  Future<TransferResult> cancelTransfer(String transferId, String userId) async {
+  Future<TransferResult> cancelTransfer(
+    String transferId,
+    String userId,
+  ) async {
     final doc = await _db.collection('diamond_transfers').doc(transferId).get();
     if (!doc.exists) {
       return TransferResult(success: false, reason: 'Transfer not found');
     }
 
     final data = doc.data()!;
-    
+
     if (data['fromUserId'] != userId) {
       return TransferResult(success: false, reason: 'Only sender can cancel');
     }
@@ -227,8 +243,11 @@ class DiamondTransferService {
         .where('status', isEqualTo: 'pending')
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => DiamondTransfer.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => DiamondTransfer.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   /// Get pending outgoing transfers for a user
@@ -239,20 +258,29 @@ class DiamondTransferService {
         .where('status', isEqualTo: 'pending')
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => DiamondTransfer.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => DiamondTransfer.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   /// Get transfer history for a user
-  Stream<List<DiamondTransfer>> watchTransferHistory(String userId, {int limit = 50}) {
+  Stream<List<DiamondTransfer>> watchTransferHistory(
+    String userId, {
+    int limit = 50,
+  }) {
     return _db
         .collection('diamond_transfers')
         .where('participantIds', arrayContains: userId)
         .orderBy('createdAt', descending: true)
         .limit(limit)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => DiamondTransfer.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => DiamondTransfer.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   /// Expire stale transfers (called by Cloud Function)
@@ -323,11 +351,7 @@ class TransferResult {
   final String? transferId;
   final String? reason;
 
-  TransferResult({
-    required this.success,
-    this.transferId,
-    this.reason,
-  });
+  TransferResult({required this.success, this.transferId, this.reason});
 }
 
 /// Diamond transfer model

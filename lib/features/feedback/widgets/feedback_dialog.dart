@@ -24,12 +24,14 @@ class _FeedbackDialogState extends ConsumerState<FeedbackDialog> {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception('User not logged in');
 
-      await ref.read(feedbackServiceProvider).submitFeedback(
-        userId: user.uid,
-        message: _messageController.text.trim(),
-        type: _selectedType,
-        contactEmail: user.email,
-      );
+      await ref
+          .read(feedbackServiceProvider)
+          .submitFeedback(
+            userId: user.uid,
+            message: _messageController.text.trim(),
+            type: _selectedType,
+            contactEmail: user.email,
+          );
 
       if (mounted) {
         Navigator.pop(context);
@@ -66,18 +68,29 @@ class _FeedbackDialogState extends ConsumerState<FeedbackDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           DropdownButtonFormField<FeedbackType>(
-            value: _selectedType,
+            initialValue: _selectedType,
             dropdownColor: const Color(0xFF2d1b4e),
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white.withOpacity(0.1),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             items: const [
-              DropdownMenuItem(value: FeedbackType.bug, child: Text('🐞 Report a Bug')),
-              DropdownMenuItem(value: FeedbackType.featureHelper, child: Text('✨ Suggest Feature')),
-              DropdownMenuItem(value: FeedbackType.general, child: Text('💭 General Comment')),
+              DropdownMenuItem(
+                value: FeedbackType.bug,
+                child: Text('🐞 Report a Bug'),
+              ),
+              DropdownMenuItem(
+                value: FeedbackType.featureHelper,
+                child: Text('✨ Suggest Feature'),
+              ),
+              DropdownMenuItem(
+                value: FeedbackType.general,
+                child: Text('💭 General Comment'),
+              ),
             ],
             onChanged: (val) {
               if (val != null) setState(() => _selectedType = val);
@@ -93,7 +106,9 @@ class _FeedbackDialogState extends ConsumerState<FeedbackDialog> {
               hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
               filled: true,
               fillColor: Colors.white.withOpacity(0.1),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ],
@@ -109,9 +124,13 @@ class _FeedbackDialogState extends ConsumerState<FeedbackDialog> {
             backgroundColor: const Color(0xFFD4AF37),
             foregroundColor: Colors.black,
           ),
-          child: _isLoading 
-            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-            : const Text('Send'),
+          child: _isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Send'),
         ),
       ],
     );

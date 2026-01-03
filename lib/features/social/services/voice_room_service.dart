@@ -13,19 +13,16 @@ class VoiceRoomConfig {
     'LIVEKIT_URL',
     defaultValue: '',
   );
-  
+
   /// Check if LiveKit is properly configured
-  static bool get isEnabled => serverUrl.isNotEmpty && serverUrl.startsWith('wss://');
-  
+  static bool get isEnabled =>
+      serverUrl.isNotEmpty && serverUrl.startsWith('wss://');
+
   static RoomOptions get roomOptions => const RoomOptions(
     adaptiveStream: true,
     dynacast: true,
-    defaultAudioPublishOptions: AudioPublishOptions(
-      dtx: true,
-    ),
-    defaultVideoPublishOptions: VideoPublishOptions(
-      simulcast: false, 
-    ),
+    defaultAudioPublishOptions: AudioPublishOptions(dtx: true),
+    defaultVideoPublishOptions: VideoPublishOptions(simulcast: false),
   );
 }
 
@@ -37,32 +34,30 @@ enum VoiceRoomState {
   failed,
 }
 
-enum VoiceRole {
-  speaker,  
-  listener, 
-}
+enum VoiceRole { speaker, listener }
 
 // Provider for the LiveKit Voice Room Service
-final liveKitRoomServiceProvider = Provider.autoDispose.family<VoiceRoomService, String>((ref, roomId) {
-  final user = ref.watch(authServiceProvider).currentUser;
-  if (user == null) throw Exception('User must be logged in');
-  
-  final service = VoiceRoomService(
-    roomId: roomId,
-    userId: user.uid,
-    userName: user.displayName ?? 'User',
-    userAvatar: user.photoURL,
-  );
-  ref.onDispose(() => service.dispose());
-  return service;
-});
+final liveKitRoomServiceProvider = Provider.autoDispose
+    .family<VoiceRoomService, String>((ref, roomId) {
+      final user = ref.watch(authServiceProvider).currentUser;
+      if (user == null) throw Exception('User must be logged in');
+
+      final service = VoiceRoomService(
+        roomId: roomId,
+        userId: user.uid,
+        userName: user.displayName ?? 'User',
+        userAvatar: user.photoURL,
+      );
+      ref.onDispose(() => service.dispose());
+      return service;
+    });
 
 class VoiceRoomService extends ChangeNotifier {
   final FirebaseFunctions _functions = FirebaseFunctions.instance;
   final String roomId;
   final String userId;
   final String userName;
-  final String? userAvatar; 
+  final String? userAvatar;
 
   Room? _room;
   LocalParticipant? _localParticipant;
@@ -71,7 +66,7 @@ class VoiceRoomService extends ChangeNotifier {
   VoiceRoomState _state = VoiceRoomState.disconnected;
   bool _isMicEnabled = false;
   VoiceRole _role = VoiceRole.listener;
-  
+
   // Stream to listen for unmute requests (for the UI)
   final _unmuteRequestController = StreamController<bool>.broadcast();
   Stream<bool> get onUnmuteRequested => _unmuteRequestController.stream;
@@ -89,7 +84,7 @@ class VoiceRoomService extends ChangeNotifier {
   bool get isConnected => _state == VoiceRoomState.connected;
   VoiceRole get role => _role;
   Room? get room => _room;
-  
+
   List<Participant> get allParticipants {
     final list = <Participant>[];
     if (_localParticipant != null) list.add(_localParticipant!);
@@ -106,8 +101,10 @@ class VoiceRoomService extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    
-    if (_state == VoiceRoomState.connecting || _state == VoiceRoomState.connected) return;
+
+    if (_state == VoiceRoomState.connecting ||
+        _state == VoiceRoomState.connected)
+      return;
 
     _state = VoiceRoomState.connecting;
     _role = asListener ? VoiceRole.listener : VoiceRole.speaker;
@@ -115,7 +112,7 @@ class VoiceRoomService extends ChangeNotifier {
 
     try {
       final token = await _getToken(isListener: asListener);
-      
+
       _room = Room();
       _setupRoomListeners();
 
@@ -131,7 +128,7 @@ class VoiceRoomService extends ChangeNotifier {
       if (!asListener) {
         await enableMicrophone();
       }
-      
+
       notifyListeners();
     } catch (e) {
       debugPrint('VoiceRoom Join Error: $e');
@@ -179,7 +176,7 @@ class VoiceRoomService extends ChangeNotifier {
       debugPrint('Mic Error: $e');
     }
   }
-  
+
   /// Mute/Unmute a remote participant (Admin only)
   Future<void> muteRemoteParticipant(String participantId, bool muted) async {
     try {
@@ -191,34 +188,32 @@ class VoiceRoomService extends ChangeNotifier {
       });
     } catch (e) {
       debugPrint('Error muting participant: $e');
-      rethrow; 
+      rethrow;
     }
   }
-  
+
   /// Mute ALL remote participants (Admin only)
   Future<void> muteAllRemoteParticipants() async {
     try {
       final callable = _functions.httpsCallable('muteAllParticipants');
-      await callable.call({
-        'roomId': roomId,
-      });
+      await callable.call({'roomId': roomId});
     } catch (e) {
       debugPrint('Error muting all: $e');
-      rethrow; 
+      rethrow;
     }
   }
 
   /// Request a user to unmute themselves (Admin only)
   Future<void> requestUnmute(String participantIdentity) async {
     if (_room == null || _localParticipant == null) return;
-    
+
     try {
       final payload = 'REQUEST_UNMUTE'.codeUnits;
-      
+
       await _localParticipant!.publishData(
-         payload,
-         reliable: true,
-         destinationIdentities: [participantIdentity],
+        payload,
+        reliable: true,
+        destinationIdentities: [participantIdentity],
       );
     } catch (e) {
       debugPrint('Error requesting unmute: $e');
@@ -233,9 +228,9 @@ class VoiceRoomService extends ChangeNotifier {
         'roomName': roomId,
         'participantName': userName,
         'participantId': userId,
-        'isSpectator': isListener, 
+        'isSpectator': isListener,
       });
-      
+
       final data = result.data;
       if (data.containsKey('token')) {
         return data['token'] as String;
@@ -244,7 +239,7 @@ class VoiceRoomService extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint("VoiceRoom Token Error: $e");
-      rethrow; 
+      rethrow;
     }
   }
 
@@ -274,10 +269,10 @@ class VoiceRoomService extends ChangeNotifier {
           // Decoding might be needed depending on how it's sent
           final dataString = String.fromCharCodes(event.data);
           if (dataString == 'REQUEST_UNMUTE') {
-             _unmuteRequestController.add(true);
+            _unmuteRequestController.add(true);
           }
         } catch (e) {
-             // ignore
+          // ignore
         }
       });
   }

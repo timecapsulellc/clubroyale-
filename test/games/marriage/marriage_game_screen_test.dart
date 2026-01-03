@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/games/marriage/widgets/visit_button_widget.dart';
 import 'package:clubroyale/games/marriage/widgets/maal_indicator.dart';
 import 'package:clubroyale/games/marriage/widgets/game_timer_widget.dart';

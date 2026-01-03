@@ -102,13 +102,10 @@ class CrashlyticsService {
     String? reason,
     bool fatal = false,
   }) async {
-    await _crashlytics.recordError(
-      error,
-      stack,
-      reason: reason,
-      fatal: fatal,
+    await _crashlytics.recordError(error, stack, reason: reason, fatal: fatal);
+    debugPrint(
+      '🔥 Crashlytics: Recorded ${fatal ? 'FATAL' : 'non-fatal'} error: $error',
     );
-    debugPrint('🔥 Crashlytics: Recorded ${fatal ? 'FATAL' : 'non-fatal'} error: $error');
   }
 
   /// Record a Flutter error
@@ -128,7 +125,7 @@ class CrashlyticsService {
     log('Network error: $endpoint returned $statusCode');
     await setKey('last_network_endpoint', endpoint);
     await setKey('last_network_status', statusCode);
-    
+
     if (statusCode >= 500) {
       await recordError(
         Exception('Server error: $endpoint returned $statusCode'),
@@ -146,7 +143,7 @@ class CrashlyticsService {
   }) async {
     log('Game error in $gameId during $gamePhase: $error');
     await setKey('last_game_error', error);
-    
+
     await recordError(
       Exception('Game error: $error'),
       null,
@@ -162,7 +159,7 @@ class CrashlyticsService {
     log('Payment error for $productId: $error');
     await setKey('last_payment_error', error);
     await setKey('last_payment_product', productId);
-    
+
     await recordError(
       Exception('Payment error: $error'),
       null,

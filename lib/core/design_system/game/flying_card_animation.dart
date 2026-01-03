@@ -1,5 +1,5 @@
 /// Flying Card Animation - Moving card visual effect
-/// 
+///
 /// Used for:
 /// - Dealing cards
 /// - Draw from Deck/Discard

@@ -1,5 +1,5 @@
 /// Spectator Service
-/// 
+///
 /// Enables watching live games without participating
 library;
 
@@ -8,12 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Spectator mode status
-enum SpectatorStatus {
-  idle,
-  joining,
-  watching,
-  error,
-}
+enum SpectatorStatus { idle, joining, watching, error }
 
 /// Spectator state
 class SpectatorState {
@@ -55,7 +50,7 @@ class SpectatorState {
 /// Spectator Service - Riverpod 3.x Notifier pattern
 class SpectatorService extends Notifier<SpectatorState> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   @override
   SpectatorState build() => const SpectatorState();
 
@@ -106,9 +101,9 @@ class SpectatorService extends Notifier<SpectatorState> {
       });
 
       // Update spectator count on room
-      await _roomRef(roomId).update({
-        'spectatorCount': FieldValue.increment(1),
-      });
+      await _roomRef(
+        roomId,
+      ).update({'spectatorCount': FieldValue.increment(1)});
 
       state = state.copyWith(
         status: SpectatorStatus.watching,
@@ -129,9 +124,7 @@ class SpectatorService extends Notifier<SpectatorState> {
   }
 
   /// Leave spectating
-  Future<void> leaveSpectating({
-    required String userId,
-  }) async {
+  Future<void> leaveSpectating({required String userId}) async {
     if (state.roomId == null) return;
 
     try {
@@ -141,9 +134,9 @@ class SpectatorService extends Notifier<SpectatorState> {
       await _spectatorsRef(roomId).doc(userId).delete();
 
       // Decrement spectator count
-      await _roomRef(roomId).update({
-        'spectatorCount': FieldValue.increment(-1),
-      });
+      await _roomRef(
+        roomId,
+      ).update({'spectatorCount': FieldValue.increment(-1)});
 
       state = const SpectatorState();
       debugPrint('👋 Left spectating');
@@ -163,7 +156,9 @@ class SpectatorService extends Notifier<SpectatorState> {
   /// Watch spectator list
   Stream<List<String>> watchSpectators(String roomId) {
     return _spectatorsRef(roomId).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => doc.data()['userName'] as String).toList();
+      return snapshot.docs
+          .map((doc) => doc.data()['userName'] as String)
+          .toList();
     });
   }
 
@@ -178,11 +173,11 @@ class SpectatorService extends Notifier<SpectatorState> {
     try {
       final doc = await _roomRef(roomId).get();
       if (!doc.exists) return false;
-      
+
       final data = doc.data()!;
       final status = data['status'] as String?;
       final allowSpectators = data['allowSpectators'] as bool? ?? true;
-      
+
       return status == 'playing' && allowSpectators;
     } catch (e) {
       return false;
@@ -195,7 +190,10 @@ final spectatorServiceProvider =
     NotifierProvider<SpectatorService, SpectatorState>(SpectatorService.new);
 
 /// Provider for room spectator count
-final spectatorCountProvider = StreamProvider.family<int, String>((ref, roomId) {
+final spectatorCountProvider = StreamProvider.family<int, String>((
+  ref,
+  roomId,
+) {
   final firestore = FirebaseFirestore.instance;
   return firestore
       .collection('rooms')
@@ -208,5 +206,7 @@ final spectatorCountProvider = StreamProvider.family<int, String>((ref, roomId) 
 /// Provider for game state stream (for spectators)
 final spectatorGameStateProvider =
     StreamProvider.family<Map<String, dynamic>?, String>((ref, roomId) {
-  return ref.watch(spectatorServiceProvider.notifier).watchGameState(roomId);
-});
+      return ref
+          .watch(spectatorServiceProvider.notifier)
+          .watchGameState(roomId);
+    });

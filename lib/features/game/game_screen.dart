@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,7 +62,10 @@ class _GameScreenState extends ConsumerState<GameScreen>
   }
 
   Future<void> _showCustomScoreDialog(
-      BuildContext context, String playerId, String playerName) async {
+    BuildContext context,
+    String playerId,
+    String playerName,
+  ) async {
     final controller = TextEditingController();
     final result = await showDialog<int>(
       context: context,
@@ -106,12 +108,17 @@ class _GameScreenState extends ConsumerState<GameScreen>
   }
 
   Future<void> _confirmRemovePlayer(
-      BuildContext context, Player player, GameRoom game) async {
+    BuildContext context,
+    Player player,
+    GameRoom game,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Remove Player'),
-        content: Text('Are you sure you want to remove ${player.name} from this game?'),
+        content: Text(
+          'Are you sure you want to remove ${player.name} from this game?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -141,7 +148,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
         icon: const Icon(Icons.flag, size: 48),
         title: const Text('Finish Game?'),
         content: const Text(
-            'This will end the game and save the final scores to the ledger.'),
+          'This will end the game and save the final scores to the ledger.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -167,10 +175,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
   /// Share room code via WhatsApp or other apps
   void _shareRoomCode(GameRoom game) {
     if (game.roomCode == null) return;
-    
+
     SharePlus.instance.share(
       ShareParams(
-        text: 'Join my ClubRoyale game!\n\n'
+        text:
+            'Join my ClubRoyale game!\n\n'
             '🎮 Room: ${game.name}\n'
             '🔢 Code: ${game.roomCode}\n'
             '💰 Point Value: ${game.config.pointValue.toInt()} units\n\n'
@@ -184,10 +193,10 @@ class _GameScreenState extends ConsumerState<GameScreen>
   Future<void> _startGame(BuildContext context) async {
     final lobbyService = ref.read(lobbyServiceProvider);
     final callBreakService = ref.read(callBreakServiceProvider);
-    
+
     // Start the game (change status)
     await lobbyService.startGame(widget.gameId);
-    
+
     // Get player IDs and deal first round
     final gameAsyncValue = ref.read(gameProvider(widget.gameId));
     gameAsyncValue.whenData((game) async {
@@ -196,7 +205,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
         await callBreakService.startNewRound(widget.gameId, playerIds);
       }
     });
-    
+
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -206,7 +215,6 @@ class _GameScreenState extends ConsumerState<GameScreen>
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -246,11 +254,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline,
-                      size: 64, color: colorScheme.error),
+                  Icon(Icons.error_outline, size: 64, color: colorScheme.error),
                   const SizedBox(height: 16),
-                  Text('Game not found',
-                      style: theme.textTheme.headlineSmall),
+                  Text('Game not found', style: theme.textTheme.headlineSmall),
                   const SizedBox(height: 24),
                   FilledButton.icon(
                     onPressed: () => context.go('/lobby'),
@@ -269,8 +275,10 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
           // Sort players by score
           final sortedPlayers = List<Player>.from(game.players)
-            ..sort((a, b) =>
-                (game.scores[b.id] ?? 0).compareTo(game.scores[a.id] ?? 0));
+            ..sort(
+              (a, b) =>
+                  (game.scores[b.id] ?? 0).compareTo(game.scores[a.id] ?? 0),
+            );
 
           return Column(
             children: [
@@ -300,9 +308,15 @@ class _GameScreenState extends ConsumerState<GameScreen>
                           Padding(
                             padding: const EdgeInsets.only(left: 8),
                             child: Chip(
-                              avatar: const Icon(Icons.star, size: 14, color: Colors.amber),
+                              avatar: const Icon(
+                                Icons.star,
+                                size: 14,
+                                color: Colors.amber,
+                              ),
                               label: const Text('Host'),
-                              backgroundColor: Colors.amber.withValues(alpha: 0.2),
+                              backgroundColor: Colors.amber.withValues(
+                                alpha: 0.2,
+                              ),
                               labelStyle: theme.textTheme.labelSmall?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -316,16 +330,25 @@ class _GameScreenState extends ConsumerState<GameScreen>
                       GestureDetector(
                         onTap: () => _shareRoomCode(game),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: colorScheme.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
+                            border: Border.all(
+                              color: colorScheme.outline.withValues(alpha: 0.3),
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.pin, size: 16, color: colorScheme.primary),
+                              Icon(
+                                Icons.pin,
+                                size: 16,
+                                color: colorScheme.primary,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 'Code: ${game.roomCode}',
@@ -336,7 +359,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              Icon(Icons.share, size: 16, color: colorScheme.primary),
+                              Icon(
+                                Icons.share,
+                                size: 16,
+                                color: colorScheme.primary,
+                              ),
                             ],
                           ),
                         ),
@@ -346,7 +373,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.people, size: 18, color: colorScheme.onSurfaceVariant),
+                        Icon(
+                          Icons.people,
+                          size: 18,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${game.players.length}/${game.config.maxPlayers}',
@@ -355,7 +386,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
                           ),
                         ),
                         const SizedBox(width: 16),
-                        Icon(Icons.monetization_on, size: 18, color: colorScheme.secondary),
+                        Icon(
+                          Icons.monetization_on,
+                          size: 18,
+                          color: colorScheme.secondary,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${game.config.pointValue.toInt()} units/pt',
@@ -364,7 +399,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
                           ),
                         ),
                         const SizedBox(width: 16),
-                        Icon(Icons.repeat, size: 18, color: colorScheme.onSurfaceVariant),
+                        Icon(
+                          Icons.repeat,
+                          size: 18,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${game.config.totalRounds} rounds',
@@ -379,7 +418,10 @@ class _GameScreenState extends ConsumerState<GameScreen>
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.orange.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(16),
@@ -390,11 +432,13 @@ class _GameScreenState extends ConsumerState<GameScreen>
                               const SizedBox(
                                 width: 12,
                                 height: 12,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                needsMorePlayers 
+                                needsMorePlayers
                                     ? 'Waiting for players to join...'
                                     : 'Ready to start!',
                                 style: theme.textTheme.bodySmall?.copyWith(
@@ -421,15 +465,14 @@ class _GameScreenState extends ConsumerState<GameScreen>
                     final isLeader = index == 0 && score > 0;
 
                     return AnimatedBuilder(
-                      animation: _scoreAnimations[player.id] ??
+                      animation:
+                          _scoreAnimations[player.id] ??
                           const AlwaysStoppedAnimation(0),
                       builder: (context, child) {
-                        final scale = 1.0 +
+                        final scale =
+                            1.0 +
                             (_scoreAnimations[player.id]?.value ?? 0) * 0.05;
-                        return Transform.scale(
-                          scale: scale,
-                          child: child,
-                        );
+                        return Transform.scale(scale: scale, child: child);
                       },
                       child: _PlayerScoreCard(
                         player: player,
@@ -477,7 +520,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
           final isHost = game.hostId == currentUserId;
           final isWaiting = game.status == GameStatus.waiting;
           final isPlaying = game.status == GameStatus.playing;
-          
+
           // Show Start Game button when waiting and enough players (need exactly 4 for Call Break)
           if (isWaiting && isHost && game.players.length >= 4) {
             return ScaleTransition(
@@ -493,7 +536,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
               ),
             );
           }
-          
+
           // Show "Play Cards" button for all players when game is playing
           if (isPlaying) {
             return Column(
@@ -526,7 +569,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
               ],
             );
           }
-          
+
           // Waiting state - show waiting message for non-hosts
           if (isWaiting && !isHost) {
             return FloatingActionButton.extended(
@@ -536,7 +579,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
               label: const Text('Waiting for host...'),
             );
           }
-          
+
           return null;
         },
         orElse: () => null,
@@ -545,7 +588,10 @@ class _GameScreenState extends ConsumerState<GameScreen>
   }
 
   void _showPlayerManagement(
-      BuildContext context, GameRoom game, String? currentUserId) {
+    BuildContext context,
+    GameRoom game,
+    String? currentUserId,
+  ) {
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
@@ -554,37 +600,39 @@ class _GameScreenState extends ConsumerState<GameScreen>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Players',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text('Players', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-            ...game.players.map((player) => ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: player.profile?.avatarUrl != null
-                        ? NetworkImage(player.profile!.avatarUrl!)
-                        : null,
-                    child: player.profile?.avatarUrl == null
-                        ? Text(player.name[0].toUpperCase())
-                        : null,
-                  ),
-                  title: Text(player.profile?.displayName ?? player.name),
-                  subtitle: Text('Score: ${game.scores[player.id] ?? 0}'),
-                  trailing: player.id != currentUserId
-                      ? IconButton(
-                          icon: Icon(Icons.remove_circle_outline,
-                              color: Theme.of(context).colorScheme.error),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _confirmRemovePlayer(context, player, game);
-                          },
-                        )
-                      : Chip(
-                          label: const Text('You'),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
+            ...game.players.map(
+              (player) => ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: player.profile?.avatarUrl != null
+                      ? NetworkImage(player.profile!.avatarUrl!)
+                      : null,
+                  child: player.profile?.avatarUrl == null
+                      ? Text(player.name[0].toUpperCase())
+                      : null,
+                ),
+                title: Text(player.profile?.displayName ?? player.name),
+                subtitle: Text('Score: ${game.scores[player.id] ?? 0}'),
+                trailing: player.id != currentUserId
+                    ? IconButton(
+                        icon: Icon(
+                          Icons.remove_circle_outline,
+                          color: Theme.of(context).colorScheme.error,
                         ),
-                )),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _confirmRemovePlayer(context, player, game);
+                        },
+                      )
+                    : Chip(
+                        label: const Text('You'),
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.primaryContainer,
+                      ),
+              ),
+            ),
             const SizedBox(height: 16),
           ],
         ),
@@ -678,7 +726,11 @@ class _PlayerScoreCard extends StatelessWidget {
                         color: Colors.amber,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.star, size: 14, color: Colors.white),
+                      child: const Icon(
+                        Icons.star,
+                        size: 14,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
               ],
@@ -723,8 +775,11 @@ class _PlayerScoreCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       child: Padding(
                         padding: const EdgeInsets.all(8),
-                        child: Icon(Icons.remove,
-                            color: colorScheme.onErrorContainer, size: 20),
+                        child: Icon(
+                          Icons.remove,
+                          color: colorScheme.onErrorContainer,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
@@ -735,8 +790,10 @@ class _PlayerScoreCard extends StatelessWidget {
                 GestureDetector(
                   onTap: onCustomScore,
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(8),
@@ -748,8 +805,8 @@ class _PlayerScoreCard extends StatelessWidget {
                         color: score > 0
                             ? colorScheme.primary
                             : score < 0
-                                ? colorScheme.error
-                                : null,
+                            ? colorScheme.error
+                            : null,
                       ),
                     ),
                   ),
@@ -768,8 +825,11 @@ class _PlayerScoreCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       child: Padding(
                         padding: const EdgeInsets.all(8),
-                        child: Icon(Icons.add,
-                            color: colorScheme.onPrimaryContainer, size: 20),
+                        child: Icon(
+                          Icons.add,
+                          color: colorScheme.onPrimaryContainer,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
@@ -795,4 +855,3 @@ class _PlayerScoreCard extends StatelessWidget {
     }
   }
 }
-

@@ -48,8 +48,8 @@ abstract class VoiceRoom with _$VoiceRoom {
 
 /// Voice room type for categorization
 enum VoiceRoomType {
-  lobby,    // General lobby voice room
-  game,     // In-game voice room
-  friends,  // Friends-only voice room
-  public,   // Public voice room
+  lobby, // General lobby voice room
+  game, // In-game voice room
+  friends, // Friends-only voice room
+  public, // Public voice room
 }

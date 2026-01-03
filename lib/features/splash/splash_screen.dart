@@ -22,20 +22,22 @@ class _ClubRoyaleSplashScreenState extends State<ClubRoyaleSplashScreen> {
   Future<void> _checkOnboardingAndNavigate() async {
     // Wait for splash animation
     await Future.delayed(const Duration(seconds: 3));
-    
+
     if (!mounted) return;
-    
+
     // Check if onboarding is complete with timeout handling
     try {
-      final prefs = await SharedPreferences.getInstance()
-          .timeout(const Duration(seconds: 2), onTimeout: () {
-        debugPrint('⚠️ SharedPreferences timeout - proceeding to home');
-        throw TimeoutException('SharedPreferences timeout');
-      });
+      final prefs = await SharedPreferences.getInstance().timeout(
+        const Duration(seconds: 2),
+        onTimeout: () {
+          debugPrint('⚠️ SharedPreferences timeout - proceeding to home');
+          throw TimeoutException('SharedPreferences timeout');
+        },
+      );
       final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
-      
+
       if (!mounted) return;
-      
+
       if (onboardingComplete) {
         debugPrint('✅ Onboarding complete - navigating to home');
         context.go('/');
@@ -66,10 +68,7 @@ class _ClubRoyaleSplashScreenState extends State<ClubRoyaleSplashScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              CasinoColors.darkPurple,
-              CasinoColors.deepPurple,
-            ],
+            colors: [CasinoColors.darkPurple, CasinoColors.deepPurple],
           ),
         ),
         child: Center(
@@ -78,16 +77,20 @@ class _ClubRoyaleSplashScreenState extends State<ClubRoyaleSplashScreen> {
             children: [
               // Logo icon - using Icon-192 (clean logo)
               Image.asset(
-                'assets/images/logo.png',
-                width: 100,
-                height: 100,
-                fit: BoxFit.contain,
-              ).animate()
-                .fadeIn(duration: 600.ms)
-                .scale(begin: const Offset(0.8, 0.8), curve: Curves.easeOutBack),
-              
+                    'assets/images/logo.png',
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.contain,
+                  )
+                  .animate()
+                  .fadeIn(duration: 600.ms)
+                  .scale(
+                    begin: const Offset(0.8, 0.8),
+                    curve: Curves.easeOutBack,
+                  ),
+
               const SizedBox(height: 24),
-              
+
               // Brand name - Gold text
               Text(
                 'ClubRoyale',
@@ -98,9 +101,9 @@ class _ClubRoyaleSplashScreenState extends State<ClubRoyaleSplashScreen> {
                   letterSpacing: 1.5,
                 ),
               ).animate(delay: 300.ms).fadeIn().slideY(begin: 0.2),
-              
+
               const SizedBox(height: 48),
-              
+
               // Loading Indicator - Gold themed
               SizedBox(
                 width: 36,

@@ -39,11 +39,7 @@ class MCPTool {
   final String? description;
   final Map<String, dynamic> inputSchema;
 
-  MCPTool({
-    required this.name,
-    this.description,
-    required this.inputSchema,
-  });
+  MCPTool({required this.name, this.description, required this.inputSchema});
 
   factory MCPTool.fromJson(Map<String, dynamic> json) {
     return MCPTool(
@@ -60,19 +56,17 @@ class MCPPrompt {
   final String? description;
   final List<MCPPromptArgument> arguments;
 
-  MCPPrompt({
-    required this.name,
-    this.description,
-    this.arguments = const [],
-  });
+  MCPPrompt({required this.name, this.description, this.arguments = const []});
 
   factory MCPPrompt.fromJson(Map<String, dynamic> json) {
     return MCPPrompt(
       name: json['name'] as String,
       description: json['description'] as String?,
-      arguments: (json['arguments'] as List?)
-          ?.map((a) => MCPPromptArgument.fromJson(a))
-          .toList() ?? [],
+      arguments:
+          (json['arguments'] as List?)
+              ?.map((a) => MCPPromptArgument.fromJson(a))
+              .toList() ??
+          [],
     );
   }
 }
@@ -108,28 +102,28 @@ class MCPService {
   /// Initialize connection to MCP server
   Future<bool> connect(String serverUrl) async {
     _serverUrl = serverUrl;
-    
+
     try {
       // Fetch server capabilities
       final response = await http.get(Uri.parse('$serverUrl/capabilities'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        
+
         // Load resources
         if (data['resources'] != null) {
           await _loadResources();
         }
-        
+
         // Load tools
         if (data['tools'] != null) {
           await _loadTools();
         }
-        
+
         // Load prompts
         if (data['prompts'] != null) {
           await _loadPrompts();
         }
-        
+
         return true;
       }
       return false;
@@ -144,10 +138,12 @@ class MCPService {
       final response = await http.get(Uri.parse('$_serverUrl/resources/list'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final resources = (data['resources'] as List?)
-            ?.map((r) => MCPResource.fromJson(r))
-            .toList() ?? [];
-        
+        final resources =
+            (data['resources'] as List?)
+                ?.map((r) => MCPResource.fromJson(r))
+                .toList() ??
+            [];
+
         for (final resource in resources) {
           _resources[resource.uri] = resource;
         }
@@ -162,10 +158,12 @@ class MCPService {
       final response = await http.get(Uri.parse('$_serverUrl/tools/list'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final tools = (data['tools'] as List?)
-            ?.map((t) => MCPTool.fromJson(t))
-            .toList() ?? [];
-        
+        final tools =
+            (data['tools'] as List?)
+                ?.map((t) => MCPTool.fromJson(t))
+                .toList() ??
+            [];
+
         for (final tool in tools) {
           _tools[tool.name] = tool;
         }
@@ -180,10 +178,12 @@ class MCPService {
       final response = await http.get(Uri.parse('$_serverUrl/prompts/list'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final prompts = (data['prompts'] as List?)
-            ?.map((p) => MCPPrompt.fromJson(p))
-            .toList() ?? [];
-        
+        final prompts =
+            (data['prompts'] as List?)
+                ?.map((p) => MCPPrompt.fromJson(p))
+                .toList() ??
+            [];
+
         for (final prompt in prompts) {
           _prompts[prompt.name] = prompt;
         }
@@ -231,10 +231,7 @@ class MCPService {
       final response = await http.post(
         Uri.parse('$_serverUrl/tools/call'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'name': toolName,
-          'arguments': arguments,
-        }),
+        body: json.encode({'name': toolName, 'arguments': arguments}),
       );
 
       if (response.statusCode == 200) {
@@ -256,10 +253,7 @@ class MCPService {
       final response = await http.post(
         Uri.parse('$_serverUrl/prompts/get'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'name': promptName,
-          'arguments': arguments,
-        }),
+        body: json.encode({'name': promptName, 'arguments': arguments}),
       );
 
       if (response.statusCode == 200) {

@@ -1,5 +1,5 @@
 /// Replay Player Screen
-/// 
+///
 /// Plays back recorded game replays with controls
 library;
 
@@ -28,13 +28,15 @@ class _ReplayPlayerScreenState extends ConsumerState<ReplayPlayerScreen> {
   }
 
   Future<void> _loadReplay() async {
-    final replay = await ref.read(replayServiceProvider).loadReplay(widget.replayId);
+    final replay = await ref
+        .read(replayServiceProvider)
+        .loadReplay(widget.replayId);
     if (mounted) {
       setState(() {
         _replay = replay;
         _isLoading = false;
       });
-      
+
       if (replay != null) {
         ref.read(replayPlaybackProvider.notifier).loadReplay(replay);
       }
@@ -62,12 +64,7 @@ class _ReplayPlayerScreenState extends ConsumerState<ReplayPlayerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_replay!.title ?? 'Replay'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () {},
-          ),
-        ],
+        actions: [IconButton(icon: const Icon(Icons.share), onPressed: () {})],
       ),
       body: Column(
         children: [
@@ -76,10 +73,7 @@ class _ReplayPlayerScreenState extends ConsumerState<ReplayPlayerScreen> {
             child: _ReplayView(replay: _replay!, playbackState: playbackState),
           ),
           // Playback controls
-          _PlaybackControls(
-            replay: _replay!,
-            playbackState: playbackState,
-          ),
+          _PlaybackControls(replay: _replay!, playbackState: playbackState),
         ],
       ),
     );
@@ -110,7 +104,8 @@ class _ReplayView extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: replay.playerNames.asMap().entries.map((entry) {
-                  final isWinner = replay.winnerId == replay.playerIds[entry.key];
+                  final isWinner =
+                      replay.winnerId == replay.playerIds[entry.key];
                   return _PlayerDisplay(
                     name: entry.value,
                     score: replay.finalScores?[entry.value] ?? 0,
@@ -119,7 +114,7 @@ class _ReplayView extends StatelessWidget {
                 }).toList(),
               ),
               const SizedBox(height: 24),
-              
+
               // Event log
               Expanded(
                 child: Card(
@@ -127,7 +122,8 @@ class _ReplayView extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     itemCount: visibleEvents.length,
                     itemBuilder: (context, index) {
-                      final event = visibleEvents[visibleEvents.length - 1 - index];
+                      final event =
+                          visibleEvents[visibleEvents.length - 1 - index];
                       return _EventTile(event: event);
                     },
                   ),
@@ -136,7 +132,7 @@ class _ReplayView extends StatelessWidget {
             ],
           ),
         ),
-        
+
         // Playback overlay
         if (!playbackState.isPlaying)
           Center(
@@ -175,10 +171,7 @@ class _PlayerDisplay extends StatelessWidget {
       children: [
         Stack(
           children: [
-            CircleAvatar(
-              radius: 28,
-              child: Text(name[0].toUpperCase()),
-            ),
+            CircleAvatar(radius: 28, child: Text(name[0].toUpperCase())),
             if (isWinner)
               const Positioned(
                 right: 0,
@@ -203,7 +196,7 @@ class _EventTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (icon, color) = _getEventVisual();
-    
+
     return ListTile(
       dense: true,
       leading: Icon(icon, size: 20, color: color),
@@ -276,10 +269,7 @@ class _PlaybackControls extends ConsumerWidget {
   final GameReplay replay;
   final ReplayPlaybackState playbackState;
 
-  const _PlaybackControls({
-    required this.replay,
-    required this.playbackState,
-  });
+  const _PlaybackControls({required this.replay, required this.playbackState});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

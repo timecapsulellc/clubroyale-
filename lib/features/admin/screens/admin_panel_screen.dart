@@ -94,7 +94,8 @@ class AdminPanelScreen extends ConsumerWidget {
             stream: adminChatService.watchOpenChats(),
             builder: (context, snapshot) {
               final count = snapshot.data?.length ?? 0;
-              final unread = snapshot.data?.where((c) => c.unreadByAdmin).length ?? 0;
+              final unread =
+                  snapshot.data?.where((c) => c.unreadByAdmin).length ?? 0;
               return _AdminMenuCard(
                 icon: Icons.chat,
                 title: 'Support Chats',
@@ -136,9 +137,9 @@ class AdminPanelScreen extends ConsumerWidget {
               subtitle: 'Add or remove sub-admins',
               onTap: () {
                 // TODO: Implement admin management
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Coming soon!')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Coming soon!')));
               },
             ),
 
@@ -173,8 +174,10 @@ class AdminPanelScreen extends ConsumerWidget {
           maxChildSize: 0.9,
           expand: false,
           builder: (context, scrollController) {
-            final historyStream = ref.watch(adminDiamondServiceProvider).watchGrantHistory();
-            
+            final historyStream = ref
+                .watch(adminDiamondServiceProvider)
+                .watchGrantHistory();
+
             return Column(
               children: [
                 AppBar(
@@ -194,38 +197,49 @@ class AdminPanelScreen extends ConsumerWidget {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }
-                      
+
                       final history = snapshot.data ?? [];
                       if (history.isEmpty) {
-                        return const Center(child: Text('No grant history found.'));
+                        return const Center(
+                          child: Text('No grant history found.'),
+                        );
                       }
-                      
+
                       return ListView.builder(
                         controller: scrollController,
                         itemCount: history.length,
                         itemBuilder: (context, index) {
                           final grant = history[index];
                           final isRejected = grant.status == 'rejected';
-                          final date = grant.createdAt != null 
-                              ? DateFormat('MMM d, h:mm a').format(grant.createdAt!) 
+                          final date = grant.createdAt != null
+                              ? DateFormat(
+                                  'MMM d, h:mm a',
+                                ).format(grant.createdAt!)
                               : 'Unknown';
-                          
+
                           return ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: isRejected ? Colors.red.shade100 : Colors.green.shade100,
+                              backgroundColor: isRejected
+                                  ? Colors.red.shade100
+                                  : Colors.green.shade100,
                               child: Icon(
-                                isRejected ? Icons.block : Icons.check, 
-                                color: isRejected ? Colors.red : Colors.green
+                                isRejected ? Icons.block : Icons.check,
+                                color: isRejected ? Colors.red : Colors.green,
                               ),
                             ),
-                            title: Text('${grant.amount} Diamonds -> ${grant.targetUserEmail}'),
+                            title: Text(
+                              '${grant.amount} Diamonds -> ${grant.targetUserEmail}',
+                            ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('${grant.reason} • $date'),
                                 Text('By: ${grant.requestedBy}'),
                                 if (isRejected)
-                                  Text('Rejected: ${grant.approvals}', style: const TextStyle(color: Colors.red)),
+                                  Text(
+                                    'Rejected: ${grant.approvals}',
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
                               ],
                             ),
                             isThreeLine: true,
@@ -258,16 +272,20 @@ class _UserLookupDialogState extends ConsumerState<_UserLookupDialog> {
 
   Future<void> _search() async {
     if (_searchController.text.isEmpty) return;
-    
+
     setState(() => _loading = true);
     try {
-      final results = await ref.read(adminDiamondServiceProvider).lookupUser(_searchController.text);
+      final results = await ref
+          .read(adminDiamondServiceProvider)
+          .lookupUser(_searchController.text);
       if (mounted) {
         setState(() => _results = results);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(ErrorHelper.getFriendlyMessage(e))),
+        );
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -306,8 +324,12 @@ class _UserLookupDialogState extends ConsumerState<_UserLookupDialog> {
                     final user = _results[index];
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl) : null,
-                        child: user.avatarUrl == null ? Text(user.displayName[0]) : null,
+                        backgroundImage: user.avatarUrl != null
+                            ? NetworkImage(user.avatarUrl)
+                            : null,
+                        child: user.avatarUrl == null
+                            ? Text(user.displayName[0])
+                            : null,
                       ),
                       title: Text(user.displayName),
                       subtitle: Text(user.email ?? user.id),

@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:clubroyale/features/profile/providers/profile_provider.dart';
 
 /// Personal Stats Card
-/// 
+///
 /// Displays user's gaming statistics:
 /// - Win Rate
 /// - Total Games
@@ -16,7 +16,7 @@ class PersonalStatsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(userProfileProvider);
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(20),
@@ -72,16 +72,16 @@ class PersonalStatsCard extends ConsumerWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Stats Row
           profileAsync.when(
             data: (profile) {
               final winRate = profile?.winRate ?? 0.0;
               final totalGames = profile?.totalGames ?? 0;
               final rank = profile?.rank ?? 0;
-              
+
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -124,9 +124,9 @@ class PersonalStatsCard extends ConsumerWidget {
               style: TextStyle(color: Colors.white54),
             ),
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Level Progress
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,7 +157,9 @@ class PersonalStatsCard extends ConsumerWidget {
                 child: LinearProgressIndicator(
                   value: 0.67,
                   backgroundColor: Colors.white.withValues(alpha: 0.1),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFD4AF37)),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    Color(0xFFD4AF37),
+                  ),
                   minHeight: 6,
                 ),
               ),
@@ -173,7 +175,7 @@ class _StatItem extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
-  
+
   const _StatItem({
     required this.label,
     required this.value,

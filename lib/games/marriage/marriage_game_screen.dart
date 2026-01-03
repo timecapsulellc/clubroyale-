@@ -1,5 +1,5 @@
 /// Royal Meld (Marriage) Practice Screen
-/// 
+///
 /// UI for playing Royal Meld card game
 /// Uses GameTerminology for multi-region localization
 library;
@@ -8,7 +8,6 @@ import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/theme/app_theme.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
-import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/games/base_game.dart';
 import 'package:clubroyale/core/card_engine/meld.dart' as meld_engine;
 import 'package:clubroyale/core/card_engine/pile.dart'; // For Card class
@@ -48,20 +47,22 @@ class MarriageGameScreen extends ConsumerStatefulWidget {
 
 class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   // ... (existing vars)
-  
+
   // Tutorial Keys
   final GlobalKey _menuKey = GlobalKey();
-  final GlobalKey _deckKey = GlobalKey(); // Renamed from centerDeckKey to avoid confusion
+  final GlobalKey _deckKey =
+      GlobalKey(); // Renamed from centerDeckKey to avoid confusion
   final GlobalKey _handKey = GlobalKey(); // Renamed from myHandKey
   final GlobalKey _sortKey = GlobalKey();
   final GlobalKey _visitKey = GlobalKey();
-  
+
   bool _showTutorial = true; // Auto-show for demo
-  
+
   List<TutorialStep> get _tutorialSteps => [
     TutorialStep(
       title: 'Welcome to Marriage! 👑',
-      description: 'The goal is to arrange your 21 cards into Sets (AAA) and Sequences (678).',
+      description:
+          'The goal is to arrange your 21 cards into Sets (AAA) and Sequences (678).',
       targetKey: null, // Center modal
     ),
     TutorialStep(
@@ -72,7 +73,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     ),
     TutorialStep(
       title: 'Draw & Discard',
-      description: 'Tap the Deck to draw a card, or pick from the Discard pile if you have a pair.',
+      description:
+          'Tap the Deck to draw a card, or pick from the Discard pile if you have a pair.',
       targetKey: _deckKey,
       tooltipAlignment: Alignment.bottomCenter,
     ),
@@ -84,7 +86,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     ),
     TutorialStep(
       title: 'Visit / Maal',
-      description: 'Once you have 3 Pure Sequences, tap here to "Visit" and unlock Bonus Points (Maal).',
+      description:
+          'Once you have 3 Pure Sequences, tap here to "Visit" and unlock Bonus Points (Maal).',
       targetKey: _visitKey,
       tooltipAlignment: Alignment.topCenter,
     ),
@@ -95,14 +98,14 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       tooltipAlignment: Alignment.bottomLeft,
     ),
   ];
-  
+
   // Core game state
   late MarriageGame _game;
   final String _playerId = 'player_1';
   final List<String> _botIds = List.generate(5, (i) => 'bot_${i + 1}');
   String? _selectedCardId;
   bool _isProcessing = false;
-  
+
   // Visit related state
   final MarriageGameConfig _config = MarriageGameConfig.nepaliStandard;
   bool _hasVisited = false;
@@ -116,23 +119,23 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
 
   // Animations
   final List<Widget> _animations = [];
-  
+
   // Timer state
   Timer? _turnTimer;
   int _remainingSeconds = 30;
-  
+
   // Sound state
   bool _isSoundMuted = false;
-  
+
   // Game log for real-time events
   final List<String> _gameLogs = [];
-  
+
   // Meld caching for performance
   List<meld_engine.Meld> _cachedMelds = [];
-  String? _lastHandHash;  // Track hand changes
-  
+  String? _lastHandHash; // Track hand changes
+
   // Animation state
-  bool _isAnimating = false;  // Pause timer during animations
+  bool _isAnimating = false; // Pause timer during animations
 
   @override
   void initState() {
@@ -146,22 +149,22 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     _stopTimer();
     super.dispose();
   }
-  
+
   void _initGame() {
     _game = MarriageGame();
     _game.initialize(<String>[_playerId, ..._botIds]);
     _game.startRound();
-    
+
     // Play shuffle sound on deal
     SoundService.playShuffleSound();
-    
+
     // Check if bots need to play (if user doesn't start)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkVisitStatus();
       _playBotTurns();
       _playDealAnimation();
     });
-    
+
     // Start timer if it's my turn
     if (_game.currentPlayerId == _playerId) {
       _startTimer();
@@ -171,14 +174,15 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   void _startTimer() {
     _stopTimer();
     setState(() => _remainingSeconds = _config.turnTimeoutSeconds);
-    
+
     _turnTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_showTutorial || _isAnimating) return; // Pause timer during tutorial and animations
+      if (_showTutorial || _isAnimating)
+        return; // Pause timer during tutorial and animations
       if (!mounted) {
         timer.cancel();
         return;
       }
-      
+
       setState(() {
         if (_remainingSeconds > 0) {
           _remainingSeconds--;
@@ -201,34 +205,40 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     if (_game.currentPlayerId != _playerId) return;
 
     final hand = _game.getHand(_playerId);
-    
+
     // 1. Draw phase if needed
     if (hand.length == 21) {
-       _game.drawFromDeck(_playerId);
+      _game.drawFromDeck(_playerId);
     }
-    
+
     // 2. Discard phase
     // Re-fetch hand
     final newHand = _game.getHand(_playerId);
     // Discard the last card (usually the one just picked or right-most)
     final cardToDiscard = newHand.last;
-    
+
     _game.playCard(_playerId, cardToDiscard);
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Turn Timeout! Auto-played.'), backgroundColor: Colors.orange),
+      const SnackBar(
+        content: Text('Turn Timeout! Auto-played.'),
+        backgroundColor: Colors.orange,
+      ),
     );
-    
+
     // Proceed
     _playBotTurns();
   }
 
   void _updateMaalState() {
     if (_game.tiplu == null) return;
-    
+
     final hand = _game.getHand(_playerId);
-    final calculator = MarriageMaalCalculator(tiplu: _game.tiplu!, config: _config);
-    
+    final calculator = MarriageMaalCalculator(
+      tiplu: _game.tiplu!,
+      config: _config,
+    );
+
     setState(() {
       _maalPoints = calculator.calculateMaalPoints(hand);
       // Simple check for marriage bonus potential (not exact meld check, but close enough for indicator)
@@ -248,17 +258,24 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     }
 
     final hand = _game.getHand(_playerId);
-    final validator = MarriageVisitValidator(config: _config, tiplu: _game.tiplu);
-    
+    final validator = MarriageVisitValidator(
+      config: _config,
+      tiplu: _game.tiplu,
+    );
+
     // Check purely for availability to update button state
     // We try 'attemptVisit' to see if ANY method works
     final result = validator.attemptVisit(hand);
-    
+
     setState(() {
       if (result.canVisit) {
         _visitStatus = VisitButtonState.ready;
-        _visitLabel = result.visitType == VisitType.tunnel ? 'TUNNEL WIN' : 'VISIT';
-        _visitSubLabel = result.visitType == VisitType.dublee ? '7 Dublees Ready' : 'Sequences Ready';
+        _visitLabel = result.visitType == VisitType.tunnel
+            ? 'TUNNEL WIN'
+            : 'VISIT';
+        _visitSubLabel = result.visitType == VisitType.dublee
+            ? '7 Dublees Ready'
+            : 'Sequences Ready';
       } else {
         _visitStatus = VisitButtonState.locked;
         // Provide hint based on what they are closest to or default
@@ -270,20 +287,23 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
 
   void _handleVisit() {
     final hand = _game.getHand(_playerId);
-    final validator = MarriageVisitValidator(config: _config, tiplu: _game.tiplu);
+    final validator = MarriageVisitValidator(
+      config: _config,
+      tiplu: _game.tiplu,
+    );
     final result = validator.attemptVisit(hand);
 
     if (result.canVisit) {
       setState(() {
         _hasVisited = true;
         _visitStatus = VisitButtonState.visited;
-        
+
         // If tunnel win (instant win), handle it
         if (result.visitType == VisitType.tunnel) {
-           _showWinDialog(winnerName: 'You (Tunnel Win!)');
+          _showWinDialog(winnerName: 'You (Tunnel Win!)');
         }
       });
-      
+
       // Show success feedback
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -311,28 +331,33 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   void _playDealAnimation() {
     // Set animation flag to pause timer
     setState(() => _isAnimating = true);
-    
+
     // Determine positions
     // Ideally we use RenderBox from keys, but for simplicity let's use screen logic
     // Center of screen (Deck)
     final size = MediaQuery.of(context).size;
     final center = Offset(size.width / 2, size.height / 2 - 50);
-    
+
     // My Hand (Bottom Center)
     final myHandPos = Offset(size.width / 2 - 50, size.height - 150);
-    
+
     // Create animation for "My" cards
     // 21 cards is too many to animate individually, let's animate a few batches
     int cardsToAnimate = 5;
-    
+
     for (int i = 0; i < cardsToAnimate; i++) {
       Future.delayed(Duration(milliseconds: i * 150), () {
         if (!mounted) return;
-        
+
         setState(() {
           _animations.add(
             FlyingCardAnimation(
-              card: _game.getHand(_playerId).isNotEmpty ? _game.getHand(_playerId).first : PlayingCard(suit: Suit.spades, rank: Rank.ace), // Dummy card if empty
+              card: _game.getHand(_playerId).isNotEmpty
+                  ? _game.getHand(_playerId).first
+                  : PlayingCard(
+                      suit: Suit.spades,
+                      rank: Rank.ace,
+                    ), // Dummy card if empty
               startOffset: center,
               endOffset: myHandPos,
               startScale: 0.5,
@@ -340,19 +365,20 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
               duration: const Duration(milliseconds: 600),
               onComplete: () {
                 if (mounted) {
-                   setState(() {
-                      if (_animations.isNotEmpty) _animations.removeAt(0); // Cleanup older
-                   });
+                  setState(() {
+                    if (_animations.isNotEmpty)
+                      _animations.removeAt(0); // Cleanup older
+                  });
                 }
               },
             ),
           );
-          
+
           SoundService.playCardSlide();
         });
       });
     }
-    
+
     // End animation after all cards dealt
     Future.delayed(Duration(milliseconds: cardsToAnimate * 150 + 700), () {
       if (mounted) {
@@ -366,20 +392,20 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     final winnerId = winnerName.contains('You') ? _playerId : '_bot_1';
     final hands = <String, List<PlayingCard>>{};
     final melds = <String, List<meld_engine.Meld>>{};
-    
+
     // Get hands for all players
     for (final id in [_playerId, '_bot_1', '_bot_2', '_bot_3']) {
       hands[id] = _game.getHand(id);
       melds[id] = _game.findMelds(id);
     }
-    
+
     final scorer = MarriageScorer(tiplu: _game.tiplu, config: _game.config);
     final settlement = scorer.calculateFinalSettlement(
       hands: hands,
       melds: melds,
       winnerId: winnerId,
     );
-    
+
     // Convert to display names
     final displayScores = <String, int>{
       'You': settlement[_playerId] ?? 0,
@@ -387,10 +413,10 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       'Bot 2': settlement['_bot_2'] ?? 0,
       'Bot 3': settlement['_bot_3'] ?? 0,
     };
-    
+
     // Winner amount is their net score
     final winAmount = (settlement[winnerId] ?? 0).abs();
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -406,16 +432,16 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
         onExit: () {
           Navigator.pop(context);
           Navigator.pop(context); // Exit screen
-        }, 
+        },
       ),
     );
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final myHand = _game.getHand(_playerId);
-    
+
     // Meld caching: only recalculate when hand changes
     final handHash = myHand.map((c) => c.id).join(',');
     if (handHash != _lastHandHash) {
@@ -423,7 +449,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       _lastHandHash = handHash;
     }
     final melds = _cachedMelds;
-    
+
     return Scaffold(
       backgroundColor: AppTheme.tableGreen,
       appBar: AppBar(
@@ -432,7 +458,10 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Use GameTerminology for game name
-            Text(GameTerminology.royalMeldGame, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              GameTerminology.royalMeldGame,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(width: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -463,7 +492,11 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Center(
-                      child: Icon(Icons.style, color: AppTheme.gold.withValues(alpha: 0.5), size: 32),
+                      child: Icon(
+                        Icons.style,
+                        color: AppTheme.gold.withValues(alpha: 0.5),
+                        size: 32,
+                      ),
                     ),
                   ),
                 ],
@@ -485,11 +518,16 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('${GameTerminology.wildCard}: ', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                  Text(
+                    '${GameTerminology.wildCard}: ',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
                   Text(
                     _game.tiplu!.displayString,
                     style: TextStyle(
-                      color: _game.tiplu!.suit.isRed ? Colors.red : Colors.white,
+                      color: _game.tiplu!.suit.isRed
+                          ? Colors.red
+                          : Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
@@ -531,18 +569,20 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                     _buildHeaderButton(Icons.menu, () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MarriageGuidebookScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => MarriageGuidebookScreen(),
+                        ),
                       );
                     }, key: _menuKey),
                     const SizedBox(width: 8),
                     _buildHeaderButton(
-                      _isSoundMuted ? Icons.volume_off : Icons.volume_up, 
+                      _isSoundMuted ? Icons.volume_off : Icons.volume_up,
                       () {
                         setState(() {
                           _isSoundMuted = !_isSoundMuted;
                           SoundService.setMuted(_isSoundMuted);
                         });
-                      }
+                      },
                     ),
                     const SizedBox(width: 8),
                     // Timer if my turn
@@ -563,18 +603,22 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                 top: 80,
                 left: 16,
                 child: GameLogOverlay(
-                  logs: _gameLogs.isEmpty 
-                    ? const ['Game started...'] 
-                    : _gameLogs.take(5).toList(), // Show last 5 logs
+                  logs: _gameLogs.isEmpty
+                      ? const ['Game started...']
+                      : _gameLogs.take(5).toList(), // Show last 5 logs
                 ),
               ),
-              
+
               // New Elliptical Layout for 8 Players
               Padding(
-                padding: const EdgeInsets.only(top: 80), // Increased top padding to avoid header overlap
+                padding: const EdgeInsets.only(
+                  top: 80,
+                ), // Increased top padding to avoid header overlap
                 child: MarriageTableLayout(
                   centerArea: Padding(
-                    padding: const EdgeInsets.only(bottom: 20), // Push deck up slightly from hand
+                    padding: const EdgeInsets.only(
+                      bottom: 20,
+                    ), // Push deck up slightly from hand
                     child: _buildCenterArea(),
                   ),
                   opponents: _buildOpponentsList(),
@@ -583,7 +627,9 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                     children: [
                       // Meld suggestions
                       if (melds.isNotEmpty) _buildMeldSuggestions(melds),
-                      const SizedBox(height: 10), // Spacing between suggestions and hand
+                      const SizedBox(
+                        height: 10,
+                      ), // Spacing between suggestions and hand
                       // Hand
                       _buildMyHand(myHand),
                       // Actions
@@ -592,7 +638,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                   ),
                 ),
               ),
-              
+
               // Polished HUD Overlay (Turn Indicator, Maal, Emotes)
               MarriageHUDOverlay(
                 currentPlayerId: _game.currentPlayerId,
@@ -600,7 +646,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                 maalPoints: _maalPoints,
                 onEmoteTap: () => _showEmotePicker(),
               ),
-              
+
               // Game Mode Banner
               const Positioned(
                 top: 50,
@@ -611,17 +657,17 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                   compact: true,
                 ),
               ),
-              
+
               // Flying Card Animations
               ..._animations,
-              
+
               // Interactive Tutorial Overlay
               if (_showTutorial)
-                 TutorialOverlay(
-                   steps: _tutorialSteps,
-                   onComplete: () => setState(() => _showTutorial = false),
-                   onSkip: () => setState(() => _showTutorial = false),
-                 ),
+                TutorialOverlay(
+                  steps: _tutorialSteps,
+                  onComplete: () => setState(() => _showTutorial = false),
+                  onSkip: () => setState(() => _showTutorial = false),
+                ),
             ],
           ),
         ),
@@ -649,43 +695,55 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   List<Widget> _buildOpponentsList() {
     return _botIds.map((botId) {
       final isCurrentTurn = _game.currentPlayerId == botId;
-      return GameOpponentWidget( // Use widget directly, not OpponentRow
+      return GameOpponentWidget(
+        // Use widget directly, not OpponentRow
         opponent: GameOpponent(
-            id: botId,
-            name: _getBotName(botId),
-            isBot: true,
-            isCurrentTurn: isCurrentTurn,
-            status: isCurrentTurn ? 'Thinking...' : null,
+          id: botId,
+          name: _getBotName(botId),
+          isBot: true,
+          isCurrentTurn: isCurrentTurn,
+          status: isCurrentTurn ? 'Thinking...' : null,
         ),
         size: 50, // Slightly smaller for 8 players
       );
     }).toList();
   }
 
-
   Widget _buildCenterArea() {
     final topDiscard = _game.topDiscard;
     final isMyTurn = _game.currentPlayerId == _playerId;
     // Discard Pickup Rule: Check config and visit status
-    final bool visitRequirementMet = !_config.mustVisitToPickDiscard || _hasVisited;
-    
+    final bool visitRequirementMet =
+        !_config.mustVisitToPickDiscard || _hasVisited;
+
     // Check for blocking cards (Joker/Wild)
     bool isDiscardBlocked = false;
     if (topDiscard != null) {
       // Check if joker blocks discard
-      if (_config.jokerBlocksDiscard && (topDiscard.isJoker || (!topDiscard.isJoker && _game.tiplu != null && topDiscard.rank == _game.tiplu!.rank && topDiscard.suit == _game.tiplu!.suit && !_config.canPickupWildFromDiscard))) {
-         // Using simplified logic here:
-         // 1. Printed Joker always blocks if enabled
-         if (topDiscard.isJoker) isDiscardBlocked = true;
-         
-         // 2. Wild Cards block if cannot pickup wild
-         if (!_config.canPickupWildFromDiscard && _isWildCard(topDiscard)) {
-           isDiscardBlocked = true;
-         }
+      if (_config.jokerBlocksDiscard &&
+          (topDiscard.isJoker ||
+              (!topDiscard.isJoker &&
+                  _game.tiplu != null &&
+                  topDiscard.rank == _game.tiplu!.rank &&
+                  topDiscard.suit == _game.tiplu!.suit &&
+                  !_config.canPickupWildFromDiscard))) {
+        // Using simplified logic here:
+        // 1. Printed Joker always blocks if enabled
+        if (topDiscard.isJoker) isDiscardBlocked = true;
+
+        // 2. Wild Cards block if cannot pickup wild
+        if (!_config.canPickupWildFromDiscard && _isWildCard(topDiscard)) {
+          isDiscardBlocked = true;
+        }
       }
     }
 
-    final canDrawFromDiscard = isMyTurn && topDiscard != null && _game.getHand(_playerId).length == 21 && visitRequirementMet && !isDiscardBlocked;
+    final canDrawFromDiscard =
+        isMyTurn &&
+        topDiscard != null &&
+        _game.getHand(_playerId).length == 21 &&
+        visitRequirementMet &&
+        !isDiscardBlocked;
     final canDrawFromDeck = isMyTurn && _game.getHand(_playerId).length == 21;
 
     return Center(
@@ -700,11 +758,11 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
               child: Container(
                 key: _deckKey,
                 child: CardWidget(
-                  card: PlayingCard(rank: CardRank.ace, suit: CardSuit.spades), 
+                  card: PlayingCard(rank: CardRank.ace, suit: CardSuit.spades),
                   isFaceUp: false,
                   isSelectable: canDrawFromDeck,
                   isSelected: false,
-                  width: 90, 
+                  width: 90,
                   height: 130,
                 ),
               ),
@@ -716,7 +774,12 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
               child: Stack(
                 children: [
                   CardWidget(
-                    card: topDiscard ?? PlayingCard(rank: CardRank.ace, suit: CardSuit.spades), // Show back styled dummy if no discard
+                    card:
+                        topDiscard ??
+                        PlayingCard(
+                          rank: CardRank.ace,
+                          suit: CardSuit.spades,
+                        ), // Show back styled dummy if no discard
                     isFaceUp: topDiscard != null,
                     isSelectable: canDrawFromDiscard,
                     isSelected: false,
@@ -738,10 +801,12 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                     ),
                   // Lock Overlay (if blocked by Joker/Wild)
                   if (topDiscard != null && isDiscardBlocked && isMyTurn)
-                     Positioned.fill(
+                    Positioned.fill(
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.3), // Red tint for blocked action
+                          color: Colors.red.withValues(
+                            alpha: 0.3,
+                          ), // Red tint for blocked action
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Center(
@@ -780,10 +845,22 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                   children: [
                     Text(
                       _getMeldTypeName(meld.type),
-                      style: const TextStyle(color: Colors.white70, fontSize: 10),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 10,
+                      ),
                     ),
                     Row(
-                      children: meld.cards.map((card) => CardWidget(card: card, isFaceUp: true, width: 30, height: 45)).toList(),
+                      children: meld.cards
+                          .map(
+                            (card) => CardWidget(
+                              card: card,
+                              isFaceUp: true,
+                              width: 30,
+                              height: 45,
+                            ),
+                          )
+                          .toList(),
                     ),
                   ],
                 ),
@@ -815,15 +892,16 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     );
   }
 
-
   Widget _buildActionBar() {
     final isMyTurn = _game.currentPlayerId == _playerId;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.5),
-        border: Border(top: BorderSide(color: AppTheme.gold.withValues(alpha: 0.3))),
+        border: Border(
+          top: BorderSide(color: AppTheme.gold.withValues(alpha: 0.3)),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -833,20 +911,24 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
             // Discard button
             CasinoButton(
               label: 'Discard',
-              onPressed: isMyTurn && _selectedCardId != null ? _discardCard : null,
+              onPressed: isMyTurn && _selectedCardId != null
+                  ? _discardCard
+                  : null,
               backgroundColor: AppTheme.gold,
               borderColor: AppTheme.goldDark,
             ),
-            
+
             // Visit Button (New)
             VisitButtonWidget(
               key: _visitKey,
               state: _visitStatus,
-              onPressed: (_visitStatus == VisitButtonState.ready) ? _handleVisit : null,
+              onPressed: (_visitStatus == VisitButtonState.ready)
+                  ? _handleVisit
+                  : null,
               label: _visitLabel,
               subLabel: _visitSubLabel,
             ),
-            
+
             // Declare button (Go Royale in global mode)
             CasinoButton(
               label: GameTerminology.declare,
@@ -860,7 +942,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       ),
     );
   }
-  
+
   void _drawFromDeck() {
     if (_isProcessing) return;
     setState(() {
@@ -871,7 +953,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       _isProcessing = false;
     });
   }
-  
+
   void _drawFromDiscard() {
     if (_isProcessing || _game.topDiscard == null) return;
     final cardPicked = _game.topDiscard!;
@@ -883,24 +965,24 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       _isProcessing = false;
     });
   }
-  
+
   void _discardCard() {
     if (_selectedCardId == null) return;
-    
+
     final hand = _game.getHand(_playerId);
     final card = hand.firstWhere((c) => c.id == _selectedCardId);
-    
+
     setState(() {
       _game.playCard(_playerId, card);
       _addGameLog('You discarded ${card.displayString}');
       _selectedCardId = null;
       _stopTimer(); // specific stop timer for human turn end
-      
+
       // Bot turns
       _playBotTurns();
     });
   }
-  
+
   // Helper to convert PlayingCard to AI-friendly string (e.g., "AS", "10H")
   String _toAiString(PlayingCard card) {
     if (card.isJoker) return 'Joker';
@@ -911,57 +993,63 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   bool _isWildCard(PlayingCard card) {
     if (_game.tiplu == null) return false;
     final tiplu = _game.tiplu!;
-    
+
     // 1. Exact Tiplu
     if (card.rank == tiplu.rank && card.suit == tiplu.suit) return true;
-    
-    // 2. Jhiplu / Poplu logic matches MarriageMaalCalculator 
+
+    // 2. Jhiplu / Poplu logic matches MarriageMaalCalculator
     // Simplified: Jhiplu is same rank, opposite color. Poplu is next rank, same suit.
     // For blocking purposes, usually "Maal" in discard is what we care about.
     // Let's use the calculator if possible or simple logic.
     // Replicating basic Maal check:
-    
+
     // Jhiplu
-    if (card.rank == tiplu.rank) return true; 
-    
+    if (card.rank == tiplu.rank) return true;
+
     // Poplu
     if (card.suit == tiplu.suit) {
-      final tipluVal = tiplu.rank.value == 1 ? 14 : tiplu.rank.value; // Ace high handled in rank?
+      final tipluVal = tiplu.rank.value == 1
+          ? 14
+          : tiplu.rank.value; // Ace high handled in rank?
       // Actually standard rank use:
       // Poplu is +1 rank.
-       int tipluV = tiplu.rank.value;
-       int cardV = card.rank.value;
-       // Adjust for Ace
-       if (tipluV == 1) tipluV = 14; 
-       if (cardV == 1) cardV = 14;
-       
-       if (cardV == tipluV + 1) return true;
-       if (tipluV == 13 && cardV == 1) return true; // K -> A
+      int tipluV = tiplu.rank.value;
+      int cardV = card.rank.value;
+      // Adjust for Ace
+      if (tipluV == 1) tipluV = 14;
+      if (cardV == 1) cardV = 14;
+
+      if (cardV == tipluV + 1) return true;
+      if (tipluV == 13 && cardV == 1) return true; // K -> A
     }
-    
+
     return false;
   }
 
   Future<void> _playBotTurns() async {
     // Check if it's a bot's turn
     if (!_botIds.contains(_game.currentPlayerId)) return;
-    
+
     final botId = _game.currentPlayerId!;
     await Future.delayed(const Duration(milliseconds: 1000));
     if (!mounted) return;
 
     try {
       final aiService = ref.read(aiServiceProvider);
-      final difficulty = 'medium'; 
-      
+      final difficulty = 'medium';
+
       final currentHand = _game.getHand(botId);
       // Serialize hand to "AS", "10H", etc.
       final handStrings = currentHand.map(_toAiString).toList();
-      
+
       final gameState = {
-        'phase': _game.currentPhase == GamePhase.playing ? 'drawing' : 'discarding',
+        'phase': _game.currentPhase == GamePhase.playing
+            ? 'drawing'
+            : 'discarding',
         'tiplu': _game.tiplu != null ? _toAiString(_game.tiplu!) : null,
-        'topDiscard': _game.topDiscard != null ? _toAiString(_game.topDiscard!) : null,
+        'topDiscard': _game.topDiscard != null
+            ? _toAiString(_game.topDiscard!)
+            : null,
         'cardsInDeck': _game.cardsRemaining,
         'roundNumber': _game.currentRound,
       };
@@ -969,47 +1057,51 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       // Determine phase logic (same as before)
       final isDrawing = currentHand.length == 21;
       gameState['phase'] = isDrawing ? 'drawing' : 'discarding';
-      
+
       final decision = await aiService.getMarriageBotPlay(
         difficulty: difficulty,
         hand: handStrings,
         gameState: gameState,
       );
-      
+
       if (!mounted) return;
-      
+
       setState(() {
         if (isDrawing) {
           if (decision.action == 'drawDiscard' && _game.topDiscard != null) {
             final pickedCard = _game.topDiscard!;
             _game.drawFromDiscard(botId);
-            _addGameLog('${_getBotName(botId)} picked ${pickedCard.displayString}');
+            _addGameLog(
+              '${_getBotName(botId)} picked ${pickedCard.displayString}',
+            );
           } else {
             _game.drawFromDeck(botId);
             _addGameLog('${_getBotName(botId)} drew from deck');
           }
           // Recursively call for discard phase
-           WidgetsBinding.instance.addPostFrameCallback((_) => _playBotTurns());
-           return;
+          WidgetsBinding.instance.addPostFrameCallback((_) => _playBotTurns());
+          return;
         } else {
           // Discarding
           if (decision.action == 'discard') {
-             // Find matching card in hand
-             // AI returns "AS", we look for any card that maps to "AS"
-             final cardToDiscard = currentHand.firstWhere(
-               (c) => _toAiString(c) == decision.card,
-               orElse: () => currentHand.last, // Fallback
-             );
-             _game.playCard(botId, cardToDiscard);
-             _addGameLog('${_getBotName(botId)} discarded ${cardToDiscard.displayString}');
+            // Find matching card in hand
+            // AI returns "AS", we look for any card that maps to "AS"
+            final cardToDiscard = currentHand.firstWhere(
+              (c) => _toAiString(c) == decision.card,
+              orElse: () => currentHand.last, // Fallback
+            );
+            _game.playCard(botId, cardToDiscard);
+            _addGameLog(
+              '${_getBotName(botId)} discarded ${cardToDiscard.displayString}',
+            );
           } else if (decision.action == 'declare') {
-             _tryBotDeclare(botId);
+            _tryBotDeclare(botId);
           }
-          
+
           // Trigger next turn logic
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _playBotTurns(); // Checks if next player is bot
-            
+
             // If next player is ME, start my timer and check visits
             if (_game.currentPlayerId == _playerId) {
               _startTimer();
@@ -1018,55 +1110,57 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           });
         }
       });
-      
     } catch (e) {
       debugPrint('AI Error: $e');
       setState(() {
-         // Smart fallback logic - don't discard valuable cards
-         final hand = _game.getHand(botId);
-         
-         if (hand.length == 21) {
-           _game.drawFromDeck(botId);
-           _addGameLog('${_getBotName(botId)} drew from deck');
-         } else {
-           // Find safest card to discard (not wild, not part of sequence)
-           final cardToDiscard = _findSafeDiscard(hand);
-           _game.playCard(botId, cardToDiscard);
-           _addGameLog('${_getBotName(botId)} discarded ${cardToDiscard.displayString}');
-         }
+        // Smart fallback logic - don't discard valuable cards
+        final hand = _game.getHand(botId);
+
+        if (hand.length == 21) {
+          _game.drawFromDeck(botId);
+          _addGameLog('${_getBotName(botId)} drew from deck');
+        } else {
+          // Find safest card to discard (not wild, not part of sequence)
+          final cardToDiscard = _findSafeDiscard(hand);
+          _game.playCard(botId, cardToDiscard);
+          _addGameLog(
+            '${_getBotName(botId)} discarded ${cardToDiscard.displayString}',
+          );
+        }
       });
     }
   }
-  
+
   /// Find the safest card to discard (not wild, not valuable)
   PlayingCard _findSafeDiscard(List<PlayingCard> hand) {
     // Priority: avoid discarding wild cards, jokers, and potential meld cards
-    
+
     // Filter out wild cards and jokers
     final nonWild = hand.where((c) => !_isWildCard(c) && !c.isJoker).toList();
     if (nonWild.isEmpty) return hand.last;
-    
+
     // Find isolated cards (not part of potential runs or sets)
     for (final card in nonWild) {
       // Check if card is isolated (no cards nearby in same suit)
       final sameSuit = nonWild.where((c) => c.suit == card.suit).toList();
-      bool hasNeighbor = sameSuit.any((c) => 
-        (c.rank.value - card.rank.value).abs() == 1);
-      
+      bool hasNeighbor = sameSuit.any(
+        (c) => (c.rank.value - card.rank.value).abs() == 1,
+      );
+
       // Check if part of set
       final sameRank = nonWild.where((c) => c.rank == card.rank).length;
-      
+
       // Isolated card: no neighbors and less than 2 same rank
       if (!hasNeighbor && sameRank < 2) {
         return card;
       }
     }
-    
+
     // If no isolated card found, return lowest value non-wild
     nonWild.sort((a, b) => a.rank.value.compareTo(b.rank.value));
     return nonWild.first;
   }
-  
+
   /// Add a log entry
   void _addGameLog(String message) {
     setState(() {
@@ -1076,7 +1170,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       }
     });
   }
-  
+
   /// Show emote picker for social gameplay
   void _showEmotePicker() {
     const emotes = [
@@ -1089,7 +1183,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       {'emoji': '🤔', 'label': 'Thinking'},
       {'emoji': '😤', 'label': 'Frustrated'},
     ];
-    
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1114,37 +1208,44 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
             Wrap(
               spacing: 12,
               runSpacing: 12,
-              children: emotes.map((emote) => GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                  _sendEmote(emote['emoji']!, emote['label']!);
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white24),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        emote['emoji']!,
-                        style: const TextStyle(fontSize: 32),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        emote['label']!,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 10,
+              children: emotes
+                  .map(
+                    (emote) => GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        _sendEmote(emote['emoji']!, emote['label']!);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              emote['emoji']!,
+                              style: const TextStyle(fontSize: 32),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              emote['label']!,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              )).toList(),
+                    ),
+                  )
+                  .toList(),
             ),
             const SizedBox(height: 16),
           ],
@@ -1152,11 +1253,11 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       ),
     );
   }
-  
+
   /// Send an emote and show feedback
   void _sendEmote(String emoji, String label) {
     _addGameLog('You: $emoji');
-    
+
     // Show floating emote animation
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1174,7 +1275,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       ),
     );
   }
-  
+
   void _tryBotDeclare(String botId) {
     if (_game.declare(botId)) {
       _showWinDialog(winnerName: _getBotName(botId));
@@ -1184,7 +1285,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       _game.playCard(botId, hand.last);
     }
   }
-  
+
   void _tryDeclare() {
     final success = _game.declare(_playerId);
     if (success) {
@@ -1198,39 +1299,53 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       );
     }
   }
-  
+
   String _getBotName(String botId) {
     final index = _botIds.indexOf(botId) + 1;
     return 'Bot $index';
   }
-  
+
   String _getPlayerName(String id) {
     if (id == _playerId) return 'You';
     return _getBotName(id);
   }
-  
+
   Color _getMeldColor(meld_engine.MeldType type) {
     switch (type) {
-      case meld_engine.MeldType.set: return Colors.blue;
-      case meld_engine.MeldType.run: return Colors.green;
-      case meld_engine.MeldType.tunnel: return Colors.orange;
-      case meld_engine.MeldType.marriage: return Colors.pink;
-      case meld_engine.MeldType.impureRun: return Colors.orange.shade300;
-      case meld_engine.MeldType.impureSet: return Colors.teal;
-      case meld_engine.MeldType.dublee: return Colors.indigo;
+      case meld_engine.MeldType.set:
+        return Colors.blue;
+      case meld_engine.MeldType.run:
+        return Colors.green;
+      case meld_engine.MeldType.tunnel:
+        return Colors.orange;
+      case meld_engine.MeldType.marriage:
+        return Colors.pink;
+      case meld_engine.MeldType.impureRun:
+        return Colors.orange.shade300;
+      case meld_engine.MeldType.impureSet:
+        return Colors.teal;
+      case meld_engine.MeldType.dublee:
+        return Colors.indigo;
     }
   }
-  
+
   String _getMeldTypeName(meld_engine.MeldType type) {
     // Use GameTerminology for multi-region support
     switch (type) {
-      case meld_engine.MeldType.set: return GameTerminology.trial;
-      case meld_engine.MeldType.run: return GameTerminology.sequence;
-      case meld_engine.MeldType.tunnel: return GameTerminology.triple;
-      case meld_engine.MeldType.marriage: return GameTerminology.royalSequenceShort;
-      case meld_engine.MeldType.impureRun: return 'Impure Sequence';
-      case meld_engine.MeldType.impureSet: return 'Impure Trial';
-      case meld_engine.MeldType.dublee: return 'Dublee';
+      case meld_engine.MeldType.set:
+        return GameTerminology.trial;
+      case meld_engine.MeldType.run:
+        return GameTerminology.sequence;
+      case meld_engine.MeldType.tunnel:
+        return GameTerminology.triple;
+      case meld_engine.MeldType.marriage:
+        return GameTerminology.royalSequenceShort;
+      case meld_engine.MeldType.impureRun:
+        return 'Impure Sequence';
+      case meld_engine.MeldType.impureSet:
+        return 'Impure Trial';
+      case meld_engine.MeldType.dublee:
+        return 'Dublee';
     }
   }
 }

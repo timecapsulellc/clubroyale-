@@ -12,11 +12,7 @@ class ErrorBoundary extends StatefulWidget {
   final Widget child;
   final Widget Function(FlutterErrorDetails)? onError;
 
-  const ErrorBoundary({
-    super.key,
-    required this.child,
-    this.onError,
-  });
+  const ErrorBoundary({super.key, required this.child, this.onError});
 
   @override
   State<ErrorBoundary> createState() => _ErrorBoundaryState();
@@ -38,7 +34,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
   void _reportError(FlutterErrorDetails details) {
     // Log to Crashlytics
     FirebaseCrashlytics.instance.recordFlutterFatalError(details);
-    
+
     // Also log to console in debug mode
     FlutterError.presentError(details);
   }
@@ -50,11 +46,8 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
   @override
   Widget build(BuildContext context) {
     if (_error != null) {
-      return widget.onError?.call(_error!) ?? 
-          ErrorScreen(
-            error: _error!,
-            onRetry: _retry,
-          );
+      return widget.onError?.call(_error!) ??
+          ErrorScreen(error: _error!, onRetry: _retry);
     }
     return widget.child;
   }
@@ -65,11 +58,7 @@ class ErrorScreen extends StatelessWidget {
   final FlutterErrorDetails error;
   final VoidCallback onRetry;
 
-  const ErrorScreen({
-    super.key,
-    required this.error,
-    required this.onRetry,
-  });
+  const ErrorScreen({super.key, required this.error, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -94,29 +83,23 @@ class ErrorScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // Title
               const Text(
                 'Oops! Something went wrong',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              
+
               // Message
               Text(
                 'We encountered an unexpected error. Please try again.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-              
+
               // Retry button
               FilledButton.icon(
                 onPressed: onRetry,
@@ -130,7 +113,7 @@ class ErrorScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // Go home button
               TextButton(
                 onPressed: () {

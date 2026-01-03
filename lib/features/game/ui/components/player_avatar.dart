@@ -45,7 +45,9 @@ class PlayerAvatar extends StatelessWidget {
               ),
               child: CircleAvatar(
                 backgroundColor: AppTheme.teal,
-                backgroundImage: imageUrl != null ? NetworkImage(imageUrl!) : null,
+                backgroundImage: imageUrl != null
+                    ? NetworkImage(imageUrl!)
+                    : null,
                 child: imageUrl == null
                     ? Text(
                         name.isNotEmpty ? name[0].toUpperCase() : '?',
@@ -57,14 +59,17 @@ class PlayerAvatar extends StatelessWidget {
                     : null,
               ),
             ),
-            
+
             // Status Badge (Pill shape to the right/top)
             if (statusLabel != null)
               Positioned(
                 right: -20,
                 top: 0,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor,
                     borderRadius: BorderRadius.circular(4),
@@ -85,11 +90,11 @@ class PlayerAvatar extends StatelessWidget {
         const SizedBox(height: 4),
         // Player Name
         Container(
-           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(4),
-            ),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(4),
+          ),
           child: Text(
             name,
             style: const TextStyle(
@@ -97,7 +102,11 @@ class PlayerAvatar extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w600,
               shadows: [
-                Shadow(blurRadius: 2, color: Colors.black, offset: Offset(1, 1)),
+                Shadow(
+                  blurRadius: 2,
+                  color: Colors.black,
+                  offset: Offset(1, 1),
+                ),
               ],
             ),
             overflow: TextOverflow.ellipsis,

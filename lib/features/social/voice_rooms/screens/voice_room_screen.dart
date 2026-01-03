@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/social/voice_rooms/models/voice_room.dart';
 import 'package:clubroyale/features/social/voice_rooms/services/voice_room_service.dart';
-import 'package:clubroyale/features/social/services/voice_room_service.dart' as LK;
+import 'package:clubroyale/features/social/services/voice_room_service.dart'
+    as LK;
 import 'package:clubroyale/features/social/services/social_service.dart';
 import 'package:clubroyale/features/social/invite_service.dart';
 import 'package:clubroyale/features/social/services/friend_service.dart';
@@ -47,48 +48,52 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
   }
 
   Future<void> _showUnmuteRequestDialog() async {
-     final doUnmute = await showDialog<bool>(
-       context: context,
-       builder: (context) => AlertDialog(
-         title: const Text('Host Request'),
-         content: const Text('The host would like you to speak. Unmute your microphone?'),
-         actions: [
-           TextButton(
-             onPressed: () => Navigator.pop(context, false),
-             child: const Text('Stay Muted'),
-           ),
-           FilledButton(
-             onPressed: () => Navigator.pop(context, true),
-             child: const Text('Unmute'),
-           ),
-         ],
-       ),
-     );
-     
-      if (doUnmute == true) {
-        // Enable local mic
-        // For LiveKit we need to get the service corresponding to this room
-        await ref.read(LK.liveKitRoomServiceProvider(widget.roomId)).enableMicrophone();
-        // Also toggle WebRTC if used separately
-        _audioService?.toggleMute();
-      }
+    final doUnmute = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Host Request'),
+        content: const Text(
+          'The host would like you to speak. Unmute your microphone?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Stay Muted'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Unmute'),
+          ),
+        ],
+      ),
+    );
+
+    if (doUnmute == true) {
+      // Enable local mic
+      // For LiveKit we need to get the service corresponding to this room
+      await ref
+          .read(LK.liveKitRoomServiceProvider(widget.roomId))
+          .enableMicrophone();
+      // Also toggle WebRTC if used separately
+      _audioService?.toggleMute();
+    }
   }
 
   Future<void> _initAudio() async {
     final user = ref.read(authServiceProvider).currentUser;
     if (user == null) return;
-    
+
     setState(() => _isConnecting = true);
-    
+
     try {
       final params = SignalingParams(
         roomId: widget.roomId,
         localUserId: user.uid,
       );
-      
+
       _audioService = ref.read(audioServiceProvider(params));
       await _audioService!.joinAudioRoom();
-      
+
       if (mounted) {
         setState(() {
           _isAudioConnected = true;
@@ -99,9 +104,9 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
       debugPrint('Error joining audio room: $e');
       if (mounted) {
         setState(() => _isConnecting = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Audio connection failed: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Audio connection failed: $e')));
       }
     }
   }
@@ -137,22 +142,24 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
         ),
         actions: [
           roomAsync.when(
-            data: (room) => room != null 
-              ? Row(
-                  children: [
-                    if (ref.watch(authServiceProvider).currentUser?.uid == room.hostId)
-                       IconButton(
-                         icon: const Icon(Icons.volume_off),
-                         tooltip: 'Mute All',
-                         onPressed: () => _confirmMuteAll(context, ref, room.id),
-                       ),
-                    IconButton(
-                      icon: const Icon(Icons.settings),
-                      onPressed: () => _showRoomSettings(context, ref, room),
-                    ),
-                  ],
-                )
-              : const SizedBox(),
+            data: (room) => room != null
+                ? Row(
+                    children: [
+                      if (ref.watch(authServiceProvider).currentUser?.uid ==
+                          room.hostId)
+                        IconButton(
+                          icon: const Icon(Icons.volume_off),
+                          tooltip: 'Mute All',
+                          onPressed: () =>
+                              _confirmMuteAll(context, ref, room.id),
+                        ),
+                      IconButton(
+                        icon: const Icon(Icons.settings),
+                        onPressed: () => _showRoomSettings(context, ref, room),
+                      ),
+                    ],
+                  )
+                : const SizedBox(),
             loading: () => const SizedBox(),
             error: (_, __) => const SizedBox(),
           ),
@@ -181,7 +188,11 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.voice_over_off, size: 64, color: Colors.grey),
+                  const Icon(
+                    Icons.voice_over_off,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
                   const SizedBox(height: 16),
                   const Text('This voice room has ended'),
                   const SizedBox(height: 16),
@@ -206,9 +217,19 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      ),
                       SizedBox(width: 8),
-                      Text('Connecting audio...', style: TextStyle(color: Colors.white)),
+                      Text(
+                        'Connecting audio...',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ],
                   ),
                 ),
@@ -221,7 +242,10 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
                     children: [
                       Icon(Icons.wifi, size: 16, color: Colors.white),
                       SizedBox(width: 4),
-                      Text('Audio connected', style: TextStyle(color: Colors.white, fontSize: 12)),
+                      Text(
+                        'Audio connected',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
                     ],
                   ),
                 ),
@@ -287,33 +311,47 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
                     final participant = participants[index];
                     final isHost = participant.id == room.hostId;
 
-                      return _ParticipantTile(
-                        participant: participant,
-                        isHost: isHost,
-                        amIHost: ref.watch(authServiceProvider).currentUser?.uid == room.hostId,
-                        isMe: participant.id == ref.watch(authServiceProvider).currentUser?.uid,
-                        onToggleMute: (muted) {
-                           ref.read(LK.liveKitRoomServiceProvider(room.id)).muteRemoteParticipant(participant.id, muted);
-                        },
-                        onRequestUnmute: () {
-                           ref.read(LK.liveKitRoomServiceProvider(room.id)).requestUnmute(participant.id);
-                           ScaffoldMessenger.of(context).showSnackBar(
-                             SnackBar(content: Text('Unmute request sent to ${participant.name}')),
-                           );
-                        },
-                      ).animate().fadeIn(delay: Duration(milliseconds: index * 50));
-                    },
-                  ),
+                    return _ParticipantTile(
+                      participant: participant,
+                      isHost: isHost,
+                      amIHost:
+                          ref.watch(authServiceProvider).currentUser?.uid ==
+                          room.hostId,
+                      isMe:
+                          participant.id ==
+                          ref.watch(authServiceProvider).currentUser?.uid,
+                      onToggleMute: (muted) {
+                        ref
+                            .read(LK.liveKitRoomServiceProvider(room.id))
+                            .muteRemoteParticipant(participant.id, muted);
+                      },
+                      onRequestUnmute: () {
+                        ref
+                            .read(LK.liveKitRoomServiceProvider(room.id))
+                            .requestUnmute(participant.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Unmute request sent to ${participant.name}',
+                            ),
+                          ),
+                        );
+                      },
+                    ).animate().fadeIn(
+                      delay: Duration(milliseconds: index * 50),
+                    );
+                  },
                 ),
+              ),
 
-                // Controls
-                Container(
-                  padding: EdgeInsets.only(
-                    left: 24,
-                    right: 24,
-                    top: 16,
-                    bottom: MediaQuery.of(context).padding.bottom + 16,
-                  ),
+              // Controls
+              Container(
+                padding: EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  top: 16,
+                  bottom: MediaQuery.of(context).padding.bottom + 16,
+                ),
                 decoration: BoxDecoration(
                   color: colorScheme.surface,
                   boxShadow: [
@@ -330,42 +368,56 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
                     // Mute button - controls both Firestore state AND actual WebRTC audio
                     Builder(
                       builder: (context) {
-                        final userId = ref.watch(authServiceProvider).currentUser?.uid;
-                        final me = userId != null ? room.participants[userId] : null;
+                        final userId = ref
+                            .watch(authServiceProvider)
+                            .currentUser
+                            ?.uid;
+                        final me = userId != null
+                            ? room.participants[userId]
+                            : null;
                         final isMuted = me?.isMuted ?? false;
-                        
+
                         return _ControlButton(
                           icon: Icons.mic_off,
                           activeIcon: Icons.mic,
                           label: isMuted ? 'Unmute' : 'Mute',
-                          isActive: !isMuted, 
+                          isActive: !isMuted,
                           onTap: () {
                             // Update Firestore state
-                            ref.read(voiceRoomServiceProvider).toggleMute(widget.roomId);
+                            ref
+                                .read(voiceRoomServiceProvider)
+                                .toggleMute(widget.roomId);
                             // Toggle actual WebRTC audio
                             _audioService?.toggleMute();
                           },
                         );
-                      }
+                      },
                     ),
                     // Deafen button
                     Builder(
                       builder: (context) {
-                        final userId = ref.watch(authServiceProvider).currentUser?.uid;
-                        final me = userId != null ? room.participants[userId] : null;
+                        final userId = ref
+                            .watch(authServiceProvider)
+                            .currentUser
+                            ?.uid;
+                        final me = userId != null
+                            ? room.participants[userId]
+                            : null;
                         final isDeafened = me?.isDeafened ?? false;
-                        
+
                         return _ControlButton(
                           icon: Icons.headset_off,
                           activeIcon: Icons.headset,
                           label: isDeafened ? 'Undeafen' : 'Deafen',
                           isActive: !isDeafened,
                           onTap: () {
-                            ref.read(voiceRoomServiceProvider).toggleDeafen(widget.roomId);
+                            ref
+                                .read(voiceRoomServiceProvider)
+                                .toggleDeafen(widget.roomId);
                             // Note: Deafen affects incoming audio - would need to mute all remote peers
                           },
                         );
-                      }
+                      },
                     ),
                     // Leave button - disconnects audio AND updates Firestore
                     _ControlButton(
@@ -378,7 +430,9 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
                         // Disconnect WebRTC audio first
                         await _leaveAudio();
                         // Then leave room in Firestore
-                        await ref.read(voiceRoomServiceProvider).leaveCurrentRoom();
+                        await ref
+                            .read(voiceRoomServiceProvider)
+                            .leaveCurrentRoom();
                         if (context.mounted) context.pop();
                       },
                     ),
@@ -444,8 +498,10 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
           maxChildSize: 0.9,
           expand: false,
           builder: (context, scrollController) {
-            final friendIdsStream = ref.watch(friendServiceProvider).watchMyFriendIds();
-            
+            final friendIdsStream = ref
+                .watch(friendServiceProvider)
+                .watchMyFriendIds();
+
             return Column(
               children: [
                 AppBar(
@@ -465,71 +521,95 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }
-                      
+
                       final friendIds = snapshot.data ?? [];
                       if (friendIds.isEmpty) {
-                        return const Center(child: Text('No friends found to invite.'));
+                        return const Center(
+                          child: Text('No friends found to invite.'),
+                        );
                       }
-                      
+
                       return ListView.builder(
                         controller: scrollController,
                         itemCount: friendIds.length,
                         itemBuilder: (context, index) {
                           final friendId = friendIds[index];
-                          
+
                           // Check if already in room
-                          final isInRoom = room.participants.containsKey(friendId);
-                          
+                          final isInRoom = room.participants.containsKey(
+                            friendId,
+                          );
+
                           return Consumer(
                             builder: (context, ref, child) {
-                              final userFuture = ref.watch(socialServiceProvider).getUserProfile(friendId);
-                              
+                              final userFuture = ref
+                                  .watch(socialServiceProvider)
+                                  .getUserProfile(friendId);
+
                               return FutureBuilder(
                                 future: userFuture,
                                 builder: (context, userSnapshot) {
                                   final user = userSnapshot.data;
                                   if (user == null) return const SizedBox();
-                                  
+
                                   return ListTile(
                                     leading: CircleAvatar(
                                       backgroundImage: user.avatarUrl != null
                                           ? NetworkImage(user.avatarUrl!)
                                           : null,
                                       child: user.avatarUrl == null
-                                          ? Text(user.displayName.isNotEmpty ? user.displayName[0].toUpperCase() : '?')
+                                          ? Text(
+                                              user.displayName.isNotEmpty
+                                                  ? user.displayName[0]
+                                                        .toUpperCase()
+                                                  : '?',
+                                            )
                                           : null,
                                     ),
                                     title: Text(user.displayName),
-                                    subtitle: Text(isInRoom ? 'Already in room' : 'Tap to invite'),
-                                    trailing: isInRoom 
-                                      ? const Icon(Icons.check, color: Colors.green)
-                                      : IconButton(
-                                          icon: const Icon(Icons.send),
-                                          onPressed: () async {
-                                            // Send invite
-                                            final success = await ref.read(inviteServiceProvider).sendInvite(
-                                              toUserId: friendId,
-                                              roomId: room.id,
-                                              roomCode: null, // Voice rooms might not have codes
-                                              gameType: 'voice_room',
-                                            );
-                                            
-                                            if (context.mounted) {
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(success 
-                                                    ? 'Invite sent to ${user.displayName}' 
-                                                    : 'Invite already sent'
+                                    subtitle: Text(
+                                      isInRoom
+                                          ? 'Already in room'
+                                          : 'Tap to invite',
+                                    ),
+                                    trailing: isInRoom
+                                        ? const Icon(
+                                            Icons.check,
+                                            color: Colors.green,
+                                          )
+                                        : IconButton(
+                                            icon: const Icon(Icons.send),
+                                            onPressed: () async {
+                                              // Send invite
+                                              final success = await ref
+                                                  .read(inviteServiceProvider)
+                                                  .sendInvite(
+                                                    toUserId: friendId,
+                                                    roomId: room.id,
+                                                    roomCode:
+                                                        null, // Voice rooms might not have codes
+                                                    gameType: 'voice_room',
+                                                  );
+
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      success
+                                                          ? 'Invite sent to ${user.displayName}'
+                                                          : 'Invite already sent',
+                                                    ),
                                                   ),
-                                                ),
-                                              );
-                                            }
-                                          },
-                                        ),
+                                                );
+                                              }
+                                            },
+                                          ),
                                   );
-                                }
+                                },
                               );
-                            }
+                            },
                           );
                         },
                       );
@@ -544,12 +624,18 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
     );
   }
 
-  Future<void> _confirmMuteAll(BuildContext context, WidgetRef ref, String roomId) async {
+  Future<void> _confirmMuteAll(
+    BuildContext context,
+    WidgetRef ref,
+    String roomId,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Mute All Participants?'),
-        content: const Text('This will mute everyone in the room except you. Participants can unmute themselves later.'),
+        content: const Text(
+          'This will mute everyone in the room except you. Participants can unmute themselves later.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -565,7 +651,9 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
 
     if (confirmed == true && context.mounted) {
       try {
-        await ref.read(LK.liveKitRoomServiceProvider(roomId)).muteAllRemoteParticipants();
+        await ref
+            .read(LK.liveKitRoomServiceProvider(roomId))
+            .muteAllRemoteParticipants();
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('All participants muted')),
@@ -573,33 +661,39 @@ class _VoiceRoomScreenState extends ConsumerState<VoiceRoomScreen> {
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to mute all: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to mute all: $e')));
         }
       }
     }
   }
 
-  Future<void> _shareRoom(BuildContext context, WidgetRef ref, VoiceRoom room) async {
+  Future<void> _shareRoom(
+    BuildContext context,
+    WidgetRef ref,
+    VoiceRoom room,
+  ) async {
     try {
       final user = ref.read(authServiceProvider).currentUser;
       if (user == null) return;
 
-      final inviteLink = await ref.read(inviteServiceProvider).generateInviteLink(
-        roomId: room.id,
-        roomCode: '', // Voice rooms don't use codes primarily
-        hostId: user.uid,
-        hostName: user.displayName ?? 'Host',
-        gameType: 'voice_room',
-      );
-      
+      final inviteLink = await ref
+          .read(inviteServiceProvider)
+          .generateInviteLink(
+            roomId: room.id,
+            roomCode: '', // Voice rooms don't use codes primarily
+            hostId: user.uid,
+            hostName: user.displayName ?? 'Host',
+            gameType: 'voice_room',
+          );
+
       await ref.read(inviteServiceProvider).shareInviteLink(inviteLink);
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to share room: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to share room: $e')));
       }
     }
   }
@@ -805,10 +899,7 @@ class _ControlButton extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            label,
-            style: theme.textTheme.labelSmall,
-          ),
+          Text(label, style: theme.textTheme.labelSmall),
         ],
       ),
     );
@@ -820,11 +911,7 @@ class VoiceRoomCard extends StatelessWidget {
   final VoiceRoom room;
   final VoidCallback onTap;
 
-  const VoiceRoomCard({
-    super.key,
-    required this.room,
-    required this.onTap,
-  });
+  const VoiceRoomCard({super.key, required this.room, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -847,10 +934,7 @@ class VoiceRoomCard extends StatelessWidget {
                   color: colorScheme.primaryContainer,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.mic,
-                  color: colorScheme.primary,
-                ),
+                child: Icon(Icons.mic, color: colorScheme.primary),
               ).animate(onPlay: (c) => c.repeat()).shimmer(duration: 2.seconds),
               const SizedBox(width: 12),
               Expanded(
@@ -884,21 +968,25 @@ class VoiceRoomCard extends StatelessWidget {
                     // Participant avatars
                     Row(
                       children: [
-                        ...room.participants.values.take(4).map((p) => Padding(
-                              padding: const EdgeInsets.only(right: 4),
-                              child: CircleAvatar(
-                                radius: 12,
-                                backgroundImage: p.photoUrl != null
-                                    ? NetworkImage(p.photoUrl!)
-                                    : null,
-                                child: p.photoUrl == null
-                                    ? Text(
-                                        p.name.isNotEmpty ? p.name[0] : '?',
-                                        style: const TextStyle(fontSize: 10),
-                                      )
-                                    : null,
+                        ...room.participants.values
+                            .take(4)
+                            .map(
+                              (p) => Padding(
+                                padding: const EdgeInsets.only(right: 4),
+                                child: CircleAvatar(
+                                  radius: 12,
+                                  backgroundImage: p.photoUrl != null
+                                      ? NetworkImage(p.photoUrl!)
+                                      : null,
+                                  child: p.photoUrl == null
+                                      ? Text(
+                                          p.name.isNotEmpty ? p.name[0] : '?',
+                                          style: const TextStyle(fontSize: 10),
+                                        )
+                                      : null,
+                                ),
                               ),
-                            )),
+                            ),
                         if (participantCount > 4)
                           Text(
                             '+${participantCount - 4}',

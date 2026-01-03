@@ -39,10 +39,7 @@ class ComingSoonCard extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: accent.withValues(alpha: 0.3),
-            width: 1.5,
-          ),
+          border: Border.all(color: accent.withValues(alpha: 0.3), width: 1.5),
         ),
         child: Stack(
           children: [
@@ -63,20 +60,17 @@ class ComingSoonCard extends StatelessWidget {
                 children: [
                   // Icon container
                   Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: accent.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      icon,
-                      size: 28,
-                      color: accent,
-                    ),
-                  )
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: accent.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(icon, size: 28, color: accent),
+                      )
                       .animate(
-                        onPlay: (controller) => controller.repeat(reverse: true),
+                        onPlay: (controller) =>
+                            controller.repeat(reverse: true),
                       )
                       .scale(
                         begin: const Offset(1, 1),
@@ -101,7 +95,9 @@ class ComingSoonCard extends StatelessWidget {
                           Text(
                             subtitle!,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.7,
+                              ),
                             ),
                           ),
                         ],
@@ -110,45 +106,42 @@ class ComingSoonCard extends StatelessWidget {
                   ),
                   // Coming Soon badge
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [accent, accent.withValues(alpha: 0.8)],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: accent.withValues(alpha: 0.4),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
                         ),
-                      ],
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.schedule,
-                          size: 14,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          'Soon',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [accent, accent.withValues(alpha: 0.8)],
                           ),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: accent.withValues(alpha: 0.4),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.schedule, size: 14, color: Colors.white),
+                            SizedBox(width: 4),
+                            Text(
+                              'Soon',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
                       .animate(
-                        onPlay: (controller) => controller.repeat(reverse: true),
+                        onPlay: (controller) =>
+                            controller.repeat(reverse: true),
                       )
                       .shimmer(
                         duration: 2000.ms,
@@ -165,19 +158,14 @@ class ComingSoonCard extends StatelessWidget {
 
   void _showComingSoonDialog(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            Icon(
-              icon,
-              color: accentColor ?? theme.colorScheme.primary,
-            ),
+            Icon(icon, color: accentColor ?? theme.colorScheme.primary),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -194,8 +182,9 @@ class ComingSoonCard extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: (accentColor ?? theme.colorScheme.primary)
-                    .withValues(alpha: 0.1),
+                color: (accentColor ?? theme.colorScheme.primary).withValues(
+                  alpha: 0.1,
+                ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -268,29 +257,25 @@ void showComingSoonBottomSheet(
               ),
               const SizedBox(height: 24),
               Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [accent, accent.withValues(alpha: 0.7)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: accent.withValues(alpha: 0.4),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [accent, accent.withValues(alpha: 0.7)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: accent.withValues(alpha: 0.4),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: Icon(
-                  icon,
-                  size: 48,
-                  color: Colors.white,
-                ),
-              )
+                    child: Icon(icon, size: 48, color: Colors.white),
+                  )
                   .animate(
                     onPlay: (controller) => controller.repeat(reverse: true),
                   )
@@ -353,10 +338,7 @@ void showComingSoonBottomSheet(
                   ),
                   child: const Text(
                     'Got it!',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
               ),

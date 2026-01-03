@@ -1,5 +1,5 @@
 /// Feed Item Card Widget
-/// 
+///
 /// Displays a single activity feed item
 library;
 
@@ -36,7 +36,11 @@ class FeedItemCard extends ConsumerWidget {
                       ? NetworkImage(item.userAvatarUrl!)
                       : null,
                   child: item.userAvatarUrl == null
-                      ? Text(item.userName.isNotEmpty ? item.userName[0].toUpperCase() : '?')
+                      ? Text(
+                          item.userName.isNotEmpty
+                              ? item.userName[0].toUpperCase()
+                              : '?',
+                        )
                       : null,
                 ),
                 const SizedBox(width: 12),
@@ -66,9 +70,9 @@ class FeedItemCard extends ConsumerWidget {
             // Content
             Text(
               item.title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 4),
             Text(
@@ -89,10 +93,9 @@ class FeedItemCard extends ConsumerWidget {
                   isLiked: item.isLikedBy(currentUserId),
                   likesCount: item.likesCount,
                   onTap: () {
-                    ref.read(activityFeedServiceProvider).toggleLike(
-                      item.id,
-                      currentUserId,
-                    );
+                    ref
+                        .read(activityFeedServiceProvider)
+                        .toggleLike(item.id, currentUserId);
                   },
                 ),
                 const SizedBox(width: 16),
@@ -148,7 +151,7 @@ class _TypeBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (icon, color, label) = _getTypeInfo();
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -215,7 +218,9 @@ class _LikeButton extends StatelessWidget {
             Icon(
               isLiked ? Icons.favorite : Icons.favorite_border,
               size: 20,
-              color: isLiked ? Colors.red : Theme.of(context).colorScheme.onSurfaceVariant,
+              color: isLiked
+                  ? Colors.red
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 4),
             Text(
@@ -255,10 +260,7 @@ class _GameScoresCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 2),
               child: Row(
                 children: [
-                  Text(
-                    _getMedal(i),
-                    style: const TextStyle(fontSize: 16),
-                  ),
+                  Text(_getMedal(i), style: const TextStyle(fontSize: 16)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(

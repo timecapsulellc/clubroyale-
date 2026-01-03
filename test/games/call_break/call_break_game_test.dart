@@ -1,4 +1,5 @@
 /// Call Break Game Unit Tests
+library;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/games/call_break/call_break_game.dart';

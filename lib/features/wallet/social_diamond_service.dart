@@ -9,7 +9,7 @@ final socialDiamondServiceProvider = Provider<SocialDiamondService>(
 );
 
 /// Service for handling social activity diamond rewards
-/// 
+///
 /// Part of Diamond Revenue Model V5 - Social Enhancements
 class SocialDiamondService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -37,7 +37,8 @@ class SocialDiamondService {
     if (todayRewards >= SocialDiamondRewards.voiceRoomHostingDailyCap) {
       return ClaimResult(
         success: false,
-        reason: 'Daily voice room hosting cap reached (${SocialDiamondRewards.voiceRoomHostingDailyCap}💎)',
+        reason:
+            'Daily voice room hosting cap reached (${SocialDiamondRewards.voiceRoomHostingDailyCap}💎)',
       );
     }
 
@@ -149,7 +150,9 @@ class SocialDiamondService {
 
     await batch.commit();
 
-    debugPrint('Voice room tip: $amount from $senderId to $receiverId (fee: $fee)');
+    debugPrint(
+      'Voice room tip: $amount from $senderId to $receiverId (fee: $fee)',
+    );
 
     return TipResult(
       success: true,
@@ -230,7 +233,11 @@ class SocialDiamondService {
       amount: cappedReward,
       description: 'Story reached $viewCount views',
       dateKey: today,
-      metadata: {'storyId': storyId, 'milestone': milestone, 'viewCount': viewCount},
+      metadata: {
+        'storyId': storyId,
+        'milestone': milestone,
+        'viewCount': viewCount,
+      },
     );
 
     return ClaimResult(success: true, amount: cappedReward);
@@ -258,7 +265,10 @@ class SocialDiamondService {
       description: 'First story bonus!',
     );
 
-    return ClaimResult(success: true, amount: SocialDiamondRewards.firstStoryPosted);
+    return ClaimResult(
+      success: true,
+      amount: SocialDiamondRewards.firstStoryPosted,
+    );
   }
 
   // ============================================================================
@@ -344,7 +354,10 @@ class SocialDiamondService {
         .get();
 
     if (existing.docs.isNotEmpty) {
-      return ClaimResult(success: false, reason: 'Weekly reward already claimed');
+      return ClaimResult(
+        success: false,
+        reason: 'Weekly reward already claimed',
+      );
     }
 
     // Verify tier requirements (simplified - full verification done by scheduled function)
@@ -386,7 +399,10 @@ class SocialDiamondService {
         .get();
 
     if (existing.docs.isNotEmpty) {
-      return ClaimResult(success: false, reason: 'Milestone already claimed this month');
+      return ClaimResult(
+        success: false,
+        reason: 'Milestone already claimed this month',
+      );
     }
 
     await _grantSocialReward(
@@ -430,11 +446,14 @@ class SocialDiamondService {
 
     return SocialRewardStatus(
       voiceRoomEarned: voiceRoomTotal,
-      voiceRoomRemaining: SocialDiamondRewards.voiceRoomHostingDailyCap - voiceRoomTotal,
+      voiceRoomRemaining:
+          SocialDiamondRewards.voiceRoomHostingDailyCap - voiceRoomTotal,
       storyViewsEarned: storyViewsTotal,
-      storyViewsRemaining: SocialDiamondRewards.storyViewsDailyCap - storyViewsTotal,
+      storyViewsRemaining:
+          SocialDiamondRewards.storyViewsDailyCap - storyViewsTotal,
       gameInvitesEarned: gameInvitesTotal,
-      gameInvitesRemaining: SocialDiamondRewards.gameInvitesDailyCap - gameInvitesTotal,
+      gameInvitesRemaining:
+          SocialDiamondRewards.gameInvitesDailyCap - gameInvitesTotal,
     );
   }
 
@@ -585,6 +604,8 @@ class SocialRewardStatus {
     required this.gameInvitesRemaining,
   });
 
-  int get totalEarnedToday => voiceRoomEarned + storyViewsEarned + gameInvitesEarned;
-  int get totalRemainingToday => voiceRoomRemaining + storyViewsRemaining + gameInvitesRemaining;
+  int get totalEarnedToday =>
+      voiceRoomEarned + storyViewsEarned + gameInvitesEarned;
+  int get totalRemainingToday =>
+      voiceRoomRemaining + storyViewsRemaining + gameInvitesRemaining;
 }

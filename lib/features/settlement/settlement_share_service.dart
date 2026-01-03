@@ -29,7 +29,6 @@ class SettlementData {
 
 /// Settlement Share Service with WhatsApp viral loop
 class SettlementShareService {
-  
   /// Share settlement to WhatsApp (or other apps)
   static Future<void> shareSettlement(SettlementData data) async {
     final message = _buildSettlementMessage(data);
@@ -39,26 +38,26 @@ class SettlementShareService {
   /// Build the viral settlement message
   static String _buildSettlementMessage(SettlementData data) {
     final buffer = StringBuffer();
-    
+
     // Header
     buffer.writeln('🎴 ${_getGameName(data.gameType)} Game Results');
     buffer.writeln('📍 Room: ${data.roomCode}');
     buffer.writeln('👤 Host: ${data.hostName}');
     buffer.writeln('─' * 28);
     buffer.writeln();
-    
+
     // Scores (sorted by rank)
     buffer.writeln('📊 FINAL SCORES:');
     final sortedScores = data.finalScores.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
-    
+
     for (var i = 0; i < sortedScores.length; i++) {
       final entry = sortedScores[i];
       final medal = _getMedal(i);
       buffer.writeln('$medal ${entry.key}: ${entry.value} pts');
     }
     buffer.writeln();
-    
+
     // Settlement (who owes whom)
     if (data.debts.isNotEmpty) {
       buffer.writeln('💰 SETTLEMENT:');
@@ -71,17 +70,17 @@ class SettlementShareService {
       }
       buffer.writeln();
     }
-    
+
     // Disclaimer
     buffer.writeln('─' * 28);
     buffer.writeln('ℹ️ This is a score summary only.');
     buffer.writeln('Players settle privately outside the app.');
     buffer.writeln();
-    
+
     // VIRAL CTA - This is the growth loop!
     buffer.writeln('🎮 Play free at: clubroyale-app.web.app');
     buffer.writeln('📲 No install needed - works in browser!');
-    
+
     return buffer.toString();
   }
 
@@ -91,7 +90,8 @@ class SettlementShareService {
     required String hostName,
     required String gameType,
   }) async {
-    final message = '''
+    final message =
+        '''
 🎴 Join my ${_getGameName(gameType)} game on ClubRoyale!
 
 📍 Room Code: $roomCode
@@ -103,13 +103,14 @@ class SettlementShareService {
 
 ${Disclaimers.shareFooter}
 ''';
-    
+
     await Share.share(message, subject: 'Join my ClubRoyale game!');
   }
 
   /// Quick share room code only
   static Future<void> shareRoomCode(String roomCode) async {
-    final message = '''
+    final message =
+        '''
 Join my game on ClubRoyale!
 
 🎴 Room Code: $roomCode
@@ -117,14 +118,15 @@ Join my game on ClubRoyale!
 
 ${Disclaimers.shareFooter}
 ''';
-    
+
     await Share.share(message);
   }
 
   /// Share referral link for diamond rewards
   static Future<void> shareReferralLink(String userId) async {
     final refCode = userId.substring(0, 8).toUpperCase();
-    final message = '''
+    final message =
+        '''
 🎴 Play card games with me on ClubRoyale!
 
 I'm playing Marriage & Call Break online with friends.
@@ -136,12 +138,12 @@ Join me and we both get free diamonds! 💎
 
 ${Disclaimers.shareFooter}
 ''';
-    
+
     await Share.share(message, subject: 'Join me on ClubRoyale!');
   }
 
   // Helper methods
-  
+
   static String _getGameName(String gameType) {
     switch (gameType) {
       case 'marriage':

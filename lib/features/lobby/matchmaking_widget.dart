@@ -1,5 +1,5 @@
 /// Matchmaking Widget
-/// 
+///
 /// UI component for finding a match
 library;
 
@@ -14,7 +14,7 @@ import 'package:clubroyale/features/auth/auth_service.dart';
 /// Matchmaking button and modal
 class MatchmakingButton extends ConsumerStatefulWidget {
   final String gameType;
-  
+
   const MatchmakingButton({super.key, required this.gameType});
 
   @override
@@ -25,32 +25,33 @@ class _MatchmakingButtonState extends ConsumerState<MatchmakingButton> {
   bool _isSearching = false;
   Duration _searchTime = Duration.zero;
   MatchResult? _matchResult;
-  
+
   void _startSearch() async {
     final authService = ref.read(authServiceProvider);
     final user = authService.currentUser;
     if (user == null) return;
-    
+
     final matchmaking = ref.read(matchmakingServiceProvider);
-    
+
     setState(() {
       _isSearching = true;
       _searchTime = Duration.zero;
       _matchResult = null;
     });
-    
+
     // Start timer
     _startTimer();
-    
+
     // Listen for status changes
     matchmaking.statusStream.listen((status) {
       if (status == QueueStatus.found) {
         // Match found!
-      } else if (status == QueueStatus.timeout || status == QueueStatus.cancelled) {
+      } else if (status == QueueStatus.timeout ||
+          status == QueueStatus.cancelled) {
         setState(() => _isSearching = false);
       }
     });
-    
+
     // Listen for matches
     matchmaking.matchStream.listen((match) {
       if (match != null) {
@@ -60,7 +61,7 @@ class _MatchmakingButtonState extends ConsumerState<MatchmakingButton> {
         _showMatchFoundDialog(match);
       }
     });
-    
+
     // Join queue
     await matchmaking.joinQueue(
       playerId: user.uid,
@@ -68,20 +69,20 @@ class _MatchmakingButtonState extends ConsumerState<MatchmakingButton> {
       gameType: widget.gameType,
     );
   }
-  
+
   void _cancelSearch() async {
     final authService = ref.read(authServiceProvider);
     final user = authService.currentUser;
     if (user == null) return;
-    
+
     final matchmaking = ref.read(matchmakingServiceProvider);
     await matchmaking.leaveQueue(user.uid);
-    
+
     setState(() {
       _isSearching = false;
     });
   }
-  
+
   void _startTimer() {
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 1));
@@ -94,7 +95,7 @@ class _MatchmakingButtonState extends ConsumerState<MatchmakingButton> {
       return false;
     });
   }
-  
+
   void _showMatchFoundDialog(MatchResult match) {
     showDialog(
       context: context,
@@ -120,7 +121,7 @@ class _MatchmakingButtonState extends ConsumerState<MatchmakingButton> {
       ),
     );
   }
-  
+
   String get _searchTimeFormatted {
     final minutes = _searchTime.inMinutes;
     final seconds = _searchTime.inSeconds % 60;
@@ -134,7 +135,7 @@ class _MatchmakingButtonState extends ConsumerState<MatchmakingButton> {
       child: _isSearching ? _buildSearchingState() : _buildIdleState(),
     );
   }
-  
+
   Widget _buildIdleState() {
     return ElevatedButton.icon(
       onPressed: _startSearch,
@@ -148,7 +149,7 @@ class _MatchmakingButtonState extends ConsumerState<MatchmakingButton> {
       ),
     );
   }
-  
+
   Widget _buildSearchingState() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -170,8 +171,7 @@ class _MatchmakingButtonState extends ConsumerState<MatchmakingButton> {
                   strokeWidth: 2,
                   color: CasinoColors.gold,
                 ),
-              ).animate(onPlay: (c) => c.repeat())
-                  .rotate(duration: 1.seconds),
+              ).animate(onPlay: (c) => c.repeat()).rotate(duration: 1.seconds),
               const SizedBox(width: 12),
               Text(
                 'Finding players...',
@@ -183,9 +183,9 @@ class _MatchmakingButtonState extends ConsumerState<MatchmakingButton> {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Timer
           Text(
             _searchTimeFormatted,
@@ -195,9 +195,9 @@ class _MatchmakingButtonState extends ConsumerState<MatchmakingButton> {
               fontFamily: 'monospace',
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Game type
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -207,23 +207,18 @@ class _MatchmakingButtonState extends ConsumerState<MatchmakingButton> {
             ),
             child: Text(
               widget.gameType.replaceAll('_', ' ').toUpperCase(),
-              style: const TextStyle(
-                color: Colors.white60,
-                fontSize: 12,
-              ),
+              style: const TextStyle(color: Colors.white60, fontSize: 12),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Cancel button
           TextButton.icon(
             onPressed: _cancelSearch,
             icon: const Icon(Icons.close, size: 16),
             label: const Text('Cancel'),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red.shade300,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red.shade300),
           ),
         ],
       ),
@@ -236,7 +231,7 @@ class _MatchFoundDialog extends StatelessWidget {
   final MatchResult match;
   final VoidCallback onAccept;
   final VoidCallback onDecline;
-  
+
   const _MatchFoundDialog({
     required this.match,
     required this.onAccept,
@@ -251,7 +246,10 @@ class _MatchFoundDialog extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [CasinoColors.cardBackgroundLight, CasinoColors.cardBackground],
+            colors: [
+              CasinoColors.cardBackgroundLight,
+              CasinoColors.cardBackground,
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -275,9 +273,9 @@ class _MatchFoundDialog extends StatelessWidget {
                 size: 48,
               ),
             ).animate().scale().fadeIn(),
-            
+
             const SizedBox(height: 16),
-            
+
             Text(
               'MATCH FOUND!',
               style: TextStyle(
@@ -287,58 +285,64 @@ class _MatchFoundDialog extends StatelessWidget {
                 letterSpacing: 2,
               ),
             ).animate().fadeIn(delay: 200.ms),
-            
+
             const SizedBox(height: 8),
-            
+
             Text(
               match.gameType.replaceAll('_', ' ').toUpperCase(),
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: Colors.white70, fontSize: 14),
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Player list
             ...match.playerNames.asMap().entries.map((entry) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundColor: CasinoColors.gold.withValues(alpha: 0.3),
-                        child: Text(
-                          '${entry.key + 1}',
-                          style: TextStyle(
-                            color: CasinoColors.gold,
-                            fontWeight: FontWeight.bold,
+                child:
+                    Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        entry.value,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate().fadeIn(delay: (300 + entry.key * 100).ms).slideX(begin: -0.1),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 16,
+                                backgroundColor: CasinoColors.gold.withValues(
+                                  alpha: 0.3,
+                                ),
+                                child: Text(
+                                  '${entry.key + 1}',
+                                  style: TextStyle(
+                                    color: CasinoColors.gold,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                entry.value,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                        .animate()
+                        .fadeIn(delay: (300 + entry.key * 100).ms)
+                        .slideX(begin: -0.1),
               );
             }),
-            
+
             const SizedBox(height: 24),
-            
+
             // Action buttons
             Row(
               children: [
@@ -349,7 +353,9 @@ class _MatchFoundDialog extends StatelessWidget {
                       foregroundColor: Colors.red,
                       side: const BorderSide(color: Colors.red),
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: const Text('Decline'),
                   ),
@@ -363,14 +369,19 @@ class _MatchFoundDialog extends StatelessWidget {
                       backgroundColor: CasinoColors.gold,
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.play_arrow),
                         SizedBox(width: 8),
-                        Text('Play!', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          'Play!',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ],
                     ),
                   ),

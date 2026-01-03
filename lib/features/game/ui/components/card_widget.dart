@@ -55,7 +55,11 @@ class CardWidget extends StatelessWidget {
           ),
         ),
         child: Center(
-          child: Icon(Icons.style, color: AppTheme.gold.withValues(alpha: 0.5), size: isLarge ? 36 : 28),
+          child: Icon(
+            Icons.style,
+            color: AppTheme.gold.withValues(alpha: 0.5),
+            size: isLarge ? 36 : 28,
+          ),
         ),
       );
     }
@@ -67,13 +71,17 @@ class CardWidget extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: glowColor ?? (isSelected ? AppTheme.gold : Colors.grey.shade300),
+          color:
+              glowColor ?? (isSelected ? AppTheme.gold : Colors.grey.shade300),
           width: (isSelected || glowColor != null) ? 2.5 : 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: glowColor?.withValues(alpha: 0.6) ?? 
-                   (isSelected ? AppTheme.gold.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.2)),
+            color:
+                glowColor?.withValues(alpha: 0.6) ??
+                (isSelected
+                    ? AppTheme.gold.withValues(alpha: 0.5)
+                    : Colors.black.withValues(alpha: 0.2)),
             blurRadius: (isSelected || glowColor != null) ? 8 : 3,
             offset: const Offset(1, 1),
           ),
@@ -104,11 +112,7 @@ class CardWidget extends StatelessWidget {
             ),
           ),
           if (cornerBadge != null)
-            Positioned(
-              top: 2,
-              right: 2,
-              child: cornerBadge!,
-            ),
+            Positioned(top: 2, right: 2, child: cornerBadge!),
         ],
       ),
     );

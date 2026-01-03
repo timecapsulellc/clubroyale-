@@ -37,10 +37,7 @@ class PlayerStatusWidget extends StatelessWidget {
             : theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: isCurrentUser
-            ? Border.all(
-                color: theme.colorScheme.primary,
-                width: 2,
-              )
+            ? Border.all(color: theme.colorScheme.primary, width: 2)
             : Border.all(
                 color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 width: 1,
@@ -178,14 +175,14 @@ class _StatChip extends StatelessWidget {
 }
 
 /// Position of a player around the table (supports up to 8 players)
-enum TablePosition { 
-  bottom,      // Position 0 - Current user (always at bottom)
-  bottomLeft,  // Position 1
-  left,        // Position 2
-  topLeft,     // Position 3
-  top,         // Position 4
-  topRight,    // Position 5
-  right,       // Position 6
+enum TablePosition {
+  bottom, // Position 0 - Current user (always at bottom)
+  bottomLeft, // Position 1
+  left, // Position 2
+  topLeft, // Position 3
+  top, // Position 4
+  topRight, // Position 5
+  right, // Position 6
   bottomRight, // Position 7
 }
 
@@ -217,10 +214,7 @@ class PlayerPositionHelper {
   static List<TablePosition> _getPositionOrderForCount(int count) {
     switch (count) {
       case 2:
-        return [
-          TablePosition.bottom,
-          TablePosition.top,
-        ];
+        return [TablePosition.bottom, TablePosition.top];
       case 3:
         return [
           TablePosition.bottom,
@@ -282,26 +276,28 @@ class PlayerPositionHelper {
   static double getAngleForPosition(TablePosition position) {
     switch (position) {
       case TablePosition.bottom:
-        return 3.14159 / 2;      // 90° (bottom)
+        return 3.14159 / 2; // 90° (bottom)
       case TablePosition.bottomLeft:
-        return 3.14159 * 0.75;   // 135°
+        return 3.14159 * 0.75; // 135°
       case TablePosition.left:
-        return 3.14159;          // 180° (left)
+        return 3.14159; // 180° (left)
       case TablePosition.topLeft:
-        return 3.14159 * 1.25;   // 225°
+        return 3.14159 * 1.25; // 225°
       case TablePosition.top:
-        return 3.14159 * 1.5;    // 270° (top)
+        return 3.14159 * 1.5; // 270° (top)
       case TablePosition.topRight:
-        return 3.14159 * 1.75;   // 315°
+        return 3.14159 * 1.75; // 315°
       case TablePosition.right:
-        return 0;                // 0° (right)
+        return 0; // 0° (right)
       case TablePosition.bottomRight:
-        return 3.14159 * 0.25;   // 45°
+        return 3.14159 * 0.25; // 45°
     }
   }
 
   /// Get normalized x,y coordinates (0-1 range) for a table position
-  static ({double x, double y}) getCoordinatesForPosition(TablePosition position) {
+  static ({double x, double y}) getCoordinatesForPosition(
+    TablePosition position,
+  ) {
     switch (position) {
       case TablePosition.bottom:
         return (x: 0.5, y: 0.95);

@@ -9,7 +9,7 @@ class ParticleBackground extends StatefulWidget {
   final Color secondaryColor;
   final int particleCount;
   final bool hasBackground;
-  
+
   const ParticleBackground({
     super.key,
     required this.child,
@@ -18,7 +18,7 @@ class ParticleBackground extends StatefulWidget {
     this.particleCount = 40,
     this.hasBackground = true,
   });
-  
+
   @override
   State<ParticleBackground> createState() => _ParticleBackgroundState();
 }
@@ -28,24 +28,24 @@ class _ParticleBackgroundState extends State<ParticleBackground>
   late AnimationController _particleController;
   late AnimationController _glowController;
   late List<_Particle> _particles;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     _particleController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 10),
     )..repeat();
-    
+
     _glowController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
     )..repeat(reverse: true);
-    
+
     _initParticles();
   }
-  
+
   void _initParticles() {
     final random = math.Random();
     _particles = List.generate(widget.particleCount, (index) {
@@ -60,7 +60,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
       );
     });
   }
-  
+
   @override
   void dispose() {
     _particleController.dispose();
@@ -71,18 +71,20 @@ class _ParticleBackgroundState extends State<ParticleBackground>
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: widget.hasBackground ? BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            CasinoColors.feltGreenLight,
-            CasinoColors.feltGreenMid,
-            CasinoColors.feltGreenDark,
-          ],
-          stops: const [0.0, 0.5, 1.0],
-        ),
-      ) : null,
+      decoration: widget.hasBackground
+          ? BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  CasinoColors.feltGreenLight,
+                  CasinoColors.feltGreenMid,
+                  CasinoColors.feltGreenDark,
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+            )
+          : null,
       child: Stack(
         children: [
           // Particle layer
@@ -101,7 +103,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
               );
             },
           ),
-          
+
           // Ambient glow orbs
           AnimatedBuilder(
             animation: _glowController,
@@ -115,7 +117,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
               );
             },
           ),
-          
+
           // Child content
           widget.child,
         ],
@@ -132,7 +134,7 @@ class _Particle {
   final double opacity;
   final double angle;
   final bool isGold;
-  
+
   _Particle({
     required this.x,
     required this.y,
@@ -150,7 +152,7 @@ class _ParticlePainter extends CustomPainter {
   final double glowAnimation;
   final Color primaryColor;
   final Color secondaryColor;
-  
+
   _ParticlePainter({
     required this.particles,
     required this.animation,
@@ -163,41 +165,54 @@ class _ParticlePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     for (final particle in particles) {
       // Update position based on animation
-      final x = (particle.x + animation * particle.speed * math.cos(particle.angle)) % 1.0;
+      final x =
+          (particle.x + animation * particle.speed * math.cos(particle.angle)) %
+          1.0;
       final y = (particle.y + animation * particle.speed * 2) % 1.0;
-      
+
       final actualX = x * size.width;
       final actualY = y * size.height;
-      
+
       // Pulse effect
-      final pulseOpacity = particle.opacity * (0.7 + 0.3 * math.sin(glowAnimation * math.pi * 2));
-      
+      final pulseOpacity =
+          particle.opacity *
+          (0.7 + 0.3 * math.sin(glowAnimation * math.pi * 2));
+
       final paint = Paint()
-        ..color = (particle.isGold ? primaryColor : Colors.white).withValues(alpha: pulseOpacity)
+        ..color = (particle.isGold ? primaryColor : Colors.white).withValues(
+          alpha: pulseOpacity,
+        )
         ..style = PaintingStyle.fill;
-      
+
       canvas.drawCircle(Offset(actualX, actualY), particle.size, paint);
-      
+
       // Optional glow for larger particles
       if (particle.size > 2) {
         final glowPaint = Paint()
-          ..color = (particle.isGold ? primaryColor : Colors.white).withValues(alpha: pulseOpacity * 0.3)
+          ..color = (particle.isGold ? primaryColor : Colors.white).withValues(
+            alpha: pulseOpacity * 0.3,
+          )
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
-        canvas.drawCircle(Offset(actualX, actualY), particle.size * 2, glowPaint);
+        canvas.drawCircle(
+          Offset(actualX, actualY),
+          particle.size * 2,
+          glowPaint,
+        );
       }
     }
   }
 
   @override
   bool shouldRepaint(covariant _ParticlePainter oldDelegate) {
-    return oldDelegate.animation != animation || oldDelegate.glowAnimation != glowAnimation;
+    return oldDelegate.animation != animation ||
+        oldDelegate.glowAnimation != glowAnimation;
   }
 }
 
 class _GlowOrbPainter extends CustomPainter {
   final double animation;
   final Color color;
-  
+
   _GlowOrbPainter({required this.animation, required this.color});
 
   @override
@@ -208,23 +223,24 @@ class _GlowOrbPainter extends CustomPainter {
       Offset(size.width * 0.8, size.height * 0.5),
       Offset(size.width * 0.5, size.height * 0.8),
     ];
-    
+
     for (int i = 0; i < positions.length; i++) {
       final offset = positions[i];
-      final radius = 100.0 + (40 * math.sin((animation + i * 0.3) * math.pi * 2));
-      
+      final radius =
+          100.0 + (40 * math.sin((animation + i * 0.3) * math.pi * 2));
+
       final gradient = RadialGradient(
         colors: [
           color.withValues(alpha: 0.15 * animation),
           color.withValues(alpha: 0.0),
         ],
       );
-      
+
       final paint = Paint()
         ..shader = gradient.createShader(
           Rect.fromCircle(center: offset, radius: radius),
         );
-      
+
       canvas.drawCircle(offset, radius, paint);
     }
   }
@@ -242,7 +258,7 @@ class FlipCard3D extends StatefulWidget {
   final bool showFront;
   final Duration duration;
   final VoidCallback? onFlipComplete;
-  
+
   const FlipCard3D({
     super.key,
     required this.front,
@@ -266,16 +282,13 @@ class _FlipCard3DState extends State<FlipCard3D>
   void initState() {
     super.initState();
     _isFrontVisible = widget.showFront;
-    
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    );
-    
+
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+
     _animation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutBack),
     );
-    
+
     _controller.addListener(() {
       if (_controller.value >= 0.5 && _isFrontVisible != widget.showFront) {
         setState(() {
@@ -283,7 +296,7 @@ class _FlipCard3DState extends State<FlipCard3D>
         });
       }
     });
-    
+
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         widget.onFlipComplete?.call();
@@ -316,7 +329,7 @@ class _FlipCard3DState extends State<FlipCard3D>
       builder: (context, child) {
         final angle = _animation.value * math.pi;
         final isShowingFront = angle < math.pi / 2;
-        
+
         return Transform(
           alignment: Alignment.center,
           transform: Matrix4.identity()
@@ -340,7 +353,7 @@ class CardDealingAnimation extends StatefulWidget {
   final int cardCount;
   final Duration staggerDelay;
   final Widget Function(int index) cardBuilder;
-  
+
   const CardDealingAnimation({
     super.key,
     required this.cardCount,
@@ -357,38 +370,35 @@ class _CardDealingAnimationState extends State<CardDealingAnimation>
   late List<AnimationController> _controllers;
   late List<Animation<Offset>> _slideAnimations;
   late List<Animation<double>> _scaleAnimations;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     _controllers = List.generate(widget.cardCount, (index) {
       return AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 500),
       );
     });
-    
+
     _slideAnimations = _controllers.map((controller) {
       return Tween<Offset>(
         begin: const Offset(0, -2),
         end: Offset.zero,
-      ).animate(CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeOutBack,
-      ));
+      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeOutBack));
     }).toList();
-    
+
     _scaleAnimations = _controllers.map((controller) {
-      return Tween<double>(begin: 0.5, end: 1.0).animate(CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeOutBack,
-      ));
+      return Tween<double>(
+        begin: 0.5,
+        end: 1.0,
+      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeOutBack));
     }).toList();
-    
+
     _startAnimations();
   }
-  
+
   void _startAnimations() async {
     for (int i = 0; i < widget.cardCount; i++) {
       await Future.delayed(widget.staggerDelay);
@@ -397,7 +407,7 @@ class _CardDealingAnimationState extends State<CardDealingAnimation>
       }
     }
   }
-  
+
   @override
   void dispose() {
     for (final controller in _controllers) {
@@ -432,7 +442,7 @@ class _CardDealingAnimationState extends State<CardDealingAnimation>
 class WinCelebration extends StatefulWidget {
   final Widget child;
   final bool celebrate;
-  
+
   const WinCelebration({
     super.key,
     required this.child,
@@ -447,23 +457,23 @@ class _WinCelebrationState extends State<WinCelebration>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late List<_ConfettiParticle> _confetti;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
     );
-    
+
     _initConfetti();
-    
+
     if (widget.celebrate) {
       _controller.forward();
     }
   }
-  
+
   void _initConfetti() {
     final random = math.Random();
     _confetti = List.generate(50, (index) {
@@ -474,11 +484,17 @@ class _WinCelebrationState extends State<WinCelebration>
         speed: 0.3 + random.nextDouble() * 0.4,
         rotation: random.nextDouble() * math.pi * 2,
         rotationSpeed: (random.nextDouble() - 0.5) * 0.5,
-        color: [CasinoColors.gold, Colors.red, Colors.blue, Colors.green, CasinoColors.richPurple][random.nextInt(5)],
+        color: [
+          CasinoColors.gold,
+          Colors.red,
+          Colors.blue,
+          Colors.green,
+          CasinoColors.richPurple,
+        ][random.nextInt(5)],
       );
     });
   }
-  
+
   @override
   void didUpdateWidget(WinCelebration oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -488,7 +504,7 @@ class _WinCelebrationState extends State<WinCelebration>
       _controller.forward();
     }
   }
-  
+
   @override
   void dispose() {
     _controller.dispose();
@@ -526,7 +542,7 @@ class _ConfettiParticle {
   double rotation;
   final double rotationSpeed;
   final Color color;
-  
+
   _ConfettiParticle({
     required this.x,
     required this.y,
@@ -541,7 +557,7 @@ class _ConfettiParticle {
 class _ConfettiPainter extends CustomPainter {
   final List<_ConfettiParticle> confetti;
   final double animation;
-  
+
   _ConfettiPainter({required this.confetti, required this.animation});
 
   @override
@@ -549,24 +565,29 @@ class _ConfettiPainter extends CustomPainter {
     for (final particle in confetti) {
       final y = particle.y + animation * particle.speed * 1.5;
       if (y > 1.0) continue;
-      
+
       final actualX = particle.x * size.width;
       final actualY = y * size.height;
-      final rotation = particle.rotation + animation * particle.rotationSpeed * math.pi * 4;
-      
+      final rotation =
+          particle.rotation + animation * particle.rotationSpeed * math.pi * 4;
+
       canvas.save();
       canvas.translate(actualX, actualY);
       canvas.rotate(rotation);
-      
+
       final paint = Paint()
         ..color = particle.color.withValues(alpha: 1.0 - animation * 0.5)
         ..style = PaintingStyle.fill;
-      
+
       canvas.drawRect(
-        Rect.fromCenter(center: Offset.zero, width: particle.size, height: particle.size * 0.6),
+        Rect.fromCenter(
+          center: Offset.zero,
+          width: particle.size,
+          height: particle.size * 0.6,
+        ),
         paint,
       );
-      
+
       canvas.restore();
     }
   }

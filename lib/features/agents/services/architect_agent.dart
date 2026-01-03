@@ -10,8 +10,10 @@ final architectAgentProvider = Provider<ArchitectAgent>((ref) {
 });
 
 /// Agent metrics provider - Riverpod 3.x Notifier pattern
-final agentMetricsProvider = NotifierProvider<AgentMetricsNotifier, Map<AgentType, AgentMetrics>>(
-    AgentMetricsNotifier.new);
+final agentMetricsProvider =
+    NotifierProvider<AgentMetricsNotifier, Map<AgentType, AgentMetrics>>(
+      AgentMetricsNotifier.new,
+    );
 
 /// Architect Agent - The Meta-Orchestrator
 /// Routes requests to specialized agents and manages the agent ecosystem
@@ -45,11 +47,17 @@ class ArchitectAgent {
       // Validate agent exists and is enabled
       final agentConfig = _agents[request.targetAgent];
       if (agentConfig == null) {
-        return _errorResponse(request, 'Agent not found: ${request.targetAgent}');
+        return _errorResponse(
+          request,
+          'Agent not found: ${request.targetAgent}',
+        );
       }
 
       if (!agentConfig.isEnabled) {
-        return _errorResponse(request, 'Agent is disabled: ${request.targetAgent}');
+        return _errorResponse(
+          request,
+          'Agent is disabled: ${request.targetAgent}',
+        );
       }
 
       // Route to appropriate agent handler
@@ -60,13 +68,21 @@ class ArchitectAgent {
 
       return response;
     } catch (e) {
-      _updateMetrics(request.targetAgent, false, startTime, error: e.toString());
+      _updateMetrics(
+        request.targetAgent,
+        false,
+        startTime,
+        error: e.toString(),
+      );
       return _errorResponse(request, e.toString());
     }
   }
 
   /// Execute the request on the target agent
-  Future<AgentResponse> _executeAgent(AgentRequest request, AgentConfig config) async {
+  Future<AgentResponse> _executeAgent(
+    AgentRequest request,
+    AgentConfig config,
+  ) async {
     switch (request.targetAgent) {
       case AgentType.architect:
         return _handleArchitectRequest(request);
@@ -104,7 +120,10 @@ class ArchitectAgent {
         final delegatedRequest = request.copyWith(targetAgent: targetAgent);
         return routeRequest(delegatedRequest);
       default:
-        return _errorResponse(request, 'Unknown architect action: ${request.action}');
+        return _errorResponse(
+          request,
+          'Unknown architect action: ${request.action}',
+        );
     }
   }
 
@@ -146,7 +165,8 @@ class ArchitectAgent {
           agent: AgentType.gaming,
           success: true,
           data: {
-            'tip': 'Focus on your strongest cards and track what has been played.',
+            'tip':
+                'Focus on your strongest cards and track what has been played.',
             'fallback': true,
           },
         );
@@ -231,10 +251,11 @@ class ArchitectAgent {
 
         case 'optimizeReward':
           // Local optimization based on user engagement
-          final engagement = request.payload['engagementScore'] as double? ?? 0.5;
+          final engagement =
+              request.payload['engagementScore'] as double? ?? 0.5;
           final baseReward = request.payload['baseReward'] as int? ?? 10;
           final multiplier = 1.0 + (engagement * 0.5);
-          
+
           return AgentResponse(
             requestId: request.id,
             agent: AgentType.economy,
@@ -295,11 +316,12 @@ class ArchitectAgent {
         // Smart notification timing
         final userActive = request.payload['userActive'] as bool? ?? false;
         final priority = request.priority;
-        
-        final shouldNotify = priority == AgentPriority.critical || 
-                            priority == AgentPriority.high || 
-                            !userActive;
-        
+
+        final shouldNotify =
+            priority == AgentPriority.critical ||
+            priority == AgentPriority.high ||
+            !userActive;
+
         return AgentResponse(
           requestId: request.id,
           agent: AgentType.notification,
@@ -324,7 +346,12 @@ class ArchitectAgent {
   }
 
   /// Update agent metrics
-  void _updateMetrics(AgentType agent, bool success, DateTime startTime, {String? error}) {
+  void _updateMetrics(
+    AgentType agent,
+    bool success,
+    DateTime startTime, {
+    String? error,
+  }) {
     final notifier = ref.read(agentMetricsProvider.notifier);
     notifier.recordRequest(
       agent,
@@ -356,7 +383,10 @@ class ArchitectAgent {
   // ==================== Convenience Methods ====================
 
   /// Get a game tip from the Gaming Agent
-  Future<String> getGameTip(String gameType, Map<String, dynamic> gameState) async {
+  Future<String> getGameTip(
+    String gameType,
+    Map<String, dynamic> gameState,
+  ) async {
     final request = createRequest(
       agent: AgentType.gaming,
       action: 'getGameTip',
@@ -367,7 +397,10 @@ class ArchitectAgent {
   }
 
   /// Moderate chat message via Social Agent
-  Future<Map<String, dynamic>> moderateChat(String message, String userId) async {
+  Future<Map<String, dynamic>> moderateChat(
+    String message,
+    String userId,
+  ) async {
     final request = createRequest(
       agent: AgentType.social,
       action: 'moderateChat',
@@ -397,13 +430,20 @@ class AgentMetricsNotifier extends Notifier<Map<AgentType, AgentMetrics>> {
   @override
   Map<AgentType, AgentMetrics> build() => {};
 
-  void recordRequest(AgentType agent, bool success, int responseTimeMs, {String? error}) {
+  void recordRequest(
+    AgentType agent,
+    bool success,
+    int responseTimeMs, {
+    String? error,
+  }) {
     final current = state[agent] ?? AgentMetrics(agent: agent);
-    
+
     final newTotal = current.totalRequests + 1;
     final newSuccess = current.successfulRequests + (success ? 1 : 0);
     final newFailed = current.failedRequests + (success ? 0 : 1);
-    final newAvgTime = ((current.avgResponseTimeMs * current.totalRequests) + responseTimeMs) / newTotal;
+    final newAvgTime =
+        ((current.avgResponseTimeMs * current.totalRequests) + responseTimeMs) /
+        newTotal;
 
     state = {
       ...state,

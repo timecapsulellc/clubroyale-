@@ -22,8 +22,8 @@ class ChatService {
     required this.userName,
     FirebaseFirestore? firestore,
     FirebaseFunctions? functions,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _functions = functions ?? FirebaseFunctions.instance;
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _functions = functions ?? FirebaseFunctions.instance;
 
   /// Get reference to chat collection
   CollectionReference<Map<String, dynamic>> get _chatRef =>
@@ -35,12 +35,14 @@ class ChatService {
         .orderBy('timestamp', descending: true)
         .limit(100) // Limit to last 100 messages
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => ChatMessage.fromFirestore(doc))
-            .where((msg) => !msg.isDeleted) // Filter deleted messages
-            .toList()
-            .reversed // Reverse to show oldest first in UI
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => ChatMessage.fromFirestore(doc))
+              .where((msg) => !msg.isDeleted) // Filter deleted messages
+              .toList()
+              .reversed // Reverse to show oldest first in UI
+              .toList(),
+        );
   }
 
   /// Send a text message
@@ -50,13 +52,16 @@ class ChatService {
     }
 
     if (content.length > 500) {
-      return SendResult(success: false, reason: 'Message too long (max 500 chars)');
+      return SendResult(
+        success: false,
+        reason: 'Message too long (max 500 chars)',
+      );
     }
 
     // Check for AI moderation
     try {
       final moderationResult = await _moderateMessage(content);
-      
+
       if (!moderationResult.isAllowed) {
         return SendResult(
           success: false,
@@ -133,14 +138,17 @@ class ChatService {
   }
 
   /// Reply to a message
-  Future<SendResult> replyToMessage(String content, ChatMessage originalMessage) async {
+  Future<SendResult> replyToMessage(
+    String content,
+    ChatMessage originalMessage,
+  ) async {
     if (content.trim().isEmpty) {
       return SendResult(success: false, reason: 'Reply cannot be empty');
     }
 
     // Moderate the reply
     final moderationResult = await _moderateMessage(content);
-    
+
     if (!moderationResult.isAllowed) {
       return SendResult(
         success: false,
@@ -168,9 +176,7 @@ class ChatService {
 
   /// Add reaction to a message
   Future<void> addReaction(String messageId, String emoji) async {
-    await _chatRef.doc(messageId).update({
-      'reactions.$userId': emoji,
-    });
+    await _chatRef.doc(messageId).update({'reactions.$userId': emoji});
   }
 
   /// Remove reaction from a message
@@ -238,23 +244,25 @@ class ChatService {
         .doc(roomId)
         .collection('typing')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .where((doc) => doc.id != userId) // Exclude self
-            .map((doc) {
-              final data = doc.data();
-              final timestamp = (data['timestamp'] as Timestamp?)?.toDate();
-              // Only include if typed within last 5 seconds
-              if (timestamp != null && 
-                  DateTime.now().difference(timestamp).inSeconds < 5) {
-                return TypingUser(
-                  userId: doc.id,
-                  userName: data['userName'] as String? ?? 'Someone',
-                );
-              }
-              return null;
-            })
-            .whereType<TypingUser>()
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .where((doc) => doc.id != userId) // Exclude self
+              .map((doc) {
+                final data = doc.data();
+                final timestamp = (data['timestamp'] as Timestamp?)?.toDate();
+                // Only include if typed within last 5 seconds
+                if (timestamp != null &&
+                    DateTime.now().difference(timestamp).inSeconds < 5) {
+                  return TypingUser(
+                    userId: doc.id,
+                    userName: data['userName'] as String? ?? 'Someone',
+                  );
+                }
+                return null;
+              })
+              .whereType<TypingUser>()
+              .toList(),
+        );
   }
 
   /// Edit a message (only own messages)
@@ -270,7 +278,7 @@ class ChatService {
       }
 
       final finalContent = moderationResult.editedMessage ?? newContent;
-      
+
       await _chatRef.doc(messageId).update({
         'content': finalContent,
         'isEdited': true,
@@ -334,11 +342,7 @@ class SendResult {
   final String? reason;
   final bool wasModerated;
 
-  SendResult({
-    required this.success,
-    this.reason,
-    this.wasModerated = false,
-  });
+  SendResult({required this.success, this.reason, this.wasModerated = false});
 }
 
 /// Result from AI moderation
@@ -403,17 +407,15 @@ final chatServiceProvider = Provider.family<ChatService, ChatServiceParams>(
 );
 
 /// Provider for chat messages stream
-final chatMessagesProvider = StreamProvider.family<List<ChatMessage>, ChatServiceParams>(
-  (ref, params) {
-    final chatService = ref.watch(chatServiceProvider(params));
-    return chatService.messagesStream;
-  },
-);
+final chatMessagesProvider =
+    StreamProvider.family<List<ChatMessage>, ChatServiceParams>((ref, params) {
+      final chatService = ref.watch(chatServiceProvider(params));
+      return chatService.messagesStream;
+    });
 
 /// Provider for typing users stream
-final typingUsersProvider = StreamProvider.family<List<TypingUser>, ChatServiceParams>(
-  (ref, params) {
-    final chatService = ref.watch(chatServiceProvider(params));
-    return chatService.typingUsersStream;
-  },
-);
+final typingUsersProvider =
+    StreamProvider.family<List<TypingUser>, ChatServiceParams>((ref, params) {
+      final chatService = ref.watch(chatServiceProvider(params));
+      return chatService.typingUsersStream;
+    });

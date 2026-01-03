@@ -1,5 +1,5 @@
 /// Badges Grid Widget
-/// 
+///
 /// Displays user's earned badges and achievements in a horizontal grid
 library;
 
@@ -29,7 +29,7 @@ class BadgesGrid extends ConsumerWidget {
     return achievementsAsync.when(
       data: (achievements) {
         final unlocked = achievements.where((a) => a.isUnlocked).toList();
-        
+
         if (unlocked.isEmpty) {
           return const _EmptyBadgesCard();
         }
@@ -61,7 +61,9 @@ class BadgesGrid extends ConsumerWidget {
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: unlocked.length > maxDisplay ? maxDisplay : unlocked.length,
+                itemCount: unlocked.length > maxDisplay
+                    ? maxDisplay
+                    : unlocked.length,
                 itemBuilder: (context, index) {
                   final achievement = unlocked[index];
                   return Padding(
@@ -99,16 +101,15 @@ class _BadgeItem extends StatelessWidget {
   final Achievement achievement;
   final VoidCallback? onTap;
 
-  const _BadgeItem({
-    required this.achievement,
-    this.onTap,
-  });
+  const _BadgeItem({required this.achievement, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final rarityColor = Color(
       int.parse(
-        AchievementsData.getRarityColor(achievement.rarity).replaceFirst('#', '0xFF'),
+        AchievementsData.getRarityColor(
+          achievement.rarity,
+        ).replaceFirst('#', '0xFF'),
       ),
     );
 
@@ -154,9 +155,9 @@ class _BadgeItem extends StatelessWidget {
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -237,16 +238,15 @@ class _EmptyBadgesCard extends StatelessWidget {
 class AchievementDetailSheet extends StatelessWidget {
   final Achievement achievement;
 
-  const AchievementDetailSheet({
-    super.key,
-    required this.achievement,
-  });
+  const AchievementDetailSheet({super.key, required this.achievement});
 
   @override
   Widget build(BuildContext context) {
     final rarityColor = Color(
       int.parse(
-        AchievementsData.getRarityColor(achievement.rarity).replaceFirst('#', '0xFF'),
+        AchievementsData.getRarityColor(
+          achievement.rarity,
+        ).replaceFirst('#', '0xFF'),
       ),
     );
     final rarityName = AchievementsData.getRarityName(achievement.rarity);
@@ -264,7 +264,9 @@ class AchievementDetailSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -295,9 +297,9 @@ class AchievementDetailSheet extends StatelessWidget {
           // Title
           Text(
             achievement.title,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           // Rarity badge
@@ -332,7 +334,9 @@ class AchievementDetailSheet extends StatelessWidget {
               children: [
                 LinearProgressIndicator(
                   value: (achievement.progress ?? 0) / achievement.maxProgress!,
-                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest,
                   valueColor: AlwaysStoppedAnimation(rarityColor),
                   borderRadius: BorderRadius.circular(4),
                 ),
@@ -350,17 +354,13 @@ class AchievementDetailSheet extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.check_circle,
-                    color: Colors.green,
-                    size: 16,
-                  ),
+                  Icon(Icons.check_circle, color: Colors.green, size: 16),
                   const SizedBox(width: 4),
                   Text(
                     'Unlocked ${_formatDate(achievement.unlockedAt!)}',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Colors.green,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelSmall?.copyWith(color: Colors.green),
                   ),
                 ],
               ),
@@ -374,7 +374,7 @@ class AchievementDetailSheet extends StatelessWidget {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final diff = now.difference(date);
-    
+
     if (diff.inDays == 0) return 'today';
     if (diff.inDays == 1) return 'yesterday';
     if (diff.inDays < 7) return '${diff.inDays} days ago';
@@ -387,17 +387,12 @@ class AchievementDetailSheet extends StatelessWidget {
 class AllAchievementsScreen extends ConsumerWidget {
   final String userId;
 
-  const AllAchievementsScreen({
-    super.key,
-    required this.userId,
-  });
+  const AllAchievementsScreen({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Achievements'),
-      ),
+      appBar: AppBar(title: const Text('Achievements')),
       body: FutureBuilder<List<Achievement>>(
         future: ref.read(achievementServiceProvider).getAllWithProgress(userId),
         builder: (context, snapshot) {
@@ -415,7 +410,7 @@ class AllAchievementsScreen extends ConsumerWidget {
               // Stats card
               _StatsCard(total: achievements.length, unlocked: unlocked.length),
               const SizedBox(height: 24),
-              
+
               // Unlocked section
               if (unlocked.isNotEmpty) ...[
                 Text(
@@ -428,13 +423,13 @@ class AllAchievementsScreen extends ConsumerWidget {
                 ...unlocked.map((a) => _AchievementListTile(achievement: a)),
                 const SizedBox(height: 24),
               ],
-              
+
               // Locked section
               Text(
                 'In Progress (${locked.length})',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               ...locked.map((a) => _AchievementListTile(achievement: a)),
@@ -494,7 +489,9 @@ class _AchievementListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final rarityColor = Color(
       int.parse(
-        AchievementsData.getRarityColor(achievement.rarity).replaceFirst('#', '0xFF'),
+        AchievementsData.getRarityColor(
+          achievement.rarity,
+        ).replaceFirst('#', '0xFF'),
       ),
     );
 
@@ -506,7 +503,7 @@ class _AchievementListTile extends StatelessWidget {
           height: 48,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: achievement.isUnlocked 
+            color: achievement.isUnlocked
                 ? rarityColor.withValues(alpha: 0.2)
                 : Colors.grey.withValues(alpha: 0.2),
             border: Border.all(

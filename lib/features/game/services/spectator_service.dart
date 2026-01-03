@@ -4,21 +4,22 @@ import 'package:clubroyale/features/auth/auth_service.dart';
 
 /// Spectator service provider
 final spectatorServiceProvider = Provider<SpectatorService>((ref) {
-  return SpectatorService(
-    firestore: FirebaseFirestore.instance,
-    ref: ref,
-  );
+  return SpectatorService(firestore: FirebaseFirestore.instance, ref: ref);
 });
 
 /// Stream of spectators for a game
-final spectatorCountProvider = StreamProvider.family<int, String>((ref, gameId) {
+final spectatorCountProvider = StreamProvider.family<int, String>((
+  ref,
+  gameId,
+) {
   return ref.watch(spectatorServiceProvider).watchSpectatorCount(gameId);
 });
 
 /// Stream of spectator list for a game
-final spectatorListProvider = StreamProvider.family<List<SpectatorInfo>, String>((ref, gameId) {
-  return ref.watch(spectatorServiceProvider).watchSpectators(gameId);
-});
+final spectatorListProvider =
+    StreamProvider.family<List<SpectatorInfo>, String>((ref, gameId) {
+      return ref.watch(spectatorServiceProvider).watchSpectators(gameId);
+    });
 
 /// Spectator info model
 class SpectatorInfo {
@@ -56,16 +57,13 @@ class SpectatorService {
   final FirebaseFirestore firestore;
   final Ref ref;
 
-  SpectatorService({
-    required this.firestore,
-    required this.ref,
-  });
+  SpectatorService({required this.firestore, required this.ref});
 
   /// Join as a spectator
   Future<void> joinAsSpectator(String gameId) async {
     final userId = ref.read(currentUserIdProvider);
     final userProfile = ref.read(authStateProvider).value;
-    
+
     if (userId == null) {
       throw Exception('User not authenticated');
     }
@@ -131,12 +129,13 @@ class SpectatorService {
         .collection('spectators')
         .orderBy('joinedAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => SpectatorInfo.fromJson({
-                  'id': doc.id,
-                  ...doc.data(),
-                }))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map(
+                (doc) => SpectatorInfo.fromJson({'id': doc.id, ...doc.data()}),
+              )
+              .toList(),
+        );
   }
 
   /// Get shareable spectator link

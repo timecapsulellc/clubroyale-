@@ -1,5 +1,5 @@
 /// Replay Service
-/// 
+///
 /// Manages saving, loading, and playing back game replays
 library;
 
@@ -32,7 +32,7 @@ class ReplayService {
     bool isPublic = false,
   }) async {
     final doc = _replaysRef.doc();
-    
+
     await doc.set({
       'id': doc.id,
       'gameType': gameType,
@@ -60,10 +60,10 @@ class ReplayService {
   Future<GameReplay?> loadReplay(String replayId) async {
     final doc = await _replaysRef.doc(replayId).get();
     if (!doc.exists) return null;
-    
+
     // Increment view count
     await doc.reference.update({'views': FieldValue.increment(1)});
-    
+
     return GameReplay.fromJson(doc.data()!);
   }
 
@@ -71,13 +71,13 @@ class ReplayService {
   Future<void> deleteReplay(String replayId, String userId) async {
     final doc = await _replaysRef.doc(replayId).get();
     if (!doc.exists) return;
-    
+
     // Only the saver can delete
     if (doc.data()!['savedBy'] != userId) {
       debugPrint('Unauthorized delete attempt');
       return;
     }
-    
+
     await doc.reference.delete();
     debugPrint('🗑️ Replay deleted: $replayId');
   }
@@ -85,19 +85,19 @@ class ReplayService {
   /// Toggle like on a replay
   Future<void> toggleLike(String replayId, String userId) async {
     final doc = _replaysRef.doc(replayId);
-    
+
     await _firestore.runTransaction((transaction) async {
       final snapshot = await transaction.get(doc);
       if (!snapshot.exists) return;
-      
+
       final likedBy = List<String>.from(snapshot.data()!['likedBy'] ?? []);
-      
+
       if (likedBy.contains(userId)) {
         likedBy.remove(userId);
       } else {
         likedBy.add(userId);
       }
-      
+
       transaction.update(doc, {'likedBy': likedBy});
     });
   }
@@ -110,7 +110,9 @@ class ReplayService {
         .limit(50)
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs.map((doc) => GameReplay.fromJson(doc.data())).toList();
+          return snapshot.docs
+              .map((doc) => GameReplay.fromJson(doc.data()))
+              .toList();
         });
   }
 
@@ -120,13 +122,15 @@ class ReplayService {
         .where('isPublic', isEqualTo: true)
         .orderBy('gameDate', descending: true)
         .limit(50);
-    
+
     if (gameType != null) {
       query = query.where('gameType', isEqualTo: gameType);
     }
-    
+
     return query.snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => GameReplay.fromJson(doc.data())).toList();
+      return snapshot.docs
+          .map((doc) => GameReplay.fromJson(doc.data()))
+          .toList();
     });
   }
 
@@ -138,7 +142,9 @@ class ReplayService {
         .limit(20)
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs.map((doc) => GameReplay.fromJson(doc.data())).toList();
+          return snapshot.docs
+              .map((doc) => GameReplay.fromJson(doc.data()))
+              .toList();
         });
   }
 
@@ -148,11 +154,14 @@ class ReplayService {
         .where('isPublic', isEqualTo: true)
         .limit(50)
         .get();
-    
+
     return snapshot.docs
         .map((doc) => GameReplay.fromJson(doc.data()))
-        .where((replay) => replay.playerNames.any(
-            (name) => name.toLowerCase().contains(playerName.toLowerCase())))
+        .where(
+          (replay) => replay.playerNames.any(
+            (name) => name.toLowerCase().contains(playerName.toLowerCase()),
+          ),
+        )
         .toList();
   }
 }
@@ -161,7 +170,7 @@ class ReplayService {
 class ReplayPlaybackController extends Notifier<ReplayPlaybackState> {
   GameReplay? _replay;
   Timer? _playbackTimer;
-  
+
   @override
   ReplayPlaybackState build() => const ReplayPlaybackState();
 
@@ -178,9 +187,9 @@ class ReplayPlaybackController extends Notifier<ReplayPlaybackState> {
   /// Start/resume playback
   void play() {
     if (_replay == null) return;
-    
+
     state = state.copyWith(isPlaying: true);
-    
+
     _playbackTimer?.cancel();
     _playbackTimer = Timer.periodic(
       Duration(milliseconds: (100 / state.playbackSpeed).round()),
@@ -206,7 +215,7 @@ class ReplayPlaybackController extends Notifier<ReplayPlaybackState> {
   /// Seek to specific time
   void seekTo(int timeMs) {
     pause();
-    
+
     // Find the event index at this time
     int eventIndex = 0;
     if (_replay != null) {
@@ -218,17 +227,14 @@ class ReplayPlaybackController extends Notifier<ReplayPlaybackState> {
         }
       }
     }
-    
-    state = state.copyWith(
-      currentTime: timeMs,
-      currentEventIndex: eventIndex,
-    );
+
+    state = state.copyWith(currentTime: timeMs, currentEventIndex: eventIndex);
   }
 
   /// Set playback speed
   void setSpeed(double speed) {
     state = state.copyWith(playbackSpeed: speed);
-    
+
     // Restart timer with new speed if playing
     if (state.isPlaying) {
       _playbackTimer?.cancel();
@@ -241,15 +247,19 @@ class ReplayPlaybackController extends Notifier<ReplayPlaybackState> {
 
   /// Skip forward by seconds
   void skipForward(int seconds) {
-    final newTime = (state.currentTime + seconds * 1000)
-        .clamp(0, state.totalDuration);
+    final newTime = (state.currentTime + seconds * 1000).clamp(
+      0,
+      state.totalDuration,
+    );
     seekTo(newTime);
   }
 
   /// Skip backward by seconds
   void skipBackward(int seconds) {
-    final newTime = (state.currentTime - seconds * 1000)
-        .clamp(0, state.totalDuration);
+    final newTime = (state.currentTime - seconds * 1000).clamp(
+      0,
+      state.totalDuration,
+    );
     seekTo(newTime);
   }
 
@@ -260,22 +270,22 @@ class ReplayPlaybackController extends Notifier<ReplayPlaybackState> {
 
   void _tick() {
     if (_replay == null) return;
-    
+
     final newTime = state.currentTime + 100;
-    
+
     if (newTime >= state.totalDuration) {
       pause();
       state = state.copyWith(currentTime: state.totalDuration);
       return;
     }
-    
+
     // Update event index
     int newEventIndex = state.currentEventIndex;
     while (newEventIndex < _replay!.events.length - 1 &&
-           _replay!.events[newEventIndex + 1].timestamp <= newTime) {
+        _replay!.events[newEventIndex + 1].timestamp <= newTime) {
       newEventIndex++;
     }
-    
+
     state = state.copyWith(
       currentTime: newTime,
       currentEventIndex: newEventIndex,
@@ -304,7 +314,10 @@ class ReplayPlaybackController extends Notifier<ReplayPlaybackState> {
 /// Providers
 final replayServiceProvider = Provider<ReplayService>((ref) => ReplayService());
 
-final userReplaysProvider = StreamProvider.family<List<GameReplay>, String>((ref, userId) {
+final userReplaysProvider = StreamProvider.family<List<GameReplay>, String>((
+  ref,
+  userId,
+) {
   return ref.watch(replayServiceProvider).watchUserReplays(userId);
 });
 
@@ -314,4 +327,5 @@ final publicReplaysProvider = StreamProvider<List<GameReplay>>((ref) {
 
 final replayPlaybackProvider =
     NotifierProvider<ReplayPlaybackController, ReplayPlaybackState>(
-        ReplayPlaybackController.new);
+      ReplayPlaybackController.new,
+    );

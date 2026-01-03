@@ -75,7 +75,9 @@ class EconomyAgent {
       isRisky: riskScore > 0.5,
       riskScore: riskScore.clamp(0.0, 1.0),
       reasons: reasons,
-      action: riskScore > 0.7 ? 'block' : (riskScore > 0.5 ? 'review' : 'allow'),
+      action: riskScore > 0.7
+          ? 'block'
+          : (riskScore > 0.5 ? 'review' : 'allow'),
     );
   }
 
@@ -235,13 +237,10 @@ class EconomyAgent {
     required int amount,
   }) async {
     final today = DateTime.now().toIso8601String().substring(0, 10);
-    await _firestore
-        .collection('daily_usage')
-        .doc('${userId}_$today')
-        .set({
-          limitType: FieldValue.increment(amount),
-          'lastUpdated': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
+    await _firestore.collection('daily_usage').doc('${userId}_$today').set({
+      limitType: FieldValue.increment(amount),
+      'lastUpdated': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 }
 

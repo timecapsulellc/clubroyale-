@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/config/casino_theme.dart'; // Correct import for CasinoColors
 
 class GameTopBar extends StatelessWidget {
@@ -30,64 +29,96 @@ class GameTopBar extends StatelessWidget {
           children: [
             // Exit Button
             _buildCircleButton(Icons.exit_to_app, onExit),
-            
+
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                     // Connection / Room Info
-                     Container(
-                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                       decoration: BoxDecoration(
-                         color: Colors.black.withValues(alpha: 0.7),
-                         borderRadius: BorderRadius.circular(20),
-                         border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.3)),
-                         boxShadow: [
-                            BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 4, offset: const Offset(0, 2)),
-                         ]
-                       ),
-                       child: Row(
-                         mainAxisSize: MainAxisSize.min,
-                         children: [
-                           const Icon(Icons.wifi, color: Colors.greenAccent, size: 14),
-                           const SizedBox(width: 8),
-                           Flexible(
-                             child: Text(
-                               '#$roomId',
-                               style: const TextStyle(color: Colors.white70, fontSize: 12),
-                               overflow: TextOverflow.ellipsis,
-                             ),
-                           ),
-                           Container(
-                               margin: const EdgeInsets.symmetric(horizontal: 8),
-                               height: 12, width: 1, color: Colors.white24
-                           ),
-                           Flexible(
-                             flex: 2,
-                             child: Text(
-                               roomName,
-                               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                               overflow: TextOverflow.ellipsis,
-                             ),
-                           ),
-                           Container(
-                               margin: const EdgeInsets.symmetric(horizontal: 8),
-                               height: 12, width: 1, color: Colors.white24
-                           ),
-                           // Balance/Points
-                            Icon(Icons.monetization_on, color: CasinoColors.gold, size: 14),
-                            const SizedBox(width: 4),
-                            Text(
-                              balance,
-                              style: TextStyle(color: CasinoColors.gold, fontWeight: FontWeight.bold, fontSize: 13),
+                    // Connection / Room Info
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: CasinoColors.gold.withValues(alpha: 0.3),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.5),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.wifi,
+                            color: Colors.greenAccent,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              '#$roomId',
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
-                         ],
-                       ),
-                     ),
-                     
-                     // Extra info if needed (Round number etc)
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 8),
+                            height: 12,
+                            width: 1,
+                            color: Colors.white24,
+                          ),
+                          Flexible(
+                            flex: 2,
+                            child: Text(
+                              roomName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 8),
+                            height: 12,
+                            width: 1,
+                            color: Colors.white24,
+                          ),
+                          // Balance/Points
+                          Icon(
+                            Icons.monetization_on,
+                            color: CasinoColors.gold,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            balance,
+                            style: TextStyle(
+                              color: CasinoColors.gold,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Extra info if needed (Round number etc)
                   ],
                 ),
               ),

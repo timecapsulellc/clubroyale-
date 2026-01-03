@@ -28,9 +28,11 @@ class SocialService {
         .where('participants', arrayContains: uid)
         .orderBy('updatedAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => SocialChat.fromJson({...doc.data(), 'id': doc.id}))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => SocialChat.fromJson({...doc.data(), 'id': doc.id}))
+              .toList(),
+        );
   }
 
   /// Create or Get Existing Direct Chat
@@ -68,7 +70,7 @@ class SocialService {
   Future<String> createVoiceRoom(String name) async {
     final uid = currentUserId;
     if (uid == null) throw Exception("Not logged in");
-    
+
     final chatRef = await _firestore.collection('chats').add({
       'type': 'voiceRoom',
       'participants': [uid],
@@ -78,7 +80,7 @@ class SocialService {
       'updatedAt': FieldValue.serverTimestamp(),
       'unreadCounts': {},
     });
-    
+
     return chatRef.id;
   }
 
@@ -93,9 +95,13 @@ class SocialService {
         .orderBy('timestamp', descending: true)
         .limit(50)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => SocialMessage.fromJson({...doc.data(), 'id': doc.id}))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map(
+                (doc) => SocialMessage.fromJson({...doc.data(), 'id': doc.id}),
+              )
+              .toList(),
+        );
   }
 
   /// Send a text message
@@ -114,7 +120,7 @@ class SocialService {
       replyToPreview: replyToPreview,
     );
   }
-  
+
   /// Send a game invite
   Future<void> sendGameInvite({
     required String chatId,
@@ -124,10 +130,7 @@ class SocialService {
     await _sendMessage(
       chatId: chatId,
       type: SocialMessageType.gameInvite,
-      content: SocialMessageContent(
-        gameRoomId: roomId,
-        gameType: gameType,
-      ),
+      content: SocialMessageContent(gameRoomId: roomId, gameType: gameType),
       previewText: '🎮 Invited you to play $gameType',
     );
   }
@@ -145,7 +148,7 @@ class SocialService {
     // 1. Upload Image
     final String fileName = '${DateTime.now().millisecondsSinceEpoch}_$uid.jpg';
     final ref = _storage.ref().child('chats/$chatId/images/$fileName');
-    
+
     // Simple upload
     await ref.putFile(imageFile);
     final downloadUrl = await ref.getDownloadURL();
@@ -154,9 +157,7 @@ class SocialService {
     await _sendMessage(
       chatId: chatId,
       type: SocialMessageType.image,
-      content: SocialMessageContent(
-        mediaUrl: downloadUrl,
-      ),
+      content: SocialMessageContent(mediaUrl: downloadUrl),
       previewText: '📷 Image',
       replyToMessageId: replyToMessageId,
       replyToPreview: replyToPreview,
@@ -176,8 +177,12 @@ class SocialService {
     if (user == null) throw Exception("Not logged in");
 
     // 1. Add Message
-    final messageRef = _firestore.collection('chats').doc(chatId).collection('messages').doc();
-    
+    final messageRef = _firestore
+        .collection('chats')
+        .doc(chatId)
+        .collection('messages')
+        .doc();
+
     final messageData = {
       'chatId': chatId,
       'senderId': user.uid,
@@ -213,21 +218,21 @@ class SocialService {
   }
 
   // ============ PRESENCE ============
-  
-  // Presence is typically handled via Realtime Database for "Online/Offline", 
+
+  // Presence is typically handled via Realtime Database for "Online/Offline",
   // but we can simulate "Active" via Firestore for this MVP using 'lastSeen'.
   Future<void> updatePresence() async {
     final uid = currentUserId;
     if (uid == null) return;
-    
+
     await _firestore.collection('users').doc(uid).update({
       'lastSeen': FieldValue.serverTimestamp(),
       'isOnline': true,
     });
   }
-  
+
   // ============ USERS ============
-  
+
   /// Get User Profile
   Future<SocialUser?> getUserProfile(String uid) async {
     final doc = await _firestore.collection('users').doc(uid).get();

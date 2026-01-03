@@ -18,7 +18,8 @@ class AnimatedCardCover extends StatefulWidget {
   State<AnimatedCardCover> createState() => _AnimatedCardCoverState();
 }
 
-class _AnimatedCardCoverState extends State<AnimatedCardCover> with SingleTickerProviderStateMixin {
+class _AnimatedCardCoverState extends State<AnimatedCardCover>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -33,7 +34,7 @@ class _AnimatedCardCoverState extends State<AnimatedCardCover> with SingleTicker
 
   void _startLoop() async {
     while (mounted) {
-      if(!_controller.isAnimating) {
+      if (!_controller.isAnimating) {
         await Future.delayed(widget.interval);
         if (mounted) {
           await _controller.forward(from: 0.0);
@@ -58,8 +59,9 @@ class _AnimatedCardCoverState extends State<AnimatedCardCover> with SingleTicker
         child: AnimatedBuilder(
           animation: _controller,
           builder: (context, child) {
-            if (_controller.value == 0 || _controller.value == 1) return const SizedBox.shrink();
-            
+            if (_controller.value == 0 || _controller.value == 1)
+              return const SizedBox.shrink();
+
             return CustomPaint(
               painter: _ShimmerPainter(_controller.value),
               child: Container(),
@@ -79,13 +81,16 @@ class _ShimmerPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
     final paint = Paint();
-    
+
     // Create a tilted gradient effect
     // We adjust the alignment slightly to give it a diagonal feel
     // and move the stops based on the percent.
-    
+
     final gradient = LinearGradient(
-      begin: Alignment(-1.5 + (percent * 0.5), -0.5), // Subtle movement in alignment
+      begin: Alignment(
+        -1.5 + (percent * 0.5),
+        -0.5,
+      ), // Subtle movement in alignment
       end: Alignment(1.5 + (percent * 0.5), 0.5),
       colors: [
         Colors.white.withValues(alpha: 0.0),
@@ -97,17 +102,18 @@ class _ShimmerPainter extends CustomPainter {
       stops: [
         (percent * 1.5) - 0.5, // Start before 0
         (percent * 1.5) - 0.25,
-        (percent * 1.5),       // Center at percent
+        (percent * 1.5), // Center at percent
         (percent * 1.5) + 0.25,
         (percent * 1.5) + 0.5, // End after 1
       ],
       tileMode: TileMode.clamp, // Don't repeat
     );
-    
+
     paint.shader = gradient.createShader(rect);
     canvas.drawRect(rect, paint);
   }
 
   @override
-  bool shouldRepaint(covariant _ShimmerPainter oldDelegate) => oldDelegate.percent != percent;
+  bool shouldRepaint(covariant _ShimmerPainter oldDelegate) =>
+      oldDelegate.percent != percent;
 }

@@ -14,7 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 enum AIDecisionType {
   /// Use local heuristics (fast, free)
   local,
-  
+
   /// Use GenKit LLM (smart, costs money)
   genkit,
 }
@@ -40,8 +40,9 @@ class AIDecisionRequest {
     // Critical decisions that need LLM
     if (phase == 'bidding') return AIDecisionType.genkit;
     if (phase == 'trumpSelection') return AIDecisionType.genkit;
-    if (phase == 'declaring' && gameType == 'marriage') return AIDecisionType.genkit;
-    
+    if (phase == 'declaring' && gameType == 'marriage')
+      return AIDecisionType.genkit;
+
     // First card of a trick (strategic lead)
     if (gameState['currentTrick']?.isEmpty ?? true) {
       // Only use GenKit for hard/expert difficulty leads
@@ -49,7 +50,7 @@ class AIDecisionRequest {
         return AIDecisionType.genkit;
       }
     }
-    
+
     // All other moves: local heuristics
     return AIDecisionType.local;
   }
@@ -67,10 +68,12 @@ class HybridAIService {
   }
 
   /// Local heuristic move (instant, free)
-  static Future<Map<String, dynamic>> _getLocalMove(AIDecisionRequest request) async {
+  static Future<Map<String, dynamic>> _getLocalMove(
+    AIDecisionRequest request,
+  ) async {
     final hand = request.hand;
     final gameState = request.gameState;
-    
+
     switch (request.gameType) {
       case 'call_break':
         return _callBreakLocalMove(hand, gameState, request.difficulty);
@@ -83,11 +86,13 @@ class HybridAIService {
   }
 
   /// GenKit LLM move (for critical decisions)
-  static Future<Map<String, dynamic>> _getGenkitMove(AIDecisionRequest request) async {
+  static Future<Map<String, dynamic>> _getGenkitMove(
+    AIDecisionRequest request,
+  ) async {
     // This would call the Cloud Function
     // For now, return local move as fallback
     // In production: await functions.httpsCallable('getBotPlay').call(...)
-    
+
     return {
       'action': 'genkit_pending',
       'source': 'genkit',
@@ -111,15 +116,15 @@ class HybridAIService {
   ) {
     final currentTrick = gameState['currentTrick'] as List? ?? [];
     final leadSuit = gameState['leadSuit'] as String?;
-    
+
     // Must follow suit if possible
     final suitCards = leadSuit != null
         ? hand.where((c) => _getSuit(c) == leadSuit).toList()
         : <String>[];
-    
+
     String selectedCard;
     String reasoning;
-    
+
     if (currentTrick.isEmpty) {
       // Leading: play highest non-trump card
       final nonTrumps = hand.where((c) => _getSuit(c) != 'S').toList();
@@ -138,8 +143,10 @@ class HybridAIService {
       } else {
         // Try to win if possible, otherwise play lowest
         final currentWinner = _getCurrentWinner(currentTrick, leadSuit!);
-        final canWin = suitCards.any((c) => _cardValue(c) > _cardValue(currentWinner));
-        
+        final canWin = suitCards.any(
+          (c) => _cardValue(c) > _cardValue(currentWinner),
+        );
+
         if (canWin) {
           selectedCard = _getLowestWinner(suitCards, currentWinner);
           reasoning = 'Following suit with winner';
@@ -151,7 +158,7 @@ class HybridAIService {
     } else {
       // Cannot follow suit: trump or discard
       final trumps = hand.where((c) => _getSuit(c) == 'S').toList();
-      
+
       if (trumps.isNotEmpty && difficulty != 'easy') {
         selectedCard = _getLowestCard(trumps);
         reasoning = 'Trumping with lowest trump';
@@ -160,7 +167,7 @@ class HybridAIService {
         reasoning = 'Discarding lowest card';
       }
     }
-    
+
     return {
       'action': 'playCard',
       'card': selectedCard,
@@ -180,7 +187,7 @@ class HybridAIService {
   ) {
     final phase = gameState['phase'] as String?;
     final topDiscard = gameState['topDiscard'] as String?;
-    
+
     if (phase == 'drawing') {
       // Drawing phase: deck or discard
       if (topDiscard != null && _isUsefulCard(topDiscard, hand)) {
@@ -247,7 +254,9 @@ class HybridAIService {
   }
 
   static String _getLowestWinner(List<String> cards, String toBeat) {
-    final winners = cards.where((c) => _cardValue(c) > _cardValue(toBeat)).toList();
+    final winners = cards
+        .where((c) => _cardValue(c) > _cardValue(toBeat))
+        .toList();
     return winners.isEmpty ? cards.first : _getLowestCard(winners);
   }
 
@@ -258,24 +267,27 @@ class HybridAIService {
     return sameRank >= 2; // Already have 2 of this rank
   }
 
-  static String _getLeastUsefulCard(List<String> hand, Map<String, dynamic> gameState) {
+  static String _getLeastUsefulCard(
+    List<String> hand,
+    Map<String, dynamic> gameState,
+  ) {
     // Simple heuristic: discard highest single card
     final rankCounts = <String, int>{};
     for (final card in hand) {
       final rank = card.substring(0, card.length - 1);
       rankCounts[rank] = (rankCounts[rank] ?? 0) + 1;
     }
-    
+
     // Find cards that are alone (not part of potential melds)
     final singles = hand.where((c) {
       final rank = c.substring(0, c.length - 1);
       return rankCounts[rank] == 1;
     }).toList();
-    
+
     if (singles.isNotEmpty) {
       return _getHighestCard(singles);
     }
-    
+
     return _getHighestCard(hand);
   }
 }

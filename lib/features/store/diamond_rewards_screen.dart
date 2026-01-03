@@ -29,10 +29,7 @@ import 'package:clubroyale/config/casino_theme.dart';
 class DiamondRewardsScreen extends StatefulWidget {
   final String userId;
 
-  const DiamondRewardsScreen({
-    super.key,
-    required this.userId,
-  });
+  const DiamondRewardsScreen({super.key, required this.userId});
 
   @override
   State<DiamondRewardsScreen> createState() => _DiamondRewardsScreenState();
@@ -50,15 +47,17 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
   }
 
   Future<void> _checkDailyLogin() async {
-    final available = await _diamondService.isDailyLoginAvailable(widget.userId);
+    final available = await _diamondService.isDailyLoginAvailable(
+      widget.userId,
+    );
     setState(() => _dailyLoginAvailable = available);
   }
 
   Future<void> _claimDailyLogin() async {
     setState(() => _claimingDaily = true);
-    
+
     final success = await _diamondService.claimDailyLogin(widget.userId);
-    
+
     setState(() {
       _claimingDaily = false;
       _dailyLoginAvailable = !success;
@@ -67,9 +66,11 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success 
-              ? '🎉 +${DiamondRewards.dailyLogin} Diamonds, Your Highness!'
-              : 'Already claimed today!'),
+          content: Text(
+            success
+                ? '🎉 +${DiamondRewards.dailyLogin} Diamonds, Your Highness!'
+                : 'Already claimed today!',
+          ),
           backgroundColor: success ? ClubRoyaleTheme.gold : Colors.orange,
         ),
       );
@@ -82,7 +83,10 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
       backgroundColor: CasinoColors.darkPurple,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Royal Treasury', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Royal Treasury',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -95,25 +99,38 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
               final balance = snapshot.data ?? 0;
               return Container(
                 margin: const EdgeInsets.only(right: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [ClubRoyaleTheme.gold, Colors.orangeAccent]),
+                  gradient: const LinearGradient(
+                    colors: [ClubRoyaleTheme.gold, Colors.orangeAccent],
+                  ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
-                    BoxShadow(color: ClubRoyaleTheme.gold.withValues(alpha: 0.4), blurRadius: 8, spreadRadius: 1)
+                    BoxShadow(
+                      color: ClubRoyaleTheme.gold.withValues(alpha: 0.4),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
                   ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Image.asset('assets/images/diamond_3d.png', width: 20, height: 20),
+                    Image.asset(
+                      'assets/images/diamond_3d.png',
+                      width: 20,
+                      height: 20,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       '$balance',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        fontSize: 16
+                        fontSize: 16,
                       ),
                     ),
                   ],
@@ -147,7 +164,10 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: ClubRoyaleTheme.champagne.withValues(alpha: 0.8)),
+                      Icon(
+                        Icons.info_outline,
+                        color: ClubRoyaleTheme.champagne.withValues(alpha: 0.8),
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -162,11 +182,11 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // How to earn section
                 _SectionHeader(title: 'Earn Royal Rewards'),
                 const SizedBox(height: 16),
-                
+
                 // Daily Login
                 _RewardCard(
                   icon: Icons.calendar_today,
@@ -181,34 +201,55 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: ClubRoyaleTheme.gold,
                             foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                           ),
                           child: _claimingDaily
                               ? const SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.black,
+                                  ),
                                 )
                               : const Text('Claim'),
                         )
                       : Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.green.withValues(alpha: 0.5)),
+                            border: Border.all(
+                              color: Colors.green.withValues(alpha: 0.5),
+                            ),
                           ),
                           child: const Row(
                             children: [
-                              Icon(Icons.check_circle, size: 16, color: Colors.greenAccent),
+                              Icon(
+                                Icons.check_circle,
+                                size: 16,
+                                color: Colors.greenAccent,
+                              ),
                               SizedBox(width: 4),
-                              Text('Claimed', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12)),
+                              Text(
+                                'Claimed',
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ],
                           ),
                         ),
                 ).animate().slideX(duration: 300.ms),
                 const SizedBox(height: 12),
-                
+
                 // Complete Games
                 _RewardCard(
                   icon: Icons.emoji_events,
@@ -216,10 +257,17 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
                   title: 'Play & Win',
                   description: 'Complete games to earn rewards',
                   reward: DiamondRewards.gameComplete,
-                  action: Text('Automatic', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontStyle: FontStyle.italic, fontSize: 12)),
+                  action: Text(
+                    'Automatic',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      fontStyle: FontStyle.italic,
+                      fontSize: 12,
+                    ),
+                  ),
                 ).animate().slideX(duration: 300.ms, delay: 100.ms),
                 const SizedBox(height: 12),
-                
+
                 // Referral
                 _RewardCard(
                   icon: Icons.group_add,
@@ -236,7 +284,7 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
                   ),
                 ).animate().slideX(duration: 300.ms, delay: 200.ms),
                 const SizedBox(height: 12),
-                
+
                 // Weekly Bonus
                 _RewardCard(
                   icon: Icons.star,
@@ -245,19 +293,37 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
                   description: 'Sunday loyalist bonus',
                   reward: DiamondRewards.weeklyBonus,
                   action: Container(
-                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                     decoration: BoxDecoration(color: Colors.amber.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
-                     child: Row(
-                       mainAxisSize: MainAxisSize.min,
-                       children: [
-                         Image.asset('assets/images/vip_crown.png', width: 14, height: 14, color: Colors.amber),
-                         const SizedBox(width: 4),
-                         const Text('Sunday', style: TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.bold)),
-                       ],
-                     )
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          'assets/images/vip_crown.png',
+                          width: 14,
+                          height: 14,
+                          color: Colors.amber,
+                        ),
+                        const SizedBox(width: 4),
+                        const Text(
+                          'Sunday',
+                          style: TextStyle(
+                            color: Colors.amber,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ).animate().slideX(duration: 300.ms, delay: 300.ms),
-                
+
                 const SizedBox(height: 32),
                 Divider(color: Colors.white.withValues(alpha: 0.1)),
                 const SizedBox(height: 16),
@@ -265,7 +331,7 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
                 // Spending info
                 _SectionHeader(title: 'Spend Your Riches'),
                 const SizedBox(height: 16),
-                
+
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -308,7 +374,10 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: CasinoColors.cardBackground,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: ClubRoyaleTheme.gold)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: ClubRoyaleTheme.gold),
+        ),
         title: const Row(
           children: [
             Icon(Icons.share, color: ClubRoyaleTheme.gold),
@@ -336,7 +405,10 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
                   Expanded(
                     child: Text(
                       'clubroyale.app/join?ref=${widget.userId.substring(0, 5)}...',
-                      style: const TextStyle(fontFamily: 'monospace', color: ClubRoyaleTheme.gold),
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        color: ClubRoyaleTheme.gold,
+                      ),
                     ),
                   ),
                   IconButton(
@@ -362,7 +434,10 @@ class _DiamondRewardsScreenState extends State<DiamondRewardsScreen> {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            style: ElevatedButton.styleFrom(backgroundColor: ClubRoyaleTheme.gold, foregroundColor: Colors.black),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ClubRoyaleTheme.gold,
+              foregroundColor: Colors.black,
+            ),
             icon: const Icon(Icons.share),
             label: const Text('Share'),
           ),
@@ -382,7 +457,15 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Container(width: 4, height: 24, color: ClubRoyaleTheme.gold),
         const SizedBox(width: 8),
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 0.5)),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            letterSpacing: 0.5,
+          ),
+        ),
       ],
     );
   }
@@ -413,8 +496,19 @@ class _RewardCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isPremium ? ClubRoyaleTheme.gold.withValues(alpha: 0.3) : Colors.white10),
-        boxShadow: isPremium ? [BoxShadow(color: ClubRoyaleTheme.gold.withValues(alpha: 0.05), blurRadius: 10)] : [],
+        border: Border.all(
+          color: isPremium
+              ? ClubRoyaleTheme.gold.withValues(alpha: 0.3)
+              : Colors.white10,
+        ),
+        boxShadow: isPremium
+            ? [
+                BoxShadow(
+                  color: ClubRoyaleTheme.gold.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                ),
+              ]
+            : [],
       ),
       padding: const EdgeInsets.all(16), // Replaces Card padding
       child: Row(
@@ -450,7 +544,11 @@ class _RewardCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    Image.asset('assets/images/diamond_3d.png', width: 16, height: 16),
+                    Image.asset(
+                      'assets/images/diamond_3d.png',
+                      width: 16,
+                      height: 16,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       '+$reward',
@@ -488,14 +586,19 @@ class _SpendingInfo extends StatelessWidget {
       children: [
         Icon(icon, color: Colors.white54, size: 20),
         const SizedBox(width: 12),
-        Expanded(child: Text(title, style: const TextStyle(color: Colors.white70))),
+        Expanded(
+          child: Text(title, style: const TextStyle(color: Colors.white70)),
+        ),
         Row(
           children: [
             Image.asset('assets/images/diamond_3d.png', width: 16, height: 16),
             const SizedBox(width: 6),
             Text(
               '$cost',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ],
         ),

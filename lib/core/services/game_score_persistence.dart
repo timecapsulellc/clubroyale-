@@ -1,5 +1,5 @@
 /// Game Score Persistence Service
-/// 
+///
 /// Saves and loads game scores using SharedPreferences
 library;
 
@@ -11,29 +11,29 @@ class GameScorePersistence {
   static const String _callBreakKey = 'call_break_scores';
   static const String _teenPattiKey = 'teen_patti_stats';
   static const String _inBetweenKey = 'in_between_stats';
-  
+
   static SharedPreferences? _prefs;
-  
+
   /// Initialize the persistence service
   static Future<void> init() async {
     _prefs ??= await SharedPreferences.getInstance();
   }
-  
+
   // === Call Break Score Persistence ===
-  
+
   /// Save Call Break scores
   static Future<void> saveCallBreakScores(Map<String, int> scores) async {
     await init();
     final jsonStr = jsonEncode(scores);
     await _prefs!.setString(_callBreakKey, jsonStr);
   }
-  
+
   /// Load Call Break scores
   static Future<Map<String, int>> loadCallBreakScores() async {
     await init();
     final jsonStr = _prefs!.getString(_callBreakKey);
     if (jsonStr == null) return {};
-    
+
     try {
       final Map<String, dynamic> decoded = jsonDecode(jsonStr);
       return decoded.map((k, v) => MapEntry(k, v as int));
@@ -41,15 +41,15 @@ class GameScorePersistence {
       return {};
     }
   }
-  
+
   /// Clear Call Break scores
   static Future<void> clearCallBreakScores() async {
     await init();
     await _prefs!.remove(_callBreakKey);
   }
-  
+
   // === Teen Patti Stats ===
-  
+
   /// Save Teen Patti stats (wins, losses, biggest pot)
   static Future<void> saveTeenPattiStats({
     required int gamesPlayed,
@@ -66,7 +66,7 @@ class GameScorePersistence {
     };
     await _prefs!.setString(_teenPattiKey, jsonEncode(stats));
   }
-  
+
   /// Load Teen Patti stats
   static Future<Map<String, int>> loadTeenPattiStats() async {
     await init();
@@ -79,7 +79,7 @@ class GameScorePersistence {
         'totalWinnings': 0,
       };
     }
-    
+
     try {
       final Map<String, dynamic> decoded = jsonDecode(jsonStr);
       return decoded.map((k, v) => MapEntry(k, v as int));
@@ -92,9 +92,9 @@ class GameScorePersistence {
       };
     }
   }
-  
+
   // === In-Between Stats ===
-  
+
   /// Save In-Between stats
   static Future<void> saveInBetweenStats({
     required int roundsPlayed,
@@ -113,7 +113,7 @@ class GameScorePersistence {
     };
     await _prefs!.setString(_inBetweenKey, jsonEncode(stats));
   }
-  
+
   /// Load In-Between stats
   static Future<Map<String, int>> loadInBetweenStats() async {
     await init();
@@ -127,7 +127,7 @@ class GameScorePersistence {
         'highestChips': 100,
       };
     }
-    
+
     try {
       final Map<String, dynamic> decoded = jsonDecode(jsonStr);
       return decoded.map((k, v) => MapEntry(k, v as int));
@@ -141,7 +141,7 @@ class GameScorePersistence {
       };
     }
   }
-  
+
   /// Clear all game stats
   static Future<void> clearAllStats() async {
     await init();

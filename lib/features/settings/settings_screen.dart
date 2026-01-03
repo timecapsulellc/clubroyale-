@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clubroyale/core/config/club_royale_theme.dart';
 import 'package:clubroyale/core/theme/multi_theme.dart';
 import 'package:clubroyale/core/widgets/theme_selector.dart';
 import 'package:clubroyale/features/settings/widgets/terminology_toggle.dart';
@@ -9,7 +8,7 @@ import 'package:clubroyale/core/services/feature_flags.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
 
 /// Settings Screen - Premium Edition
-/// 
+///
 /// Enhanced UI/UX with:
 /// - Hero Header
 /// - Quick Action Grid (Wallet, Profile)
@@ -21,24 +20,24 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeColors = ref.watch(themeColorsProvider);
-    
+
     return Scaffold(
       backgroundColor: themeColors.background,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           _buildSliverAppBar(context, themeColors),
-          
+
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   // 1. Prime Actions (Wallet & Profile)
+                  // 1. Prime Actions (Wallet & Profile)
                   _buildPrimeActionsGrid(context, themeColors),
                   const SizedBox(height: 32),
-                  
+
                   // 2. Gameplay Settings (The Core Experience)
                   _buildSectionTitle('GAMEPLAY', themeColors),
                   const SizedBox(height: 16),
@@ -49,11 +48,11 @@ class SettingsScreen extends ConsumerWidget {
                   _buildSwitchTile(
                     title: 'Strict Mode (Nepali Variant)',
                     subtitle: 'Enable arcade penalties and precise Maal rules',
-                    value: true, 
+                    value: true,
                     onChanged: (val) {}, // Todo: wire up to provider
                     themeColors: themeColors,
                   ),
-                  
+
                   const SizedBox(height: 32),
 
                   // 3. Social & Privacy
@@ -77,9 +76,9 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 32),
                   ],
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // 4. Audio Settings
                   _buildSectionTitle('AUDIO', themeColors),
                   const SizedBox(height: 16),
@@ -112,18 +111,18 @@ class SettingsScreen extends ConsumerWidget {
                           ),
                         ],
                       );
-                    }
+                    },
                   ),
-                  
+
                   const SizedBox(height: 32),
 
                   // 5. Appearance
                   _buildSectionTitle('APPEARANCE', themeColors),
                   const SizedBox(height: 16),
                   const ThemeSelectorWidget(),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // 5. Support & Legal
                   _buildSectionTitle('SUPPORT', themeColors),
                   const SizedBox(height: 16),
@@ -142,7 +141,7 @@ class SettingsScreen extends ConsumerWidget {
                     onTap: () => context.push('/about'),
                     themeColors: themeColors,
                   ),
-                  
+
                   const SizedBox(height: 48),
                 ],
               ),
@@ -170,9 +169,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
         background: Container(
-          decoration: BoxDecoration(
-            gradient: themeColors.primaryGradient,
-          ),
+          decoration: BoxDecoration(gradient: themeColors.primaryGradient),
           child: Stack(
             children: [
               // Subtle Pattern Overlay
@@ -281,10 +278,7 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: Colors.white70, fontSize: 12),
             ),
           ],
         ),
@@ -332,7 +326,7 @@ class SettingsScreen extends ConsumerWidget {
         border: Border.all(color: Colors.white10),
       ),
       child: SwitchListTile(
-        activeColor: themeColors.gold,
+        activeThumbColor: themeColors.gold,
         contentPadding: EdgeInsets.zero,
         title: Text(
           title,
@@ -346,7 +340,10 @@ class SettingsScreen extends ConsumerWidget {
           padding: const EdgeInsets.only(top: 4),
           child: Text(
             subtitle,
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.5),
+              fontSize: 12,
+            ),
           ),
         ),
         value: value,
@@ -354,7 +351,7 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Widget _buildNavigationTile({
     required IconData icon,
     required String title,
@@ -391,10 +388,17 @@ class SettingsScreen extends ConsumerWidget {
           padding: const EdgeInsets.only(top: 4),
           child: Text(
             subtitle,
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.5),
+              fontSize: 12,
+            ),
           ),
         ),
-        trailing: Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white24),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: Colors.white24,
+        ),
         onTap: onTap,
       ),
     );

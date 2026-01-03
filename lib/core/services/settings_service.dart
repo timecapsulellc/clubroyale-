@@ -13,9 +13,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Provider for settings service
-final settingsServiceProvider = AsyncNotifierProvider<SettingsService, UserSettings>(() {
-  return SettingsService();
-});
+final settingsServiceProvider =
+    AsyncNotifierProvider<SettingsService, UserSettings>(() {
+      return SettingsService();
+    });
 
 /// User settings data class
 class UserSettings {
@@ -130,6 +131,8 @@ class SettingsService extends AsyncNotifier<UserSettings> {
   Future<void> setNotificationsEnabled(bool enabled) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyNotifications, enabled);
-    state = AsyncValue.data(state.value!.copyWith(notificationsEnabled: enabled));
+    state = AsyncValue.data(
+      state.value!.copyWith(notificationsEnabled: enabled),
+    );
   }
 }

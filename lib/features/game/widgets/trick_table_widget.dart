@@ -47,7 +47,7 @@ class TrickTableWidget extends StatelessWidget {
                       width: 2,
                     ),
                   ),
-                   child: Center(
+                  child: Center(
                     child: Icon(
                       Icons.casino_outlined,
                       color: Colors.white.withValues(alpha: 0.5),
@@ -87,8 +87,7 @@ class TrickTableWidget extends StatelessWidget {
     final positions = <String, CardPosition>{};
 
     // Find current user index
-    final currentUserIndex =
-        players.indexWhere((p) => p.id == currentUserId);
+    final currentUserIndex = players.indexWhere((p) => p.id == currentUserId);
 
     if (currentUserIndex == -1) return positions;
 
@@ -124,10 +123,5 @@ class CardPosition {
   final double? left;
   final double? right;
 
-  CardPosition({
-    this.top,
-    this.bottom,
-    this.left,
-    this.right,
-  });
+  CardPosition({this.top, this.bottom, this.left, this.right});
 }

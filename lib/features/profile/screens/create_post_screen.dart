@@ -68,9 +68,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     if (userId == null) return null;
 
     final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final storageRef = FirebaseStorage.instance
-        .ref()
-        .child('posts/$userId/$timestamp');
+    final storageRef = FirebaseStorage.instance.ref().child(
+      'posts/$userId/$timestamp',
+    );
 
     final uploadTask = storageRef.putData(_mediaBytes!);
     final snapshot = await uploadTask;
@@ -80,9 +80,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   Future<void> _createPost() async {
     final content = _contentController.text.trim();
     if (content.isEmpty && _mediaBytes == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please add some content')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please add some content')));
       return;
     }
 
@@ -107,16 +107,16 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Post created!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Post created!')));
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create post: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to create post: $e')));
       }
     } finally {
       if (mounted) {
@@ -142,7 +142,10 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('Post', style: TextStyle(fontWeight: FontWeight.bold)),
+                : const Text(
+                    'Post',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
           ),
         ],
       ),
@@ -193,7 +196,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                fillColor: colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.3,
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -261,7 +266,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 decoration: BoxDecoration(
                   color: colorScheme.primaryContainer.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: colorScheme.primary.withValues(alpha: 0.5)),
+                  border: Border.all(
+                    color: colorScheme.primary.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: Row(
                   children: [

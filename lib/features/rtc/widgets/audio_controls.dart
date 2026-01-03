@@ -57,10 +57,7 @@ class AudioControlWidget extends ConsumerWidget {
               // Leave button
               IconButton(
                 onPressed: () => audioService.leaveAudioRoom(),
-                icon: Icon(
-                  Icons.call_end,
-                  color: theme.colorScheme.error,
-                ),
+                icon: Icon(Icons.call_end, color: theme.colorScheme.error),
                 tooltip: 'Leave Voice Chat',
               ),
 
@@ -109,10 +106,7 @@ class AudioControlWidget extends ConsumerWidget {
       child: Container(
         width: 12,
         height: 12,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       ),
     );
   }
@@ -190,23 +184,18 @@ class AudioPeersPanel extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.headset_mic, size: 16, color: theme.colorScheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  'Voice Chat',
-                  style: theme.textTheme.titleSmall,
+                Icon(
+                  Icons.headset_mic,
+                  size: 16,
+                  color: theme.colorScheme.primary,
                 ),
+                const SizedBox(width: 8),
+                Text('Voice Chat', style: theme.textTheme.titleSmall),
               ],
             ),
             const Divider(),
             // Local user
-            _buildPeerTile(
-              context,
-              audioService,
-              userId,
-              'You',
-              isLocal: true,
-            ),
+            _buildPeerTile(context, audioService, userId, 'You', isLocal: true),
             // Remote peers
             ...audioService.connectedPeers.map((peerId) {
               final name = peerNames?[peerId] ?? 'Player';
@@ -226,15 +215,14 @@ class AudioPeersPanel extends ConsumerWidget {
     bool isLocal = false,
   }) {
     final theme = Theme.of(context);
-    final isMuted = isLocal ? audioService.isMuted : audioService.isPeerMuted(peerId);
+    final isMuted = isLocal
+        ? audioService.isMuted
+        : audioService.isPeerMuted(peerId);
 
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(
-        radius: 16,
-        child: Text(name[0].toUpperCase()),
-      ),
+      leading: CircleAvatar(radius: 16, child: Text(name[0].toUpperCase())),
       title: Text(name),
       trailing: IconButton(
         icon: Icon(

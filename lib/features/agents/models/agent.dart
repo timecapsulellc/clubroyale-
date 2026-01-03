@@ -1,5 +1,5 @@
 /// Agent Models
-/// 
+///
 /// Defines the data models for the agent system.
 /// Using plain Dart classes for compatibility.
 library;
@@ -10,11 +10,11 @@ part 'agent.g.dart';
 
 /// Base agent type enumeration
 enum AgentType {
-  architect,   // Meta-orchestrator agent
-  gaming,      // Game AI, bots, tips
-  social,      // Chat moderation, translation
-  economy,     // Rewards, fraud detection
-  content,     // Story/post moderation
+  architect, // Meta-orchestrator agent
+  gaming, // Game AI, bots, tips
+  social, // Chat moderation, translation
+  economy, // Rewards, fraud detection
+  content, // Story/post moderation
   notification, // Smart notifications
 }
 
@@ -30,21 +30,10 @@ enum AgentCapability {
 }
 
 /// Agent priority levels
-enum AgentPriority {
-  low,
-  normal,
-  high,
-  critical,
-}
+enum AgentPriority { low, normal, high, critical }
 
 /// Agent status
-enum AgentStatus {
-  idle,
-  processing,
-  waiting,
-  error,
-  disabled,
-}
+enum AgentStatus { idle, processing, waiting, error, disabled }
 
 /// Agent request model
 @JsonSerializable()
@@ -209,7 +198,8 @@ class AgentConfig {
       description: description ?? this.description,
       capabilities: capabilities ?? this.capabilities,
       isEnabled: isEnabled ?? this.isEnabled,
-      maxConcurrentRequests: maxConcurrentRequests ?? this.maxConcurrentRequests,
+      maxConcurrentRequests:
+          maxConcurrentRequests ?? this.maxConcurrentRequests,
       timeoutMs: timeoutMs ?? this.timeoutMs,
       modelId: modelId ?? this.modelId,
       customConfig: customConfig ?? this.customConfig,
@@ -282,7 +272,10 @@ class AgentDefinitions {
     type: AgentType.gaming,
     name: 'Gaming Agent',
     description: 'Handles game AI, bot behavior, and strategic tips',
-    capabilities: [AgentCapability.gameStrategy, AgentCapability.textGeneration],
+    capabilities: [
+      AgentCapability.gameStrategy,
+      AgentCapability.textGeneration,
+    ],
     modelId: 'gemini-1.5-flash',
   );
 
@@ -290,7 +283,11 @@ class AgentDefinitions {
     type: AgentType.social,
     name: 'Social Agent',
     description: 'Chat moderation, translation, and social interactions',
-    capabilities: [AgentCapability.moderation, AgentCapability.translation, AgentCapability.textGeneration],
+    capabilities: [
+      AgentCapability.moderation,
+      AgentCapability.translation,
+      AgentCapability.textGeneration,
+    ],
     modelId: 'gemini-1.5-flash',
   );
 

@@ -30,10 +30,11 @@ class PlayingCardWidget extends StatefulWidget {
   State<PlayingCardWidget> createState() => _PlayingCardWidgetState();
 }
 
-class _PlayingCardWidgetState extends State<PlayingCardWidget> with SingleTickerProviderStateMixin {
+class _PlayingCardWidgetState extends State<PlayingCardWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  
+
   // Track previous face-down state to trigger sound or haptic if needed
   late bool _wasFaceDown;
 
@@ -42,9 +43,9 @@ class _PlayingCardWidgetState extends State<PlayingCardWidget> with SingleTicker
     super.initState();
     _wasFaceDown = widget.isFaceDown;
     _controller = AnimationController(
-        duration: const Duration(milliseconds: 400),
-        vsync: this,
-        value: widget.isFaceDown ? 1.0 : 0.0 // Initial state
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+      value: widget.isFaceDown ? 1.0 : 0.0, // Initial state
     );
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
   }
@@ -95,39 +96,53 @@ class _PlayingCardWidgetState extends State<PlayingCardWidget> with SingleTicker
 
     // Main interaction wrapper
     return Semantics(
-      label: widget.card != null 
-          ? '${widget.card!.rank.displayString} of ${widget.card!.suit.name}' 
+      label: widget.card != null
+          ? '${widget.card!.rank.displayString} of ${widget.card!.suit.name}'
           : 'Card Back',
       button: true,
       enabled: widget.isPlayable,
       child: GestureDetector(
-        onTap: widget.isPlayable && !widget.isFaceDown && !widget.isLoading ? widget.onTap : null,
+        onTap: widget.isPlayable && !widget.isFaceDown && !widget.isLoading
+            ? widget.onTap
+            : null,
         child: AnimatedBuilder(
-        animation: _animation,
-        builder: (context, child) {
-          // Calculate rotation
-          final double angle = _animation.value * pi;
-          final bool isBackVisible = angle >= pi / 2;
+          animation: _animation,
+          builder: (context, child) {
+            // Calculate rotation
+            final double angle = _animation.value * pi;
+            final bool isBackVisible = angle >= pi / 2;
 
-          return Transform(
-            transform: Matrix4.identity()
-              ..setEntry(3, 2, 0.001) // Perspective
-              ..rotateY(angle),
-            alignment: Alignment.center,
-            child: widget.isSelected
-                ? Transform.translate(
-                    offset: const Offset(0, -12),
-                    child: _buildCardContent(isBackVisible, theme, 
-                        isRotated: isBackVisible),
-                  )
-                : _buildCardContent(isBackVisible, theme, isRotated: isBackVisible),
-          );
-        },
+            return Transform(
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.001) // Perspective
+                ..rotateY(angle),
+              alignment: Alignment.center,
+              child: widget.isSelected
+                  ? Transform.translate(
+                      offset: const Offset(0, -12),
+                      child: _buildCardContent(
+                        isBackVisible,
+                        theme,
+                        isRotated: isBackVisible,
+                      ),
+                    )
+                  : _buildCardContent(
+                      isBackVisible,
+                      theme,
+                      isRotated: isBackVisible,
+                    ),
+            );
+          },
+        ),
       ),
-    ));
+    );
   }
 
-  Widget _buildCardContent(bool isBackVisible, ThemeData theme, {bool isRotated = false}) {
+  Widget _buildCardContent(
+    bool isBackVisible,
+    ThemeData theme, {
+    bool isRotated = false,
+  }) {
     // If showing back, we are rotated 180 degrees (pi).
     // To show the back image correctly (upright), we need to rotate it back IF the flip rotation inverted it.
     // Standard Card Flip: Back is usually rendered mirrored if we just rotate logic.
@@ -135,7 +150,7 @@ class _PlayingCardWidgetState extends State<PlayingCardWidget> with SingleTicker
     // 0 deg: Front (Normal)
     // 180 deg: Back (Mirrored horizontally)
     // So if rendering Back, we should Wrap in Transform(rotateY(pi)) to un-mirror it relative to the viewer.
-    
+
     return Transform(
       alignment: Alignment.center,
       transform: isRotated ? Matrix4.rotationY(pi) : Matrix4.identity(),
@@ -166,8 +181,8 @@ class _PlayingCardWidgetState extends State<PlayingCardWidget> with SingleTicker
               child: isBackVisible
                   ? _buildCardBack(theme)
                   : widget.card != null
-                      ? _buildCardFace(widget.card!, theme)
-                      : _buildEmptyCard(theme),
+                  ? _buildCardFace(widget.card!, theme)
+                  : _buildEmptyCard(theme),
             ),
             if (widget.isLoading && !isBackVisible)
               Container(

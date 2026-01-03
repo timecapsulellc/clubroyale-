@@ -139,37 +139,37 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                       ),
                     ),
                   )
-                : _currentStory.mediaUrl != null 
-                    ? Image.network(
-                        _currentStory.mediaUrl!,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
-                              color: colorScheme.primary,
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) => const Center(
-                          child: Icon(
-                            Icons.error_outline,
-                            size: 64,
-                            color: Colors.white54,
-                          ),
+                : _currentStory.mediaUrl != null
+                ? Image.network(
+                    _currentStory.mediaUrl!,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                              : null,
+                          color: colorScheme.primary,
                         ),
-                      )
-                    : const Center(
-                        child: Icon(
-                          Icons.image_not_supported,
-                          size: 64,
-                          color: Colors.white54,
-                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) => const Center(
+                      child: Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.white54,
                       ),
+                    ),
+                  )
+                : const Center(
+                    child: Icon(
+                      Icons.image_not_supported,
+                      size: 64,
+                      color: Colors.white54,
+                    ),
+                  ),
 
             // Gradient overlay at top
             Positioned(
@@ -211,17 +211,17 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                         child: index < _currentIndex
                             ? Container(color: Colors.white)
                             : index == _currentIndex
-                                ? AnimatedBuilder(
-                                    animation: _progressController,
-                                    builder: (context, child) {
-                                      return FractionallySizedBox(
-                                        alignment: Alignment.centerLeft,
-                                        widthFactor: _progressController.value,
-                                        child: Container(color: Colors.white),
-                                      );
-                                    },
-                                  )
-                                : const SizedBox.shrink(),
+                            ? AnimatedBuilder(
+                                animation: _progressController,
+                                builder: (context, child) {
+                                  return FractionallySizedBox(
+                                    alignment: Alignment.centerLeft,
+                                    widthFactor: _progressController.value,
+                                    child: Container(color: Colors.white),
+                                  );
+                                },
+                              )
+                            : const SizedBox.shrink(),
                       ),
                     ),
                   );
@@ -295,15 +295,13 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                     color: _currentStory.textColor != null
                         ? Color(
                             int.parse(_currentStory.textColor!, radix: 16) +
-                                0xFF000000)
+                                0xFF000000,
+                          )
                         : Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                     shadows: const [
-                      Shadow(
-                        blurRadius: 4,
-                        color: Colors.black54,
-                      ),
+                      Shadow(blurRadius: 4, color: Colors.black54),
                     ],
                   ),
                   textAlign: TextAlign.center,
@@ -377,10 +375,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                       },
                     ),
                     IconButton(
-                      icon: const Icon(
-                        Icons.send,
-                        color: Colors.white,
-                      ),
+                      icon: const Icon(Icons.send, color: Colors.white),
                       onPressed: () {
                         // TODO: Open reply DM
                       },
@@ -398,11 +393,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
-                    Icons.pause,
-                    color: Colors.white,
-                    size: 48,
-                  ),
+                  child: const Icon(Icons.pause, color: Colors.white, size: 48),
                 ).animate().scale(duration: 200.ms),
               ),
           ],

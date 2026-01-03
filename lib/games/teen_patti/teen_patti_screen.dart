@@ -1,5 +1,5 @@
 /// Teen Patti Game Screen
-/// 
+///
 /// Real-time multiplayer Teen Patti game UI
 library;
 
@@ -12,7 +12,6 @@ import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 import 'package:clubroyale/core/widgets/turn_timer.dart';
 import 'package:clubroyale/core/widgets/dynamic_chip_stack.dart';
 import 'package:clubroyale/core/widgets/tutorial_overlay.dart'; // Tutorial
-import 'package:clubroyale/core/design_system/game/felt_texture_painter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -28,11 +27,8 @@ import 'package:clubroyale/features/video/widgets/video_grid.dart';
 
 class TeenPattiScreen extends ConsumerStatefulWidget {
   final String roomId;
-  
-  const TeenPattiScreen({
-    required this.roomId,
-    super.key,
-  });
+
+  const TeenPattiScreen({required this.roomId, super.key});
 
   @override
   ConsumerState<TeenPattiScreen> createState() => _TeenPattiScreenState();
@@ -43,23 +39,25 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
   bool _hasSeenCards = false;
   int _betAmount = 1;
   bool _isChatExpanded = false;
-  bool _showVideoGrid = false;
-  
+  final bool _showVideoGrid = false;
+
   // Tutorial state
   bool _showTutorial = true;
   final GlobalKey _cardsKey = GlobalKey();
   final GlobalKey _potKey = GlobalKey();
   final GlobalKey _actionBarKey = GlobalKey();
   final GlobalKey _rulesKey = GlobalKey();
-  
+
   List<TutorialStep> get _tutorialSteps => [
     TutorialStep(
       title: 'Welcome to Teen Patti! 🃏',
-      description: 'The goal is to have the best 3-card hand. Trail (3-of-a-kind) beats all!',
+      description:
+          'The goal is to have the best 3-card hand. Trail (3-of-a-kind) beats all!',
     ),
     TutorialStep(
       title: 'Your Cards',
-      description: 'Tap here to see your cards (Seen mode). Playing Blind costs fewer chips!',
+      description:
+          'Tap here to see your cards (Seen mode). Playing Blind costs fewer chips!',
       targetKey: _cardsKey,
       tooltipAlignment: Alignment.topCenter,
     ),
@@ -71,7 +69,8 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
     ),
     TutorialStep(
       title: 'Actions',
-      description: 'Fold to give up, Bet to stay in, or Show when only 2 players remain.',
+      description:
+          'Fold to give up, Bet to stay in, or Show when only 2 players remain.',
       targetKey: _actionBarKey,
       tooltipAlignment: Alignment.topCenter,
     ),
@@ -82,10 +81,10 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       tooltipAlignment: Alignment.bottomLeft,
     ),
   ];
-  
+
   // Card lookup cache
   final Map<String, Card> _cardCache = {};
-  
+
   @override
   void initState() {
     super.initState();
@@ -96,28 +95,26 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
   void dispose() {
     super.dispose();
   }
-  
+
   void _buildCardCache() {
     final deck = Deck.standard();
     for (final card in deck.cards) {
       _cardCache[card.id] = card;
     }
   }
-  
+
   Card? _getCard(String id) => _cardCache[id];
-  
+
   @override
   Widget build(BuildContext context) {
     final teenPattiService = ref.watch(teenPattiServiceProvider);
     final authService = ref.watch(authServiceProvider);
     final currentUser = authService.currentUser;
-    
+
     if (currentUser == null) {
-      return const Scaffold(
-        body: Center(child: Text('Please sign in')),
-      );
+      return const Scaffold(body: Center(child: Text('Please sign in')));
     }
-    
+
     return StreamBuilder<TeenPattiGameState?>(
       stream: teenPattiService.watchGameState(widget.roomId),
       builder: (context, snapshot) {
@@ -130,7 +127,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
             ),
           );
         }
-        
+
         final state = snapshot.data;
         if (state == null) {
           return Scaffold(
@@ -140,148 +137,184 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
               title: const Text('Teen Patti'),
             ),
             body: const Center(
-              child: Text('Waiting for game...', style: TextStyle(color: Colors.white70)),
+              child: Text(
+                'Waiting for game...',
+                style: TextStyle(color: Colors.white70),
+              ),
             ),
           );
         }
-        
+
         // Check if game finished
         if (state.phase == 'finished') {
           return _buildGameOverScreen(state, currentUser.uid);
         }
-        
+
         final myHand = state.playerHands[currentUser.uid] ?? [];
         final isMyTurn = state.currentPlayerId == currentUser.uid;
         final myStatus = state.playerStatus[currentUser.uid] ?? 'blind';
-        
-          return Scaffold(
-            extendBodyBehindAppBar: true, // Allow table to show behind app bar
-            appBar: AppBar(
-              backgroundColor: Colors.transparent, // Let table show through
-              elevation: 0,
-              leading: Container(
+
+        return Scaffold(
+          extendBodyBehindAppBar: true, // Allow table to show behind app bar
+          appBar: AppBar(
+            backgroundColor: Colors.transparent, // Let table show through
+            elevation: 0,
+            leading: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black26,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => context.go('/lobby'),
+              ),
+            ),
+            title: const Text(
+              'Teen Patti',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            centerTitle: true,
+            actions: [
+              // Help/Menu Button for consistency
+              Container(
+                key: _rulesKey,
                 margin: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.black26,
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => context.go('/lobby'),
-                ),
-              ),
-              title: const Text('Teen Patti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              centerTitle: true,
-              actions: [
-                // Help/Menu Button for consistency
-                Container(
-                  key: _rulesKey,
-                  margin: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
-                  child: IconButton(
-                    icon: const Icon(Icons.help_outline, color: Colors.white),
-                    onPressed: () {
-                       showDialog(
-                         context: context,
-                         builder: (c) => AlertDialog(
-                           backgroundColor: CasinoColors.cardBackground,
-                           title: const Text('Teen Patti Rules (Flash)', style: TextStyle(color: CasinoColors.gold)),
-                           content: const SingleChildScrollView(
-                             child: Text(
-                               '1. Highest to Lowest Rankings:\n'
-                               '   • TRAIL (Set): 3 cards of same rank (AAA is highest)\n'
-                               '   • PURE SEQUENCE: 3 consecutive cards of same suit\n'
-                               '   • SEQUENCE: 3 consecutive cards\n'
-                               '   • COLOR: 3 cards of same suit\n'
-                               '   • PAIR: 2 cards of same rank\n'
-                               '   • HIGH CARD: Highest individual card\n\n'
-                               '2. Blind vs Seen:\n'
-                               '   • Blind player bets 1x.\n'
-                               '   • Seen player must bet 2x current stake.\n\n'
-                               '3. Show:\n'
-                               '   • Only possible when 2 players remain.',
-                               style: TextStyle(color: Colors.white70),
-                             ),
-                           ),
-                           actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('Got it'))],
-                         ),
-                       );
-                    },
-                  ),
-                ),
-              ],
-            ),
-            body: TableLayout(
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    // _buildAppBar removed from body as we moved it to Scaffold.appBar
-                    SizedBox(height: kToolbarHeight), 
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          Column(
-                            children: [
-                              // Game mode indicator
-                              _buildGameModeBanner(state, currentUser.uid),
-                              _buildTurnIndicator(isMyTurn, myStatus),
-                              Expanded(flex: 2, child: _buildOpponentsArea(state, currentUser.uid)),
-                              Container(key: _potKey, child: _buildPotArea(state.pot)),
-                              Expanded(flex: 3, child: Container(key: _cardsKey, child: _buildMyCards(myHand, myStatus))),
-                              Container(key: _actionBarKey, child: _buildActionBar(isMyTurn, myStatus, state)),
-                            ],
+                  icon: const Icon(Icons.help_outline, color: Colors.white),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (c) => AlertDialog(
+                        backgroundColor: CasinoColors.cardBackground,
+                        title: const Text(
+                          'Teen Patti Rules (Flash)',
+                          style: TextStyle(color: CasinoColors.gold),
+                        ),
+                        content: const SingleChildScrollView(
+                          child: Text(
+                            '1. Highest to Lowest Rankings:\n'
+                            '   • TRAIL (Set): 3 cards of same rank (AAA is highest)\n'
+                            '   • PURE SEQUENCE: 3 consecutive cards of same suit\n'
+                            '   • SEQUENCE: 3 consecutive cards\n'
+                            '   • COLOR: 3 cards of same suit\n'
+                            '   • PAIR: 2 cards of same rank\n'
+                            '   • HIGH CARD: Highest individual card\n\n'
+                            '2. Blind vs Seen:\n'
+                            '   • Blind player bets 1x.\n'
+                            '   • Seen player must bet 2x current stake.\n\n'
+                            '3. Show:\n'
+                            '   • Only possible when 2 players remain.',
+                            style: TextStyle(color: Colors.white70),
                           ),
-                          // Video Grid Overlay
-                          if (_showVideoGrid)
-                            Positioned(
-                              top: 60,
-                              right: 16,
-                              width: 200,
-                              height: 300,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.black87,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: VideoGridWidget(
-                                  roomId: widget.roomId,
-                                  userId: currentUser.uid,
-                                  userName: currentUser.displayName ?? 'Player',
-                                ),
-                              ),
-                            ),
-                          // Chat Overlay
-                          Positioned(
-                            bottom: 140, // Above hand
-                            left: 16,
-                            child: ChatOverlay(
-                              roomId: widget.roomId,
-                              userId: currentUser.uid,
-                              userName: currentUser.displayName ?? 'Player',
-                              isExpanded: _isChatExpanded,
-                              onToggle: () => setState(() => _isChatExpanded = !_isChatExpanded),
-                            ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(c),
+                            child: const Text('Got it'),
                           ),
-                          // Tutorial Overlay
-                          if (_showTutorial)
-                            TutorialOverlay(
-                              steps: _tutorialSteps,
-                              onComplete: () => setState(() => _showTutorial = false),
-                              onSkip: () => setState(() => _showTutorial = false),
-                            ),
                         ],
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
+            ],
+          ),
+          body: TableLayout(
+            child: SafeArea(
+              child: Column(
+                children: [
+                  // _buildAppBar removed from body as we moved it to Scaffold.appBar
+                  SizedBox(height: kToolbarHeight),
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        Column(
+                          children: [
+                            // Game mode indicator
+                            _buildGameModeBanner(state, currentUser.uid),
+                            _buildTurnIndicator(isMyTurn, myStatus),
+                            Expanded(
+                              flex: 2,
+                              child: _buildOpponentsArea(
+                                state,
+                                currentUser.uid,
+                              ),
+                            ),
+                            Container(
+                              key: _potKey,
+                              child: _buildPotArea(state.pot),
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Container(
+                                key: _cardsKey,
+                                child: _buildMyCards(myHand, myStatus),
+                              ),
+                            ),
+                            Container(
+                              key: _actionBarKey,
+                              child: _buildActionBar(isMyTurn, myStatus, state),
+                            ),
+                          ],
+                        ),
+                        // Video Grid Overlay
+                        if (_showVideoGrid)
+                          Positioned(
+                            top: 60,
+                            right: 16,
+                            width: 200,
+                            height: 300,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black87,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: VideoGridWidget(
+                                roomId: widget.roomId,
+                                userId: currentUser.uid,
+                                userName: currentUser.displayName ?? 'Player',
+                              ),
+                            ),
+                          ),
+                        // Chat Overlay
+                        Positioned(
+                          bottom: 140, // Above hand
+                          left: 16,
+                          child: ChatOverlay(
+                            roomId: widget.roomId,
+                            userId: currentUser.uid,
+                            userName: currentUser.displayName ?? 'Player',
+                            isExpanded: _isChatExpanded,
+                            onToggle: () => setState(
+                              () => _isChatExpanded = !_isChatExpanded,
+                            ),
+                          ),
+                        ),
+                        // Tutorial Overlay
+                        if (_showTutorial)
+                          TutorialOverlay(
+                            steps: _tutorialSteps,
+                            onComplete: () =>
+                                setState(() => _showTutorial = false),
+                            onSkip: () => setState(() => _showTutorial = false),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          );
+          ),
+        );
       },
     );
   }
-  
-
 
   Widget _buildPotBadge(int pot) {
     return Container(
@@ -294,17 +327,24 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset('assets/images/chips/chip_red.png', width: 16, height: 16),
+          Image.asset(
+            'assets/images/chips/chip_red.png',
+            width: 16,
+            height: 16,
+          ),
           const SizedBox(width: 4),
           Text(
             'Pot: $pot',
-            style: const TextStyle(color: CasinoColors.gold, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: CasinoColors.gold,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildStakeBadge(int stake) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -318,17 +358,19 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       ),
     );
   }
-  
+
   Widget _buildTurnIndicator(bool isMyTurn, String myStatus) {
     final statusText = myStatus == 'blind' ? '🙈 Blind' : '👀 Seen';
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: isMyTurn ? Colors.green.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.3),
-        border: Border(bottom: BorderSide(
-          color: isMyTurn ? Colors.green : Colors.white24,
-        )),
+        color: isMyTurn
+            ? Colors.green.withValues(alpha: 0.3)
+            : Colors.black.withValues(alpha: 0.3),
+        border: Border(
+          bottom: BorderSide(color: isMyTurn ? Colors.green : Colors.white24),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -348,21 +390,18 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
               ],
             ],
           ),
-          Text(
-            statusText,
-            style: const TextStyle(color: Colors.white70),
-          ),
+          Text(statusText, style: const TextStyle(color: Colors.white70)),
         ],
       ),
     );
   }
-  
+
   /// Build the game mode banner showing AI/Multiplayer status
   Widget _buildGameModeBanner(TeenPattiGameState state, String myId) {
     final allPlayers = state.playerHands.keys.toList();
     final botCount = allPlayers.where((id) => id.startsWith('bot_')).length;
     final humanCount = allPlayers.length - botCount;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: GameModeBanner(
@@ -375,7 +414,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
 
   Widget _buildOpponentsArea(TeenPattiGameState state, String myId) {
     final opponents = state.playerHands.keys.where((id) => id != myId).toList();
-    
+
     // Convert to GameOpponent objects for the new widget
     final opponentWidgets = opponents.map((playerId) {
       final status = state.playerStatus[playerId] ?? 'blind';
@@ -383,7 +422,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       final isCurrentTurn = state.currentPlayerId == playerId;
       final isFolded = status == 'folded';
       final isBot = playerId.startsWith('bot_');
-      
+
       return GameOpponent(
         id: playerId,
         name: isBot ? _getBotDisplayName(playerId) : 'Player',
@@ -395,46 +434,45 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
         cardCount: state.playerHands[playerId]?.length ?? 0,
       );
     }).toList();
-    
+
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: OpponentRow(
-        opponents: opponentWidgets,
-        avatarSize: 50,
-      ),
+      child: OpponentRow(opponents: opponentWidgets, avatarSize: 50),
     );
   }
-  
+
   /// Get a display name for bot players
   String _getBotDisplayName(String botId) {
-    final botNames = ['TrickMaster', 'CardShark', 'LuckyDice', 'DeepThink', 'RoyalAce'];
+    final botNames = [
+      'TrickMaster',
+      'CardShark',
+      'LuckyDice',
+      'DeepThink',
+      'RoyalAce',
+    ];
     final index = botId.hashCode.abs() % botNames.length;
     return botNames[index];
   }
-  
 
-  
   Widget _buildPotArea(int pot) {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: PotDisplay(
-        potAmount: pot,
-        label: '💰 POT',
-        size: 70,
-      ),
+      child: PotDisplay(potAmount: pot, label: '💰 POT', size: 70),
     );
   }
 
   // Helper method removed - using SoundService directly
-  
+
   Widget _buildMyCards(List<String> cardIds, String myStatus) {
     final showCards = myStatus == 'seen' || _hasSeenCards;
-    
+
     return GestureDetector(
-      onTap: myStatus == 'blind' && !_hasSeenCards ? () {
-        setState(() => _hasSeenCards = true);
-        _seeCards();
-      } : null,
+      onTap: myStatus == 'blind' && !_hasSeenCards
+          ? () {
+              setState(() => _hasSeenCards = true);
+              _seeCards();
+            }
+          : null,
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -442,22 +480,23 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
             final index = entry.key;
             final cardId = entry.value;
             final card = _getCard(cardId);
-            
+
             return AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              child: showCards
-                  ? _buildCardFace(card!)
-                  : _buildCardBack(index),
-            ).animate(delay: Duration(milliseconds: 100 * index))
-             .fadeIn()
-             .scale();
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  child: showCards
+                      ? _buildCardFace(card!)
+                      : _buildCardBack(index),
+                )
+                .animate(delay: Duration(milliseconds: 100 * index))
+                .fadeIn()
+                .scale();
           }).toList(),
         ),
       ),
     );
   }
-  
+
   Widget _buildCardFace(Card card) {
     return Container(
       width: 80,
@@ -495,7 +534,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       ),
     );
   }
-  
+
   Widget _buildCardBack(int index) {
     return Container(
       width: 80,
@@ -518,17 +557,23 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       ),
     );
   }
-  
-  Widget _buildActionBar(bool isMyTurn, String myStatus, TeenPattiGameState state) {
+
+  Widget _buildActionBar(
+    bool isMyTurn,
+    String myStatus,
+    TeenPattiGameState state,
+  ) {
     final isSeen = myStatus == 'seen';
     final minBet = isSeen ? state.currentStake * 2 : state.currentStake;
     final maxBet = isSeen ? state.currentStake * 4 : state.currentStake * 2;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.7),
-        border: Border(top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3))),
+        border: Border(
+          top: BorderSide(color: CasinoColors.gold.withValues(alpha: 0.3)),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -539,10 +584,16 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
               padding: const EdgeInsets.only(bottom: 12),
               child: Row(
                 children: [
-                  Text('Bet: $_betAmount', style: const TextStyle(color: Colors.white)),
+                  Text(
+                    'Bet: $_betAmount',
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   Expanded(
                     child: Slider(
-                      value: _betAmount.toDouble().clamp(minBet.toDouble(), maxBet.toDouble()),
+                      value: _betAmount.toDouble().clamp(
+                        minBet.toDouble(),
+                        maxBet.toDouble(),
+                      ),
                       min: minBet.toDouble(),
                       max: maxBet.toDouble(),
                       divisions: maxBet - minBet > 0 ? maxBet - minBet : 1,
@@ -555,7 +606,7 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
                 ],
               ),
             ),
-          
+
           // Action buttons
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -572,21 +623,27 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
                     foregroundColor: Colors.white,
                   ),
                 ),
-                
+
                 const SizedBox(width: 8),
 
                 // Bet/Chaal button
                 ElevatedButton.icon(
-                  onPressed: isMyTurn && !_isProcessing ? () => _bet(minBet, maxBet) : null,
+                  onPressed: isMyTurn && !_isProcessing
+                      ? () => _bet(minBet, maxBet)
+                      : null,
                   icon: const Icon(Icons.attach_money),
                   // P0 FIX: Display valid amount matching the slider
-                  label: Text(isSeen ? 'Chaal ${math.max(_betAmount, minBet)}' : 'Blind ${math.max(_betAmount, minBet)}'),
+                  label: Text(
+                    isSeen
+                        ? 'Chaal ${math.max(_betAmount, minBet)}'
+                        : 'Blind ${math.max(_betAmount, minBet)}',
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CasinoColors.gold,
                     foregroundColor: Colors.black,
                   ),
                 ),
-                
+
                 const SizedBox(width: 8),
 
                 // Show button (only when 2 players left)
@@ -607,18 +664,18 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       ),
     );
   }
-  
+
   int _getActivePlayerCount(TeenPattiGameState state) {
     return state.playerStatus.values.where((s) => s != 'folded').length;
   }
-  
+
   Widget _buildGameOverScreen(TeenPattiGameState state, String myId) {
     final isWinner = state.winnerId == myId;
-    
+
     if (isWinner) {
       HapticHelper.winCelebration();
     }
-    
+
     return Scaffold(
       backgroundColor: CasinoColors.feltGreenDark,
       body: Center(
@@ -641,7 +698,9 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              isWinner ? 'You won ${state.pot} chips!' : 'Better luck next time!',
+              isWinner
+                  ? 'You won ${state.pot} chips!'
+                  : 'Better luck next time!',
               style: const TextStyle(color: Colors.white70, fontSize: 18),
             ),
             const SizedBox(height: 32),
@@ -650,7 +709,10 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: CasinoColors.gold,
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
               ),
               child: const Text('Back to Lobby'),
             ),
@@ -659,17 +721,17 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       ),
     );
   }
-  
+
   Future<void> _seeCards() async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
-    
+
     try {
       // Haptic feedback for card reveal
       HapticHelper.cardMove();
       // Play card flip/slide sound
       await SoundService.playCardSlide();
-      
+
       final service = ref.read(teenPattiServiceProvider);
       final userId = ref.read(authServiceProvider).currentUser?.uid;
       if (userId != null) {
@@ -679,17 +741,17 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       if (mounted) setState(() => _isProcessing = false);
     }
   }
-  
+
   Future<void> _bet(int minBet, int maxBet) async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
-    
+
     try {
       // Haptic feedback for betting
       HapticHelper.chipPlace();
       // Play chip bet sound
-      await SoundService.playChipSound(); 
-      
+      await SoundService.playChipSound();
+
       final service = ref.read(teenPattiServiceProvider);
       final userId = ref.read(authServiceProvider).currentUser?.uid;
       if (userId != null) {
@@ -701,17 +763,17 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       if (mounted) setState(() => _isProcessing = false);
     }
   }
-  
+
   Future<void> _fold() async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
-    
+
     try {
       // Haptic feedback for fold action
       HapticHelper.lightTap();
       // Play fold sound (using card_slide as placeholder)
       await SoundService.playCardSlide();
-      
+
       final service = ref.read(teenPattiServiceProvider);
       final userId = ref.read(authServiceProvider).currentUser?.uid;
       if (userId != null) {
@@ -721,17 +783,17 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
       if (mounted) setState(() => _isProcessing = false);
     }
   }
-  
+
   Future<void> _showdown() async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
-    
+
     try {
       // Haptic feedback for showdown moment
       HapticHelper.success();
       // Play showdown/win sound
       await SoundService.playRoundEnd();
-      
+
       final service = ref.read(teenPattiServiceProvider);
       final userId = ref.read(authServiceProvider).currentUser?.uid;
       if (userId != null) {

@@ -7,6 +7,7 @@
 /// - Meld detection
 /// - Declare validation
 /// - Scoring
+library;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/games/marriage/marriage_game.dart';

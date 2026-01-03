@@ -68,12 +68,16 @@ class CardValidationService {
 
     // Count high cards
     final spades = hand.where((c) => c.suit == CardSuit.spades).toList();
-    final highSpades = spades.where((c) => c.rank.value >= 11).length; // J, Q, K, A
+    final highSpades = spades
+        .where((c) => c.rank.value >= 11)
+        .length; // J, Q, K, A
     strength += highSpades * 2; // Spades worth more (trump)
 
     // Count aces and kings in other suits
     final otherSuits = hand.where((c) => c.suit != CardSuit.spades).toList();
-    final highCards = otherSuits.where((c) => c.rank.value >= 13).length; // K, A
+    final highCards = otherSuits
+        .where((c) => c.rank.value >= 13)
+        .length; // K, A
     strength += highCards;
 
     // Estimate bid (conservative)

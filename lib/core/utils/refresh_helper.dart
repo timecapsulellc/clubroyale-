@@ -9,16 +9,16 @@ import 'haptic_helper.dart';
 /// Simple refresh callback mixin for StatefulWidgets
 mixin RefreshableMixin<T extends StatefulWidget> on State<T> {
   bool _isRefreshing = false;
-  
+
   bool get isRefreshing => _isRefreshing;
-  
+
   /// Handle refresh with haptic feedback and loading state
   Future<void> handleRefresh(Future<void> Function() refreshCallback) async {
     if (_isRefreshing) return;
-    
+
     setState(() => _isRefreshing = true);
     HapticHelper.lightTap();
-    
+
     try {
       await refreshCallback();
     } finally {

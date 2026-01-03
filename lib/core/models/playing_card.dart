@@ -39,13 +39,13 @@ enum CardRank {
 
   /// Point value for Marriage scoring (face cards = 10)
   int get points => value >= 10 ? 10 : value;
-  
+
   /// Display string (deprecated alias for symbol, kept for compatibility if needed)
   String get displayString => symbol;
 }
 
 /// Represents a playing card in the deck
-/// 
+///
 /// Unified model for both Game Engine logic and UI/Serialization.
 @freezed
 abstract class PlayingCard with _$PlayingCard {
@@ -64,25 +64,24 @@ abstract class PlayingCard with _$PlayingCard {
   /// Create a joker card
   factory PlayingCard.joker([int deckIndex = 0]) => PlayingCard(
     suit: CardSuit.spades, // Dummy suit for Joker
-    rank: CardRank.ace,    // Dummy rank for Joker
+    rank: CardRank.ace, // Dummy rank for Joker
     deckIndex: deckIndex,
     isJoker: true,
   );
 
   /// Get a unique string identifier for this card
-  String get id => isJoker 
-      ? 'joker_$deckIndex' 
-      : '${rank.name}_${suit.name}_$deckIndex';
-      
+  String get id =>
+      isJoker ? 'joker_$deckIndex' : '${rank.name}_${suit.name}_$deckIndex';
+
   /// Simple ID format without deck index (for simple comparisons where deck doesn't matter)
   String get simpleId => isJoker ? 'joker' : '${suit.name}_${rank.name}';
 
   /// Display string like "A♠" or "7♥"
   String get displayString => isJoker ? '🃏' : '${rank.symbol}${suit.symbol}';
-  
+
   /// Asset path for card image
-  String get assetPath => isJoker 
-      ? 'assets/cards/png/joker.png' 
+  String get assetPath => isJoker
+      ? 'assets/cards/png/joker.png'
       : 'assets/cards/png/${rank.symbol.toLowerCase()}_of_${suit.name}.png';
 
   /// Compare two cards for trick-taking logic
@@ -100,27 +99,27 @@ abstract class PlayingCard with _$PlayingCard {
     }
 
     if (trumpSuit != null) {
-        // This card is trump
-        if (suit == trumpSuit) {
+      // This card is trump
+      if (suit == trumpSuit) {
         return 1;
-        }
+      }
 
-        // Other card is trump
-        if (other.suit == trumpSuit) {
+      // Other card is trump
+      if (other.suit == trumpSuit) {
         return -1;
-        }
+      }
     }
 
     if (ledSuit != null) {
-        // This card follows led suit (and other doesn't, and wasn't trump)
-        if (suit == ledSuit) {
+      // This card follows led suit (and other doesn't, and wasn't trump)
+      if (suit == ledSuit) {
         return 1;
-        }
+      }
 
-        // Other card follows led suit
-        if (other.suit == ledSuit) {
+      // Other card follows led suit
+      if (other.suit == ledSuit) {
         return -1;
-        }
+      }
     }
 
     // Neither card follows suit or is trump (shouldn't happen in valid trick-taking if following rules)

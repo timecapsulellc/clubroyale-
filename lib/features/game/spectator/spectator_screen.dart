@@ -1,5 +1,5 @@
 /// Spectator Screen
-/// 
+///
 /// Displays a read-only view of an ongoing game
 library;
 
@@ -44,11 +44,13 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
     final user = auth.currentUser;
     if (user == null) return;
 
-    await ref.read(spectatorServiceProvider.notifier).joinAsSpectator(
-      roomId: widget.roomId,
-      userId: user.uid,
-      userName: user.displayName ?? 'Spectator',
-    );
+    await ref
+        .read(spectatorServiceProvider.notifier)
+        .joinAsSpectator(
+          roomId: widget.roomId,
+          userId: user.uid,
+          userName: user.displayName ?? 'Spectator',
+        );
   }
 
   Future<void> _leaveSpectating() async {
@@ -56,16 +58,18 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
     final user = auth.currentUser;
     if (user == null) return;
 
-    await ref.read(spectatorServiceProvider.notifier).leaveSpectating(
-      userId: user.uid,
-    );
+    await ref
+        .read(spectatorServiceProvider.notifier)
+        .leaveSpectating(userId: user.uid);
   }
 
   @override
   Widget build(BuildContext context) {
     final spectatorState = ref.watch(spectatorServiceProvider);
     final gameStateAsync = ref.watch(spectatorGameStateProvider(widget.roomId));
-    final spectatorCountAsync = ref.watch(spectatorCountProvider(widget.roomId));
+    final spectatorCountAsync = ref.watch(
+      spectatorCountProvider(widget.roomId),
+    );
 
     final user = ref.read(authServiceProvider).currentUser;
 
@@ -122,11 +126,7 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
               ),
             ),
           // Spectator badge
-          Positioned(
-            top: 16,
-            left: 16,
-            child: _SpectatorBadge(),
-          ),
+          Positioned(top: 16, left: 16, child: _SpectatorBadge()),
         ],
       ),
     );
@@ -174,9 +174,7 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
     return gameStateAsync.when(
       data: (gameData) {
         if (gameData == null) {
-          return const Center(
-            child: Text('Game not found'),
-          );
+          return const Center(child: Text('Game not found'));
         }
 
         final status = gameData['status'] as String?;
@@ -188,7 +186,9 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
                 const Icon(Icons.sports_esports, size: 64),
                 const SizedBox(height: 16),
                 Text(
-                  status == 'finished' ? 'Game Finished' : 'Game not in progress',
+                  status == 'finished'
+                      ? 'Game Finished'
+                      : 'Game not in progress',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 if (status == 'finished') ...[
@@ -209,12 +209,8 @@ class _SpectatorScreenState extends ConsumerState<SpectatorScreen> {
           gameData: gameData,
         );
       },
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      error: (error, _) => Center(
-        child: Text('Error: $error'),
-      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text('Error: $error')),
     );
   }
 
@@ -269,10 +265,7 @@ class _GameSpectatorView extends StatelessWidget {
   final String gameType;
   final Map<String, dynamic> gameData;
 
-  const _GameSpectatorView({
-    required this.gameType,
-    required this.gameData,
-  });
+  const _GameSpectatorView({required this.gameType, required this.gameData});
 
   @override
   Widget build(BuildContext context) {
@@ -293,9 +286,9 @@ class _GameSpectatorView extends StatelessWidget {
             ),
             child: Text(
               'Round $round',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 24),
@@ -312,7 +305,8 @@ class _GameSpectatorView extends StatelessWidget {
               itemBuilder: (context, index) {
                 final player = players[index];
                 final playerId = player['id'] as String?;
-                final playerName = player['name'] as String? ?? 'Player ${index + 1}';
+                final playerName =
+                    player['name'] as String? ?? 'Player ${index + 1}';
                 final score = player['score'] as int? ?? 0;
                 final isCurrentTurn = playerId == currentPlayer;
 
@@ -372,10 +366,7 @@ class _PlayerCard extends StatelessWidget {
             : Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
         border: isCurrentTurn
-            ? Border.all(
-                color: Theme.of(context).colorScheme.primary,
-                width: 2,
-              )
+            ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2)
             : null,
       ),
       child: Column(
@@ -394,9 +385,9 @@ class _PlayerCard extends StatelessWidget {
               ],
               Text(
                 name,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis,
               ),
             ],

@@ -1,8 +1,7 @@
 /// Bracket View Widget
-/// 
+///
 /// Displays tournament brackets visually
 library;
-
 
 import 'package:flutter/material.dart';
 import 'package:clubroyale/features/tournament/tournament_model.dart';
@@ -37,10 +36,10 @@ class BracketView extends StatelessWidget {
               matches: roundsMap[round]!,
               isLastRound: round == rounds.last,
             ),
-            if (round != rounds.last) 
+            if (round != rounds.last)
               BracketConnector(
                 itemCount: roundsMap[round]!.length,
-                itemHeight: 120.0, 
+                itemHeight: 120.0,
                 gap: 16.0,
               ),
           ],
@@ -82,10 +81,12 @@ class _RoundColumn extends StatelessWidget {
           ),
         ).animate().fadeIn(delay: 100.ms * roundNumber),
         const SizedBox(height: 16),
-        ...matches.map((match) => Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: _MatchCard(bracket: match),
-        )),
+        ...matches.map(
+          (match) => Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: _MatchCard(bracket: match),
+          ),
+        ),
       ],
     );
   }
@@ -118,8 +119,8 @@ class _MatchCard extends StatelessWidget {
           color: isLive
               ? CasinoColors.gold
               : isComplete
-                  ? CasinoColors.feltGreen
-                  : Colors.white10,
+              ? CasinoColors.feltGreen
+              : Colors.white10,
           width: isLive ? 2 : 1,
         ),
         boxShadow: [
@@ -143,7 +144,9 @@ class _MatchCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: Colors.black26,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(11),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -159,23 +162,31 @@ class _MatchCard extends StatelessWidget {
                 ),
                 if (isLive)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: CasinoColors.gold,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text(
-                      'LIVE',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ).animate(onPlay: (c) => c.repeat(reverse: true))
-                   .fade(duration: 600.ms, begin: 0.5, end: 1.0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: CasinoColors.gold,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'LIVE',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                      .animate(onPlay: (c) => c.repeat(reverse: true))
+                      .fade(duration: 600.ms, begin: 0.5, end: 1.0),
                 if (isComplete)
-                  const Icon(Icons.check_circle, color: CasinoColors.feltGreen, size: 14),
+                  const Icon(
+                    Icons.check_circle,
+                    color: CasinoColors.feltGreen,
+                    size: 14,
+                  ),
               ],
             ),
           ),

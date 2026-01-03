@@ -100,7 +100,7 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
     setState(() => _isLoading = true);
 
     try {
-      final rewardEarned = await adService.showRewardedAd();
+      final rewardEarned = adService.showRewardedAd();
 
       if (rewardEarned) {
         final rewardsService = ref.read(diamondRewardsServiceProvider);
@@ -114,7 +114,8 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                    '🎬 Earned ${result.amount} diamonds! (${result.remaining} ads left today)'),
+                  '🎬 Earned ${result.amount} diamonds! (${result.remaining} ads left today)',
+                ),
                 backgroundColor: Colors.green,
               ),
             );
@@ -269,27 +270,35 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
                       ),
                     ),
                     ElevatedButton(
-                      onPressed: _isLoading ? null : () async {
-                        final user = ref.read(authServiceProvider).currentUser;
-                        if (user == null) return;
-                        
-                        setState(() => _isLoading = true);
-                        try {
-                          final diamondService = DiamondService();
-                          await diamondService.grantTestDiamonds(user.uid);
-                          
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('🎉 Granted 10,000 test diamonds!'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                          }
-                        } finally {
-                          if (mounted) setState(() => _isLoading = false);
-                        }
-                      },
+                      onPressed: _isLoading
+                          ? null
+                          : () async {
+                              final user = ref
+                                  .read(authServiceProvider)
+                                  .currentUser;
+                              if (user == null) return;
+
+                              setState(() => _isLoading = true);
+                              try {
+                                final diamondService = DiamondService();
+                                await diamondService.grantTestDiamonds(
+                                  user.uid,
+                                );
+
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        '🎉 Granted 10,000 test diamonds!',
+                                      ),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                }
+                              } finally {
+                                if (mounted) setState(() => _isLoading = false);
+                              }
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
@@ -344,7 +353,8 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
             amount: DiamondConfig.perGameComplete,
             isClaimed: false,
             isPlayGames: true,
-            progress: (_status?.gamesCompletedToday ?? 0) /
+            progress:
+                (_status?.gamesCompletedToday ?? 0) /
                 DiamondConfig.maxGamesPerDay,
           ),
 
@@ -367,8 +377,9 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
                 : 'Available on Sundays',
             amount: DiamondConfig.weeklyBonus,
             isClaimed: _status?.weeklyBonusClaimed ?? false,
-            onClaim:
-                _status?.canClaimWeeklyBonus == true ? _claimWeeklyBonus : null,
+            onClaim: _status?.canClaimWeeklyBonus == true
+                ? _claimWeeklyBonus
+                : null,
             isLoading: _isLoading,
           ),
 
@@ -420,8 +431,9 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
                   children: [
                     Text(
                       "Today's Social Earnings",
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     _buildProgressRow(
@@ -599,8 +611,9 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
                 const SizedBox(width: 12),
                 Text(
                   'Weekly Engagement Tiers',
-                  style: theme.textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -633,7 +646,9 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.amber.shade100,
                         borderRadius: BorderRadius.circular(20),
@@ -692,14 +707,16 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
                 children: [
                   Text(
                     title,
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: Colors.grey.shade600),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: Colors.grey.shade600,
+                    ),
                   ),
                   if (progress != null) ...[
                     const SizedBox(height: 8),
@@ -741,8 +758,10 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
                   )
                 else if (isClaimed)
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.green.shade100,
                       borderRadius: BorderRadius.circular(20),
@@ -769,8 +788,10 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
                   )
                 else
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(20),
@@ -809,8 +830,10 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.local_fire_department,
-                      color: Colors.white),
+                  child: const Icon(
+                    Icons.local_fire_department,
+                    color: Colors.white,
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -819,8 +842,9 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
                     children: [
                       Text(
                         'Win Streak 🔥',
-                        style: theme.textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       const Text(
@@ -851,4 +875,3 @@ class _EarnDiamondsScreenState extends ConsumerState<EarnDiamondsScreen>
     );
   }
 }
-

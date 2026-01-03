@@ -1,5 +1,5 @@
 /// Friends Service
-/// 
+///
 /// Manages friend relationships: sending requests, accepting, listing friends.
 library;
 
@@ -31,11 +31,7 @@ final pendingRequestsProvider = StreamProvider<List<FriendRequest>>((ref) {
 });
 
 /// Friend relationship status
-enum FriendStatus {
-  pending,
-  accepted,
-  blocked,
-}
+enum FriendStatus { pending, accepted, blocked }
 
 /// Friend data model
 class Friend {
@@ -140,7 +136,7 @@ class FriendsService {
           .doc(toUserId)
           .get();
 
-      if (alreadyFriends.exists && 
+      if (alreadyFriends.exists &&
           alreadyFriends.data()?['status'] == 'accepted') {
         debugPrint('Already friends');
         return false;
@@ -171,11 +167,14 @@ class FriendsService {
 
     try {
       // Get the request
-      final requestDoc = await _db.collection('friendRequests').doc(requestId).get();
+      final requestDoc = await _db
+          .collection('friendRequests')
+          .doc(requestId)
+          .get();
       if (!requestDoc.exists) return false;
 
       final request = FriendRequest.fromJson(requestDoc.data()!, requestId);
-      
+
       // Verify this request is for current user
       if (request.toUserId != currentUser.uid) return false;
 
@@ -189,7 +188,11 @@ class FriendsService {
 
       // Add to current user's friend list
       batch.set(
-        _db.collection('friends').doc(currentUser.uid).collection('list').doc(request.fromUserId),
+        _db
+            .collection('friends')
+            .doc(currentUser.uid)
+            .collection('list')
+            .doc(request.fromUserId),
         {
           'displayName': request.fromDisplayName,
           'avatarUrl': request.fromAvatarUrl,
@@ -200,7 +203,11 @@ class FriendsService {
 
       // Add current user to sender's friend list
       batch.set(
-        _db.collection('friends').doc(request.fromUserId).collection('list').doc(currentUser.uid),
+        _db
+            .collection('friends')
+            .doc(request.fromUserId)
+            .collection('list')
+            .doc(currentUser.uid),
         {
           'displayName': currentUser.displayName ?? 'Player',
           'avatarUrl': currentUser.photoURL,
@@ -242,12 +249,20 @@ class FriendsService {
 
       // Remove from current user's list
       batch.delete(
-        _db.collection('friends').doc(currentUser.uid).collection('list').doc(friendId),
+        _db
+            .collection('friends')
+            .doc(currentUser.uid)
+            .collection('list')
+            .doc(friendId),
       );
 
       // Remove from friend's list
       batch.delete(
-        _db.collection('friends').doc(friendId).collection('list').doc(currentUser.uid),
+        _db
+            .collection('friends')
+            .doc(friendId)
+            .collection('list')
+            .doc(currentUser.uid),
       );
 
       await batch.commit();

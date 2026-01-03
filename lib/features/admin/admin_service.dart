@@ -27,13 +27,13 @@ class AdminService {
   /// Check if admin can approve a grant of given amount
   bool canApproveGrant(String email, int amount) {
     final role = AdminConfig.getRole(email);
-    
+
     if (role == AdminRole.none) return false;
-    
+
     if (role == AdminRole.sub) {
       return amount <= AdminConfig.subAdminMaxGrant;
     }
-    
+
     return true; // Primary admin can approve any amount
   }
 
@@ -44,7 +44,10 @@ class AdminService {
   }
 
   /// Add a sub-admin (primary admins only)
-  Future<bool> addSubAdmin(String primaryAdminEmail, String newAdminEmail) async {
+  Future<bool> addSubAdmin(
+    String primaryAdminEmail,
+    String newAdminEmail,
+  ) async {
     if (!AdminConfig.isPrimaryAdmin(primaryAdminEmail)) {
       return false;
     }
@@ -61,7 +64,10 @@ class AdminService {
   }
 
   /// Remove a sub-admin (primary admins only)
-  Future<bool> removeSubAdmin(String primaryAdminEmail, String adminEmail) async {
+  Future<bool> removeSubAdmin(
+    String primaryAdminEmail,
+    String adminEmail,
+  ) async {
     if (!AdminConfig.isPrimaryAdmin(primaryAdminEmail)) {
       return false;
     }

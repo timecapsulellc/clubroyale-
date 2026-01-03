@@ -3,22 +3,27 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // ClubRoyale Brand Colors
-  static const Color tableGreen = Color(0xFF2D1B4E); // ClubRoyale deep purple (replaces green)
-  static const Color tableLightGreen = Color(0xFF4A1C6F); // ClubRoyale royal purple
+  static const Color tableGreen = Color(
+    0xFF2D1B4E,
+  ); // ClubRoyale deep purple (replaces green)
+  static const Color tableLightGreen = Color(
+    0xFF4A1C6F,
+  ); // ClubRoyale royal purple
   static const Color gold = Color(0xFFD4AF37); // ClubRoyale rich gold
   static const Color goldDark = Color(0xFFB8860B); // Dark gold accent
   static const Color orange = Color(0xFFFF6F00);
-  static const Color teal = Color(0xFF4A1C6F); // Using royal purple instead of teal
-  
+  static const Color teal = Color(
+    0xFF4A1C6F,
+  ); // Using royal purple instead of teal
+
   static const Color creamWhite = Color(0xFFF5F5F5);
   static const Color champagne = Color(0xFFF7E7CE); // ClubRoyale champagne
-
 
   static ThemeData get theme {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark, // Default to dark because of deep green usage
-      
+      brightness:
+          Brightness.dark, // Default to dark because of deep green usage
       // Color Scheme
       colorScheme: const ColorScheme(
         brightness: Brightness.dark,
@@ -34,26 +39,26 @@ class AppTheme {
       ),
 
       scaffoldBackgroundColor: tableGreen,
-      
+
       // Typography
       textTheme: TextTheme(
         // Headings (Game Titles, Modal Headers)
-        displayLarge: GoogleFonts.lobster(
-          fontSize: 57, 
-          fontWeight: FontWeight.normal,
+        displayLarge: GoogleFonts.oswald(
+          fontSize: 57,
+          fontWeight: FontWeight.bold,
           color: gold,
         ),
-        displayMedium: GoogleFonts.lobster(
+        displayMedium: GoogleFonts.oswald(
           fontSize: 45,
-          fontWeight: FontWeight.normal,
+          fontWeight: FontWeight.bold,
           color: creamWhite,
         ),
-        displaySmall: GoogleFonts.lobster(
+        displaySmall: GoogleFonts.oswald(
           fontSize: 36,
-          fontWeight: FontWeight.normal,
+          fontWeight: FontWeight.bold,
           color: gold,
         ),
-        
+
         // UI Headers
         headlineLarge: GoogleFonts.roboto(
           fontSize: 32,
@@ -65,27 +70,22 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           color: gold,
         ),
-        
+
         // Body Text
-        bodyLarge: GoogleFonts.openSans(
-          fontSize: 16,
-          color: creamWhite,
-        ),
-        bodyMedium: GoogleFonts.openSans(
-          fontSize: 14,
-          color: creamWhite,
-        ),
+        bodyLarge: GoogleFonts.openSans(fontSize: 16, color: creamWhite),
+        bodyMedium: GoogleFonts.openSans(fontSize: 14, color: creamWhite),
       ),
 
       // Component Themes
-      
+
       // 1. App Bar
       appBarTheme: AppBarTheme(
         backgroundColor: tableGreen,
         foregroundColor: gold,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.lobster(
+        titleTextStyle: GoogleFonts.oswald(
           fontSize: 28,
+          fontWeight: FontWeight.bold,
           color: gold,
         ),
         iconTheme: const IconThemeData(color: gold),
@@ -97,7 +97,9 @@ class AppTheme {
           foregroundColor: Colors.black, // Text on Gold
           backgroundColor: gold,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30), // Pill shape common in casinos
+            borderRadius: BorderRadius.circular(
+              30,
+            ), // Pill shape common in casinos
             side: const BorderSide(color: goldDark, width: 2), // Bevel effect
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -108,7 +110,7 @@ class AppTheme {
           elevation: 4,
         ),
       ),
-      
+
       // 3. Dialogs
       dialogTheme: const DialogThemeData(
         backgroundColor: teal,

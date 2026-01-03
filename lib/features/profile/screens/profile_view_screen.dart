@@ -91,9 +91,7 @@ class ProfileViewScreen extends ConsumerWidget {
               ),
 
               // Tabs for Posts/Achievements/Badges
-              SliverToBoxAdapter(
-                child: _ProfileTabs(userId: targetUserId),
-              ),
+              SliverToBoxAdapter(child: _ProfileTabs(userId: targetUserId)),
             ],
           );
         },
@@ -167,7 +165,9 @@ class ProfileViewScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Block User'),
-        content: Text('Are you sure you want to block ${profile.displayName}? They won\'t be able to see your profile or message you.'),
+        content: Text(
+          'Are you sure you want to block ${profile.displayName}? They won\'t be able to see your profile or message you.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -178,7 +178,9 @@ class ProfileViewScreen extends ConsumerWidget {
               Navigator.pop(context);
               // TODO: Call ProfileService.blockUser(profile.id)
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${profile.displayName} has been blocked')),
+                SnackBar(
+                  content: Text('${profile.displayName} has been blocked'),
+                ),
               );
             },
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -199,17 +201,23 @@ class ProfileViewScreen extends ConsumerWidget {
           children: [
             Text('Why are you reporting ${profile.displayName}?'),
             const SizedBox(height: 16),
-            ..._reportReasons.map((reason) => ListTile(
-              title: Text(reason),
-              leading: const Icon(Icons.report_problem_outlined),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Call ReportService.reportUser(profile.id, reason)
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Report submitted. Thank you for keeping our community safe!')),
-                );
-              },
-            )),
+            ..._reportReasons.map(
+              (reason) => ListTile(
+                title: Text(reason),
+                leading: const Icon(Icons.report_problem_outlined),
+                onTap: () {
+                  Navigator.pop(context);
+                  // TODO: Call ReportService.reportUser(profile.id, reason)
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Report submitted. Thank you for keeping our community safe!',
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
         actions: [
@@ -236,10 +244,7 @@ class _ProfileHeader extends StatelessWidget {
   final UserProfile profile;
   final bool isOwnProfile;
 
-  const _ProfileHeader({
-    required this.profile,
-    required this.isOwnProfile,
-  });
+  const _ProfileHeader({required this.profile, required this.isOwnProfile});
 
   @override
   Widget build(BuildContext context) {
@@ -253,10 +258,7 @@ class _ProfileHeader extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                CasinoColors.richPurple,
-                CasinoColors.deepPurple,
-              ],
+              colors: [CasinoColors.richPurple, CasinoColors.deepPurple],
             ),
             image: profile.coverPhotoUrl != null
                 ? DecorationImage(
@@ -274,10 +276,7 @@ class _ProfileHeader extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                Colors.black.withValues(alpha: 0.7),
-              ],
+              colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
             ),
           ),
         ),
@@ -295,7 +294,9 @@ class _ProfileHeader extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: profile.isVerified ? CasinoColors.gold : Colors.white,
+                    color: profile.isVerified
+                        ? CasinoColors.gold
+                        : Colors.white,
                     width: 3,
                   ),
                 ),
@@ -307,7 +308,10 @@ class _ProfileHeader extends StatelessWidget {
                   child: profile.avatarUrl == null
                       ? Text(
                           profile.displayName[0].toUpperCase(),
-                          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
                         )
                       : null,
                 ),
@@ -331,7 +335,11 @@ class _ProfileHeader extends StatelessWidget {
                         ),
                         if (profile.isVerified) ...[
                           const SizedBox(width: 8),
-                          const Icon(Icons.verified, color: Colors.blue, size: 20),
+                          const Icon(
+                            Icons.verified,
+                            color: Colors.blue,
+                            size: 20,
+                          ),
                         ],
                         if (profile.isCreator) ...[
                           const SizedBox(width: 4),
@@ -343,7 +351,10 @@ class _ProfileHeader extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: _getRankColor(profile.rankTitle),
                             borderRadius: BorderRadius.circular(12),
@@ -447,11 +458,7 @@ class _StatItem extends StatelessWidget {
   final String value;
   final VoidCallback? onTap;
 
-  const _StatItem({
-    required this.label,
-    required this.value,
-    this.onTap,
-  });
+  const _StatItem({required this.label, required this.value, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -485,10 +492,7 @@ class _ActionButtons extends ConsumerWidget {
   final UserProfile profile;
   final bool isOwnProfile;
 
-  const _ActionButtons({
-    required this.profile,
-    required this.isOwnProfile,
-  });
+  const _ActionButtons({required this.profile, required this.isOwnProfile});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -539,14 +543,16 @@ class _ActionButtons extends ConsumerWidget {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
               ),
-              error: (_, __) => ElevatedButton(
-                onPressed: () {},
-                child: const Text('Follow'),
-              ),
+              error: (_, __) =>
+                  ElevatedButton(onPressed: () {}, child: const Text('Follow')),
               data: (isFollowing) => ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isFollowing ? colorScheme.surfaceContainerHighest : colorScheme.primary,
-                  foregroundColor: isFollowing ? colorScheme.onSurface : colorScheme.onPrimary,
+                  backgroundColor: isFollowing
+                      ? colorScheme.surfaceContainerHighest
+                      : colorScheme.primary,
+                  foregroundColor: isFollowing
+                      ? colorScheme.onSurface
+                      : colorScheme.onPrimary,
                 ),
                 onPressed: () async {
                   final service = ref.read(profileServiceProvider);
@@ -557,7 +563,9 @@ class _ActionButtons extends ConsumerWidget {
                   }
                   ref.invalidate(isFollowingProvider(profile.id));
                 },
-                icon: Icon(isFollowing ? Icons.person_remove : Icons.person_add),
+                icon: Icon(
+                  isFollowing ? Icons.person_remove : Icons.person_add,
+                ),
                 label: Text(isFollowing ? 'Following' : 'Follow'),
               ),
             ),
@@ -588,7 +596,8 @@ class _ProfileTabs extends ConsumerStatefulWidget {
   ConsumerState<_ProfileTabs> createState() => _ProfileTabsState();
 }
 
-class _ProfileTabsState extends ConsumerState<_ProfileTabs> with SingleTickerProviderStateMixin {
+class _ProfileTabsState extends ConsumerState<_ProfileTabs>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -655,7 +664,11 @@ class _PostsGrid extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.photo_library_outlined, size: 64, color: Colors.grey),
+                Icon(
+                  Icons.photo_library_outlined,
+                  size: 64,
+                  color: Colors.grey,
+                ),
                 SizedBox(height: 16),
                 Text('No posts yet'),
               ],

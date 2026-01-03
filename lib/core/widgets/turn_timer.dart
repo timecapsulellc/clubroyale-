@@ -1,5 +1,5 @@
 /// Turn Timer Widget
-/// 
+///
 /// A reusable circular countdown timer for all card games.
 /// Shows remaining time with color-coded urgency levels.
 library;
@@ -27,7 +27,7 @@ class TurnTimer extends StatelessWidget {
     final progress = totalSeconds > 0 ? remainingSeconds / totalSeconds : 0.0;
     final color = _getColor(progress);
     final isCritical = remainingSeconds <= 5 && remainingSeconds > 0;
-    
+
     Widget timer = Container(
       width: size,
       height: size,
@@ -71,7 +71,7 @@ class TurnTimer extends StatelessWidget {
         ],
       ),
     );
-    
+
     // Add pulse animation for critical time
     if (isCritical && showPulse) {
       timer = timer
@@ -88,7 +88,7 @@ class TurnTimer extends StatelessWidget {
             duration: 500.ms,
           );
     }
-    
+
     return timer;
   }
 
@@ -117,42 +117,46 @@ class TurnTimerBadge extends StatelessWidget {
     final isCritical = remainingSeconds <= 5;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(
-              value: progress,
-              strokeWidth: 2,
-              backgroundColor: color.withValues(alpha: 0.3),
-              valueColor: AlwaysStoppedAnimation(color),
-            ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color),
           ),
-          const SizedBox(width: 6),
-          Text(
-            '${remainingSeconds}s',
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 2,
+                  backgroundColor: color.withValues(alpha: 0.3),
+                  valueColor: AlwaysStoppedAnimation(color),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '${remainingSeconds}s',
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ).animate(
-      onComplete: (controller) => isCritical ? controller.repeat() : null,
-    ).shimmer(
-      duration: isCritical ? 500.ms : 1000.ms,
-      color: isCritical ? Colors.red.withValues(alpha: 0.3) : Colors.transparent,
-    );
+        )
+        .animate(
+          onComplete: (controller) => isCritical ? controller.repeat() : null,
+        )
+        .shimmer(
+          duration: isCritical ? 500.ms : 1000.ms,
+          color: isCritical
+              ? Colors.red.withValues(alpha: 0.3)
+              : Colors.transparent,
+        );
   }
 
   Color _getColor(double progress) {

@@ -3,7 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// Game Settlement Dialog
-/// 
+///
 /// A polished overlay shown at the end of a round/game:
 /// - Winner announcement with animation
 /// - Score breakdown
@@ -16,7 +16,7 @@ class GameSettlementDialog extends StatelessWidget {
   final bool isWinner;
   final VoidCallback onNextRound;
   final VoidCallback onExit;
-  
+
   const GameSettlementDialog({
     super.key,
     required this.winnerName,
@@ -58,10 +58,13 @@ class GameSettlementDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // 1. Result Header
-            _buildResultHeader().animate().scale(duration: 400.ms, curve: Curves.elasticOut),
-            
+            _buildResultHeader().animate().scale(
+              duration: 400.ms,
+              curve: Curves.elasticOut,
+            ),
+
             const SizedBox(height: 24),
-            
+
             // 2. Winner Amount
             Text(
               isWinner ? '+$winAmount 💎' : '$winAmount 💎',
@@ -72,9 +75,9 @@ class GameSettlementDialog extends StatelessWidget {
                 color: isWinner ? const Color(0xFFD4AF37) : Colors.redAccent,
               ),
             ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2, end: 0),
-            
+
             const SizedBox(height: 32),
-            
+
             // 3. Score Breakdown
             Container(
               padding: const EdgeInsets.all(16),
@@ -96,7 +99,9 @@ class GameSettlementDialog extends StatelessWidget {
                         Text(
                           '${entry.value > 0 ? '+' : ''}${entry.value}',
                           style: TextStyle(
-                            color: entry.value > 0 ? Colors.greenAccent : Colors.white,
+                            color: entry.value > 0
+                                ? Colors.greenAccent
+                                : Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -106,9 +111,9 @@ class GameSettlementDialog extends StatelessWidget {
                 }).toList(),
               ),
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // 4. Actions
             Row(
               children: [
@@ -135,13 +140,15 @@ class GameSettlementDialog extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // 5. Share Button
             TextButton.icon(
               onPressed: () {
-                Share.share('I just won $winAmount 💎 in ClubRoyale Marriage! Can you beat me? #ClubRoyale #MarriageCardGame');
+                Share.share(
+                  'I just won $winAmount 💎 in ClubRoyale Marriage! Can you beat me? #ClubRoyale #MarriageCardGame',
+                );
               },
               icon: const Icon(Icons.share, size: 16, color: Colors.white54),
               label: const Text(
@@ -154,7 +161,7 @@ class GameSettlementDialog extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildResultHeader() {
     return Column(
       children: [

@@ -140,7 +140,9 @@ class _ChatOverlayState extends ConsumerState<ChatOverlay> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: theme.colorScheme.primaryContainer,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
             ),
             child: Row(
               children: [
@@ -177,7 +179,9 @@ class _ChatOverlayState extends ConsumerState<ChatOverlay> {
                 itemBuilder: (context, index) {
                   final isMe = index % 2 == 0;
                   return Align(
-                    alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment: isMe
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: SkeletonBox(
@@ -189,7 +193,8 @@ class _ChatOverlayState extends ConsumerState<ChatOverlay> {
                   );
                 },
               ),
-              error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
+              error: (e, _) =>
+                  Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
             ),
           ),
 
@@ -209,15 +214,23 @@ class _ChatOverlayState extends ConsumerState<ChatOverlay> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.chat_bubble_outline, size: 48, color: theme.colorScheme.outline.withValues(alpha: 0.5)),
+            Icon(
+              Icons.chat_bubble_outline,
+              size: 48,
+              color: theme.colorScheme.outline.withValues(alpha: 0.5),
+            ),
             const SizedBox(height: 8),
             Text(
               'No messages yet',
-              style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             Text(
               'Say hello to your friends! 👋',
-              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.outline,
+              ),
             ),
           ],
         ),
@@ -280,9 +293,7 @@ class _ChatOverlayState extends ConsumerState<ChatOverlay> {
                   style: message.type == MessageType.emoji
                       ? const TextStyle(fontSize: 24)
                       : theme.textTheme.bodySmall?.copyWith(
-                          color: isMe
-                              ? theme.colorScheme.onPrimary
-                              : null,
+                          color: isMe ? theme.colorScheme.onPrimary : null,
                         ),
                 ),
               ],
@@ -402,7 +413,7 @@ class ChatMiniBubble extends ConsumerWidget {
         }
 
         final lastMessage = messages.last;
-        
+
         return GestureDetector(
           onTap: onTap,
           child: Container(

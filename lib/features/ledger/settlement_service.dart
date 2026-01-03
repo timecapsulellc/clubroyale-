@@ -2,7 +2,9 @@ import 'transaction_model.dart';
 
 class SettlementService {
   List<Transaction> calculateDebts(
-      Map<String, int> playerScores, double pointValue) {
+    Map<String, int> playerScores,
+    double pointValue,
+  ) {
     final transactions = <Transaction>[];
     final players = playerScores.keys.toList();
     final scores = playerScores.values.toList();
@@ -26,11 +28,9 @@ class SettlementService {
         final winnerCredit = playerScores[winner]! * pointValue;
         final payment = (loserDebt < winnerCredit) ? loserDebt : winnerCredit;
 
-        transactions.add(Transaction(
-          fromPlayer: loser,
-          toPlayer: winner,
-          amount: payment,
-        ));
+        transactions.add(
+          Transaction(fromPlayer: loser, toPlayer: winner, amount: payment),
+        );
 
         playerScores[winner] = (winnerCredit - payment).toInt();
         loserDebt -= payment;

@@ -44,7 +44,7 @@ class _BiddingDialogState extends State<BiddingDialog> {
             style: theme.textTheme.bodyLarge,
           ),
           const SizedBox(height: 24),
-          
+
           // Bid selector
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -63,7 +63,7 @@ class _BiddingDialogState extends State<BiddingDialog> {
                   icon: const Icon(Icons.remove_circle),
                   iconSize: 36,
                 ),
-                
+
                 // Current bid
                 Container(
                   width: 80,
@@ -81,7 +81,7 @@ class _BiddingDialogState extends State<BiddingDialog> {
                     ),
                   ),
                 ),
-                
+
                 // Increase button
                 IconButton(
                   onPressed: _selectedBid < widget.maxBid
@@ -93,9 +93,9 @@ class _BiddingDialogState extends State<BiddingDialog> {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Quick bid buttons
           Wrap(
             spacing: 8,

@@ -42,7 +42,6 @@ class GameRiveAnimation extends StatefulWidget {
 class _GameRiveAnimationState extends State<GameRiveAnimation> {
   Artboard? _riveArtboard;
 
-
   @override
   void initState() {
     super.initState();
@@ -53,7 +52,7 @@ class _GameRiveAnimationState extends State<GameRiveAnimation> {
     try {
       final data = await rootBundle.load(widget.asset.path);
       final file = RiveFile.import(data);
-      
+
       final artboard = widget.artboard != null
           ? file.artboardByName(widget.artboard!)
           : file.mainArtboard;
@@ -69,10 +68,10 @@ class _GameRiveAnimationState extends State<GameRiveAnimation> {
             widget.onStateMachineInit?.call(controller);
           }
         } else if (widget.animation != null) {
-           // Simple animation playback managed by RiveAnimation widget usually, 
-           // but efficiently managing artboard manually gives more control
-           final controller = SimpleAnimation(widget.animation!);
-           artboard.addController(controller);
+          // Simple animation playback managed by RiveAnimation widget usually,
+          // but efficiently managing artboard manually gives more control
+          final controller = SimpleAnimation(widget.animation!);
+          artboard.addController(controller);
         }
       }
 
@@ -93,10 +92,7 @@ class _GameRiveAnimationState extends State<GameRiveAnimation> {
       return const SizedBox.shrink();
     }
 
-    return Rive(
-      artboard: _riveArtboard!,
-      fit: widget.fit,
-    );
+    return Rive(artboard: _riveArtboard!, fit: widget.fit);
   }
 }
 
@@ -121,17 +117,17 @@ class _RiveCardFlipState extends State<RiveCardFlip> {
   SMIBool? _isFaceUpInput;
 
   void _onStateMachineInit(StateMachineController controller) {
-    // Note: Actual input name depends on the Rive file. 
-    // Common names: 'FaceUp', 'IsUp', 'Flip'. 
+    // Note: Actual input name depends on the Rive file.
+    // Common names: 'FaceUp', 'IsUp', 'Flip'.
     // We'll try to find a boolean input.
     if (controller.inputs.isNotEmpty) {
       for (var input in controller.inputs) {
-         if (input is SMIBool) {
-           _isFaceUpInput = input;
-           // Set initial state
-           _isFaceUpInput?.value = widget.isFaceUp;
-           break;
-         }
+        if (input is SMIBool) {
+          _isFaceUpInput = input;
+          // Set initial state
+          _isFaceUpInput?.value = widget.isFaceUp;
+          break;
+        }
       }
     }
   }
@@ -161,7 +157,7 @@ class _RiveCardFlipState extends State<RiveCardFlip> {
 /// Widget for Confetti Celebration
 class RiveConfetti extends StatelessWidget {
   final bool play;
-  
+
   const RiveConfetti({super.key, required this.play});
 
   @override
@@ -171,7 +167,7 @@ class RiveConfetti extends StatelessWidget {
       asset: RiveAsset.confetti,
       fit: BoxFit.cover,
       // Generic animation play
-      animation: 'Explosion', 
+      animation: 'Explosion',
     );
   }
 }
@@ -179,7 +175,7 @@ class RiveConfetti extends StatelessWidget {
 /// Widget for Winner Trophy
 class RiveWinnerTrophy extends StatelessWidget {
   final double size;
-  
+
   const RiveWinnerTrophy({super.key, this.size = 200});
 
   @override
@@ -198,7 +194,7 @@ class RiveWinnerTrophy extends StatelessWidget {
 /// Widget for Star/Maal
 class RiveStar extends StatelessWidget {
   final double size;
-  
+
   const RiveStar({super.key, this.size = 50});
 
   @override

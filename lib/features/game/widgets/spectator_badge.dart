@@ -8,11 +8,7 @@ class SpectatorBadge extends ConsumerWidget {
   final String gameId;
   final VoidCallback? onTap;
 
-  const SpectatorBadge({
-    super.key,
-    required this.gameId,
-    this.onTap,
-  });
+  const SpectatorBadge({super.key, required this.gameId, this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,18 +21,12 @@ class SpectatorBadge extends ConsumerWidget {
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.2),
-          ),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.visibility,
-              color: Colors.white70,
-              size: 16,
-            ),
+            const Icon(Icons.visibility, color: Colors.white70, size: 16),
             const SizedBox(width: 6),
             spectatorCount.when(
               data: (count) => Text(
@@ -139,7 +129,11 @@ class SpectatorListSheet extends ConsumerWidget {
                   padding: EdgeInsets.all(32),
                   child: Column(
                     children: [
-                      Icon(Icons.visibility_off, color: Colors.white24, size: 48),
+                      Icon(
+                        Icons.visibility_off,
+                        color: Colors.white24,
+                        size: 48,
+                      ),
                       SizedBox(height: 12),
                       Text(
                         'No one is watching yet',
@@ -177,7 +171,10 @@ class SpectatorListSheet extends ConsumerWidget {
                       ),
                       subtitle: Text(
                         'Watching since ${_formatTime(spectator.joinedAt)}',
-                        style: const TextStyle(color: Colors.white54, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 12,
+                        ),
                       ),
                     );
                   },
@@ -190,7 +187,10 @@ class SpectatorListSheet extends ConsumerWidget {
             ),
             error: (_, __) => const Padding(
               padding: EdgeInsets.all(32),
-              child: Text('Error loading spectators', style: TextStyle(color: Colors.red)),
+              child: Text(
+                'Error loading spectators',
+                style: TextStyle(color: Colors.red),
+              ),
             ),
           ),
           // Share button
@@ -203,7 +203,8 @@ class SpectatorListSheet extends ConsumerWidget {
                   // Share game spectator link
                   ShareService.shareAppDownload(
                     context: context,
-                    customMessage: '👀 Watch this game live on ClubRoyale! 🃏\n\nJoin as a spectator: https://clubroyale-app.web.app/spectate/$gameId',
+                    customMessage:
+                        '👀 Watch this game live on ClubRoyale! 🃏\n\nJoin as a spectator: https://clubroyale-app.web.app/spectate/$gameId',
                   );
                   Navigator.pop(context);
                 },

@@ -7,23 +7,16 @@ class GameException implements Exception {
   final String? code;
   final dynamic originalError;
 
-  GameException(
-    this.message, {
-    this.code,
-    this.originalError,
-  });
+  GameException(this.message, {this.code, this.originalError});
 
   @override
-  String toString() => 'GameException: $message${code != null ? ' (code: $code)' : ''}';
+  String toString() =>
+      'GameException: $message${code != null ? ' (code: $code)' : ''}';
 }
 
 /// Exception for network-related errors
 class NetworkException extends GameException {
-  NetworkException(
-    super.message, {
-    super.code,
-    super.originalError,
-  });
+  NetworkException(super.message, {super.code, super.originalError});
 
   @override
   String toString() => 'NetworkException: $message';
@@ -31,10 +24,7 @@ class NetworkException extends GameException {
 
 /// Exception for invalid game state or moves
 class InvalidMoveException extends GameException {
-  InvalidMoveException(
-    super.message, {
-    super.code,
-  });
+  InvalidMoveException(super.message, {super.code});
 
   @override
   String toString() => 'InvalidMoveException: $message';
@@ -42,11 +32,7 @@ class InvalidMoveException extends GameException {
 
 /// Exception for Firebase-related errors
 class FirebaseGameException extends GameException {
-  FirebaseGameException(
-    super.message, {
-    super.code,
-    super.originalError,
-  });
+  FirebaseGameException(super.message, {super.code, super.originalError});
 
   @override
   String toString() => 'FirebaseGameException: $message';
@@ -54,11 +40,7 @@ class FirebaseGameException extends GameException {
 
 /// Exception for authentication errors
 class AuthenticationException extends GameException {
-  AuthenticationException(
-    super.message, {
-    super.code,
-    super.originalError,
-  });
+  AuthenticationException(super.message, {super.code, super.originalError});
 
   @override
   String toString() => 'AuthenticationException: $message';

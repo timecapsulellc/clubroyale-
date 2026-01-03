@@ -28,7 +28,7 @@ class QuickSocialActions extends ConsumerWidget {
             ),
           ),
         ),
-        
+
         // Pill Buttons Row
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -38,13 +38,17 @@ class QuickSocialActions extends ConsumerWidget {
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.only(bottom: 10),
-                child: _ActionPillButton(
-                  icon: Icons.smart_toy,
-                  label: '🎮 Play vs AI',
-                  isFilled: true,
-                  fillColor: const Color(0xFF16a34a), // Green
-                  onTap: () => context.go('/lobby'),
-                ).animate().fadeIn(delay: 50.ms).shimmer(duration: 1500.ms, color: Colors.white24),
+                child:
+                    _ActionPillButton(
+                          icon: Icons.smart_toy,
+                          label: '🎮 Play vs AI',
+                          isFilled: true,
+                          fillColor: const Color(0xFF16a34a), // Green
+                          onTap: () => context.go('/lobby'),
+                        )
+                        .animate()
+                        .fadeIn(delay: 50.ms)
+                        .shimmer(duration: 1500.ms, color: Colors.white24),
               ),
               Row(
                 children: [
@@ -118,19 +122,25 @@ class _ActionPillButton extends StatelessWidget {
         child: Container(
           height: 44,
           decoration: BoxDecoration(
-            color: isFilled ? (fillColor ?? const Color(0xFF7c3aed)) : Colors.transparent,
+            color: isFilled
+                ? (fillColor ?? const Color(0xFF7c3aed))
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(25),
             border: Border.all(
-              color: isFilled ? Colors.transparent : const Color(0xFF7c3aed).withOpacity(0.5),
+              color: isFilled
+                  ? Colors.transparent
+                  : const Color(0xFF7c3aed).withOpacity(0.5),
               width: 1.5,
             ),
-            boxShadow: isFilled ? [
-              BoxShadow(
-                color: const Color(0xFF7c3aed).withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ] : null,
+            boxShadow: isFilled
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF7c3aed).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
           ),
           child: Stack(
             children: [
@@ -148,7 +158,9 @@ class _ActionPillButton extends StatelessWidget {
                       child: Text(
                         label,
                         style: TextStyle(
-                          color: isFilled ? Colors.white : const Color(0xFF7c3aed),
+                          color: isFilled
+                              ? Colors.white
+                              : const Color(0xFF7c3aed),
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),

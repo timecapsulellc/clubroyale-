@@ -1,5 +1,5 @@
 /// Replay List Screen
-/// 
+///
 /// Shows user's saved replays and public replays
 library;
 
@@ -77,11 +77,15 @@ class _MyReplaysTab extends ConsumerWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
             itemCount: replays.length,
-            itemBuilder: (context, index) => _ReplayCard(replay: replays[index]),
+            itemBuilder: (context, index) =>
+                _ReplayCard(replay: replays[index]),
           ),
         );
       },
-      loading: () => const ContextualLoader(message: 'Loading replays...', icon: Icons.video_library),
+      loading: () => const ContextualLoader(
+        message: 'Loading replays...',
+        icon: Icons.video_library,
+      ),
       error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
     );
   }
@@ -119,7 +123,10 @@ class _PopularReplaysTab extends ConsumerWidget {
           ),
         );
       },
-      loading: () => const ContextualLoader(message: 'Loading replays...', icon: Icons.trending_up),
+      loading: () => const ContextualLoader(
+        message: 'Loading replays...',
+        icon: Icons.trending_up,
+      ),
       error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
     );
   }
@@ -155,7 +162,9 @@ class _ReplayCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: _getGameColor(replay.gameType).withValues(alpha: 0.2),
+                      color: _getGameColor(
+                        replay.gameType,
+                      ).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -170,9 +179,8 @@ class _ReplayCard extends StatelessWidget {
                       children: [
                         Text(
                           replay.title ?? _getGameName(replay.gameType),
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           replay.playerNames.join(", "),
@@ -202,7 +210,10 @@ class _ReplayCard extends StatelessWidget {
                   const Spacer(),
                   if (replay.winnerId != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.amber.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
@@ -210,7 +221,11 @@ class _ReplayCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.emoji_events, size: 14, color: Colors.amber),
+                          const Icon(
+                            Icons.emoji_events,
+                            size: 14,
+                            color: Colors.amber,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             replay.winnerName ?? 'Winner',
@@ -233,19 +248,27 @@ class _ReplayCard extends StatelessWidget {
 
   Color _getGameColor(String type) {
     switch (type) {
-      case 'marriage': return Colors.pink;
-      case 'call_break': return Colors.blue;
-      case 'teen_patti': return Colors.orange;
-      default: return Colors.purple;
+      case 'marriage':
+        return Colors.pink;
+      case 'call_break':
+        return Colors.blue;
+      case 'teen_patti':
+        return Colors.orange;
+      default:
+        return Colors.purple;
     }
   }
 
   String _getGameName(String type) {
     switch (type) {
-      case 'marriage': return 'Marriage Game';
-      case 'call_break': return 'Call Break';
-      case 'teen_patti': return 'Teen Patti';
-      default: return type;
+      case 'marriage':
+        return 'Marriage Game';
+      case 'call_break':
+        return 'Call Break';
+      case 'teen_patti':
+        return 'Teen Patti';
+      default:
+        return type;
     }
   }
 }

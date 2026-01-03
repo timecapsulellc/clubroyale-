@@ -1,5 +1,5 @@
 /// Emote Widget - In-game social interactions
-/// 
+///
 /// Features:
 /// - Circular emote picker menu
 /// - Expanding/collapsing animation
@@ -31,11 +31,7 @@ class EmotePicker extends StatefulWidget {
   final VoidCallback? onClose;
   final Function(GameEmote) onEmoteSelected;
 
-  const EmotePicker({
-    super.key,
-    this.onClose,
-    required this.onEmoteSelected,
-  });
+  const EmotePicker({super.key, this.onClose, required this.onEmoteSelected});
 
   @override
   State<EmotePicker> createState() => _EmotePickerState();
@@ -116,34 +112,37 @@ class _EmoteButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.1),
-              border: Border.all(color: Colors.white24),
-            ),
-            child: Text(
-              emote.emoji,
-              style: const TextStyle(fontSize: 28),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            emote.label,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds, delay: 1.seconds),
+      child:
+          Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.1),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: Text(
+                      emote.emoji,
+                      style: const TextStyle(fontSize: 28),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    emote.label,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              )
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .shimmer(duration: 2.seconds, delay: 1.seconds),
     );
   }
 }
@@ -178,14 +177,14 @@ class _FlyingEmoteAnimationState extends State<FlyingEmoteAnimation>
   void initState() {
     super.initState();
     _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 1500));
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
 
-
-
-    _positionAnimation = Tween<Offset>(
-      begin: widget.startOffset,
-      end: widget.endOffset,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic));
+    _positionAnimation =
+        Tween<Offset>(begin: widget.startOffset, end: widget.endOffset).animate(
+          CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+        );
 
     // Scale up then down
     _scaleAnimation = TweenSequence([

@@ -7,6 +7,7 @@
 /// Since we can't easily mock Firebase in a widget test without
 /// full Firebase emulator setup, this test focuses on the
 /// game state management that MarriageService would orchestrate.
+library;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/games/marriage/marriage_game.dart';

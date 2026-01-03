@@ -14,12 +14,12 @@ abstract class UserProfile with _$UserProfile {
     String? avatarUrl,
     String? coverPhotoUrl,
     String? bio,
-    
+
     // Social counts
     @Default(0) int followersCount,
     @Default(0) int followingCount,
     @Default(0) int postsCount,
-    
+
     // Game stats
     @Default(0) int gamesPlayed,
     @Default(0) int gamesWon,
@@ -28,27 +28,27 @@ abstract class UserProfile with _$UserProfile {
     @Default(0) int totalDiamondsEarned,
     @Default(0) int currentStreak,
     @Default(0) int longestStreak,
-    
+
     // Achievements
     @Default([]) List<String> achievements,
     @Default([]) List<String> badges,
-    
+
     // Profile customization
     String? profileTheme,
     String? accentColor,
     @Default(false) bool isVerified,
     @Default(false) bool isCreator,
     @Default(false) bool isPrivate,
-    
+
     // Social links
     String? instagramHandle,
     String? twitterHandle,
     String? discordTag,
-    
+
     // Timestamps
     DateTime? createdAt,
     DateTime? lastActiveAt,
-    
+
     // Featured content
     String? featuredPostId,
     @Default([]) List<String> highlightedStoryIds,
@@ -99,13 +99,7 @@ abstract class UserPost with _$UserPost {
 }
 
 /// Post media type
-enum PostMediaType {
-  none,
-  image,
-  video,
-  gameHighlight,
-  achievement,
-}
+enum PostMediaType { none, image, video, gameHighlight, achievement }
 
 /// Achievement definition
 @freezed
@@ -129,13 +123,7 @@ abstract class Achievement with _$Achievement {
 }
 
 /// Achievement rarity tier
-enum AchievementRarity {
-  common,
-  uncommon,
-  rare,
-  epic,
-  legendary,
-}
+enum AchievementRarity { common, uncommon, rare, epic, legendary }
 
 /// Profile badge
 @freezed

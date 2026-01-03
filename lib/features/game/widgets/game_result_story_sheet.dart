@@ -44,7 +44,8 @@ class GameResultStorySheet extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<GameResultStorySheet> createState() => _GameResultStorySheetState();
+  ConsumerState<GameResultStorySheet> createState() =>
+      _GameResultStorySheetState();
 }
 
 class _GameResultStorySheetState extends ConsumerState<GameResultStorySheet> {
@@ -77,10 +78,7 @@ class _GameResultStorySheetState extends ConsumerState<GameResultStorySheet> {
             child: Column(
               children: [
                 if (widget.isCurrentUserWinner) ...[
-                  const Text(
-                    '🏆',
-                    style: TextStyle(fontSize: 48),
-                  ),
+                  const Text('🏆', style: TextStyle(fontSize: 48)),
                   const SizedBox(height: 8),
                   const Text(
                     'VICTORY!',
@@ -92,10 +90,7 @@ class _GameResultStorySheetState extends ConsumerState<GameResultStorySheet> {
                     ),
                   ),
                 ] else ...[
-                  const Text(
-                    '🎮',
-                    style: TextStyle(fontSize: 48),
-                  ),
+                  const Text('🎮', style: TextStyle(fontSize: 48)),
                   const SizedBox(height: 8),
                   const Text(
                     'GAME COMPLETE',
@@ -109,10 +104,7 @@ class _GameResultStorySheetState extends ConsumerState<GameResultStorySheet> {
                 const SizedBox(height: 8),
                 Text(
                   _getGameDisplayName(widget.gameType),
-                  style: const TextStyle(
-                    color: Colors.white54,
-                    fontSize: 16,
-                  ),
+                  style: const TextStyle(color: Colors.white54, fontSize: 16),
                 ),
               ],
             ),
@@ -186,10 +178,7 @@ class _GameResultStorySheetState extends ConsumerState<GameResultStorySheet> {
           // Skip button
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Skip',
-              style: TextStyle(color: Colors.white38),
-            ),
+            child: const Text('Skip', style: TextStyle(color: Colors.white38)),
           ),
           SizedBox(height: MediaQuery.of(context).viewInsets.bottom + 20),
         ],
@@ -237,7 +226,13 @@ class _GameResultStorySheetState extends ConsumerState<GameResultStorySheet> {
     required int score,
     required bool isWinner,
   }) {
-    final medal = rank == 1 ? '🥇' : rank == 2 ? '🥈' : rank == 3 ? '🥉' : '   ';
+    final medal = rank == 1
+        ? '🥇'
+        : rank == 2
+        ? '🥈'
+        : rank == 3
+        ? '🥉'
+        : '   ';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -306,22 +301,30 @@ class _GameResultStorySheetState extends ConsumerState<GameResultStorySheet> {
 
   void _shareViaSystem() {
     final buffer = StringBuffer();
-    
+
     if (widget.isCurrentUserWinner) {
       buffer.writeln('🏆 I WON! 🏆');
     }
     buffer.writeln('🎴 ${_getGameDisplayName(widget.gameType)} Results');
     buffer.writeln('─' * 20);
-    
+
     // Sort and display scores
     final sortedScores = widget.scores.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
-    
+
     for (var i = 0; i < sortedScores.length; i++) {
-      final medal = i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '  ';
-      buffer.writeln('$medal ${sortedScores[i].key}: ${sortedScores[i].value} pts');
+      final medal = i == 0
+          ? '🥇'
+          : i == 1
+          ? '🥈'
+          : i == 2
+          ? '🥉'
+          : '  ';
+      buffer.writeln(
+        '$medal ${sortedScores[i].key}: ${sortedScores[i].value} pts',
+      );
     }
-    
+
     buffer.writeln('─' * 20);
     if (_caption != null && _caption!.isNotEmpty) {
       buffer.writeln('💬 $_caption');
@@ -330,10 +333,7 @@ class _GameResultStorySheetState extends ConsumerState<GameResultStorySheet> {
     buffer.writeln('📱 Play with me on ClubRoyale!');
     buffer.writeln('🔗 clubroyale.app');
 
-    ShareService.shareText(
-      text: buffer.toString(),
-      context: context,
-    );
+    ShareService.shareText(text: buffer.toString(), context: context);
   }
 
   String _getGameDisplayName(String gameType) {
@@ -362,7 +362,7 @@ class _GameResultStorySheetState extends ConsumerState<GameResultStorySheet> {
 /// Quick action button to trigger story share
 class ShareToStoryButton extends StatelessWidget {
   final VoidCallback onTap;
-  
+
   const ShareToStoryButton({super.key, required this.onTap});
 
   @override
@@ -372,9 +372,7 @@ class ShareToStoryButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Colors.purple, Colors.pink],
-          ),
+          gradient: const LinearGradient(colors: [Colors.purple, Colors.pink]),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(

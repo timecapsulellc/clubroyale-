@@ -54,7 +54,7 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
     if (content.isEmpty) return;
 
     final chatService = ref.read(chatServiceProvider(_params));
-    
+
     SendResult result;
     if (_replyingTo != null) {
       result = await chatService.replyToMessage(content, _replyingTo!);
@@ -103,15 +103,13 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.outlineVariant,
-        ),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Column(
         children: [
           // Header
           _buildHeader(theme),
-          
+
           // Messages list
           Expanded(
             child: messagesAsync.when(
@@ -119,9 +117,11 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
               loading: () => ListView.builder(
                 padding: const EdgeInsets.all(8),
                 itemCount: 5,
-                itemBuilder: (context, index) => SkeletonMessage(isMe: index % 2 == 0),
+                itemBuilder: (context, index) =>
+                    SkeletonMessage(isMe: index % 2 == 0),
               ),
-              error: (e, _) => Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
+              error: (e, _) =>
+                  Center(child: Text(ErrorHelper.getFriendlyMessage(e))),
             ),
           ),
 
@@ -147,7 +147,11 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
       ),
       child: Row(
         children: [
-          Icon(Icons.chat, size: 18, color: theme.colorScheme.onPrimaryContainer),
+          Icon(
+            Icons.chat,
+            size: 18,
+            color: theme.colorScheme.onPrimaryContainer,
+          ),
           const SizedBox(width: 8),
           Text(
             'Chat',
@@ -158,10 +162,13 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
           const Spacer(),
           IconButton(
             icon: Icon(
-              _showQuickEmojis ? Icons.emoji_emotions : Icons.emoji_emotions_outlined,
+              _showQuickEmojis
+                  ? Icons.emoji_emotions
+                  : Icons.emoji_emotions_outlined,
               size: 20,
             ),
-            onPressed: () => setState(() => _showQuickEmojis = !_showQuickEmojis),
+            onPressed: () =>
+                setState(() => _showQuickEmojis = !_showQuickEmojis),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
           ),
@@ -189,7 +196,8 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
       itemBuilder: (context, index) {
         final message = messages[index];
         final isMe = message.senderId == widget.userId;
-        final isSystem = message.type == MessageType.system ||
+        final isSystem =
+            message.type == MessageType.system ||
             message.type == MessageType.gameEvent;
 
         if (isSystem) {
@@ -230,7 +238,9 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 2),
         child: Row(
-          mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisAlignment: isMe
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             if (!isMe) ...[
@@ -245,7 +255,10 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
             ],
             Flexible(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: isMe
                       ? theme.colorScheme.primary
@@ -269,15 +282,16 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    
+
                     // Reply preview
                     if (message.replyPreview != null)
                       Container(
                         margin: const EdgeInsets.only(bottom: 4),
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: (isMe ? Colors.white : theme.colorScheme.primary)
-                              .withValues(alpha: 0.1),
+                          color:
+                              (isMe ? Colors.white : theme.colorScheme.primary)
+                                  .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -285,8 +299,12 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontStyle: FontStyle.italic,
                             color: isMe
-                                ? theme.colorScheme.onPrimary.withValues(alpha: 0.7)
-                                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                ? theme.colorScheme.onPrimary.withValues(
+                                    alpha: 0.7,
+                                  )
+                                : theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.7,
+                                  ),
                           ),
                         ),
                       ),
@@ -347,10 +365,7 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
                   Text(entry.key, style: const TextStyle(fontSize: 12)),
                   if (entry.value > 1) ...[
                     const SizedBox(width: 2),
-                    Text(
-                      '${entry.value}',
-                      style: theme.textTheme.labelSmall,
-                    ),
+                    Text('${entry.value}', style: theme.textTheme.labelSmall),
                   ],
                 ],
               ),
@@ -453,10 +468,7 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
           const SizedBox(width: 8),
           IconButton(
             onPressed: _sendMessage,
-            icon: Icon(
-              Icons.send,
-              color: theme.colorScheme.primary,
-            ),
+            icon: Icon(Icons.send, color: theme.colorScheme.primary),
           ),
         ],
       ),
@@ -490,14 +502,20 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
             ),
             if (message.senderId == widget.userId || widget.isAdmin)
               ListTile(
-                leading: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
+                leading: Icon(
+                  Icons.delete,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 title: Text(
                   'Delete',
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  chatService.deleteMessage(message.id!, isAdmin: widget.isAdmin);
+                  chatService.deleteMessage(
+                    message.id!,
+                    isAdmin: widget.isAdmin,
+                  );
                 },
               ),
           ],
@@ -532,7 +550,7 @@ class _ChatWidgetState extends ConsumerState<ChatWidget> {
 
   void _toggleReaction(ChatMessage message, String emoji) {
     final chatService = ref.read(chatServiceProvider(_params));
-    
+
     if (message.reactions[widget.userId] == emoji) {
       chatService.removeReaction(message.id!);
     } else {

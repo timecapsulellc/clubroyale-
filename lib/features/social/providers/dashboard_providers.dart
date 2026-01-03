@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
@@ -11,7 +10,7 @@ import 'package:clubroyale/core/demo/demo_data.dart';
 final unreadChatsCountProvider = StreamProvider<int>((ref) {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return Stream.value(0);
-  
+
   return FirebaseFirestore.instance
       .collection('chats')
       .where('participants', arrayContains: userId)
@@ -24,7 +23,7 @@ final unreadChatsCountProvider = StreamProvider<int>((ref) {
 final onlineFriendsCountProvider = StreamProvider<int>((ref) {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return Stream.value(0);
-  
+
   // Note: Firestore doesn't support subcollection queries across parents easily without collection groups
   // But here we query a specific user's friends subcollection
   return FirebaseFirestore.instance
@@ -46,8 +45,8 @@ final activeVoiceRoomsProvider = StreamProvider<List<VoiceRoom>>((ref) {
       .snapshots()
       .map((snapshot) {
         final rooms = snapshot.docs
-          .map((doc) => VoiceRoom.fromJson({...doc.data(), 'id': doc.id}))
-          .toList();
+            .map((doc) => VoiceRoom.fromJson({...doc.data(), 'id': doc.id}))
+            .toList();
         return rooms.isEmpty ? DemoData.voiceRooms : rooms;
       });
 });
@@ -63,8 +62,8 @@ final spectatorGamesProvider = StreamProvider<List<GameRoom>>((ref) {
       .snapshots()
       .map((snapshot) {
         final rooms = snapshot.docs
-          .map((doc) => GameRoom.fromJson({...doc.data(), 'id': doc.id}))
-          .toList();
+            .map((doc) => GameRoom.fromJson({...doc.data(), 'id': doc.id}))
+            .toList();
         return rooms.isEmpty ? DemoData.games : rooms;
       });
 });
@@ -73,7 +72,7 @@ final spectatorGamesProvider = StreamProvider<List<GameRoom>>((ref) {
 final pendingFriendRequestsProvider = StreamProvider<int>((ref) {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return Stream.value(0);
-  
+
   return FirebaseFirestore.instance
       .collection('friendships')
       .where('toUserId', isEqualTo: userId)
@@ -83,10 +82,13 @@ final pendingFriendRequestsProvider = StreamProvider<int>((ref) {
 });
 
 // Activity feed provider
-final activityFeedProvider = StreamProvider.family<List<SocialActivity>, int>((ref, limit) {
+final activityFeedProvider = StreamProvider.family<List<SocialActivity>, int>((
+  ref,
+  limit,
+) {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return Stream.value([]);
-  
+
   return FirebaseFirestore.instance
       .collection('activity_feed')
       .where('targetUserId', isEqualTo: userId)
@@ -95,8 +97,8 @@ final activityFeedProvider = StreamProvider.family<List<SocialActivity>, int>((r
       .snapshots()
       .map((snapshot) {
         final activities = snapshot.docs
-          .map((doc) => SocialActivity.fromFirestore(doc))
-          .toList();
+            .map((doc) => SocialActivity.fromFirestore(doc))
+            .toList();
         return activities.isEmpty ? DemoData.activities : activities;
       });
 });

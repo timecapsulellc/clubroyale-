@@ -1,12 +1,12 @@
 /// Game Animations - Lottie-based animations for game events
-/// 
+///
 /// Features:
 /// - Confetti celebration
 /// - Winner trophy
 /// - Loading spinner
 /// - Success checkmark
 /// - Coin/diamond animations
-/// 
+///
 /// SETUP: Download animations from LottieFiles.com (free):
 /// 1. Search for "confetti" → Save as assets/animations/confetti.json
 /// 2. Search for "trophy" → Save as assets/animations/winner.json
@@ -26,7 +26,7 @@ class ConfettiAnimation extends StatelessWidget {
   final VoidCallback? onComplete;
   final double? width;
   final double? height;
-  
+
   const ConfettiAnimation({
     this.play = true,
     this.repeat = false,
@@ -35,7 +35,7 @@ class ConfettiAnimation extends StatelessWidget {
     this.height,
     super.key,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Lottie.asset(
@@ -57,13 +57,9 @@ class ConfettiAnimation extends StatelessWidget {
 class WinnerAnimation extends StatelessWidget {
   final double size;
   final bool repeat;
-  
-  const WinnerAnimation({
-    this.size = 200,
-    this.repeat = true,
-    super.key,
-  });
-  
+
+  const WinnerAnimation({this.size = 200, this.repeat = true, super.key});
+
   @override
   Widget build(BuildContext context) {
     return Lottie.asset(
@@ -87,12 +83,9 @@ class WinnerAnimation extends StatelessWidget {
 /// Use when: Waiting for game, loading state
 class LoadingCardsAnimation extends StatelessWidget {
   final double size;
-  
-  const LoadingCardsAnimation({
-    this.size = 100,
-    super.key,
-  });
-  
+
+  const LoadingCardsAnimation({this.size = 100, super.key});
+
   @override
   Widget build(BuildContext context) {
     return Lottie.asset(
@@ -104,9 +97,7 @@ class LoadingCardsAnimation extends StatelessWidget {
         return SizedBox(
           width: size,
           height: size,
-          child: const CircularProgressIndicator(
-            color: Color(0xFFD4AF37),
-          ),
+          child: const CircularProgressIndicator(color: Color(0xFFD4AF37)),
         );
       },
     );
@@ -118,13 +109,9 @@ class LoadingCardsAnimation extends StatelessWidget {
 class SuccessAnimation extends StatelessWidget {
   final double size;
   final VoidCallback? onComplete;
-  
-  const SuccessAnimation({
-    this.size = 80,
-    this.onComplete,
-    super.key,
-  });
-  
+
+  const SuccessAnimation({this.size = 80, this.onComplete, super.key});
+
   @override
   Widget build(BuildContext context) {
     return Lottie.asset(
@@ -133,11 +120,7 @@ class SuccessAnimation extends StatelessWidget {
       height: size,
       repeat: false,
       errorBuilder: (context, error, stackTrace) {
-        return Icon(
-          Icons.check_circle,
-          size: size * 0.5,
-          color: Colors.green,
-        );
+        return Icon(Icons.check_circle, size: size * 0.5, color: Colors.green);
       },
     );
   }
@@ -149,14 +132,14 @@ class CoinCelebrationAnimation extends StatelessWidget {
   final int amount;
   final double size;
   final String currency; // 'coins', 'diamonds', 'maal'
-  
+
   const CoinCelebrationAnimation({
     required this.amount,
     this.size = 150,
     this.currency = 'coins',
     super.key,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -196,7 +179,7 @@ class CoinCelebrationAnimation extends StatelessWidget {
       ],
     );
   }
-  
+
   Widget _getCurrencyIcon() {
     switch (currency) {
       case 'diamonds':
@@ -207,7 +190,7 @@ class CoinCelebrationAnimation extends StatelessWidget {
         return const Text('🪙', style: TextStyle(fontSize: 20));
     }
   }
-  
+
   Color _getCurrencyColor() {
     switch (currency) {
       case 'diamonds':
@@ -225,13 +208,9 @@ class CoinCelebrationAnimation extends StatelessWidget {
 class CardDealingAnimation extends StatelessWidget {
   final int cardCount;
   final VoidCallback? onComplete;
-  
-  const CardDealingAnimation({
-    this.cardCount = 21,
-    this.onComplete,
-    super.key,
-  });
-  
+
+  const CardDealingAnimation({this.cardCount = 21, this.onComplete, super.key});
+
   @override
   Widget build(BuildContext context) {
     return Lottie.asset(
@@ -249,12 +228,9 @@ class CardDealingAnimation extends StatelessWidget {
 /// Use when: Turn changes to current player
 class YourTurnAnimation extends StatelessWidget {
   final double size;
-  
-  const YourTurnAnimation({
-    this.size = 120,
-    super.key,
-  });
-  
+
+  const YourTurnAnimation({this.size = 120, super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -290,12 +266,9 @@ class YourTurnAnimation extends StatelessWidget {
 /// Use when: Maal is declared/calculated
 class MaalBonusAnimation extends StatelessWidget {
   final int maalPoints;
-  
-  const MaalBonusAnimation({
-    required this.maalPoints,
-    super.key,
-  });
-  
+
+  const MaalBonusAnimation({required this.maalPoints, super.key});
+
   @override
   Widget build(BuildContext context) {
     return Stack(

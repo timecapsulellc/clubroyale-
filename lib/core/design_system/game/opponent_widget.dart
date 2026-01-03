@@ -59,8 +59,8 @@ class OpponentWidget extends StatelessWidget {
                   color: isCurrentTurn
                       ? const Color(0xFFD4AF37)
                       : data.isVisited
-                          ? Colors.green
-                          : Colors.white24,
+                      ? Colors.green
+                      : Colors.white24,
                   width: isCurrentTurn ? 3 : 2,
                 ),
                 boxShadow: isCurrentTurn
@@ -106,11 +106,7 @@ class OpponentWidget extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.style,
-                      color: Colors.white70,
-                      size: 10,
-                    ),
+                    const Icon(Icons.style, color: Colors.white70, size: 10),
                     const SizedBox(width: 2),
                     Text(
                       '${data.cardCount}',
@@ -136,11 +132,7 @@ class OpponentWidget extends StatelessWidget {
                     color: Colors.green,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 10,
-                  ),
+                  child: const Icon(Icons.check, color: Colors.white, size: 10),
                 ),
               ),
 
@@ -194,10 +186,7 @@ class OpponentWidget extends StatelessWidget {
             ),
             child: Text(
               '💎 ${data.maalPoints}',
-              style: const TextStyle(
-                color: Colors.purple,
-                fontSize: 9,
-              ),
+              style: const TextStyle(color: Colors.purple, fontSize: 9),
             ),
           ),
         ],

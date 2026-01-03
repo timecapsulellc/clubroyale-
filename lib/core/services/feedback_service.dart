@@ -2,11 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 /// Types of feedback that users can submit
-enum FeedbackType {
-  bug,
-  feature,
-  general,
-}
+enum FeedbackType { bug, feature, general }
 
 /// Service for collecting and storing user feedback
 class FeedbackService {
@@ -24,7 +20,7 @@ class FeedbackService {
     String? email,
   }) async {
     final user = _auth.currentUser;
-    
+
     await _firestore.collection('feedback').add({
       'userId': user?.uid,
       'userEmail': email ?? user?.email,

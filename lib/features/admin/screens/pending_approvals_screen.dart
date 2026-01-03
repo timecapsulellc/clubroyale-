@@ -25,9 +25,7 @@ class PendingApprovalsScreen extends ConsumerWidget {
     final adminDiamondService = ref.read(adminDiamondServiceProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pending Approvals'),
-      ),
+      appBar: AppBar(title: const Text('Pending Approvals')),
       body: StreamBuilder<List<DiamondRequest>>(
         stream: adminDiamondService.watchRequestsForAdmin(user.email!),
         builder: (context, snapshot) {
@@ -62,8 +60,10 @@ class PendingApprovalsScreen extends ConsumerWidget {
               return _RequestCard(
                 request: request,
                 currentAdminEmail: user.email!,
-                onApprove: () => _approveRequest(context, ref, request.id, user.email!),
-                onReject: () => _showRejectDialog(context, ref, request.id, user.email!),
+                onApprove: () =>
+                    _approveRequest(context, ref, request.id, user.email!),
+                onReject: () =>
+                    _showRejectDialog(context, ref, request.id, user.email!),
               );
             },
           );
@@ -81,7 +81,7 @@ class PendingApprovalsScreen extends ConsumerWidget {
     try {
       final adminDiamondService = ref.read(adminDiamondServiceProvider);
       await adminDiamondService.approveRequest(requestId, adminEmail);
-      
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -156,10 +156,7 @@ class PendingApprovalsScreen extends ConsumerWidget {
       } catch (e) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: $e'),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
           );
         }
       }
@@ -200,7 +197,9 @@ class _RequestCard extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: _getStatusColor(request.status).withValues(alpha: 0.2),
+                  backgroundColor: _getStatusColor(
+                    request.status,
+                  ).withValues(alpha: 0.2),
                   child: Icon(
                     _getStatusIcon(request.status),
                     color: _getStatusColor(request.status),
@@ -223,7 +222,10 @@ class _RequestCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.amber.shade100,
                     borderRadius: BorderRadius.circular(20),
@@ -251,7 +253,10 @@ class _RequestCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Reason:', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Reason:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   Text(request.reason),
                 ],
               ),
@@ -301,7 +306,9 @@ class _RequestCard extends StatelessWidget {
                     onPressed: onReject,
                     icon: const Icon(Icons.close),
                     label: const Text('Reject'),
-                    style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   FilledButton.icon(

@@ -1,5 +1,5 @@
 /// Royal Meld (Marriage) Game Entry Screen
-/// 
+///
 /// Entry point for Royal Meld game with options to:
 /// - Practice (single-player with bots - free)
 /// - Create Room (multiplayer - costs diamonds)
@@ -29,7 +29,8 @@ class MarriageEntryScreen extends ConsumerStatefulWidget {
   const MarriageEntryScreen({super.key});
 
   @override
-  ConsumerState<MarriageEntryScreen> createState() => _MarriageEntryScreenState();
+  ConsumerState<MarriageEntryScreen> createState() =>
+      _MarriageEntryScreenState();
 }
 
 class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
@@ -59,8 +60,12 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Use GameTerminology emoji based on region
-            Text(GameTerminology.currentRegion == GameRegion.southAsia ? '👰' : '👑', 
-              style: const TextStyle(fontSize: 24)),
+            Text(
+              GameTerminology.currentRegion == GameRegion.southAsia
+                  ? '👰'
+                  : '👑',
+              style: const TextStyle(fontSize: 24),
+            ),
             const SizedBox(width: 8),
             Text(
               GameTerminology.royalMeldGame,
@@ -95,21 +100,21 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
                 // Game Info Card
                 _buildGameInfoCard(),
                 const SizedBox(height: 32),
-                
+
                 // Main Actions
                 _buildCreateRoomButton(),
                 const SizedBox(height: 16),
-                
+
                 // Game Rules Settings
                 MarriageSettingsCompact(
                   config: _gameConfig,
                   onEditPressed: _showRulesEditor,
                 ),
                 const SizedBox(height: 16),
-                
+
                 _buildJoinRoomButton(),
                 const SizedBox(height: 32),
-                
+
                 // Divider
                 Row(
                   children: [
@@ -128,7 +133,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
                   ],
                 ),
                 const SizedBox(height: 32),
-                
+
                 // Practice Mode
                 _buildPracticeModeButton(),
               ],
@@ -144,10 +149,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Colors.deepPurple.shade800,
-            Colors.purple.shade600,
-          ],
+          colors: [Colors.deepPurple.shade800, Colors.purple.shade600],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -177,10 +179,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
           Text(
             'Create melds, find the ${GameTerminology.wildCard}, and ${GameTerminology.declare.toLowerCase()} to win!',
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white70,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.white70),
           ),
           const SizedBox(height: 16),
           // How to Play Button
@@ -188,7 +187,9 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const MarriageGuidebookScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const MarriageGuidebookScreen(),
+                ),
               );
             },
             icon: const Icon(Icons.help_outline, color: Colors.amberAccent),
@@ -202,7 +203,9 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
             style: TextButton.styleFrom(
               backgroundColor: Colors.black12,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -216,9 +219,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
           ),
         ],
       ),
-    ).animate()
-     .fadeIn(duration: 400.ms)
-     .slideY(begin: -0.2, end: 0);
+    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.2, end: 0);
   }
 
   Widget _buildInfoChip(IconData icon, String label) {
@@ -249,158 +250,168 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
   Widget _buildCreateRoomButton() {
     final isTestMode = TestMode.isEnabled;
     final cost = isTestMode ? 'FREE' : '${DiamondConfig.roomCreationCost} 💎';
-    
+
     return Container(
-      height: 72,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.amber.shade600, Colors.orange.shade700],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.amber.withValues(alpha: 0.4),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+          height: 72,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.amber.shade600, Colors.orange.shade700],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.amber.withValues(alpha: 0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: _isCreatingRoom ? null : _createRoom,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: _isCreatingRoom
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _isCreatingRoom ? null : _createRoom,
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: _isCreatingRoom
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(
+                              Icons.add,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Create Room',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                        )
-                      : const Icon(Icons.add, color: Colors.white, size: 24),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Create Room',
-                        style: TextStyle(
-                          fontSize: 18,
+                          Text(
+                            'Host a multiplayer game',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        cost,
+                        style: const TextStyle(
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
-                      Text(
-                        'Host a multiplayer game',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white70,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    cost,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    ).animate(delay: 200.ms)
-     .fadeIn(duration: 400.ms)
-     .slideX(begin: -0.2, end: 0);
+        )
+        .animate(delay: 200.ms)
+        .fadeIn(duration: 400.ms)
+        .slideX(begin: -0.2, end: 0);
   }
 
   Widget _buildJoinRoomButton() {
     return Container(
-      height: 72,
-      decoration: BoxDecoration(
-        color: CasinoColors.cardBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.deepPurple.shade400,
-          width: 2,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: _showJoinDialog,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurple.withValues(alpha: 0.3),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.vpn_key, color: Colors.deepPurple, size: 24),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Join Room',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+          height: 72,
+          decoration: BoxDecoration(
+            color: CasinoColors.cardBackground,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.deepPurple.shade400, width: 2),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _showJoinDialog,
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple.withValues(alpha: 0.3),
+                        shape: BoxShape.circle,
                       ),
-                      Text(
-                        'Enter a 6-digit room code',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white70,
-                        ),
+                      child: const Icon(
+                        Icons.vpn_key,
+                        color: Colors.deepPurple,
+                        size: 24,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Join Room',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            'Enter a 6-digit room code',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.chevron_right, color: Colors.white54),
+                  ],
                 ),
-                Icon(Icons.chevron_right, color: Colors.white54),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    ).animate(delay: 300.ms)
-     .fadeIn(duration: 400.ms)
-     .slideX(begin: 0.2, end: 0);
+        )
+        .animate(delay: 300.ms)
+        .fadeIn(duration: 400.ms)
+        .slideX(begin: 0.2, end: 0);
   }
 
   Widget _buildPracticeModeButton() {
@@ -409,10 +420,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
       decoration: BoxDecoration(
         color: Colors.grey.shade800.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.grey.shade600,
-          width: 1,
-        ),
+        border: Border.all(color: Colors.grey.shade600, width: 1),
       ),
       child: Material(
         color: Colors.transparent,
@@ -436,7 +444,10 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.green.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(8),
@@ -455,8 +466,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
           ),
         ),
       ),
-    ).animate(delay: 500.ms)
-     .fadeIn(duration: 400.ms);
+    ).animate(delay: 500.ms).fadeIn(duration: 400.ms);
   }
 
   Future<void> _createRoom() async {
@@ -475,14 +485,11 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
     setState(() => _isCreatingRoom = true);
 
     final isTestMode = TestMode.isEnabled;
-    
+
     // Check diamond balance (skip in Test Mode)
     if (!isTestMode) {
       final cost = DiamondConfig.roomCreationCost;
-      final hasEnough = await diamondService.hasEnoughDiamonds(
-        user.uid,
-        cost,
-      );
+      final hasEnough = await diamondService.hasEnoughDiamonds(user.uid, cost);
 
       if (!hasEnough && mounted) {
         setState(() => _isCreatingRoom = false);
@@ -496,33 +503,32 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
         pointValue: 10,
         totalRounds: _gameConfig.totalRounds,
       );
-      
+
       final newGameRoom = GameRoom(
         name: 'Marriage #${Random().nextInt(1000)}',
         hostId: user.uid,
         config: config,
         gameType: 'marriage',
-        players: [
-          Player(id: user.uid, name: user.displayName ?? 'Player 1'),
-        ],
+        players: [Player(id: user.uid, name: user.displayName ?? 'Player 1')],
         scores: {user.uid: 0},
         createdAt: DateTime.now(),
       );
 
       final newGameId = await lobbyService.createGame(newGameRoom);
-      
+
       // Store Marriage-specific config in the game document
-      await FirebaseFirestore.instance.collection('games').doc(newGameId).update({
-        'marriageConfig': _gameConfig.toJson(),
-      });
+      await FirebaseFirestore.instance
+          .collection('games')
+          .doc(newGameId)
+          .update({'marriageConfig': _gameConfig.toJson()});
 
       // Deduct diamonds after successful room creation (skip in Test Mode)
       if (!isTestMode) {
         final cost = DiamondConfig.roomCreationCost;
         final success = await diamondService.deductDiamonds(
-          user.uid, 
+          user.uid,
           cost,
-          description: 'Created Marriage Room'
+          description: 'Created Marriage Room',
         );
         if (!success) {
           // This case should ideally not happen if hasEnoughDiamonds was checked
@@ -538,14 +544,18 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
               children: [
                 const Icon(Icons.check_circle, color: Colors.white),
                 const SizedBox(width: 8),
-                Text(isTestMode 
-                  ? 'Room created! (Test Mode - Free)' 
-                  : 'Room created! Create for ${DiamondConfig.roomCreationCost} 💎'),
+                Text(
+                  isTestMode
+                      ? 'Room created! (Test Mode - Free)'
+                      : 'Room created! Create for ${DiamondConfig.roomCreationCost} 💎',
+                ),
               ],
             ),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
         context.go('/lobby/$newGameId');
@@ -566,7 +576,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
 
   void _showRulesEditor() {
     MarriageGameConfig tempConfig = _gameConfig;
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -655,7 +665,9 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
               Navigator.pop(context);
               context.go('/wallet');
             },
-            style: FilledButton.styleFrom(backgroundColor: Colors.amber.shade700),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.amber.shade700,
+            ),
             child: const Text('Get Diamonds'),
           ),
         ],
@@ -673,7 +685,11 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
             color: Colors.deepPurple.shade50,
             shape: BoxShape.circle,
           ),
-          child: Icon(Icons.vpn_key, size: 48, color: Colors.deepPurple.shade600),
+          child: Icon(
+            Icons.vpn_key,
+            size: 48,
+            color: Colors.deepPurple.shade600,
+          ),
         ),
         title: const Text('Join Room'),
         content: Column(
@@ -710,14 +726,16 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: _isJoining ? null : () {
-              final code = _codeController.text.trim();
-              if (code.length == 6) {
-                Navigator.pop(context);
-                _joinByCode(code);
-              }
-            },
-            child: _isJoining 
+            onPressed: _isJoining
+                ? null
+                : () {
+                    final code = _codeController.text.trim();
+                    if (code.length == 6) {
+                      Navigator.pop(context);
+                      _joinByCode(code);
+                    }
+                  },
+            child: _isJoining
                 ? const SizedBox(
                     width: 20,
                     height: 20,
@@ -740,10 +758,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
     setState(() => _isJoining = true);
 
     try {
-      final player = Player(
-        id: user.uid,
-        name: user.displayName ?? 'Player',
-      );
+      final player = Player(id: user.uid, name: user.displayName ?? 'Player');
 
       final gameId = await lobbyService.joinByCode(code, player);
 
@@ -754,10 +769,7 @@ class _MarriageEntryScreenState extends ConsumerState<MarriageEntryScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('$e'), backgroundColor: Colors.red),
         );
       }
     } finally {

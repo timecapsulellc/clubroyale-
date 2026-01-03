@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -106,9 +105,10 @@ class LeaderboardScreen extends ConsumerWidget {
                         opacity: 0.1,
                         child: GridView.builder(
                           physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 8,
-                          ),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 8,
+                              ),
                           itemCount: 64,
                           itemBuilder: (context, index) {
                             return Icon(
@@ -122,19 +122,25 @@ class LeaderboardScreen extends ConsumerWidget {
                     ),
                     // Trophy icon
                     Center(
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.emoji_events_rounded,
-                          size: 56,
-                          color: Colors.white,
-                        ),
-                      ).animate(onPlay: (c) => c.repeat(reverse: true))
-                       .scale(duration: 1500.ms, begin: const Offset(0.95, 0.95), end: const Offset(1.05, 1.05)),
+                      child:
+                          Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.15),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.emoji_events_rounded,
+                                  size: 56,
+                                  color: Colors.white,
+                                ),
+                              )
+                              .animate(onPlay: (c) => c.repeat(reverse: true))
+                              .scale(
+                                duration: 1500.ms,
+                                begin: const Offset(0.95, 0.95),
+                                end: const Offset(1.05, 1.05),
+                              ),
                     ),
                   ],
                 ),
@@ -146,9 +152,7 @@ class LeaderboardScreen extends ConsumerWidget {
           leaderboardAsync.when(
             data: (entries) {
               if (entries.isEmpty) {
-                return SliverFillRemaining(
-                  child: _EmptyState(),
-                );
+                return SliverFillRemaining(child: _EmptyState());
               }
 
               return SliverList(
@@ -162,10 +166,11 @@ class LeaderboardScreen extends ConsumerWidget {
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                       child: Text(
                         'Other Rankings',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade700,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey.shade700,
+                            ),
                       ),
                     ),
 
@@ -174,10 +179,14 @@ class LeaderboardScreen extends ConsumerWidget {
                     final player = entry.value;
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: _EnhancedLeaderboardTile(
-                        entry: player,
-                        rank: index + 4,
-                      ).animate(delay: (100 * index).ms).fadeIn().slideX(begin: 0.1),
+                      child:
+                          _EnhancedLeaderboardTile(
+                                entry: player,
+                                rank: index + 4,
+                              )
+                              .animate(delay: (100 * index).ms)
+                              .fadeIn()
+                              .slideX(begin: 0.1),
                     );
                   }),
 
@@ -220,10 +229,7 @@ class _PremiumPodium extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Colors.amber.shade50,
-            Colors.white,
-          ],
+          colors: [Colors.amber.shade50, Colors.white],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
@@ -324,7 +330,11 @@ class _PodiumPlayer extends StatelessWidget {
         if (showCrown)
           const Text('👑', style: TextStyle(fontSize: 32))
               .animate(onPlay: (c) => c.repeat(reverse: true))
-              .scale(duration: 1000.ms, begin: const Offset(0.9, 0.9), end: const Offset(1.1, 1.1))
+              .scale(
+                duration: 1000.ms,
+                begin: const Offset(0.9, 0.9),
+                end: const Offset(1.1, 1.1),
+              )
         else
           const SizedBox(height: 32),
 
@@ -350,7 +360,9 @@ class _PodiumPlayer extends StatelessWidget {
             child: CircleAvatar(
               radius: avatarSize / 2 - 3,
               backgroundColor: colors[0].withValues(alpha: 0.2),
-              backgroundImage: entry.avatarUrl != null ? NetworkImage(entry.avatarUrl!) : null,
+              backgroundImage: entry.avatarUrl != null
+                  ? NetworkImage(entry.avatarUrl!)
+                  : null,
               child: entry.avatarUrl == null
                   ? Text(
                       entry.playerName[0].toUpperCase(),
@@ -460,10 +472,7 @@ class _EnhancedLeaderboardTile extends StatelessWidget {
   final LeaderboardEntry entry;
   final int rank;
 
-  const _EnhancedLeaderboardTile({
-    required this.entry,
-    required this.rank,
-  });
+  const _EnhancedLeaderboardTile({required this.entry, required this.rank});
 
   @override
   Widget build(BuildContext context) {
@@ -508,7 +517,9 @@ class _EnhancedLeaderboardTile extends StatelessWidget {
             CircleAvatar(
               radius: 24,
               backgroundColor: Colors.amber.shade100,
-              backgroundImage: entry.avatarUrl != null ? NetworkImage(entry.avatarUrl!) : null,
+              backgroundImage: entry.avatarUrl != null
+                  ? NetworkImage(entry.avatarUrl!)
+                  : null,
               child: entry.avatarUrl == null
                   ? Text(
                       entry.playerName[0].toUpperCase(),
@@ -535,9 +546,17 @@ class _EnhancedLeaderboardTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      _MiniStat(icon: Icons.games, value: '${entry.gamesPlayed}', color: Colors.blue),
+                      _MiniStat(
+                        icon: Icons.games,
+                        value: '${entry.gamesPlayed}',
+                        color: Colors.blue,
+                      ),
                       const SizedBox(width: 12),
-                      _MiniStat(icon: Icons.emoji_events, value: '${entry.gamesWon}', color: Colors.amber),
+                      _MiniStat(
+                        icon: Icons.emoji_events,
+                        value: '${entry.gamesWon}',
+                        color: Colors.amber,
+                      ),
                     ],
                   ),
                 ],
@@ -574,7 +593,11 @@ class _MiniStat extends StatelessWidget {
   final String value;
   final Color color;
 
-  const _MiniStat({required this.icon, required this.value, required this.color});
+  const _MiniStat({
+    required this.icon,
+    required this.value,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -645,7 +668,10 @@ class _EmptyState extends StatelessWidget {
               label: const Text('Start Playing'),
               style: FilledButton.styleFrom(
                 backgroundColor: Colors.amber.shade700,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -657,5 +683,3 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
-
-

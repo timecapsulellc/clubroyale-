@@ -56,7 +56,7 @@ class GameHUDWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          
+
           // Trump suit indicator
           if (trumpSuit != null)
             Expanded(
@@ -69,7 +69,7 @@ class GameHUDWidget extends StatelessWidget {
               ),
             ),
           const SizedBox(width: 8),
-          
+
           // Phase indicator
           if (gamePhase != null)
             Expanded(
@@ -105,12 +105,7 @@ class GameHUDWidget extends StatelessWidget {
         children: [
           Icon(icon, size: 20, color: theme.colorScheme.primary),
           const SizedBox(height: 4),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontSize: 10,
-            ),
-          ),
+          Text(label, style: theme.textTheme.bodySmall?.copyWith(fontSize: 10)),
           Text(
             value,
             style: theme.textTheme.titleSmall?.copyWith(
@@ -199,14 +194,13 @@ class PlayerScoresWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isCurrentTurn
-                      ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
+                      ? theme.colorScheme.primaryContainer.withValues(
+                          alpha: 0.5,
+                        )
                       : null,
                   borderRadius: BorderRadius.circular(8),
                   border: isCurrentUser
-                      ? Border.all(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        )
+                      ? Border.all(color: theme.colorScheme.primary, width: 2)
                       : null,
                 ),
                 child: Row(
@@ -234,10 +228,7 @@ class PlayerScoresWidget extends StatelessWidget {
                         style: theme.textTheme.bodySmall,
                       ),
                     const SizedBox(width: 12),
-                    Text(
-                      'Tricks: $tricks',
-                      style: theme.textTheme.bodySmall,
-                    ),
+                    Text('Tricks: $tricks', style: theme.textTheme.bodySmall),
                     const SizedBox(width: 12),
                     Text(
                       'Score: $score',

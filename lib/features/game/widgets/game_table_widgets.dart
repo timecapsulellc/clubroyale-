@@ -73,7 +73,7 @@ class TrickAreaWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(90),
             ),
           ),
-          
+
           // Trump indicator
           Positioned(
             top: 0,
@@ -99,7 +99,7 @@ class TrickAreaWidget extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Played cards
           ...cards.asMap().entries.map((entry) {
             final index = entry.key;
@@ -148,10 +148,7 @@ class TrickAreaWidget extends StatelessWidget {
       case 1:
         return [Offset(centerX, centerY)];
       case 2:
-        return [
-          Offset(centerX - 30, centerY),
-          Offset(centerX + 30, centerY),
-        ];
+        return [Offset(centerX - 30, centerY), Offset(centerX + 30, centerY)];
       case 3:
         return [
           Offset(centerX, centerY - 35),
@@ -216,11 +213,14 @@ class PlayerBidStatus extends StatelessWidget {
             backgroundColor: isCurrentTurn ? colorScheme.primary : Colors.grey,
             child: Text(
               playerName[0].toUpperCase(),
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(width: 8),
-          
+
           // Name and status
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,8 +239,8 @@ class PlayerBidStatus extends StatelessWidget {
                     color: madeBid
                         ? Colors.green
                         : failedBid
-                            ? Colors.red
-                            : colorScheme.onSurfaceVariant,
+                        ? Colors.red
+                        : colorScheme.onSurfaceVariant,
                   ),
                 )
               else
@@ -253,7 +253,7 @@ class PlayerBidStatus extends StatelessWidget {
                 ),
             ],
           ),
-          
+
           // Status indicator
           if (isWinning) ...[
             const SizedBox(width: 8),
@@ -300,18 +300,20 @@ class RoundScoreCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             const Divider(),
-            
+
             // Header row
             Row(
               children: [
                 const Expanded(flex: 2, child: Text('Player')),
                 const Expanded(child: Text('Bid', textAlign: TextAlign.center)),
                 const Expanded(child: Text('Won', textAlign: TextAlign.center)),
-                const Expanded(child: Text('Score', textAlign: TextAlign.center)),
+                const Expanded(
+                  child: Text('Score', textAlign: TextAlign.center),
+                ),
               ],
             ),
             const SizedBox(height: 8),
-            
+
             // Player rows
             ...playerNames.entries.map((entry) {
               final playerId = entry.key;

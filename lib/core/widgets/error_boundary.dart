@@ -15,11 +15,7 @@ class ErrorBoundary extends StatefulWidget {
   final Widget child;
   final Widget Function(Object error, VoidCallback retry)? errorBuilder;
 
-  const ErrorBoundary({
-    super.key,
-    required this.child,
-    this.errorBuilder,
-  });
+  const ErrorBoundary({super.key, required this.child, this.errorBuilder});
 
   @override
   State<ErrorBoundary> createState() => _ErrorBoundaryState();
@@ -80,7 +76,7 @@ class DefaultErrorWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // Title
               const Text(
                 'Oops! Something went wrong',
@@ -92,7 +88,7 @@ class DefaultErrorWidget extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              
+
               // Subtitle
               Text(
                 "We're sorry, but something unexpected happened. Please try again.",
@@ -103,7 +99,7 @@ class DefaultErrorWidget extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-              
+
               // Retry button
               FilledButton.icon(
                 onPressed: onRetry,
@@ -112,11 +108,14 @@ class DefaultErrorWidget extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.amber.shade700,
                   foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // Go Home button
               TextButton(
                 onPressed: () {
@@ -140,11 +139,7 @@ class AsyncErrorWidget extends StatelessWidget {
   final Object error;
   final VoidCallback? onRetry;
 
-  const AsyncErrorWidget({
-    super.key,
-    required this.error,
-    this.onRetry,
-  });
+  const AsyncErrorWidget({super.key, required this.error, this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +210,7 @@ class ErrorSnackBar {
   }) {
     // Report to Crashlytics
     FirebaseCrashlytics.instance.log('Error shown to user: $message');
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -252,4 +247,3 @@ class ErrorSnackBar {
     show(context, message);
   }
 }
-

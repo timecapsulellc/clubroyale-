@@ -35,7 +35,9 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 3),
+    );
   }
 
   @override
@@ -46,11 +48,11 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
 
   void _checkAndPlayConfetti(GameRoom game) {
     if (_hasPlayedConfetti) return;
-    
+
     final authService = ref.read(authServiceProvider);
     final currentUser = authService.currentUser;
     if (currentUser == null) return;
-    
+
     final myScore = game.scores[currentUser.uid] ?? 0;
     if (myScore > 0) {
       _hasPlayedConfetti = true;
@@ -91,7 +93,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
       buffer.writeln('  $icon $name: $score pts');
     }
     buffer.writeln('');
-    
+
     if (transactions.isEmpty) {
       buffer.writeln('✅ All settled! No payments needed.');
     } else {
@@ -117,7 +119,9 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
       // Wait for the widget to be rendered
       await Future.delayed(const Duration(milliseconds: 100));
 
-      final boundary = _receiptKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      final boundary =
+          _receiptKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) {
         throw Exception('Could not capture receipt');
       }
@@ -126,15 +130,15 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       final bytes = byteData!.buffer.asUint8List();
 
-      final fileName = 'settlement_${game.id ?? 'receipt'}_${DateTime.now().millisecondsSinceEpoch}.png';
-      
+      final fileName =
+          'settlement_${game.id ?? 'receipt'}_${DateTime.now().millisecondsSinceEpoch}.png';
+
       // Use the platform-specific ReceiptService
       await ReceiptService().shareReceiptImage(
         bytes,
         fileName,
-        'Settlement Receipt for ${game.name}'
+        'Settlement Receipt for ${game.name}',
       );
-
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -204,336 +208,435 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
       body: Stack(
         children: [
           ledgerAsyncValue.when(
-        data: (game) {
-          if (game == null) {
-            return Center(
+            data: (game) {
+              if (game == null) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: colorScheme.error,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('Game not found'),
+                      const SizedBox(height: 16),
+                      FilledButton(
+                        onPressed: () => context.go('/'),
+                        child: const Text('Back to Lobby'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              // Check for win and play confetti
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _checkAndPlayConfetti(game);
+              });
+
+              final transactions = _calculateSettlements(game);
+
+              // Sort players by score (highest first)
+              final sortedPlayers = List<Player>.from(game.players)
+                ..sort(
+                  (a, b) => (game.scores[b.id] ?? 0).compareTo(
+                    game.scores[a.id] ?? 0,
+                  ),
+                );
+
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Receipt Card (capturable for image)
+                      RepaintBoundary(
+                        key: _receiptKey,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              // Header
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      colorScheme.primary,
+                                      colorScheme.secondary,
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(16),
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    const Icon(
+                                      Icons.receipt_long,
+                                      size: 48,
+                                      color: Colors.white,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Settlement Receipt',
+                                      style: theme.textTheme.titleLarge
+                                          ?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                    Text(
+                                      game.name,
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.8,
+                                            ),
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // Game Info
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    _InfoChip(
+                                      icon: Icons.people,
+                                      label: '${game.players.length} Players',
+                                    ),
+                                    _InfoChip(
+                                      icon: Icons.monetization_on,
+                                      label:
+                                          '${game.config.pointValue.toInt()} units/pt',
+                                    ),
+                                    _InfoChip(
+                                      icon: Icons.repeat,
+                                      label:
+                                          '${game.config.totalRounds} Rounds',
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const Divider(height: 1),
+
+                              // Scores Section
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Final Scores',
+                                      style: theme.textTheme.titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    ...sortedPlayers.map((player) {
+                                      final score = game.scores[player.id] ?? 0;
+                                      final isWinner = score > 0;
+                                      final isLoser = score < 0;
+                                      final moneyValue =
+                                          (score * game.config.pointValue)
+                                              .abs();
+
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 4,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 16,
+                                              backgroundColor: isWinner
+                                                  ? Colors.green.withValues(
+                                                      alpha: 0.2,
+                                                    )
+                                                  : isLoser
+                                                  ? Colors.red.withValues(
+                                                      alpha: 0.2,
+                                                    )
+                                                  : colorScheme
+                                                        .surfaceContainerHighest,
+                                              child: Text(
+                                                player.name[0].toUpperCase(),
+                                                style: TextStyle(
+                                                  color: isWinner
+                                                      ? Colors.green
+                                                      : isLoser
+                                                      ? Colors.red
+                                                      : null,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Text(
+                                                player.profile?.displayName ??
+                                                    player.name,
+                                                style:
+                                                    theme.textTheme.bodyLarge,
+                                              ),
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  '$score pts',
+                                                  style: theme
+                                                      .textTheme
+                                                      .titleMedium
+                                                      ?.copyWith(
+                                                        color: isWinner
+                                                            ? Colors.green
+                                                            : isLoser
+                                                            ? Colors.red
+                                                            : null,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                ),
+                                                Text(
+                                                  '${isWinner
+                                                      ? '+'
+                                                      : isLoser
+                                                      ? '-'
+                                                      : ''}${moneyValue.toInt()} units',
+                                                  style: theme
+                                                      .textTheme
+                                                      .bodySmall
+                                                      ?.copyWith(
+                                                        color: colorScheme
+                                                            .onSurfaceVariant,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                                  ],
+                                ),
+                              ),
+
+                              const Divider(height: 1),
+
+                              // Settlements Section
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.swap_horiz, size: 20),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'Settlements',
+                                          style: theme.textTheme.titleMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    if (transactions.isEmpty)
+                                      Container(
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: Colors.green.withValues(
+                                            alpha: 0.1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.check_circle,
+                                              color: Colors.green,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'All settled! No payments needed.',
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    else
+                                      ...transactions.map(
+                                        (tx) => _TransactionTile(
+                                          fromName: _getPlayerName(
+                                            game,
+                                            tx.fromPlayer,
+                                          ),
+                                          toName: _getPlayerName(
+                                            game,
+                                            tx.toPlayer,
+                                          ),
+                                          amount: tx.amount,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+
+                              // Footer
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.surfaceContainerHighest,
+                                  borderRadius: const BorderRadius.vertical(
+                                    bottom: Radius.circular(16),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.sports_esports,
+                                      size: 16,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Generated by ClubRoyale',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: colorScheme.onSurfaceVariant,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Action Buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                final transactions = _calculateSettlements(
+                                  game,
+                                );
+                                _shareAsText(game, transactions);
+                              },
+                              icon: const Icon(Icons.text_fields),
+                              label: const Text('Share Text'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: FilledButton.icon(
+                              onPressed: _isGeneratingImage
+                                  ? null
+                                  : () => _shareAsImage(game),
+                              icon: _isGeneratingImage
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.photo_camera),
+                              label: Text(
+                                _isGeneratingImage
+                                    ? 'Generating...'
+                                    : 'Share Image',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Back to Lobby
+                      TextButton(
+                        onPressed: () => context.go('/'),
+                        child: const Text('Back to Lobby'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+            loading: () => const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading settlement...'),
+                ],
+              ),
+            ),
+            error: (error, stack) => Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.error_outline, size: 64, color: colorScheme.error),
                   const SizedBox(height: 16),
-                  const Text('Game not found'),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: () => context.go('/'),
-                    child: const Text('Back to Lobby'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          // Check for win and play confetti
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _checkAndPlayConfetti(game);
-          });
-
-          final transactions = _calculateSettlements(game);
-          
-          // Sort players by score (highest first)
-          final sortedPlayers = List<Player>.from(game.players)
-            ..sort((a, b) => (game.scores[b.id] ?? 0).compareTo(game.scores[a.id] ?? 0));
-
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Receipt Card (capturable for image)
-                  RepaintBoundary(
-                    key: _receiptKey,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          // Header
-                          Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [colorScheme.primary, colorScheme.secondary],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                            ),
-                            child: Column(
-                              children: [
-                                const Icon(Icons.receipt_long, size: 48, color: Colors.white),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Settlement Receipt',
-                                  style: theme.textTheme.titleLarge?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  game.name,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.8),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // Game Info
-                          Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _InfoChip(
-                                  icon: Icons.people,
-                                  label: '${game.players.length} Players',
-                                ),
-                                _InfoChip(
-                                  icon: Icons.monetization_on,
-                                  label: '${game.config.pointValue.toInt()} units/pt',
-                                ),
-                                _InfoChip(
-                                  icon: Icons.repeat,
-                                  label: '${game.config.totalRounds} Rounds',
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const Divider(height: 1),
-
-                          // Scores Section
-                          Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Final Scores',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                ...sortedPlayers.map((player) {
-                                  final score = game.scores[player.id] ?? 0;
-                                  final isWinner = score > 0;
-                                  final isLoser = score < 0;
-                                  final moneyValue = (score * game.config.pointValue).abs();
-                                  
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 4),
-                                    child: Row(
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 16,
-                                          backgroundColor: isWinner 
-                                              ? Colors.green.withValues(alpha: 0.2)
-                                              : isLoser 
-                                                  ? Colors.red.withValues(alpha: 0.2)
-                                                  : colorScheme.surfaceContainerHighest,
-                                          child: Text(
-                                            player.name[0].toUpperCase(),
-                                            style: TextStyle(
-                                              color: isWinner ? Colors.green : isLoser ? Colors.red : null,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Text(
-                                            player.profile?.displayName ?? player.name,
-                                            style: theme.textTheme.bodyLarge,
-                                          ),
-                                        ),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              '$score pts',
-                                              style: theme.textTheme.titleMedium?.copyWith(
-                                                color: isWinner ? Colors.green : isLoser ? Colors.red : null,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Text(
-                                              '${isWinner ? '+' : isLoser ? '-' : ''}${moneyValue.toInt()} units',
-                                              style: theme.textTheme.bodySmall?.copyWith(
-                                                color: colorScheme.onSurfaceVariant,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }),
-                              ],
-                            ),
-                          ),
-
-                          const Divider(height: 1),
-
-                          // Settlements Section
-                          Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.swap_horiz, size: 20),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Settlements',
-                                      style: theme.textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                if (transactions.isEmpty)
-                                  Container(
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green.withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.check_circle, color: Colors.green),
-                                        SizedBox(width: 8),
-                                        Text('All settled! No payments needed.'),
-                                      ],
-                                    ),
-                                  )
-                                else
-                                  ...transactions.map((tx) => _TransactionTile(
-                                    fromName: _getPlayerName(game, tx.fromPlayer),
-                                    toName: _getPlayerName(game, tx.toPlayer),
-                                    amount: tx.amount,
-                                  )),
-                              ],
-                            ),
-                          ),
-
-                          // Footer
-                          Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                              color: colorScheme.surfaceContainerHighest,
-                              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
-                              ),
-                              child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                  Icon(Icons.sports_esports, size: 16, color: colorScheme.onSurfaceVariant),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                  'Generated by ClubRoyale',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
-                                  ),
-                                  ),
-                              ],
-                              ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Action Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            final transactions = _calculateSettlements(game);
-                            _shareAsText(game, transactions);
-                          },
-                          icon: const Icon(Icons.text_fields),
-                          label: const Text('Share Text'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: FilledButton.icon(
-                          onPressed: _isGeneratingImage ? null : () => _shareAsImage(game),
-                          icon: _isGeneratingImage 
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                )
-                              : const Icon(Icons.photo_camera),
-                          label: Text(_isGeneratingImage ? 'Generating...' : 'Share Image'),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Back to Lobby
-                  TextButton(
-                    onPressed: () => context.go('/'),
-                    child: const Text('Back to Lobby'),
-                  ),
+                  Text('Error: $error'),
                 ],
               ),
             ),
-          );
-        },
-        loading: () => const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Loading settlement...'),
-            ],
           ),
-        ),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 64, color: colorScheme.error),
-              const SizedBox(height: 16),
-              Text('Error: $error'),
-            ],
+          // Confetti Overlay
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              shouldLoop: false,
+              colors: const [
+                Colors.green,
+                Colors.blue,
+                Colors.pink,
+                Colors.orange,
+                Colors.purple,
+              ],
+            ),
           ),
-        ),
+        ],
       ),
-      // Confetti Overlay
-      Align(
-        alignment: Alignment.topCenter,
-        child: ConfettiWidget(
-          confettiController: _confettiController,
-          blastDirectionality: BlastDirectionality.explosive,
-          shouldLoop: false,
-          colors: const [Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.purple],
-        ),
-      ),
-    ],
-    ),
     );
   }
 }
@@ -549,7 +652,11 @@ class _InfoChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+        Icon(
+          icon,
+          size: 16,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
         const SizedBox(width: 4),
         Text(label, style: Theme.of(context).textTheme.bodySmall),
       ],
@@ -589,14 +696,16 @@ class _TransactionTile extends StatelessWidget {
             backgroundColor: Colors.red.withValues(alpha: 0.2),
             child: Text(
               fromName[0].toUpperCase(),
-              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
             ),
           ),
           const SizedBox(width: 8),
           // From name
-          Expanded(
-            child: Text(fromName, style: theme.textTheme.bodyMedium),
-          ),
+          Expanded(child: Text(fromName, style: theme.textTheme.bodyMedium)),
           // Arrow with amount
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -622,7 +731,11 @@ class _TransactionTile extends StatelessWidget {
           const SizedBox(width: 8),
           // To name
           Expanded(
-            child: Text(toName, style: theme.textTheme.bodyMedium, textAlign: TextAlign.right),
+            child: Text(
+              toName,
+              style: theme.textTheme.bodyMedium,
+              textAlign: TextAlign.right,
+            ),
           ),
           const SizedBox(width: 8),
           // To avatar
@@ -631,7 +744,11 @@ class _TransactionTile extends StatelessWidget {
             backgroundColor: Colors.green.withValues(alpha: 0.2),
             child: Text(
               toName[0].toUpperCase(),
-              style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12),
+              style: const TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
             ),
           ),
         ],

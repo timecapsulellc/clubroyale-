@@ -2,7 +2,9 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final roomCodeServiceProvider = Provider<RoomCodeService>((ref) => RoomCodeService());
+final roomCodeServiceProvider = Provider<RoomCodeService>(
+  (ref) => RoomCodeService(),
+);
 
 /// Service for generating and managing 6-digit room codes
 class RoomCodeService {
@@ -20,14 +22,15 @@ class RoomCodeService {
     do {
       // Generate 6-digit code
       code = _generateCode();
-      
+
       // Check if code is already in use
       isUnique = await isCodeAvailable(code);
       attempts++;
-      
+
       if (attempts >= maxAttempts) {
         // Fallback: append timestamp suffix
-        code = '${_generateCode().substring(0, 3)}${DateTime.now().millisecondsSinceEpoch % 1000}';
+        code =
+            '${_generateCode().substring(0, 3)}${DateTime.now().millisecondsSinceEpoch % 1000}';
         break;
       }
     } while (!isUnique);

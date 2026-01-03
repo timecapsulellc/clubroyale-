@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'dart:math' as math;
 
 /// Hero Section - "The Royal Table"
-/// 
+///
 /// Cinematic animated hero showcasing premium gaming experience:
 /// - Animated card fan cycling through 4 games
 /// - Gold particle effects
@@ -16,10 +16,11 @@ class HeroSection extends StatefulWidget {
   State<HeroSection> createState() => _HeroSectionState();
 }
 
-class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin {
+class _HeroSectionState extends State<HeroSection>
+    with TickerProviderStateMixin {
   late AnimationController _cardController;
   late AnimationController _particleController;
-  
+
   @override
   void initState() {
     super.initState();
@@ -27,13 +28,13 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
       vsync: this,
       duration: const Duration(seconds: 8),
     )..repeat();
-    
+
     _particleController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
     )..repeat();
   }
-  
+
   @override
   void dispose() {
     _cardController.dispose();
@@ -45,7 +46,7 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
-    
+
     return Container(
       width: double.infinity,
       height: isDesktop ? 600 : 500,
@@ -64,10 +65,10 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
         children: [
           // Background Pattern (Felt Texture Effect)
           _buildFeltPattern(),
-          
+
           // Gold Particle Effects
           _buildParticles(),
-          
+
           // Main Content
           Center(
             child: ConstrainedBox(
@@ -78,25 +79,33 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Logo/Brand
-                    _buildLogo().animate().fadeIn(duration: 600.ms).slideY(begin: -0.3, end: 0),
-                    
+                    _buildLogo()
+                        .animate()
+                        .fadeIn(duration: 600.ms)
+                        .slideY(begin: -0.3, end: 0),
+
                     const SizedBox(height: 32),
-                    
+
                     // Animated Card Fan
-                    _buildCardFan(isDesktop).animate().scale(delay: 300.ms, duration: 800.ms),
-                    
+                    _buildCardFan(
+                      isDesktop,
+                    ).animate().scale(delay: 300.ms, duration: 800.ms),
+
                     const SizedBox(height: 40),
-                    
+
                     // Tagline
                     _buildTagline().animate().fadeIn(delay: 500.ms),
-                    
+
                     const SizedBox(height: 32),
-                    
+
                     // CTA Buttons
-                    _buildCTAs(context, isDesktop).animate().fadeIn(delay: 700.ms).slideY(begin: 0.3, end: 0),
-                    
+                    _buildCTAs(context, isDesktop)
+                        .animate()
+                        .fadeIn(delay: 700.ms)
+                        .slideY(begin: 0.3, end: 0),
+
                     const SizedBox(height: 40),
-                    
+
                     // Stats Bar
                     _buildStatsBar(isDesktop).animate().fadeIn(delay: 900.ms),
                   ],
@@ -108,15 +117,11 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
       ),
     );
   }
-  
+
   Widget _buildFeltPattern() {
-    return Positioned.fill(
-      child: CustomPaint(
-        painter: _FeltPatternPainter(),
-      ),
-    );
+    return Positioned.fill(child: CustomPaint(painter: _FeltPatternPainter()));
   }
-  
+
   Widget _buildParticles() {
     return AnimatedBuilder(
       animation: _particleController,
@@ -128,7 +133,7 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
       },
     );
   }
-  
+
   Widget _buildLogo() {
     return Column(
       children: [
@@ -146,11 +151,7 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
               ),
             ],
           ),
-          child: const Icon(
-            Icons.casino,
-            size: 48,
-            color: Color(0xFFD4AF37),
-          ),
+          child: const Icon(Icons.casino, size: 48, color: Color(0xFFD4AF37)),
         ),
         const SizedBox(height: 16),
         // Brand Name
@@ -172,12 +173,12 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
       ],
     );
   }
-  
+
   Widget _buildCardFan(bool isDesktop) {
     final cardSize = isDesktop ? 120.0 : 80.0;
     final games = ['♠', '♥', '♦', '♣'];
     final colors = [Colors.white, Colors.red, Colors.red, Colors.white];
-    
+
     return AnimatedBuilder(
       animation: _cardController,
       builder: (context, child) {
@@ -189,12 +190,13 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
             children: List.generate(4, (index) {
               // Calculate rotation for fan effect
               final baseAngle = (index - 1.5) * 0.15;
-              final wobble = math.sin(_cardController.value * math.pi * 2 + index) * 0.02;
+              final wobble =
+                  math.sin(_cardController.value * math.pi * 2 + index) * 0.02;
               final angle = baseAngle + wobble;
-              
+
               // Calculate horizontal offset
               final xOffset = (index - 1.5) * (isDesktop ? 40 : 25);
-              
+
               return Transform.translate(
                 offset: Offset(xOffset, 0),
                 child: Transform.rotate(
@@ -208,7 +210,7 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
       },
     );
   }
-  
+
   Widget _buildCard(String suit, Color color, double size) {
     return Container(
       width: size,
@@ -237,7 +239,7 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
       ),
     );
   }
-  
+
   Widget _buildTagline() {
     return Column(
       children: [
@@ -263,7 +265,7 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
       ],
     );
   }
-  
+
   Widget _buildCTAs(BuildContext context, bool isDesktop) {
     return Wrap(
       spacing: 16,
@@ -287,50 +289,56 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
       ],
     );
   }
-  
+
   Widget _buildStatsBar(bool isDesktop) {
     final stats = [
       ('⭐', '50K+', 'Players'),
       ('🏆', '24/7', 'Tournaments'),
       ('💎', 'FREE', 'Entry'),
     ];
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: const Color(0xFFD4AF37).withValues(alpha: 0.3)),
+        border: Border.all(
+          color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
+        ),
       ),
       child: Wrap(
         spacing: isDesktop ? 48 : 24,
-        children: stats.map((stat) => Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(stat.$1, style: const TextStyle(fontSize: 20)),
-            const SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  stat.$2,
-                  style: const TextStyle(
-                    color: Color(0xFFD4AF37),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+        children: stats
+            .map(
+              (stat) => Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(stat.$1, style: const TextStyle(fontSize: 20)),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        stat.$2,
+                        style: const TextStyle(
+                          color: Color(0xFFD4AF37),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        stat.$3,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.6),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                Text(
-                  stat.$3,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
-                    fontSize: 11,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        )).toList(),
+                ],
+              ),
+            )
+            .toList(),
       ),
     );
   }
@@ -341,7 +349,7 @@ class _PrimaryCTA extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback onTap;
-  
+
   const _PrimaryCTA({
     required this.label,
     required this.icon,
@@ -351,45 +359,50 @@ class _PrimaryCTA extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(30),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFD4AF37), Color(0xFFF7E7CE), Color(0xFFD4AF37)],
-            ),
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
             borderRadius: BorderRadius.circular(30),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFD4AF37).withValues(alpha: 0.4),
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: Colors.black, size: 24),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  letterSpacing: 2,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFFD4AF37),
+                    Color(0xFFF7E7CE),
+                    Color(0xFFD4AF37),
+                  ],
                 ),
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFD4AF37).withValues(alpha: 0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, color: Colors.black, size: 24),
+                  const SizedBox(width: 8),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-    ).animate(onPlay: (c) => c.repeat(reverse: true))
-      .shimmer(duration: 2.seconds, delay: 1.seconds);
+        )
+        .animate(onPlay: (c) => c.repeat(reverse: true))
+        .shimmer(duration: 2.seconds, delay: 1.seconds);
   }
 }
 
@@ -398,7 +411,7 @@ class _SecondaryCTA extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback onTap;
-  
+
   const _SecondaryCTA({
     required this.label,
     required this.icon,
@@ -448,7 +461,7 @@ class _FeltPatternPainter extends CustomPainter {
     final paint = Paint()
       ..color = Colors.black.withValues(alpha: 0.05)
       ..strokeWidth = 0.5;
-    
+
     // Draw subtle grid pattern
     const spacing = 20.0;
     for (double x = 0; x < size.width; x += spacing) {
@@ -465,25 +478,25 @@ class _FeltPatternPainter extends CustomPainter {
 /// Gold Particle Painter - Floating dust effect
 class _GoldParticlePainter extends CustomPainter {
   final double animationValue;
-  
+
   _GoldParticlePainter(this.animationValue);
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = const Color(0xFFD4AF37).withValues(alpha: 0.3);
-    
+
     final random = math.Random(42); // Consistent seed
-    
+
     for (int i = 0; i < 30; i++) {
       final x = random.nextDouble() * size.width;
       final baseY = random.nextDouble() * size.height;
       final speed = 0.5 + random.nextDouble() * 0.5;
       final particleSize = 1.0 + random.nextDouble() * 2;
-      
+
       // Animate upward
       final y = (baseY - (animationValue * size.height * speed)) % size.height;
-      
+
       canvas.drawCircle(Offset(x, y), particleSize, paint);
     }
   }

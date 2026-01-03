@@ -1,5 +1,5 @@
 /// PlayerStrategy - Abstract interface for bot AI
-/// 
+///
 /// Based on gin_rummy PlayerStrategy pattern
 /// Allows different difficulty levels and play styles
 library;
@@ -19,7 +19,7 @@ class Hand extends Pile {
     clear();
     addCards(sorted);
   }
-  
+
   /// Sort the hand by rank, then by suit
   void sortByRank() {
     final sorted = List<PlayingCard>.from(cards)
@@ -37,16 +37,24 @@ class Hand extends Pile {
 abstract class PlayerStrategy {
   /// Name of this strategy for display
   String get name;
-  
+
   /// Difficulty level (1-5)
   int get difficulty;
-  
+
   /// Select which card to discard from hand
-  PlayingCard selectCardToDiscard(Hand hand, List<PlayingCard> discardPile, {PlayingCard? tiplu});
-  
+  PlayingCard selectCardToDiscard(
+    Hand hand,
+    List<PlayingCard> discardPile, {
+    PlayingCard? tiplu,
+  });
+
   /// Should we draw from the discard pile instead of deck?
-  bool shouldDrawFromDiscard(PlayingCard topDiscard, Hand hand, {PlayingCard? tiplu});
-  
+  bool shouldDrawFromDiscard(
+    PlayingCard topDiscard,
+    Hand hand, {
+    PlayingCard? tiplu,
+  });
+
   /// Should we declare/show our hand? (Marriage/Rummy)
   bool shouldDeclare(Hand hand, {PlayingCard? tiplu});
 }
@@ -55,24 +63,32 @@ abstract class PlayerStrategy {
 class RandomStrategy implements PlayerStrategy {
   @override
   String get name => 'Random Bot';
-  
+
   @override
   int get difficulty => 1;
-  
+
   @override
-  PlayingCard selectCardToDiscard(Hand hand, List<PlayingCard> discardPile, {PlayingCard? tiplu}) {
+  PlayingCard selectCardToDiscard(
+    Hand hand,
+    List<PlayingCard> discardPile, {
+    PlayingCard? tiplu,
+  }) {
     // Just pick a random card
     if (hand.isEmpty) throw StateError('Cannot discard from empty hand');
     final randomIndex = DateTime.now().millisecondsSinceEpoch % hand.length;
     return hand.cards[randomIndex];
   }
-  
+
   @override
-  bool shouldDrawFromDiscard(PlayingCard topDiscard, Hand hand, {PlayingCard? tiplu}) {
+  bool shouldDrawFromDiscard(
+    PlayingCard topDiscard,
+    Hand hand, {
+    PlayingCard? tiplu,
+  }) {
     // 30% chance to draw from discard
     return DateTime.now().millisecondsSinceEpoch % 10 < 3;
   }
-  
+
   @override
   bool shouldDeclare(Hand hand, {PlayingCard? tiplu}) {
     // Never declares (too random to win)
@@ -84,25 +100,33 @@ class RandomStrategy implements PlayerStrategy {
 class ConservativeStrategy implements PlayerStrategy {
   @override
   String get name => 'Conservative Bot';
-  
+
   @override
   int get difficulty => 3;
-  
+
   @override
-  PlayingCard selectCardToDiscard(Hand hand, List<PlayingCard> discardPile, {PlayingCard? tiplu}) {
+  PlayingCard selectCardToDiscard(
+    Hand hand,
+    List<PlayingCard> discardPile, {
+    PlayingCard? tiplu,
+  }) {
     // Discard highest point card not in a potential meld
     final sorted = List<PlayingCard>.from(hand.cards)
       ..sort((a, b) => b.rank.points.compareTo(a.rank.points));
     return sorted.first;
   }
-  
+
   @override
-  bool shouldDrawFromDiscard(PlayingCard topDiscard, Hand hand, {PlayingCard? tiplu}) {
+  bool shouldDrawFromDiscard(
+    PlayingCard topDiscard,
+    Hand hand, {
+    PlayingCard? tiplu,
+  }) {
     // Only draw if it completes a meld potential
     // Simple heuristic: draw if we have another card of same rank
     return hand.cards.any((c) => c.rank == topDiscard.rank);
   }
-  
+
   @override
   bool shouldDeclare(Hand hand, {PlayingCard? tiplu}) {
     // Declare if total points < 5
@@ -115,43 +139,51 @@ class ConservativeStrategy implements PlayerStrategy {
 class AggressiveStrategy implements PlayerStrategy {
   @override
   String get name => 'Aggressive Bot';
-  
+
   @override
   int get difficulty => 4;
-  
+
   @override
-  PlayingCard selectCardToDiscard(Hand hand, List<PlayingCard> discardPile, {PlayingCard? tiplu}) {
+  PlayingCard selectCardToDiscard(
+    Hand hand,
+    List<PlayingCard> discardPile, {
+    PlayingCard? tiplu,
+  }) {
     // Discard cards that don't fit any potential meld
     final cards = List<PlayingCard>.from(hand.cards);
-    
+
     // Group by rank and suit
     final rankCounts = <CardRank, int>{};
     final suitCounts = <CardSuit, int>{};
-    
+
     for (final card in cards) {
       rankCounts[card.rank] = (rankCounts[card.rank] ?? 0) + 1;
       suitCounts[card.suit] = (suitCounts[card.suit] ?? 0) + 1;
     }
-    
+
     // Find the most "isolated" card
     cards.sort((a, b) {
       final aScore = (rankCounts[a.rank] ?? 0) + (suitCounts[a.suit] ?? 0) / 2;
       final bScore = (rankCounts[b.rank] ?? 0) + (suitCounts[b.suit] ?? 0) / 2;
       return aScore.compareTo(bScore);
     });
-    
+
     return cards.first;
   }
-  
+
   @override
-  bool shouldDrawFromDiscard(PlayingCard topDiscard, Hand hand, {PlayingCard? tiplu}) {
+  bool shouldDrawFromDiscard(
+    PlayingCard topDiscard,
+    Hand hand, {
+    PlayingCard? tiplu,
+  }) {
     // Draw if it helps form a meld
     final sameRank = hand.cards.where((c) => c.rank == topDiscard.rank).length;
     final sameSuit = hand.cards.where((c) => c.suit == topDiscard.suit).length;
-    
+
     return sameRank >= 2 || sameSuit >= 3;
   }
-  
+
   @override
   bool shouldDeclare(Hand hand, {PlayingCard? tiplu}) {
     // Declare more aggressively
