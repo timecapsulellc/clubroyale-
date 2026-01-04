@@ -1581,10 +1581,10 @@ class _MarriageMultiplayerScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-  _getCard(result)riendlyMessage(e)),
+            content: Text('Error: $e'),
             backgroundColor: Colors.red,
           ),
-        )
+        );
       }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
