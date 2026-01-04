@@ -45,6 +45,8 @@ import 'package:clubroyale/games/marriage/widgets/hud/action_indicators.dart';
 import 'package:clubroyale/features/game/ui/animations/card_animations.dart';
 import 'package:clubroyale/features/game/ui/animations/victory_celebration.dart';
 import 'package:clubroyale/core/services/haptic_service.dart';
+import 'package:clubroyale/core/widgets/reconnection_overlay.dart';
+import 'package:clubroyale/core/widgets/turn_timeout_warning.dart';
 
 /// Multiplayer Marriage game screen
 class MarriageMultiplayerScreen extends ConsumerStatefulWidget {
@@ -628,6 +630,29 @@ class _MarriageMultiplayerScreenState
 
             // Card Flying Animations
             CardAnimationOverlay(controller: _cardAnimController),
+
+            // Turn Timeout Warning (flashing overlay when time is low)
+            if (isMyTurn)
+              TurnTimeoutWarning(
+                remainingSeconds: state.turnTimeRemaining ?? 30,
+                warningThreshold: 15,
+                criticalThreshold: 5,
+                onTimeout: () {
+                  // Auto-discard when timeout (if possible)
+                  if (_selectedCardId != null) {
+                    _discardCard(state);
+                  }
+                },
+              ),
+
+            // Reconnection Overlay
+            ReconnectionOverlay(
+              isConnected: true, // TODO: Wire to actual connection state
+              onRetry: () {
+                // Force refresh game state
+                ref.invalidate(marriageStateProvider(widget.roomId));
+              },
+            ),
 
             // Guided Gameplay Tutorial Overlay
             if (_guidedTutorialController != null && _showTutorial)

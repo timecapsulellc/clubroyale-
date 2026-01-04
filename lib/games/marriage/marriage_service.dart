@@ -141,6 +141,14 @@ class MarriageGameState {
 
   /// Get a player's current Maal points
   int getMaalPoints(String playerId) => playerMaalPoints[playerId] ?? 0;
+
+  /// Get remaining turn time in seconds (for timeout warning)
+  int? get turnTimeRemaining {
+    if (turnStartTime == null) return null;
+    final elapsed = DateTime.now().difference(turnStartTime!).inSeconds;
+    final remaining = config.turnTimeoutSeconds - elapsed;
+    return remaining > 0 ? remaining : 0;
+  }
 }
 
 class MarriageService {
