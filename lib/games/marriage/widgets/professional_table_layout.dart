@@ -28,10 +28,10 @@ class ProfessionalTableLayout extends StatelessWidget {
         final height = constraints.maxHeight;
 
         // Optimizing for mobile landscape (constrained height)
-        // Hand takes less vertical space, giving more to the table.
+        // Hand takes significantly less vertical space (25%)
         final isLandscapeMobile = width > height && height < 500;
         
-        final handHeightRatio = isLandscapeMobile ? 0.32 : 0.42;
+        final handHeightRatio = isLandscapeMobile ? 0.25 : 0.42;
         final handHeight = height * handHeightRatio;
         final tableHeight = height * (1.0 - handHeightRatio);
         final railWidth = 12.0;
@@ -157,9 +157,9 @@ class ProfessionalTableLayout extends StatelessWidget {
     // Calculate ellipse center and radii for opponent placement
     final cx = width / 2;
     // Push opponents higher on mobile to clear center area
-    final cy = tableHeight * (isMobile ? 0.35 : 0.40); 
+    final cy = tableHeight * (isMobile ? 0.30 : 0.40); 
     final rx = (width - railWidth * 2) * 0.44; // Slightly wider
-    final ry = tableHeight * (isMobile ? 0.35 : 0.30);
+    final ry = tableHeight * (isMobile ? 0.25 : 0.30);
 
     // Calculate optimal positions based on player count
     final positions = _getOptimalPositions(count);

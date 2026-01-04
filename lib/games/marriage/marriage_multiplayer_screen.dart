@@ -237,6 +237,10 @@ class _MarriageMultiplayerScreenState
         }
         _previousTurnPlayerId = state.currentPlayerId;
 
+        final screenSize = MediaQuery.of(context).size;
+        final isLandscapeMobile =
+            screenSize.width > screenSize.height && screenSize.height < 500;
+
         return Stack(
           children: [
             Scaffold(
@@ -265,7 +269,9 @@ class _MarriageMultiplayerScreenState
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   // Banner moved to Stack
-                                  if (isMyTurn) _buildPhaseIndicator(state),
+                                  // Only show phase indicator if enough space
+                                  if (isMyTurn && !isLandscapeMobile)
+                                    _buildPhaseIndicator(state),
                                   _buildProfessionalCenterArea(
                                     state,
                                     topDiscard,
@@ -302,7 +308,12 @@ class _MarriageMultiplayerScreenState
                                     ),
                                   ),
                                 ),
-                                padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
+                                padding: EdgeInsets.only(
+                                  top: isLandscapeMobile ? 4 : 12,
+                                  left: 8,
+                                  right: 8,
+                                  bottom: isLandscapeMobile ? 0 : 8,
+                                ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -311,10 +322,16 @@ class _MarriageMultiplayerScreenState
                                       state,
                                       currentUser.uid,
                                     ),
-                                    _buildMyHand(
-                                      myHand,
-                                      isMyTurn,
+                                    MarriageHandWidget(
                                       key: _tutorialKeys['player_hand'],
+                                      handCards:
+                                          state.playerHands[currentUser.uid] ?? [],
+                                      selectedCardId: _selectedCardId,
+                                      highlightedCardIds: _highlightedCardIds,
+                                      onCardTap: _onCardTap,
+                                      onCardDoubleTap: _discardCard,
+                                      isMyTurn: isMyTurn,
+                                      scale: isLandscapeMobile ? 0.8 : 1.0,
                                       tiplu: tiplu,
                                       config: state.config,
                                     ),
@@ -388,8 +405,9 @@ class _MarriageMultiplayerScreenState
                             // 3. HUD Layer - Right Arc Controller
                             Positioned(
                               right: 0,
-                              top: 100, // Reduced top margin
-                              bottom: 50, // Reduced bottom margin
+                              // Push closer to edge on mobile landscape
+                              top: isLandscapeMobile ? 20 : 100,
+                              bottom: isLandscapeMobile ? 20 : 50,
                               child: Center(
                                 child: RightArcGameController(
                                   onShowCards: isMyTurn
@@ -440,18 +458,23 @@ class _MarriageMultiplayerScreenState
                               top: 60,
                               left: 0,
                               right: 0,
-                              child: Center(child: _buildGameModeBanner(state)),
+                              child: Center(
+                                child: isLandscapeMobile
+                                    ? const SizedBox.shrink()
+                                    : _buildGameModeBanner(state),
+                              ),
                             ),
                           ],
                         ),
                       ),
 
-                      // Custom Top Bar (Floating)
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        child: Consumer(
+                      // Custom Top Bar (Floating) - Hidden on Mobile Landscape
+                      if (!isLandscapeMobile)
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          child: Consumer(
                           builder: (context, ref, child) {
                             final diamondService = ref.watch(
                               diamondServiceProvider,
@@ -493,7 +516,8 @@ class _MarriageMultiplayerScreenState
 
                       // Video/Audio Controls (Responsive Row at Top Right)
                       Positioned(
-                        top: 56, // Just below TopBar
+                        // Move to top-right edge if TopBar is hidden
+                        top: isLandscapeMobile ? 8 : 56,
                         right: 16,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,

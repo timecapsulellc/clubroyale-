@@ -13,6 +13,7 @@ class MarriageHandWidget extends StatefulWidget {
   final Function(String?) onCardSelected;
   final PlayingCard? tiplu;
   final MarriageGameConfig config;
+  final double scale;
 
   const MarriageHandWidget({
     super.key,
@@ -21,6 +22,7 @@ class MarriageHandWidget extends StatefulWidget {
     required this.onCardSelected,
     this.tiplu,
     this.config = MarriageGameConfig.nepaliStandard,
+    this.scale = 1.0,
   });
 
   @override
@@ -389,8 +391,8 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
         // Cards Stack (Fan)
         // Using a custom stack to render overlapping cards
         SizedBox(
-          height: 145, // Card Height + Fan effect
-          width: 40.0 + (group.length * 45.0), // Dynamic width for larger cards
+          height: 145 * widget.scale, // Scaled height
+          width: (40.0 + (group.length * 45.0)) * widget.scale, // Scaled width
           child: Stack(
             clipBehavior: Clip.none,
             children: [
@@ -427,7 +429,7 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
               // Render Cards
               for (int i = 0; i < group.length; i++)
                 Positioned(
-                  left: i * 45.0,
+                  left: i * 45.0 * widget.scale, // Scaled offset
                   top: 0,
                   child: LongPressDraggable<PlayingCard>(
                     data: group[i],
@@ -437,13 +439,17 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                       elevation: 8,
                       borderRadius: BorderRadius.circular(8),
                       child: Transform.scale(
-                        scale: 1.15,
+                        scale: 1.15 * widget.scale, // Feedback also scaled
                         child: CardWidget(card: group[i], isFaceUp: true),
                       ),
                     ),
                     childWhenDragging: Opacity(
                       opacity: 0.3,
-                      child: CardWidget(card: group[i], isFaceUp: true),
+                      child: Transform.scale(
+                        scale: widget.scale,
+                        alignment: Alignment.topLeft,
+                        child: CardWidget(card: group[i], isFaceUp: true),
+                      ),
                     ),
                     onDragStarted: () {
                       // Provide haptic feedback
@@ -451,7 +457,11 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                     child: GestureDetector(
                       onTap: () => widget.onCardSelected(group[i].id),
                       behavior: HitTestBehavior.opaque,
-                      child: _buildCardWithBadges(group[i]),
+                      child: Transform.scale(
+                        scale: widget.scale,
+                        alignment: Alignment.topLeft,
+                        child: _buildCardWithBadges(group[i]),
+                      ),
                     ),
                   ),
                 ),
