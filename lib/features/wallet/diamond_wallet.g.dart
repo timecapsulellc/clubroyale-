@@ -85,4 +85,5 @@ const _$DiamondTransactionTypeEnumMap = {
   DiamondTransactionType.refund: 'refund',
   DiamondTransactionType.bonus: 'bonus',
   DiamondTransactionType.signup: 'signup',
+  DiamondTransactionType.tierUpgrade: 'tierUpgrade',
 };

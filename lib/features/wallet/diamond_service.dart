@@ -3,6 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/wallet/diamond_wallet.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 final diamondServiceProvider = Provider<DiamondService>(
   (ref) => DiamondService(),
@@ -151,15 +152,48 @@ class DiamondService {
   // ============ CLOUD FUNCTIONS (V5) ============
 
   /// Upgrade to Verified Tier (Calls Cloud Function)
+  /// Upgrade to Verified Tier (Client-side implementation)
+  /// Upgrade to Verified Tier (Client-side implementation)
   Future<void> upgradeToVerified() async {
-    try {
-      final callable = _functions.httpsCallable('upgradeToVerified');
-      await callable.call();
-      // Success means no exception thrown
-    } catch (e) {
-      debugPrint('Error upgrading tier: $e');
-      rethrow;
+    const cost = 100;
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    
+    if (userId == null) {
+      throw Exception('User must be logged in to upgrade');
     }
+
+    // 1. Check Balance
+    final wallet = await getWallet(userId);
+    if (wallet.balance < cost) {
+      throw FirebaseException(
+        plugin: 'cloud_firestore',
+        code: 'failed-precondition',
+        message: 'Insufficient diamonds'
+      );
+    }
+
+    // 2. Perform Transaction (Client-side update)
+    final batch = _db.batch();
+    final userRef = _db.collection('users').doc(userId);
+    
+    // Deduct diamonds and set tier
+    batch.update(userRef, {
+      'diamondBalance': FieldValue.increment(-cost),
+      'userTier': 'verified',
+      'diamondsByOrigin.spent': FieldValue.increment(cost),
+    });
+    
+    // 3. Record Transaction
+    await _recordTransaction(
+      userId: userId,
+      amount: -cost,
+      type: DiamondTransactionType.tierUpgrade, // Assuming this exists or mapping to generic
+      description: 'Upgrade to Verified Tier',
+    );
+    
+    await batch.commit();
+    
+    debugPrint('✅ User $userId upgraded to Verified tier');
   }
 
   /// Transfer Diamonds P2P (Calls Cloud Function)

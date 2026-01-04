@@ -1,7 +1,7 @@
 name: clubroyale
 description: "ClubRoyale - Your Private Card Club - Premium multiplayer card games"
 publish_to: 'none'
-version: 1.2.0+3
+version: 1.2.1+4
 
 
 environment:

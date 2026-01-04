@@ -106,4 +106,5 @@ enum DiamondTransactionType {
   refund, // Refund from cancelled room
   bonus, // Free diamonds (referral, etc.)
   signup, // Signup bonus diamonds
+  tierUpgrade, // Spent to upgrade tier
 }

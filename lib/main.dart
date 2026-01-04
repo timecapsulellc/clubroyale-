@@ -10,6 +10,7 @@ import 'package:clubroyale/core/services/feature_flags.dart';
 import 'core/services/analytics_service.dart';
 import 'core/services/update_service.dart';
 import 'package:clubroyale/core/performance/asset_preloader.dart'; // Asset Preloader
+import 'package:clubroyale/core/services/ad_service.dart'; // Mobile Ads
 
 import 'features/lobby/lobby_screen.dart';
 import 'features/lobby/room_waiting_screen.dart';
@@ -445,6 +446,14 @@ void main() async {
   } catch (e) {
     debugPrint('⚠️ Firebase initialization failed: $e');
     // Continue anyway - app can work with limited functionality
+  }
+
+  // Initialize AdService (Mobile Ads SDK)
+  try {
+    await adService.initialize();
+    debugPrint('✅ AdService initialized successfully');
+  } catch (e) {
+    debugPrint('⚠️ AdService initialization failed: $e');
   }
 
   // Initialize Firebase Crashlytics (skip on web - not supported)
