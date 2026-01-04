@@ -27,9 +27,13 @@ class ProfessionalTableLayout extends StatelessWidget {
         final width = constraints.maxWidth;
         final height = constraints.maxHeight;
 
-        // Reserve space for hand and rail
-        final tableHeight = height * 0.58;
-        final handHeight = height * 0.42;
+        // Optimizing for mobile landscape (constrained height)
+        // Hand takes less vertical space, giving more to the table.
+        final isLandscapeMobile = width > height && height < 500;
+        
+        final handHeightRatio = isLandscapeMobile ? 0.32 : 0.42;
+        final handHeight = height * handHeightRatio;
+        final tableHeight = height * (1.0 - handHeightRatio);
         final railWidth = 12.0;
 
         return Stack(
@@ -39,7 +43,7 @@ class ProfessionalTableLayout extends StatelessWidget {
               left: railWidth,
               top: railWidth,
               right: railWidth,
-              bottom: handHeight,
+              bottom: handHeight, // Hand overlaps slightly or touches bottom of rail
               child: _buildTableRail(),
             ),
 
@@ -67,7 +71,7 @@ class ProfessionalTableLayout extends StatelessWidget {
             // 3. Center Area (Deck/Discard)
             Positioned(
               left: width / 2 - 140,
-              top: tableHeight * 0.35,
+              top: tableHeight * (isLandscapeMobile ? 0.30 : 0.35),
               width: 280,
               child: centerArea,
             ),
@@ -77,6 +81,7 @@ class ProfessionalTableLayout extends StatelessWidget {
               width: width,
               tableHeight: tableHeight,
               railWidth: railWidth,
+              isMobile: isLandscapeMobile,
             ),
 
             // 5. My Hand (fixed at bottom)
@@ -92,7 +97,7 @@ class ProfessionalTableLayout extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.black.withValues(alpha: 0.0),
-                      Colors.black.withValues(alpha: 0.3),
+                      Colors.black.withValues(alpha: 0.5),
                     ],
                   ),
                 ),
@@ -142,6 +147,7 @@ class ProfessionalTableLayout extends StatelessWidget {
     required double width,
     required double tableHeight,
     required double railWidth,
+    required bool isMobile,
   }) {
     if (opponents.isEmpty) return [];
 
@@ -150,9 +156,10 @@ class ProfessionalTableLayout extends StatelessWidget {
 
     // Calculate ellipse center and radii for opponent placement
     final cx = width / 2;
-    final cy = tableHeight * 0.40;
-    final rx = (width - railWidth * 2) * 0.42;
-    final ry = tableHeight * 0.30;
+    // Push opponents higher on mobile to clear center area
+    final cy = tableHeight * (isMobile ? 0.35 : 0.40); 
+    final rx = (width - railWidth * 2) * 0.44; // Slightly wider
+    final ry = tableHeight * (isMobile ? 0.35 : 0.30);
 
     // Calculate optimal positions based on player count
     final positions = _getOptimalPositions(count);
@@ -162,8 +169,12 @@ class ProfessionalTableLayout extends StatelessWidget {
       final x = cx + rx * math.cos(angle);
       final y = cy + ry * math.sin(angle);
 
-      // Adjust widget size based on player count
-      final slotSize = count > 5 ? 60.0 : 80.0;
+      // Adjust widget size based on player count and screen size
+      double baseSize = count > 5 ? 60.0 : 80.0;
+      if (isMobile) {
+        baseSize *= 0.85; // Scale down for mobile
+      }
+      final slotSize = baseSize;
 
       widgets.add(
         Positioned(
