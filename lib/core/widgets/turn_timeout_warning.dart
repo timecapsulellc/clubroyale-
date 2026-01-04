@@ -53,13 +53,13 @@ class _TurnTimeoutWarningState extends State<TurnTimeoutWarning>
     // Timeout reached
     if (widget.remainingSeconds <= 0 && !_lastTickPlayed) {
       _lastTickPlayed = true;
-      HapticService.heavyImpact();
+      HapticService.victory();
       widget.onTimeout?.call();
     }
   }
 
   void _playTickFeedback() {
-    HapticService.lightImpact();
+    HapticService.turnNotification();
   }
 
   @override

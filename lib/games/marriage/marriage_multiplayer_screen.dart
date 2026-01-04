@@ -650,9 +650,9 @@ class _MarriageMultiplayerScreenState
                 warningThreshold: 15,
                 criticalThreshold: 5,
                 onTimeout: () {
-                  // Auto-discard when timeout (if possible)
+                  // Auto-discard when timeout (if a card is selected)
                   if (_selectedCardId != null) {
-                    _discardCard(state);
+                    _discardCard();
                   }
                 },
               ),
@@ -661,8 +661,8 @@ class _MarriageMultiplayerScreenState
             ReconnectionOverlay(
               isConnected: true, // TODO: Wire to actual connection state
               onRetry: () {
-                // Force refresh game state
-                ref.invalidate(marriageStateProvider(widget.roomId));
+                // Trigger UI rebuild by setting state
+                setState(() {});
               },
             ),
 
