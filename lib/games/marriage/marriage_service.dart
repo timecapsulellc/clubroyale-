@@ -40,6 +40,12 @@ class MarriageGameState {
   final Map<String, List<Map<String, dynamic>>>
   playerDeclaredMelds; // playerId -> list of serialized melds
 
+  // === Scoring State (for Victory Celebration) ===
+  final String? declarerId; // Player who declared/finished the round
+  final String? winnerId; // Winner of the round (may differ if wrong declaration)
+  final Map<String, int> roundScores; // playerId -> score for this round
+  final Map<String, int> totalScores; // playerId -> cumulative score
+
   MarriageGameState({
     required this.tipluCardId,
     required this.playerHands,
@@ -57,6 +63,10 @@ class MarriageGameState {
     this.playerVisitType = const {},
     this.playerMaalPoints = const {},
     this.playerDeclaredMelds = const {},
+    this.declarerId,
+    this.winnerId,
+    this.roundScores = const {},
+    this.totalScores = const {},
   });
 
   factory MarriageGameState.fromJson(Map<String, dynamic> json) {
@@ -102,6 +112,19 @@ class MarriageGameState {
             (k, v) => MapEntry(k, List<Map<String, dynamic>>.from(v as List)),
           ) ??
           {},
+      // Scoring state
+      declarerId: json['declarerId'] as String?,
+      winnerId: json['winnerId'] as String?,
+      roundScores:
+          (json['roundScores'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(k, v as int),
+          ) ??
+          {},
+      totalScores:
+          (json['totalScores'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(k, v as int),
+          ) ??
+          {},
     );
   }
 
@@ -122,6 +145,10 @@ class MarriageGameState {
     'playerVisitType': playerVisitType,
     'playerMaalPoints': playerMaalPoints,
     'playerDeclaredMelds': playerDeclaredMelds,
+    'declarerId': declarerId,
+    'winnerId': winnerId,
+    'roundScores': roundScores,
+    'totalScores': totalScores,
   };
 
   /// Check if player has drawn this turn

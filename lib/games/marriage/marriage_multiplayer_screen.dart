@@ -613,20 +613,32 @@ class _MarriageMultiplayerScreenState
                 ),
               ),
             ),
-            // Overlays Layer (Victory, Animations)
-            // TODO: Re-enable VictoryCelebration when Scoring State (declarerId, roundScores) is implemented
-            if (state.phase == 'scoring')
-              Center(child: Text('Game Over (Scoring Impl Pending)')),
 
-            /*
-            VictoryCelebration(
-              winnerId: state.phase == 'scoring' ? state.declarerId : null,
-              myPlayerId: currentUser.uid,
-              scores: state.roundScores,
-              scoreDetails: state.scoreDetails,
-              onDismiss: () { },
-            ),
-            */
+            // Victory Celebration (when round ends in scoring phase)
+            if (state.phase == 'scoring' && state.winnerId != null)
+              VictoryCelebration(
+                winnerName: state.winnerId == currentUser.uid
+                    ? 'You'
+                    : 'Player ${state.winnerId?.substring(0, 4) ?? ''}',
+                winnerScore: state.roundScores[state.winnerId] ?? 0,
+                scores: state.roundScores.entries
+                    .map(
+                      (e) => PlayerScore(
+                        name: e.key == currentUser.uid
+                            ? 'You'
+                            : 'Player ${e.key.substring(0, 4)}',
+                        maalPoints: state.playerMaalPoints[e.key] ?? 0,
+                        totalScore: state.totalScores[e.key] ?? 0,
+                        isMe: e.key == currentUser.uid,
+                        wasVisited: state.playerVisited[e.key] ?? false,
+                      ),
+                    )
+                    .toList(),
+                isMe: state.winnerId == currentUser.uid,
+                onDismiss: () {
+                  // TODO: Trigger next round or return to lobby
+                },
+              ),
 
             // Card Flying Animations
             CardAnimationOverlay(controller: _cardAnimController),
