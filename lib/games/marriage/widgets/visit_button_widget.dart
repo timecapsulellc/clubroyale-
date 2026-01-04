@@ -23,6 +23,8 @@ class VisitButtonWidget extends StatelessWidget {
   final VoidCallback? onPressed;
   final String label;
   final String subLabel;
+  final int pureSequenceCount; // For progress display
+  final int dubleeCount; // For progress display
 
   const VisitButtonWidget({
     super.key,
@@ -30,6 +32,8 @@ class VisitButtonWidget extends StatelessWidget {
     this.onPressed,
     this.label = 'VISIT',
     this.subLabel = 'Unlock Maal',
+    this.pureSequenceCount = 0,
+    this.dubleeCount = 0,
   });
 
   @override
@@ -45,12 +49,27 @@ class VisitButtonWidget extends StatelessWidget {
   }
 
   Widget _buildLockedState() {
+    // Determine which path is closer to completion
+    final seqProgress = pureSequenceCount / 3; // Need 3 sequences
+    final dubProgress = dubleeCount / 7; // Need 7 dublees
+    
+    String progressText;
+    Color progressColor;
+    
+    if (seqProgress >= dubProgress) {
+      progressText = '$pureSequenceCount/3 SEQ';
+      progressColor = pureSequenceCount >= 2 ? Colors.orange : Colors.grey;
+    } else {
+      progressText = '$dubleeCount/7 DUB';
+      progressColor = dubleeCount >= 5 ? Colors.orange : Colors.grey;
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.withOpacity(0.3)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -70,11 +89,24 @@ class VisitButtonWidget extends StatelessWidget {
               ),
             ],
           ),
-          if (subLabel.isNotEmpty)
-            Text(
-              subLabel,
-              style: TextStyle(color: Colors.grey[600], fontSize: 10),
+          const SizedBox(height: 4),
+          // Progress indicator
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: progressColor.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: progressColor.withValues(alpha: 0.5)),
             ),
+            child: Text(
+              progressText,
+              style: TextStyle(
+                color: progressColor,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
       ),
     );

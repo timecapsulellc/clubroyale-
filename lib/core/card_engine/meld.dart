@@ -125,33 +125,32 @@ class RunMeld extends Meld {
 
     if (isConsecutive) return true;
 
-    // Handle Ace-wrap sequences (Q-K-A where Ace is high)
-    // Check if it's a high-ace sequence
-    if (sorted.first.rank == CardRank.ace && sorted.length >= 3) {
-      // Re-sort treating Ace as 14
-      final sortedHighAce = List<PlayingCard>.from(cards)
+    // Handle Ace-Low sequences (A-2-3) where Ace is naturally High (14)
+    if (sorted.last.rank == CardRank.ace && sorted.length >= 3) {
+      // Re-sort treating Ace as 1
+      final sortedLowAce = List<PlayingCard>.from(cards)
         ..sort((a, b) {
-          final aVal = a.rank == CardRank.ace ? 14 : a.rank.value;
-          final bVal = b.rank == CardRank.ace ? 14 : b.rank.value;
+          final aVal = a.rank == CardRank.ace ? 1 : a.rank.value;
+          final bVal = b.rank == CardRank.ace ? 1 : b.rank.value;
           return aVal.compareTo(bVal);
         });
 
-      // Check consecutive with high ace
-      isConsecutive = true;
-      for (int i = 1; i < sortedHighAce.length; i++) {
-        final prevVal = sortedHighAce[i - 1].rank == CardRank.ace
-            ? 14
-            : sortedHighAce[i - 1].rank.value;
-        final currVal = sortedHighAce[i].rank == CardRank.ace
-            ? 14
-            : sortedHighAce[i].rank.value;
+      // Check consecutive with low ace
+      bool isLowConsecutive = true;
+      for (int i = 1; i < sortedLowAce.length; i++) {
+        final prevVal = sortedLowAce[i - 1].rank == CardRank.ace
+            ? 1
+            : sortedLowAce[i - 1].rank.value;
+        final currVal = sortedLowAce[i].rank == CardRank.ace
+            ? 1
+            : sortedLowAce[i].rank.value;
         if (currVal != prevVal + 1) {
-          isConsecutive = false;
+          isLowConsecutive = false;
           break;
         }
       }
 
-      if (isConsecutive) return true;
+      if (isLowConsecutive) return true;
     }
 
     return false;

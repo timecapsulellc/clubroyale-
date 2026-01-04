@@ -179,6 +179,25 @@ class MarriageService {
     // Remaining deck
     final deckCards = deck.cards.map((c) => c.id).toList();
 
+    // Check for Start-of-Game Tunnela Bonus
+    // Authentic Rule: Tunnela at start gives immediate bonus points
+    final initialMaalPoints = <String, int>{};
+    if (config.tunnelBonus) {
+      for (final playerId in playerIds) {
+        final handIds = playerHands[playerId] ?? [];
+        final hand = handIds
+            .map((id) => _getCard(id))
+            .whereType<PlayingCard>()
+            .toList();
+
+        final tunnels = MeldDetector.findTunnels(hand);
+        if (tunnels.isNotEmpty) {
+          final points = tunnels.length * config.tunnelDisplayBonusValue;
+          initialMaalPoints[playerId] = points;
+        }
+      }
+    }
+
     // Create game state with config and turnPhase initialized to 'drawing'
     final gameState = MarriageGameState(
       tipluCardId: tiplu?.id ?? '',
@@ -191,6 +210,7 @@ class MarriageService {
       turnPhase: 'drawing', // P0 FIX: Start in drawing phase
       turnStartTime: DateTime.now(), // P1: Turn timer start
       config: config, // Store the host's rule configuration
+      playerMaalPoints: initialMaalPoints,
     );
 
     // Save to Firestore

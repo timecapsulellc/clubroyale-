@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Available theme presets for ClubRoyale
@@ -109,17 +110,17 @@ class ThemeColors {
 
   // ========== ROYAL GREEN + GOLD (NEW DEFAULT) ==========
   static const royalGreen = ThemeColors(
-    primary: Color(0xFF0D5C3D), // Deep forest green
-    secondary: Color(0xFF1B7A4E), // Rich green
+    primary: Color(0xFFD4AF37), // Gold is primary for actions
+    secondary: Color(0xFF1B7A4E), // Rich green secondary
     accent: Color(0xFFD4AF37), // Classic gold
-    background: Color(0xFF051A12), // Very dark green
-    surface: Color(0xFF0A2E1F), // Dark green card bg
-    surfaceLight: Color(0xFF134A32), // Lighter green
+    background: Color(0xFF0D3B2E), // Deep radial green (Edge) - from CasinoColors
+    surface: Color(0xFF165B47), // Table green mid
+    surfaceLight: Color(0xFF1F7A5E), // Table green light
     gold: Color(0xFFD4AF37), // Gold accents
     textPrimary: Color(0xFFFFFFFF),
     textSecondary: Color(0xFFB8D4C8),
     primaryGradient: LinearGradient(
-      colors: [Color(0xFF1B7A4E), Color(0xFF0D5C3D), Color(0xFF051A12)],
+      colors: [Color(0xFF165B47), Color(0xFF0D3B2E)],
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
     ),
@@ -247,6 +248,20 @@ class ThemeBuilder {
       brightness: Brightness.dark,
       primaryColor: colors.primary,
       scaffoldBackgroundColor: colors.background,
+      
+      // Premium Typography
+      textTheme: TextTheme(
+        displayLarge: GoogleFonts.oswald(fontSize: 57, fontWeight: FontWeight.bold, color: colors.textPrimary),
+        displayMedium: GoogleFonts.oswald(fontSize: 45, fontWeight: FontWeight.bold, color: colors.textPrimary), // Headlines
+        displaySmall: GoogleFonts.oswald(fontSize: 36, fontWeight: FontWeight.bold, color: colors.textPrimary),
+        headlineLarge: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold, color: colors.textPrimary),
+        headlineMedium: GoogleFonts.oswald(fontSize: 28, fontWeight: FontWeight.bold, color: colors.textPrimary),
+        titleLarge: GoogleFonts.roboto(fontSize: 22, fontWeight: FontWeight.w500, color: colors.textPrimary), // AppBars/Dialog Titles
+        titleMedium: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w500, color: colors.textPrimary),
+        bodyLarge: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.normal, color: colors.textPrimary),
+        bodyMedium: GoogleFonts.roboto(fontSize: 14, fontWeight: FontWeight.normal, color: colors.textSecondary),
+      ),
+
       colorScheme: ColorScheme.dark(
         primary: colors.accent,
         secondary: colors.secondary,
@@ -263,20 +278,25 @@ class ThemeBuilder {
       cardTheme: CardThemeData(
         color: colors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 4,
+        elevation: 8,
+        shadowColor: Colors.black.withValues(alpha: 0.4),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: colors.gold,
           foregroundColor: colors.background,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          textStyle: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.bold),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: colors.gold),
+        style: TextButton.styleFrom(
+          foregroundColor: colors.gold,
+          textStyle: GoogleFonts.roboto(fontSize: 14, fontWeight: FontWeight.bold),
+        ),
       ),
       iconTheme: IconThemeData(color: colors.textPrimary),
       dividerColor: colors.surfaceLight,
@@ -284,6 +304,8 @@ class ThemeBuilder {
         backgroundColor: colors.surface,
         selectedItemColor: colors.gold,
         unselectedItemColor: colors.textSecondary,
+        selectedLabelStyle: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold),
+        unselectedLabelStyle: GoogleFonts.roboto(fontSize: 12),
       ),
     );
   }

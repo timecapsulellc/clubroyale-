@@ -32,7 +32,19 @@ import 'package:clubroyale/features/game/ui/components/table_layout.dart';
 import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
-import 'package:clubroyale/games/marriage/services/services.dart'; // Import new services
+import 'package:clubroyale/games/marriage/services/services.dart';
+import 'package:clubroyale/games/marriage/widgets/hud/right_arc_game_controller.dart';
+import 'package:clubroyale/games/marriage/widgets/hud/game_actions_sidebar.dart';
+import 'package:clubroyale/games/marriage/widgets/hud/game_log_overlay.dart';
+import 'package:clubroyale/games/marriage/widgets/marriage_guided_tutorial.dart';
+import 'package:clubroyale/core/widgets/interactive_tutorial.dart';
+import 'package:clubroyale/games/marriage/widgets/professional_table_layout.dart';
+import 'package:clubroyale/games/marriage/widgets/hud/player_slot_widget.dart';
+import 'package:clubroyale/games/marriage/widgets/hud/center_table_area.dart';
+import 'package:clubroyale/games/marriage/widgets/hud/action_indicators.dart';
+import 'package:clubroyale/features/game/ui/animations/card_animations.dart';
+import 'package:clubroyale/features/game/ui/animations/victory_celebration.dart';
+import 'package:clubroyale/core/services/haptic_service.dart';
 
 /// Multiplayer Marriage game screen
 class MarriageMultiplayerScreen extends ConsumerStatefulWidget {
@@ -55,10 +67,13 @@ class _MarriageMultiplayerScreenState
   bool _showTutorial = false; // Tutorial overlay state
   bool _showHints = true; // Toggle hints
   GameHint? _currentHint; // Current active hint
-  final Set<String> _highlightedCardIds = {}; 
+  final Set<String> _highlightedCardIds = {};
+  String? _previousTurnPlayerId; // Track for turn notification sound 
 
   // Services
   late final MarriageHintService _hintService;
+  InteractiveTutorialController? _guidedTutorialController;
+  final CardAnimationController _cardAnimController = CardAnimationController();
 
   // Keys for tutorial highlighting
   final Map<String, GlobalKey> _tutorialKeys = {
@@ -74,12 +89,34 @@ class _MarriageMultiplayerScreenState
   // PlayingCard lookup cache
   final Map<String, PlayingCard> _cardCache = {};
 
+  Stream<MarriageGameState?>? _gameStateStream;
+
   @override
   void initState() {
     super.initState();
     _hintService = MarriageHintService(); // Initialize hint service
+    
+     // Initialize stream once to avoid flickering on rebuilds
+    _gameStateStream = ref.read(marriageServiceProvider).watchGameState(widget.roomId);
+
     _buildCardCache();
     _checkFirstTimeTutorial();
+    _initGuidedTutorial();
+    
+    // Play dealing animation on load (optional)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // _cardAnimController.dealCards(); // Not implemented yet
+    });
+  }
+
+  @override
+  void didUpdateWidget(MarriageMultiplayerScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.roomId != widget.roomId) {
+      setState(() {
+         _gameStateStream = ref.read(marriageServiceProvider).watchGameState(widget.roomId);
+      });
+    }
   }
 
   void _buildCardCache() {
@@ -104,6 +141,17 @@ class _MarriageMultiplayerScreenState
     }
   }
 
+  /// Initialize the guided gameplay tutorial
+  void _initGuidedTutorial() {
+    _guidedTutorialController = MarriageGuidedTutorial.createController(
+      deckKey: _tutorialKeys['deck_pile'],
+      discardKey: _tutorialKeys['discard_pile'],
+      handKey: _tutorialKeys['player_hand'],
+      visitButtonKey: _tutorialKeys['visit_button'],
+      tipluIndicatorKey: _tutorialKeys['tiplu_indicator'],
+    );
+  }
+
   PlayingCard? _getCard(String id) => _cardCache[id];
 
   String _getBotName(String botId) {
@@ -120,7 +168,6 @@ class _MarriageMultiplayerScreenState
 
   @override
   Widget build(BuildContext context) {
-    final marriageService = ref.watch(marriageServiceProvider);
     final authService = ref.watch(authServiceProvider);
     final currentUser = authService.currentUser;
 
@@ -129,7 +176,7 @@ class _MarriageMultiplayerScreenState
     }
 
     return StreamBuilder<MarriageGameState?>(
-      stream: marriageService.watchGameState(widget.roomId),
+      stream: _gameStateStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
@@ -174,18 +221,29 @@ class _MarriageMultiplayerScreenState
           });
         }
 
-        return Scaffold(
-          body: TutorialOverlay(
-            showTutorial: _showTutorial,
-            onComplete: () => setState(() => _showTutorial = false),
-            elementKeys: _tutorialKeys,
-            child: TableLayout(
-              child: Stack(
-              children: [
-                // 1. Content Layer (Particles + Game Board)
-                ParticleBackground(
-                  primaryColor: CasinoColors.gold,
-                  secondaryColor: CasinoColors.feltGreenMid,
+        // Play "Your Turn" notification sound when turn changes to this player
+        if (isMyTurn && _previousTurnPlayerId != currentUser.uid) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            SoundService.playYourTurn();
+            HapticService.turnNotification();
+          });
+        }
+        _previousTurnPlayerId = state.currentPlayerId;
+
+        return Stack(
+          children: [
+            Scaffold(
+              body: TutorialOverlay(
+                showTutorial: _showTutorial,
+                onComplete: () => setState(() => _showTutorial = false),
+                elementKeys: _tutorialKeys,
+                child: TableLayout(
+                  child: Stack(
+                  children: [
+                    // 1. Content Layer (Particles + Game Board)
+                    ParticleBackground(
+                      primaryColor: CasinoColors.gold,
+                  secondaryColor: CasinoColors.tableGreenMid,
                   particleCount: 15,
                   hasBackground: false,
                   child: Stack(
@@ -193,21 +251,22 @@ class _MarriageMultiplayerScreenState
                       // ... existing children
                       // Main Game Layer
                       // Main Game Layer
-                      MarriageTableLayout(
+                      // Main Game Layer
+                      ProfessionalTableLayout(
                         centerArea: Column(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             // Banner moved to Stack
                             if (isMyTurn) _buildPhaseIndicator(state),
-                            _buildCenterArea(state, topDiscard, isMyTurn),
-                            // Meld Suggestions moved to Hand
+                            _buildProfessionalCenterArea(state, topDiscard, isMyTurn),
                           ],
                         ),
-                        opponents: _buildOpponentWidgets(
+                        opponents: _buildProfessionalOpponents(
                           state,
                           currentUser.uid,
                         ),
+
                         myHand: Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -232,21 +291,67 @@ class _MarriageMultiplayerScreenState
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              _buildMeldSuggestions(
-                                myHand,
-                                tiplu,
-                              ), // Moved here
+                              /* _buildMeldSuggestions - Moved elsewhere or removed */
                               _buildCompactStatusBar(state, currentUser.uid),
                               _buildMyHand(
                                 myHand,
                                 isMyTurn,
-                                key: _tutorialKeys['player_hand'], // Add key
+                                key: _tutorialKeys['player_hand'],
                                 tiplu: tiplu,
                                 config: state.config,
                               ),
-                              _buildActionBar(isMyTurn, state, currentUser.uid),
+                              // Legacy action bar removed
                             ],
                           ),
+                        ),
+                      ),
+                      
+                      // 2. HUD Layer - Left Sidebar (Actions)
+                      // Only visible/interactable if needed, or always visible?
+                      // Reference shows it as a slide-out or persistent left bar.
+                      // We'll place it center-left.
+                      Positioned(
+                        left: 0,
+                        top: 100,
+                        bottom: 100, // Constrain height
+                        child: Center(
+                          child: GameActionsSidebar(
+                            onShowSequence: () => _handleShowSequence(state),
+                            onShowDublee: () => _handleShowDublee(state), // Optional feature
+                            onFinishGame: isMyTurn ? () => _handleShow(state) : null,
+                            onCancelAction: () { /* Handle cancel logic */ },
+                            onGetTunela: () { /* Handle get tunela */ },
+                            onQuitGame: () => context.go('/lobby'),
+                          ),
+                        ),
+                      ),
+
+                      // 3. HUD Layer - Right Arc Controller
+                      Positioned(
+                        right: 0,
+                        top: 100,
+                        bottom: 150, // Avoid overlapping hand too much
+                        child: Center(
+                          child: RightArcGameController(
+                            onShowCards: isMyTurn ? () => _handleShow(state) : null,
+                            onSequence: () => _handleShowSequence(state),
+                            onDublee: () => _handleShowDublee(state),
+                            onCancel: () { /* Handle Cancel */ },
+                            isShowEnabled: isMyTurn && !state.isDrawingPhase, // Only show after discard/drawing? Check rules. 
+                            // Actually SHOW is usually finishing the game.
+                            isSequenceEnabled: true,
+                            isDubleeEnabled: true,
+                            isCancelEnabled: true,
+                          ),
+                        ),
+                      ),
+
+                      // 4. HUD Layer - Game Log Overlay (Left)
+                      Positioned(
+                        left: 16,
+                        top: 120, // Below top bars
+                        child: GameLogOverlay(
+                          logs: const [], // TODO: Add activity log to MarriageGameState
                         ),
                       ),
 
@@ -431,7 +536,41 @@ class _MarriageMultiplayerScreenState
               ],
             ),
           ),
-        )); // Close TutorialOverlay and Scaffold
+        )),
+            // Overlays Layer (Victory, Animations)
+            // TODO: Re-enable VictoryCelebration when Scoring State (declarerId, roundScores) is implemented
+            if (state.phase == 'scoring')
+              Center(child: Text('Game Over (Scoring Impl Pending)')),
+
+            /*
+            VictoryCelebration(
+              winnerId: state.phase == 'scoring' ? state.declarerId : null,
+              myPlayerId: currentUser.uid,
+              scores: state.roundScores,
+              scoreDetails: state.scoreDetails,
+              onDismiss: () { },
+            ),
+            */
+            
+            // Card Flying Animations
+            CardAnimationOverlay(controller: _cardAnimController),
+
+            // Guided Gameplay Tutorial Overlay
+            if (_guidedTutorialController != null && _showTutorial)
+              InteractiveTutorialOverlay(
+                controller: _guidedTutorialController!,
+                onComplete: () async {
+                  await MarriageTutorial.markCompleted();
+                  if (mounted) {
+                    setState(() => _showTutorial = false);
+                  }
+                },
+                onSkip: () async {
+                  await MarriageTutorial.markCompleted();
+                },
+              ),
+          ],
+        ); // Close outer Stack
       },
     );
   }
@@ -737,81 +876,121 @@ class _MarriageMultiplayerScreenState
         );
   }
 
-  List<Widget> _buildOpponentWidgets(MarriageGameState state, String myId) {
-    final opponents = state.playerHands.keys.where((id) => id != myId).toList();
+  // === Helper Builders for Professional Layout ===
 
-    return opponents.map((playerId) {
-      final cardCount = state.playerHands[playerId]?.length ?? 0;
-      final isCurrentTurn = state.currentPlayerId == playerId;
-      final visited = state.hasVisited(playerId);
-      final maalPoints = state.getMaalPoints(playerId);
-      final isBot = playerId.startsWith('bot_');
+  Widget _buildProfessionalCenterArea(
+    MarriageGameState state,
+    PlayingCard? topDiscard,
+    bool isMyTurn,
+  ) {
+    return CenterTableArea(
+      deckCount: state.deckCards.length,
+      topDiscard: topDiscard,
+      discardCount: state.discardPile.length,
+      tiplu: state.tipluCardId.isNotEmpty ? _getCard(state.tipluCardId) : null,
+      isMyTurn: isMyTurn,
+      canDrawFromDeck: isMyTurn && state.turnPhase == 'drawing',
+      canDrawFromDiscard: isMyTurn && state.turnPhase == 'drawing',
+      turnPhase: state.turnPhase,
+      onDeckTap: () => _drawFromDeck(),
+      onDiscardTap: () => _drawFromDiscard(),
+      deckKey: _tutorialKeys['deck_pile'],
+      discardKey: _tutorialKeys['discard_pile'],
+      tipluKey: _tutorialKeys['tiplu_indicator'],
+      isDiscardBlocked: false,
+    );
+  }
 
-      // Use Stack to overlay lock/unlock icon on avatar
+  List<Widget> _buildProfessionalOpponents(
+    MarriageGameState state,
+    String myId,
+  ) {
+    final allPlayers = state.playerHands.keys.toList();
+    // Sort players to put me at bottom, then rotate rest
+    final myIndex = allPlayers.indexOf(myId);
+    final rotatedPlayers = [
+      ...allPlayers.sublist(myIndex + 1),
+      ...allPlayers.sublist(0, myIndex),
+    ];
+
+    // Responsive: Use compact slots if many players
+    final isCompact = rotatedPlayers.length > 4;
+
+    return rotatedPlayers.map((playerId) {
+      final hand = state.playerHands[playerId] ?? [];
+      final isTurn = state.currentPlayerId == playerId;
+      final profile = _getBotName(playerId); // Only name, need avatar logic
+      final hasVisited = state.hasVisited(playerId);
+      final timer = isTurn && state.config.turnTimeoutSeconds > 0
+          ? ref.read(marriageServiceProvider).getRemainingTurnTime(state) /
+            state.config.turnTimeoutSeconds
+          : 0.0;
+      
+      // Determine action status for bubble
+      OpponentAction? action;
+      if (isTurn) {
+         action = state.turnPhase == 'drawing' 
+             ? OpponentAction.thinking 
+             : OpponentAction.discarding;
+      }
+      // Ideally we'd track "Drawing..." state too via specific updates
+
       return Stack(
+        alignment: Alignment.topCenter,
         clipBehavior: Clip.none,
-        alignment: Alignment.center,
         children: [
-          GameOpponentWidget(
-            opponent: GameOpponent(
-              id: playerId,
-              name: isBot
-                  ? _getBotName(playerId)
-                  : 'Player', // Validated mapping
-              isBot: isBot,
-              isCurrentTurn: isCurrentTurn,
-              cardCount: cardCount,
-              status: isCurrentTurn ? 'Thinking' : null,
-              score: null, // Don't show score yet mid-game?
-            ),
-            size: 50,
-            showStats: true,
-          ),
-
-          // Visited Status Indicator (lock)
-          Positioned(
-            right: 0,
-            top: 0,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: visited ? Colors.green : Colors.grey.shade800,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 1.5),
+          isCompact
+            ? PlayerSlotCompact(
+                playerName: profile,
+                cardCount: hand.length,
+                isCurrentTurn: isTurn,
+                hasVisited: hasVisited,
+              )
+            : PlayerSlotWidget(
+                playerName: profile,
+                cardCount: hand.length,
+                isCurrentTurn: isTurn,
+                hasVisited: hasVisited,
+                maalPoints: state.getMaalPoints(playerId),
+                onTap: () {},
               ),
-              child: Icon(
-                visited ? Icons.lock_open : Icons.lock,
-                color: Colors.white,
-                size: 10,
-              ),
-            ),
-          ),
-
-          // Maal Points Badge (only if visited)
-          if (visited && maalPoints > 0)
-            Positioned(
-              bottom: 20, // Adjust to sit near name
-              right: -4,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.purple,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white, width: 1),
-                ),
-                child: Text(
-                  '💎$maalPoints',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
+              
+              // Action Bubble
+              if (action != null)
+                Positioned(
+                  top: -40,
+                  child: ActionIndicatorBubble(
+                    action: action,
+                    isVisible: true,
                   ),
                 ),
-              ),
-            ),
         ],
-      ).animate().fadeIn(delay: 200.ms);
+      );
     }).toList();
+  }
+
+  // === End Professional Builders ===
+
+
+
+  Widget _buildEmptySeat() {
+    return Container(
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.2),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: CasinoColors.tableGreenLight.withValues(alpha: 0.3),
+          width: 2,
+        ),
+      ),
+      child: Icon(
+        Icons.event_seat_rounded,
+        size: 24,
+        color: CasinoColors.tableGreenLight.withValues(alpha: 0.5),
+      ),
+    );
   }
 
   void _updateHints(
@@ -1249,156 +1428,7 @@ class _MarriageMultiplayerScreenState
     }
   }
 
-  Widget _buildActionBar(bool isMyTurn, MarriageGameState state, String myId) {
-    // P0 FIX: Use state.isDiscardingPhase instead of local _hasDrawn
-    final canDiscard =
-        isMyTurn && state.isDiscardingPhase && _selectedCardId != null;
-    final canDeclare = isMyTurn && state.isDiscardingPhase;
 
-    final hasVisited = state.hasVisited(myId);
-    final canVisit = isMyTurn && !hasVisited;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.8),
-        border: Border(
-          top: BorderSide(
-            color: CasinoColors.gold.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Discard Button (Left)
-            _buildGameActionButton(
-              label: _selectedCardId != null
-                  ? '↑ Discard'
-                  : (isMyTurn && state.isDiscardingPhase
-                        ? '👆 Tap Card'
-                        : '↑ Discard'),
-              color: canDiscard ? Colors.orange : Colors.grey.shade800,
-              icon: canDiscard ? Icons.arrow_upward : Icons.touch_app,
-              isEnabled: canDiscard,
-              onPressed: _discardCard,
-            ),
-
-            // Visit (Center - Main Action)
-            if (!hasVisited)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    key: _tutorialKeys['visit_button'],
-                    child: _buildGameActionButton(
-                      label: '🔒 VISIT (Unlock Maal)',
-                      color: Colors
-                          .purple, // Matching the user's reference Guide color
-                      icon: Icons.lock_open,
-                      isEnabled: canVisit,
-                      onPressed: _attemptVisit,
-                      isPrimary: true,
-                    ),
-                  ),
-                ),
-              )
-            else
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.purple.withValues(alpha: 0.5),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '🔓 VISITED',
-                        style: TextStyle(
-                          color: Colors.purpleAccent,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        '💎 Maal: ${state.getMaalPoints(myId)}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-            // Declare/Go Royale (Right)
-            _buildGameActionButton(
-              label: '✓ Go Royale',
-              color: Colors.green,
-              icon: Icons.check_circle,
-              isEnabled: canDeclare,
-              onPressed: _declare,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGameActionButton({
-    required String label,
-    required Color color,
-    required IconData icon,
-    required bool isEnabled,
-    required VoidCallback onPressed,
-    bool isPrimary = false,
-  }) {
-    return ElevatedButton(
-      onPressed: isEnabled ? onPressed : null,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        foregroundColor: Colors.white,
-        disabledBackgroundColor: Colors.grey.shade900,
-        disabledForegroundColor: Colors.grey.shade600,
-        elevation: isEnabled ? 4 : 0,
-        padding: EdgeInsets.symmetric(
-          horizontal: isPrimary ? 20 : 16,
-          vertical: isPrimary ? 16 : 12,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(
-            color: isEnabled ? Colors.white24 : Colors.transparent,
-          ),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: isPrimary ? 24 : 20),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: isPrimary ? 13 : 11,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Future<void> _attemptVisit() async {
     if (_isProcessing) return;
@@ -1420,6 +1450,8 @@ class _MarriageMultiplayerScreenState
 
       if (success) {
         // Show success animation
+        HapticService.visitSuccess();
+      SoundService.playVisit();
         if (mounted) {
           _showCelebrationEffect(context);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1478,9 +1510,32 @@ class _MarriageMultiplayerScreenState
       final userId = authService.currentUser?.uid;
 
       if (userId != null) {
-        await marriageService.drawFromDeck(widget.roomId, userId);
-        SoundService.playCardSlide();
-        // P0 FIX: No need to set _hasDrawn - state updates from Firestore stream
+        final result = await marriageService.drawFromDeck(widget.roomId, userId);
+        
+        // Play sound and haptics
+        HapticService.cardDraw();
+        SoundService.playCardPickup();
+        
+        // Animate
+        final deckKey = _tutorialKeys['deck_pile'];
+        final handKey = _tutorialKeys['player_hand'];
+        if (deckKey?.currentContext != null && handKey?.currentContext != null) {
+          final start = (deckKey!.currentContext!.findRenderObject() as RenderBox)
+              .localToGlobal(Offset.zero);
+          final end = (handKey!.currentContext!.findRenderObject() as RenderBox)
+              .localToGlobal(Offset.zero);
+              
+          final card = result != null ? _getCard(result) : null;
+          
+          if (card != null) {
+            _cardAnimController.animateDrawFromDeck(
+              card: card,
+              deckPosition: start,
+              handPosition: end + const Offset(100, 0),
+              onComplete: () {},
+            );
+          }
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -1553,7 +1608,30 @@ class _MarriageMultiplayerScreenState
             );
           }
         } else {
-          SoundService.playCardSlide();
+          // Success - Play sound and haptics
+          HapticService.cardDraw();
+          SoundService.playCardPickup();
+          
+          // Animate
+          final discardKey = _tutorialKeys['discard_pile'];
+          final handKey = _tutorialKeys['player_hand'];
+          if (discardKey?.currentContext != null && handKey?.currentContext != null) {
+            final start = (discardKey!.currentContext!.findRenderObject() as RenderBox)
+                .localToGlobal(Offset.zero);
+            final end = (handKey!.currentContext!.findRenderObject() as RenderBox)
+                .localToGlobal(Offset.zero);
+            
+            final card = result != null ? _getCard(result) : null;
+
+            if (card != null) {
+              _cardAnimController.animateDrawFromDeck(
+                card: card,
+                deckPosition: start,
+                handPosition: end + const Offset(100, 0),
+                onComplete: () {},
+              );
+            }
+          }
         }
       }
     } catch (e) {
@@ -1587,7 +1665,31 @@ class _MarriageMultiplayerScreenState
           userId,
           _selectedCardId!,
         );
-        SoundService.playCardSlide();
+        
+        // Play sound and haptics
+        HapticService.cardDiscard();
+        SoundService.playCardPlace();
+
+        // Animate
+        final discardKey = _tutorialKeys['discard_pile'];
+        final handKey = _tutorialKeys['player_hand'];
+        if (discardKey?.currentContext != null && handKey?.currentContext != null) {
+          final start = (handKey!.currentContext!.findRenderObject() as RenderBox)
+              .localToGlobal(Offset.zero); // ideally specific card pos
+          final end = (discardKey!.currentContext!.findRenderObject() as RenderBox)
+              .localToGlobal(Offset.zero);
+
+          final card = _getCard(_selectedCardId!);
+          
+          if (card != null) {
+            _cardAnimController.animateDiscard(
+              card: card,
+              cardPosition: start + const Offset(100, 0),
+              discardPosition: end,
+              onComplete: () {},
+            );
+          }
+        }
         setState(() {
           _selectedCardId = null;
           // P0 FIX: No need to reset _hasDrawn - state updates from Firestore stream
@@ -2033,5 +2135,23 @@ class _MarriageMultiplayerScreenState
         ),
       ],
     );
+  }
+
+
+
+  void _handleShow(MarriageGameState state) {
+    // Implement show/finish logic
+    if (state.isDiscardingPhase) {
+      _declare();
+    }
+  }
+
+  void _handleShowSequence(MarriageGameState state) {
+    // Logic to show sequences (Visit / Mal Herne)
+    _attemptVisit();
+  }
+
+  void _handleShowDublee(MarriageGameState state) {
+     // Logic to show Dublee
   }
 }

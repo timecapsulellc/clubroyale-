@@ -9,7 +9,6 @@ import 'package:clubroyale/features/game/game_config.dart';
 import 'package:clubroyale/features/lobby/lobby_service.dart';
 import 'package:clubroyale/core/config/diamond_config.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart';
-import 'package:clubroyale/features/wallet/diamond_balance_widget.dart';
 import 'package:clubroyale/features/feedback/feedback_dialog.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:share_plus/share_plus.dart';
@@ -17,10 +16,9 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:clubroyale/core/responsive/responsive_utils.dart';
 import 'package:clubroyale/config/casino_theme.dart';
-import 'package:clubroyale/core/widgets/skeleton_loading.dart';
-import 'package:clubroyale/core/error/error_display.dart';
+import 'package:clubroyale/features/lobby/widgets/lobby_user_profile.dart';
+import 'package:clubroyale/features/lobby/widgets/lobby_main_menu.dart';
 
 import '../auth/auth_service.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
@@ -63,342 +61,345 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       }
     }
 
-    return Scaffold(
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          // Premium Header
-          SliverAppBar(
-            expandedHeight: 180,
-            floating: false,
-            pinned: true,
-            stretch: true,
-            backgroundColor: const Color(0xFF0D4A2E), // Deep Casino Green
-            leading: IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.arrow_back, color: Colors.white),
-              ),
-              onPressed: () => context.go('/'),
-            ),
-            actions: [
-              DiamondBalanceBadge(),
-              IconButton(
-                icon: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.feedback_outlined,
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () => FeedbackDialog.show(context),
-                tooltip: 'Send Feedback',
-              ),
-              IconButton(
-                icon: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.withValues(alpha: 0.3), // Gold accent
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.amber.shade600),
-                  ),
-                  child: const Icon(Icons.pin_outlined, color: Colors.white),
-                ),
-                onPressed: () => _showJoinByCodeDialog(context, ref),
-                tooltip: 'Join by Code',
-              ),
-              const SizedBox(width: 8),
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              title: const Text(
-                'Game Lobby',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  shadows: [Shadow(color: Colors.black54, blurRadius: 4)],
-                ),
-              ),
-              centerTitle: true,
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  // Banner Image
-                  Image.asset(
-                    'assets/images/dashboard_banner.png',
-                    fit: BoxFit.cover,
-                  ),
-                  // Gradient Overlay for text readability
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 0.3),
-                          Colors.transparent,
-                          CasinoColors.deepPurple.withValues(alpha: 0.8),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Center icon - cards (subtle animation)
-                  Center(
-                    child:
-                        Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: CasinoColors.gold.withValues(
-                                    alpha: 0.5,
-                                  ),
-                                  width: 2,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: CasinoColors.gold.withValues(
-                                      alpha: 0.2,
-                                    ),
-                                    blurRadius: 20,
-                                    spreadRadius: 2,
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.style_rounded, // Card stack icon
-                                size: 48,
-                                color: CasinoColors.gold,
-                              ),
-                            )
-                            .animate(onPlay: (c) => c.repeat(reverse: true))
-                            .scale(
-                              duration: 2000.ms,
-                              begin: const Offset(0.95, 0.95),
-                              end: const Offset(1.05, 1.05),
-                            ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+    String selectedGameId = 'marriage'; // Default
 
-          // Quick Actions Bar
-          SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              child: Column(
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: CasinoColors.greenFeltGradient,
+        ),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // INSTANT PLAY - Featured Action
-                  Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(bottom: 12),
-                        child: FilledButton.icon(
-                          onPressed: () {
-                            HapticHelper.lightTap();
-                            _playNow(context, ref);
-                          },
-                          icon: const Icon(Icons.play_arrow_rounded, size: 28),
-                          label: const Text(
-                            '⚡ PLAY NOW',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: Colors.green.shade600,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 8,
-                            shadowColor: Colors.green.shade300,
+                  // 1. LEFT SIDEBAR (Game Modes)
+                  // We wrap it in a Column to put Profile above it, or let Sidebar handle it.
+                  // Reference: Profile Top-Left, then Game Modes.
+                  // 1. LEFT SIDEBAR (Menu Panel)
+                  // Wider panel for the "Command Center" look
+                  SizedBox(
+                    width: 300,
+                    child: Column(
+                      children: [
+                        const LobbyUserProfile(),
+                        Expanded(
+                          child: LobbyMainMenu(
+                            onSinglePlayer: () {
+                              // "Practice" Mode
+                              context.go('/marriage/practice');
+                            },
+                            onLocalMultiplayer: () {
+                              // Placeholder for Local Networking feature
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Local Multiplayer coming soon!'),
+                                  backgroundColor: CasinoColors.tableGreenMid,
+                                ),
+                              );
+                            },
+                            onOnlinePublic: () {
+                              // Just sets filter to default (showing grid)
+                              setState(() {
+                                selectedGameId = 'marriage';
+                              });
+                            },
+                            onOnlinePrivate: () {
+                              _showCreateGameDialog(context, ref, initialGameType: selectedGameId);
+                            },
                           ),
                         ),
-                      )
-                      .animate(delay: 50.ms)
-                      .fadeIn()
-                      .shimmer(duration: 1500.ms, color: Colors.white30),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _QuickActionButton(
-                          icon: Icons.add_rounded,
-                          label: 'Create Room',
-                          color: const Color(0xFF1A6B4A), // Casino green
-                          onTap: () => _showCreateGameDialog(context, ref),
-                        ).animate(delay: 100.ms).fadeIn().slideX(begin: -0.2),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _QuickActionButton(
-                          icon: Icons.pin_rounded,
-                          label: 'Join by Code',
-                          color: Colors.amber.shade700, // Gold
-                          onTap: () => _showJoinByCodeDialog(context, ref),
-                        ).animate(delay: 200.ms).fadeIn().slideX(begin: 0.2),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  // Tournaments button
-                  _QuickActionButton(
-                    icon: Icons.emoji_events_rounded,
-                    label: '🏆 Tournaments',
-                    color: const Color(0xFF7C3AED), // Purple for tournaments
-                    onTap: () => context.push('/tournaments'),
-                  ).animate(delay: 300.ms).fadeIn().slideY(begin: 0.2),
+
+                  // 2. MAIN CONTENT AREA (Center)
+                  Expanded(
+                    child: Column(
+                      children: [
+                        // Top Bar (Utilities)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Title / Breadcrumb
+                              Text(
+                                selectedGameId == 'marriage'
+                                    ? GameTerminology.royalMeldGame
+                                    : 'Game Lobby',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  shadows: [
+                                    Shadow(
+                                        color: Colors.black54, blurRadius: 4)
+                                  ],
+                                ),
+                              ),
+                              // Utilities (Top-Right)
+                              Row(
+                                children: [
+                                  _buildUtilityIcon(
+                                      Icons.feedback_outlined, 'Feedback',
+                                      () => FeedbackDialog.show(context)),
+                                  const SizedBox(width: 12),
+                                  _buildUtilityIcon(Icons.privacy_tip_outlined,
+                                      'Privacy', () {}),
+                                  const SizedBox(width: 12),
+                                  _buildUtilityIcon(
+                                      Icons.settings_outlined, 'Settings',
+                                      () => context.push('/settings')),
+                                  const SizedBox(width: 12),
+                                  _buildUtilityIcon(
+                                      Icons.apps_rounded, 'Other Games',
+                                      () {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('More games coming soon!')),
+                                        );
+                                      }),
+                                  const SizedBox(width: 12),
+                                  _buildUtilityIcon(
+                                      Icons.account_circle_outlined, 'Account',
+                                      () => context.push('/profile')),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Main Content ScrollView
+                        Expanded(
+                          child: CustomScrollView(
+                            physics: const BouncingScrollPhysics(),
+                            slivers: [
+                              // Quick Actions (Play Now, Create, Join)
+                              SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 8),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 2,
+                                        child: _buildPlayNowButton(context, ref),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: _QuickActionButton(
+                                          icon: Icons.add_rounded,
+                                          label: 'Create',
+                                          color: CasinoColors.tableGreenMid,
+                                          onTap: () =>
+                                              _showCreateGameDialog(context, ref, initialGameType: selectedGameId),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: _QuickActionButton(
+                                          icon: Icons.pin_rounded,
+                                          label: 'Join Code',
+                                          color: CasinoColors.gold,
+                                          onTap: () =>
+                                              _showJoinByCodeDialog(context, ref),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              // Available Rooms Header
+                              SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      24, 24, 24, 16),
+                                  child: Text(
+                                    'ACTIVE TABLES',
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      color: Colors.white.withValues(alpha: 0.7),
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              // Rooms Grid
+                              StreamBuilder<List<GameRoom>>(
+                                stream: gamesStream,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const SliverFillRemaining(
+                                      child: Center(
+                                          child: CircularProgressIndicator()),
+                                    );
+                                  }
+                                  if (snapshot.hasError) {
+                                    return SliverFillRemaining(
+                                        child: Text(
+                                            'Error: ${snapshot.error}'));
+                                  }
+
+                                  final allGames = snapshot.data ?? [];
+                                  // Filter games by selected mode
+                                  final games = allGames
+                                      .where((g) => g.gameType == selectedGameId)
+                                      .toList();
+
+                                  if (games.isEmpty) {
+                                      return SliverFillRemaining(
+                                      child: _EmptyState(
+                                        onCreateRoom: () => _showCreateGameDialog(context, ref, initialGameType: selectedGameId),
+                                        onJoinByCode: () => _showJoinByCodeDialog(context, ref),
+                                      ),
+                                    );
+                                  }
+
+                                  return SliverPadding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24),
+                                    sliver: SliverGrid(
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3, // Desktop/Tablet optimized
+                                        childAspectRatio: 1.1,
+                                        crossAxisSpacing: 16,
+                                        mainAxisSpacing: 16,
+                                      ),
+                                      delegate: SliverChildBuilderDelegate(
+                                        (context, index) {
+                                            final game = games[index];
+                                            final isFinished = game.isFinished || game.status == GameStatus.settled;
+                                            final currentUser = authService.currentUser;
+                                            final isInGame = game.players.any((p) => p.id == currentUser?.uid);
+                                            final isHost = game.hostId == currentUser?.uid;
+
+                                          return _EnhancedGameCard(
+                                            game: games[index],
+                                            isFinished: isFinished,
+                                            isInGame: isInGame,
+                                            isHost: isHost,
+                                            onTap: () {
+                                                if (isFinished) {
+                                                context.go('/ledger/${game.id}');
+                                                } else if (game.status == GameStatus.waiting) {
+                                                context.go('/lobby/${game.id}');
+                                                } else {
+                                                context.go('/game/${game.id}/play');
+                                                }
+                                            },
+                                            onJoin: isInGame ? null : () => _joinGame(context, ref, game),
+                                            onShareCode: game.roomCode != null ? () => _shareRoomCode(context, game) : null,
+                                          );
+                                        },
+                                        childCount: games.length,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              
+                              const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ),
-
-          // Section Header
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: Text(
-                'Available Rooms',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade700,
+              
+              // 3. SECONDARY NAV (Bottom-Right)
+              // Floating over content
+              Positioned(
+                bottom: 24,
+                right: 24,
+                child: Row(
+                  children: [
+                    _buildSecondaryButton(Icons.help_outline, 'Learn', () {}),
+                    const SizedBox(width: 16),
+                    _buildSecondaryButton(Icons.leaderboard, 'Rankings', () => context.push('/rankings')),
+                  ],
                 ),
               ),
-            ).animate(delay: 300.ms).fadeIn(),
+            ],
           ),
-
-          // Games List
-          StreamBuilder<List<GameRoom>>(
-            stream: gamesStream,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: SliverGrid(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: context.responsive(
-                        mobile: 1,
-                        tablet: 2,
-                        desktop: 4,
-                      ),
-                      childAspectRatio: context.responsive(
-                        mobile: 1.1,
-                        tablet: 0.9,
-                        desktop: 0.85,
-                      ),
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => const SkeletonGameCard(),
-                      childCount: 4,
-                    ),
-                  ),
-                );
-              }
-
-              if (snapshot.hasError) {
-                return SliverFillRemaining(
-                  child: ErrorDisplay(
-                    title: 'Connection Error',
-                    message: snapshot.error.toString(),
-                    icon: Icons.wifi_off_rounded,
-                    onRetry: () => ref.invalidate(lobbyServiceProvider),
-                  ),
-                );
-              }
-
-              final games = snapshot.data ?? [];
-
-              if (games.isEmpty) {
-                return SliverFillRemaining(
-                  child: _EmptyState(
-                    onCreateRoom: () => _showCreateGameDialog(context, ref),
-                    onJoinByCode: () => _showJoinByCodeDialog(context, ref),
-                  ),
-                );
-              }
-
-              return SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: context.responsive(
-                      mobile: 1,
-                      tablet: 2,
-                      desktop: 4,
-                    ),
-                    childAspectRatio: context.responsive(
-                      mobile: 1.1,
-                      tablet: 0.9,
-                      desktop: 0.85,
-                    ),
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                  ),
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final game = games[index];
-                    final isFinished =
-                        game.isFinished || game.status == GameStatus.settled;
-                    final currentUser = authService.currentUser;
-                    final isInGame = game.players.any(
-                      (p) => p.id == currentUser?.uid,
-                    );
-                    final isHost = game.hostId == currentUser?.uid;
-
-                    return _EnhancedGameCard(
-                          game: game,
-                          isFinished: isFinished,
-                          isInGame: isInGame,
-                          isHost: isHost,
-                          onTap: () {
-                            if (isFinished) {
-                              context.go('/ledger/${game.id}');
-                            } else if (game.status == GameStatus.waiting) {
-                              context.go('/lobby/${game.id}');
-                            } else {
-                              context.go('/game/${game.id}/play');
-                            }
-                          },
-                          onJoin: isInGame
-                              ? null
-                              : () => _joinGame(context, ref, game),
-                          onShareCode: game.roomCode != null
-                              ? () => _shareRoomCode(context, game)
-                              : null,
-                        )
-                        .animate(delay: (100 * index).ms)
-                        .fadeIn()
-                        .scale(begin: const Offset(0.9, 0.9));
-                  }, childCount: games.length),
-                ),
-              );
-            },
-          ),
-
-          // Bottom padding
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
-        ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateGameDialog(context, ref),
-        icon: const Icon(Icons.add),
-        label: const Text('New Room'),
-        backgroundColor: Colors.amber.shade700, // Gold FAB
-        foregroundColor: Colors.black, // Dark text for contrast
-        elevation: 8,
-      ).animate().fadeIn(delay: 500.ms).scale(),
     );
+  }
+
+  Widget _buildUtilityIcon(IconData icon, String tooltip, VoidCallback onTap) {
+    return IconButton(
+      onPressed: onTap,
+      tooltip: tooltip,
+      icon: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.1),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
+    );
+  }
+
+  Widget _buildSecondaryButton(IconData icon, String label, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: CasinoColors.deepPurple.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.3)),
+          boxShadow: [
+             BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0,2))
+          ]
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: CasinoColors.gold, size: 18),
+            const SizedBox(width: 8),
+            Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlayNowButton(BuildContext context, WidgetRef ref) {
+    return FilledButton.icon(
+      onPressed: () {
+        HapticHelper.lightTap();
+        _playNow(context, ref);
+      },
+      icon: const Icon(Icons.bolt, size: 26),
+      label: const Text(
+        'PLAY NOW',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.0,
+        ),
+      ),
+      style: FilledButton.styleFrom(
+        backgroundColor: Colors.green.shade600,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        elevation: 8,
+        shadowColor: Colors.green.shade900,
+      ),
+    ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(delay: 2000.ms, duration: 1000.ms, color: Colors.white30);
   }
 
   /// Shows dialog to join a game by 6-digit code
@@ -509,11 +510,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   /// Shows dialog to create a game with configuration
   Future<void> _showCreateGameDialog(
     BuildContext context,
-    WidgetRef ref,
-  ) async {
+    WidgetRef ref, {
+    String initialGameType = 'call_break',
+  }) async {
     double pointValue = 10;
     int totalRounds = 5;
-    String gameType = 'call_break';
+    String gameType = initialGameType;
 
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
@@ -1191,8 +1193,8 @@ class _EnhancedGameCard extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 4,
-      shadowColor: Colors.deepPurple.withValues(alpha: 0.2),
+      elevation: 6,
+      shadowColor: Colors.black.withValues(alpha: 0.4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
         onTap: onTap,
@@ -1204,9 +1206,13 @@ class _EnhancedGameCard extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.white,
-                Colors.deepPurple.shade50.withValues(alpha: 0.3),
+                const Color(0xFF0A2F1F), // Very dark green
+                const Color(0xFF0F3D29), // Dark green
               ],
+            ),
+            border: Border.all(
+              color: CasinoColors.gold.withValues(alpha: 0.3),
+              width: 1,
             ),
           ),
           child: Column(
@@ -1219,14 +1225,17 @@ class _EnhancedGameCard extends StatelessWidget {
                     colors: isFinished
                         ? [Colors.grey.shade400, Colors.grey.shade600]
                         : [
-                            Colors.deepPurple.shade400,
-                            Colors.deepPurple.shade600,
+                            CasinoColors.tableGreenDark,
+                            CasinoColors.tableGreenMid,
                           ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(20),
                   ),
                 ),
+
                 child: Row(
                   children: [
                     Container(

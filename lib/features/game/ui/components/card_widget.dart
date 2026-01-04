@@ -64,27 +64,34 @@ class CardWidget extends StatelessWidget {
       );
     }
 
-    return Container(
+    // Enhanced selection styling
+    final effectiveGlow = glowColor ?? (isSelected ? AppTheme.gold : null);
+    final hasSomeGlow = effectiveGlow != null;
+
+    Widget cardContent = Container(
       width: w,
       height: h,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color:
-              glowColor ?? (isSelected ? AppTheme.gold : Colors.grey.shade300),
-          width: (isSelected || glowColor != null) ? 2.5 : 1,
+          color: effectiveGlow ?? Colors.grey.shade300,
+          width: hasSomeGlow ? 3 : 1,
         ),
         boxShadow: [
+          // Base shadow
           BoxShadow(
-            color:
-                glowColor?.withValues(alpha: 0.6) ??
-                (isSelected
-                    ? AppTheme.gold.withValues(alpha: 0.5)
-                    : Colors.black.withValues(alpha: 0.2)),
-            blurRadius: (isSelected || glowColor != null) ? 8 : 3,
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 3,
             offset: const Offset(1, 1),
           ),
+          // Glow effect for selected/maal cards
+          if (hasSomeGlow)
+            BoxShadow(
+              color: effectiveGlow.withValues(alpha: 0.6),
+              blurRadius: isSelected ? 16 : 10,
+              spreadRadius: isSelected ? 2 : 1,
+            ),
         ],
       ),
       child: Stack(
@@ -111,10 +118,49 @@ class CardWidget extends StatelessWidget {
               ],
             ),
           ),
+          // Corner badge (Maal indicator)
           if (cornerBadge != null)
             Positioned(top: 2, right: 2, child: cornerBadge!),
+          // Selected badge
+          if (isSelected)
+            Positioned(
+              bottom: 4,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppTheme.gold,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    '✓',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
+
+    // Add lift effect for selected cards
+    if (isSelected) {
+      cardContent = Transform.translate(
+        offset: const Offset(0, -8),
+        child: Transform.scale(
+          scale: 1.05,
+          child: cardContent,
+        ),
+      );
+    }
+
+    return cardContent;
   }
 }
+

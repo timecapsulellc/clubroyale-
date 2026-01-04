@@ -48,11 +48,10 @@ class MarriageTableLayout extends StatelessWidget {
         // So Loop from PI (Left) -> -PI/2 (Top) -> 0 (Right).
 
         final centerX = width / 2;
-        final centerY =
-            height * 0.40; // Shift table up (was 0.5) to give space for hand
+        final centerY = height * 0.45; // Shift down slightly
 
-        final radiusX = width * 0.40; // Horizontal radius
-        final radiusY = height * 0.35; // Vertical radius
+        final radiusX = width * 0.42; // Wider
+        final radiusY = height * 0.38; // Slightly taller arc
 
         // Calculate max height for the hand area to prevent overflow
         final maxHandHeight = height * 0.40;
@@ -118,24 +117,35 @@ class MarriageTableLayout extends StatelessWidget {
 
     // If we have many players, we might need to go slightly below the equator
 
-    double startAngle = math.pi; // Left
-    double endAngle = 0.0; // Right
+    // Updated to match reference:
+    // Start Angle: ~200 degrees (Left-Down) -> ~-20 degrees (Right-Down)
+    // This wraps the opponents around the top half
+    double startAngle = math.pi + 0.3; // ~200 deg
+    double endAngle = -0.3; // ~-20 deg
 
-    // Extend slightly for more players?
-    // startAngle = math.pi + 0.2;
-    // endAngle = -0.2;
+    // Total arc based on max players? Or dynamic?
+    // Reference 3 shows 3 bots at Top-Left, Top, Top-Right. Typical 5 player game.
+    // We stick to distributing available opponents evenly across the arc.
+    
+    // If we have just 1 opponent, put them at Top (-Pi/2)
+    // If we have 4, distribute evenly.
 
-    // Step calculation
-    // If 1 opponent, place at -Pi/2 (Top)
-    double step = (startAngle - endAngle) / (count + 1);
+    double step;
+    if (count == 1) {
+       startAngle = -math.pi / 2;
+       endAngle = -math.pi / 2;
+       step = 0;
+    } else {
+       step = (startAngle - endAngle) / (count + 1);
+    }
 
     for (int i = 0; i < count; i++) {
-      // Calculate angle
-      // i=0 -> First opponent. Place them on Left side? Or Right?
-      // Usually "Left" (Clockwise) order.
-      // So index 0 is at StartAngle - step
-
-      double angle = startAngle - (step * (i + 1));
+      double angle;
+      if (count == 1) {
+        angle = startAngle; 
+      } else {
+        angle = startAngle - (step * (i + 1));
+      }
 
       // Calculate position
       // Using an ellipse equation: x = a cos(t), y = b sin(t)

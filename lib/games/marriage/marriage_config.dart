@@ -29,7 +29,7 @@ abstract class MarriageGameConfig with _$MarriageGameConfig {
     /// (no wilds) to declare. "No Life" penalty applies otherwise.
     @Default(true) bool requirePureSequence,
 
-    /// Marriage Required: Must have at least one K+Q Marriage meld to declare.
+    /// Marriage Required: Must have Jhiplu+Tiplu+Poplu combo to declare.
     @Default(false) bool requireMarriageToWin,
 
     // === Bonus Rules ===
@@ -37,11 +37,24 @@ abstract class MarriageGameConfig with _$MarriageGameConfig {
     /// Dublee Bonus: Award 25 points for two sequences of same suit.
     @Default(true) bool dubleeBonus,
 
-    /// Tunnel Bonus: Award 50 points for 3 cards of same rank AND suit.
+    /// Tunnel Bonus: Award points for 3 cards of same rank AND suit.
+    /// If shown before first draw, award 5 pts (authentic Nepali rule).
     @Default(true) bool tunnelBonus,
 
-    /// Marriage Bonus: Award 100 points for K+Q pair in melds.
+    /// Tunnel display bonus value (shown before first draw).
+    @Default(5) int tunnelDisplayBonusValue,
+
+    /// Marriage Bonus: Award 10 points for Jhiplu+Tiplu+Poplu combo of same suit.
     @Default(true) bool marriageBonus,
+
+    /// Marriage combo value (Jhiplu+Tiplu+Poplu).
+    @Default(10) int marriageBonusValue,
+
+    /// 8-Dublee Win: Player can win by holding 8 pairs of same rank+suit.
+    @Default(true) bool eightDubleeWinEnabled,
+
+    /// Bonus points for winning with 8 Dublees.
+    @Default(5) int eightDubleeWinBonus,
 
     // === Limits ===
 

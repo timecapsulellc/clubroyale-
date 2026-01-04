@@ -172,6 +172,82 @@ class MarriageMaalCalculator {
 
     return counts;
   }
+
+  /// Check if hand contains a Marriage Combo (Jhiplu + Tiplu + Poplu of same suit)
+  /// Returns the bonus value if present, 0 otherwise.
+  int getMarriageComboBonus(List<Card> hand) {
+    if (!config.marriageBonus) return 0;
+
+    bool hasJhiplu = false;
+    bool hasTiplu = false;
+    bool hasPoplu = false;
+
+    for (final card in hand) {
+      final type = getMaalType(card);
+      if (type == MaalType.jhiplu) hasJhiplu = true;
+      if (type == MaalType.tiplu) hasTiplu = true;
+      if (type == MaalType.poplu) hasPoplu = true;
+    }
+
+    // Marriage: All three Maal cards of same suit (Tiplu's suit)
+    if (hasJhiplu && hasTiplu && hasPoplu) {
+      return config.marriageBonusValue;
+    }
+    return 0;
+  }
+
+  /// Count Tunnels (3 identical cards: same rank AND suit) in hand.
+  /// Used for display bonus calculation.
+  int countTunnels(List<Card> hand) {
+    // Group cards by rank+suit key
+    final Map<String, int> cardCounts = {};
+    for (final card in hand) {
+      if (card.isJoker) continue;
+      final key = '${card.rank.value}_${card.suit.index}';
+      cardCounts[key] = (cardCounts[key] ?? 0) + 1;
+    }
+
+    // Count how many groups have 3+ cards (tunnel)
+    int tunnels = 0;
+    for (final count in cardCounts.values) {
+      if (count >= 3) tunnels++;
+    }
+    return tunnels;
+  }
+
+  /// Calculate Tunnel Display Bonus (shown before first draw).
+  /// 1 Tunnel = 5 pts, 2 Tunnels = 15 pts, 3 Tunnels = 25 pts.
+  int getTunnelDisplayBonus(List<Card> hand) {
+    if (!config.tunnelBonus) return 0;
+
+    final tunnelCount = countTunnels(hand);
+    if (tunnelCount == 0) return 0;
+    if (tunnelCount == 1) return config.tunnelDisplayBonusValue;
+    if (tunnelCount == 2) return config.tunnelDisplayBonusValue * 3; // 15
+    return config.tunnelDisplayBonusValue * 5; // 25 for 3+
+  }
+
+  /// Check if hand can win with 8 Dublees (8 pairs of same rank+suit).
+  bool canWinWith8Dublee(List<Card> hand) {
+    if (!config.eightDubleeWinEnabled) return false;
+    if (hand.length < 16) return false; // Need at least 16 cards for 8 pairs
+
+    // Group cards by rank+suit key
+    final Map<String, int> cardCounts = {};
+    for (final card in hand) {
+      if (card.isJoker) continue;
+      final key = '${card.rank.value}_${card.suit.index}';
+      cardCounts[key] = (cardCounts[key] ?? 0) + 1;
+    }
+
+    // Count pairs (2 or more of same card)
+    int pairCount = 0;
+    for (final count in cardCounts.values) {
+      pairCount += count ~/ 2; // Integer division gives number of pairs
+    }
+
+    return pairCount >= 8;
+  }
 }
 
 /// Information about a Maal card

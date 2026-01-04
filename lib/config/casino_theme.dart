@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Casino-themed color palette for premium gaming experience
 /// Aligned with ClubRoyale brand: Royal Purple + Gold
@@ -9,6 +10,12 @@ class CasinoColors {
   static const Color richPurple = Color(0xFF4A1C6F); // ClubRoyale royal purple
 
   // Purple Table Colors
+  // Green Felt Table Colors (New Premium Theme)
+  static const Color tableGreenDark = Color(0xFF0D3B2E); // Deep radial green (Edge)
+  static const Color tableGreenMid = Color(0xFF165B47); // Warning/Mid green
+  static const Color tableGreenLight = Color(0xFF1F7A5E); // Center spotlight green
+  
+  // Legacy Purple Table Colors (Keep for other modes if needed, or deprecate)
   static const Color feltGreenDark = Color(0xFF1f1035); // Purple dark
   static const Color feltGreenMid = Color(0xFF3b2066); // Purple mid
   static const Color feltGreenLight = Color(0xFF5a3a87); // Purple light
@@ -37,10 +44,40 @@ class CasinoColors {
     colors: [feltGreenMid, feltGreenDark],
   );
 
+  static const RadialGradient greenFeltGradient = RadialGradient(
+    center: Alignment.center,
+    radius: 1.2,
+    colors: [tableGreenLight, tableGreenMid, tableGreenDark],
+    stops: [0.0, 0.6, 1.0],
+  );
+
   static const LinearGradient feltTableGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [feltGreenLight, feltGreenMid, feltGreenDark],
+    stops: [0.0, 0.5, 1.0],
+  );
+
+  // Classic Casino Green Theme (Alternative)
+  static const RadialGradient classicGreenFeltGradient = RadialGradient(
+    center: Alignment.center,
+    radius: 1.2,
+    colors: [
+      Color(0xFF1B5E20), // Light green center
+      Color(0xFF0D4B14), // Mid green
+      Color(0xFF042808), // Dark green edge
+    ],
+    stops: [0.0, 0.6, 1.0],
+  );
+
+  static const LinearGradient classicGreenTableGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      Color(0xFF1B5E20),
+      Color(0xFF0D4B14),
+      Color(0xFF042808),
+    ],
     stops: [0.0, 0.5, 1.0],
   );
 
@@ -83,10 +120,61 @@ class CasinoColors {
   ];
 
   // ThemeData for Casino
+  // Common Text Theme
+  static TextTheme get _textTheme => TextTheme(
+    displayLarge: GoogleFonts.oswald(
+      fontSize: 57, 
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    displayMedium: GoogleFonts.oswald(
+      fontSize: 45, 
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    displaySmall: GoogleFonts.oswald(
+      fontSize: 36, 
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    headlineLarge: GoogleFonts.oswald(
+      fontSize: 32, 
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    headlineMedium: GoogleFonts.oswald(
+      fontSize: 28, 
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    titleLarge: GoogleFonts.roboto(
+      fontSize: 22, 
+      fontWeight: FontWeight.w500,
+      color: Colors.white,
+    ),
+    titleMedium: GoogleFonts.roboto(
+      fontSize: 16, 
+      fontWeight: FontWeight.w500,
+      color: Colors.white,
+    ),
+    bodyLarge: GoogleFonts.roboto(
+      fontSize: 16, 
+      fontWeight: FontWeight.normal,
+      color: Colors.white,
+    ),
+    bodyMedium: GoogleFonts.roboto(
+      fontSize: 14, 
+      fontWeight: FontWeight.normal,
+      color: Colors.white70,
+    ),
+  );
+
+  // ThemeData for Casino (Purple - Legacy/Default)
   static ThemeData get darkTheme => ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: darkPurple,
+    textTheme: _textTheme,
     colorScheme: ColorScheme.dark(
       primary: gold,
       secondary: richPurple,
@@ -108,6 +196,39 @@ class CasinoColors {
         foregroundColor: darkPurple,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+    ),
+  );
+
+  // ThemeData for Casino (Royal Green - Premium)
+  static ThemeData get greenTheme => ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.dark,
+    scaffoldBackgroundColor: tableGreenDark,
+    textTheme: _textTheme,
+    colorScheme: ColorScheme.dark(
+      primary: gold,
+      secondary: tableGreenMid,
+      surface: const Color(0xFF0F2B22), // Darker green surface
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      foregroundColor: Colors.white,
+    ),
+    cardTheme: CardThemeData(
+      color: const Color(0xFF0F2B22),
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: gold,
+        foregroundColor: tableGreenDark, // Dark text on gold
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     ),
   );

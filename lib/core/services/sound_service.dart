@@ -203,4 +203,66 @@ class SoundService {
       await playRoundEnd();
     }
   }
+
+  // === NEW: Card-specific sounds ===
+
+  /// Play card deal sound (when cards are dealt to players)
+  static Future<void> playCardDeal() async {
+    HapticFeedback.lightImpact();
+    try {
+      await _sfxPlayer.play(AssetSource('sounds/cards/card_deal.ogg'), volume: 0.7);
+    } catch (_) {
+      await playCardSlide();
+    }
+  }
+
+  /// Play card flip sound (when card is revealed)
+  static Future<void> playCardFlip() async {
+    HapticFeedback.lightImpact();
+    try {
+      await _sfxPlayer.play(AssetSource('sounds/cards/card_flip.ogg'), volume: 0.8);
+    } catch (_) {
+      await playCardSlide();
+    }
+  }
+
+  /// Play card pickup sound (when drawing from deck/discard)
+  static Future<void> playCardPickup() async {
+    HapticFeedback.selectionClick();
+    try {
+      await _sfxPlayer.play(AssetSource('sounds/cards/card_pickup.ogg'), volume: 0.7);
+    } catch (_) {
+      await playCardSlide();
+    }
+  }
+
+  /// Play card place sound (when discarding a card)
+  static Future<void> playCardPlace() async {
+    HapticFeedback.lightImpact();
+    try {
+      await _sfxPlayer.play(AssetSource('sounds/cards/card_place.ogg'), volume: 0.8);
+    } catch (_) {
+      await playCardSlide();
+    }
+  }
+
+  /// Play "your turn" notification sound
+  static Future<void> playYourTurn() async {
+    HapticFeedback.mediumImpact();
+    try {
+      await _sfxPlayer.play(AssetSource('sounds/ui/notification.ogg'), volume: 0.6);
+    } catch (_) {
+      await _playSound('sounds/ding.mp3', volume: 0.5);
+    }
+  }
+
+  /// Play visit success sound (when player visits/veshows)
+  static Future<void> playVisit() async {
+    HapticFeedback.heavyImpact();
+    try {
+      await _sfxPlayer.play(AssetSource('sounds/ui/success.ogg'), volume: 0.9);
+    } catch (_) {
+      await playMaalDeclare();
+    }
+  }
 }

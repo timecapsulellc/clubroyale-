@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/store/theme_store_provider.dart';
+import 'package:clubroyale/config/casino_theme.dart';
 
 /// Dynamic table layout that uses the user's selected theme
 class TableLayout extends ConsumerWidget {
@@ -13,13 +14,8 @@ class TableLayout extends ConsumerWidget {
     final theme = ref.watch(selectedThemeProvider);
 
     return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF121212), // Dark ambient background
-        image: DecorationImage(
-          image: AssetImage('assets/images/tables/table_oval_premium.png'),
-          fit: BoxFit.cover, // Fill the screen for better mobile visibility
-          alignment: Alignment.center,
-        ),
+      decoration: const BoxDecoration(
+        gradient: CasinoColors.greenFeltGradient,
       ),
       child: SafeArea(
         child: Stack(
