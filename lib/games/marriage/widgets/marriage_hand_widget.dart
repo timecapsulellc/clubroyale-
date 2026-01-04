@@ -4,6 +4,8 @@ import 'package:clubroyale/features/game/ui/components/card_widget.dart';
 import 'package:clubroyale/core/card_engine/meld.dart';
 
 import 'package:clubroyale/core/theme/app_theme.dart';
+import 'package:clubroyale/core/services/haptic_service.dart';
+import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart'; // For Maal badges
 import 'package:clubroyale/games/marriage/marriage_config.dart';
 
@@ -256,6 +258,8 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                 onWillAcceptWithDetails: (details) => true,
                 onAcceptWithDetails: (details) {
                   _moveCardToNewGroup(details.data);
+                  HapticService.mediumImpact();
+                  SoundService.playCardPlace();
                 },
                 builder: (context, candidates, rejects) {
                   return Container(
@@ -411,6 +415,10 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                       _groups.removeWhere((g) => g.isEmpty);
                       // Add to this group
                       _groups[groupIndex].add(card);
+                      
+                      // Feedback
+                      HapticService.mediumImpact();
+                      SoundService.playCardPlace();
                     });
                   },
                   builder: (context, candidates, rejects) {
@@ -452,10 +460,13 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                       ),
                     ),
                     onDragStarted: () {
-                      // Provide haptic feedback
+                      HapticService.cardTap(); // Selection feeling
                     },
                     child: GestureDetector(
-                      onTap: () => widget.onCardSelected(group[i].id),
+                      onTap: () {
+                        HapticService.selectionClick();
+                        widget.onCardSelected(group[i].id);
+                      },
                       behavior: HitTestBehavior.opaque,
                       child: Transform.scale(
                         scale: widget.scale,

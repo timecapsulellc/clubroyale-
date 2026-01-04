@@ -313,12 +313,21 @@ class ConfettiOverlay extends StatelessWidget {
               left: startX,
               top: -20,
               child:
+            final shape = index % 3 == 0 ? BoxShape.circle : BoxShape.rectangle;
+
+            return Positioned(
+              left: startX,
+              top: -20,
+              child:
                   Container(
                         width: size,
-                        height: size * 1.5,
+                        height: size * (shape == BoxShape.circle ? 1.0 : 1.5),
                         decoration: BoxDecoration(
                           color: color,
-                          borderRadius: BorderRadius.circular(2),
+                          shape: shape,
+                          borderRadius: shape == BoxShape.rectangle
+                              ? BorderRadius.circular(2)
+                              : null,
                         ),
                       )
                       .animate(delay: Duration(milliseconds: delay))
@@ -344,57 +353,4 @@ class ConfettiOverlay extends StatelessWidget {
   }
 }
 
-/// Simple defeat overlay (less celebratory)
-class DefeatOverlay extends StatelessWidget {
-  final String winnerName;
-  final int pointsLost;
-  final VoidCallback? onDismiss;
 
-  const DefeatOverlay({
-    super.key,
-    required this.winnerName,
-    required this.pointsLost,
-    this.onDismiss,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onDismiss,
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.8),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.sentiment_dissatisfied,
-                size: 60,
-                color: Colors.grey,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                '$winnerName Wins',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '-$pointsLost points',
-                style: const TextStyle(fontSize: 18, color: Colors.red),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Tap to continue',
-                style: TextStyle(color: Colors.white54),
-              ),
-            ],
-          ).animate().fadeIn().slideY(begin: 0.1, end: 0),
-        ),
-      ),
-    );
-  }
-}
