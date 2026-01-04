@@ -31,117 +31,126 @@ class RightArcGameController extends StatelessWidget {
 
     // Center point of the arc is roughly off-screen to the right-center.
 
-    return SizedBox(
-      width: 120, // Width of the control area
-      height: 350, // Height of the control area
-      child: Stack(
-        alignment: Alignment.centerRight,
-        clipBehavior: Clip.none,
-        children: [
-          // Background "Arc" visual (optional, wireframe in reference)
-          Positioned(
-            right: -50,
-            child: Container(
-              width: 150,
-              height: 400,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  width: 2,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Calculate responsive radius based on height
+        final height = constraints.maxHeight > 0 ? constraints.maxHeight : 350.0;
+        final radius = (height * 0.4).clamp(60.0, 100.0);
+        final centerY = height / 2;
+        
+        return SizedBox(
+          width: 120,
+          height: height,
+          child: Stack(
+            alignment: Alignment.centerRight,
+            clipBehavior: Clip.none,
+            children: [
+              // Background "Arc" visual
+              Positioned(
+                right: -radius * 0.6,
+                top: centerY - (radius * 2.5),
+                child: Container(
+                  width: radius * 2,
+                  height: radius * 5,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      width: 2,
+                    ),
+                    shape: BoxShape.circle,
+                  ),
                 ),
-                shape: BoxShape.circle,
               ),
-            ),
-          ),
 
-          // Buttons positioned along the arc
-          // Top-most: DUB (Dublee)
-          // Upper-Mid: SEQ (Sequence)
-          // Lower-Mid: SHOW (Show Cards / Finish)
-          // Bottom: CAN (Cancel)
-          _buildArcPositioned(
-            angleDegrees: -45, // Top
-            child: _ArcButton(
-              label: 'DUB',
-              onTap: onDublee,
-              isEnabled: isDubleeEnabled,
-            ),
-          ),
+              _buildArcPositioned(
+                angleDegrees: -45, // Top
+                centerY: centerY,
+                radius: radius,
+                child: _ArcButton(
+                  label: 'DUB',
+                  onTap: onDublee,
+                  isEnabled: isDubleeEnabled,
+                ),
+              ),
 
-          _buildArcPositioned(
-            angleDegrees: -15, // Upper Mid
-            child: _ArcButton(
-              label: 'SEQ',
-              onTap: onSequence,
-              isEnabled: isSequenceEnabled,
-            ),
-          ),
+              _buildArcPositioned(
+                angleDegrees: -15, // Upper Mid
+                centerY: centerY,
+                radius: radius,
+                child: _ArcButton(
+                  label: 'SEQ',
+                  onTap: onSequence,
+                  isEnabled: isSequenceEnabled,
+                ),
+              ),
 
-          _buildArcPositioned(
-            angleDegrees: 15, // Lower Mid (Main action really)
-            child: _ArcButton(
-              label: 'SHOW',
-              labelVertical: true,
-              isLarge: true,
-              onTap: onShowCards,
-              isEnabled: isShowEnabled,
-            ),
-          ),
+              _buildArcPositioned(
+                angleDegrees: 15, // Lower Mid
+                centerY: centerY,
+                radius: radius,
+                child: _ArcButton(
+                  label: 'SHOW',
+                  labelVertical: true,
+                  isLarge: true,
+                  onTap: onShowCards,
+                  isEnabled: isShowEnabled,
+                ),
+              ),
 
-          _buildArcPositioned(
-            angleDegrees: 45, // Bottom
-            child: _ArcButton(
-              label: 'CAN',
-              onTap: onCancel,
-              isEnabled: isCancelEnabled,
-            ),
+              _buildArcPositioned(
+                angleDegrees: 45, // Bottom
+                centerY: centerY,
+                radius: radius,
+                child: _ArcButton(
+                  label: 'CAN',
+                  onTap: onCancel,
+                  isEnabled: isCancelEnabled,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildArcPositioned({
     required double angleDegrees,
+    required double centerY,
+    required double radius,
     required Widget child,
   }) {
-    // Radius of our virtual arc
-    const double radius = 80;
-
-    // Convert angle to radians
-    final angle = angleDegrees * (math.pi / 180);
-
-    // Calculate x, y based on angle relative to center-right
-    // 0 degrees is directly Left of the center point (since arc is on Right)
-    // Wait, let's simplify.
-    // We just want vertically distributed with slight x-offset.
-
-    // Simple approach: Use Positioned relative to the container.
-    // Container is 120w x 350h. Center is (60, 175).
-
-    double yOffset = 0;
-    double xOffset = 0;
-
-    if (angleDegrees == -45) {
-      yOffset = -120;
-      xOffset = 20;
-    }
-    if (angleDegrees == -15) {
-      yOffset = -40;
+    // 0 degrees is horizontal right.
+    // -45 is up, +45 is down.
+    
+    // Simple vertical distribution with curve
+    // Height diff calculation
+    // Y = Sin(angle) * Radius
+    // X = Cos(angle) * Radius (offset from right edge)
+    
+    // We want the curve to bow out to the left
+    
+    double yOffset;
+    double xOffset;
+    
+    // Custom mapping for layout fit
+     if (angleDegrees == -45) {
+      yOffset = -radius * 1.5;
+      xOffset = 16;
+    } else if (angleDegrees == -15) {
+      yOffset = -radius * 0.5;
       xOffset = 0;
-    }
-    if (angleDegrees == 15) {
-      yOffset = 60;
+    } else if (angleDegrees == 15) {
+      yOffset = radius * 0.7; // Larger gap for SHOW button
       xOffset = 0;
-    }
-    if (angleDegrees == 45) {
-      yOffset = 140;
-      xOffset = 20;
+    } else { // 45
+      yOffset = radius * 1.8;
+      xOffset = 16;
     }
 
     return Positioned(
-      right: 16 + xOffset, // Pushed against right edge
-      top: 175 + yOffset - 30, // CenterY + Offset - HalfHeight
+      right: 16 + xOffset,
+      top: centerY + yOffset - 30, 
       child: child,
     );
   }

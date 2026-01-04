@@ -66,6 +66,7 @@ class _MarriageMultiplayerScreenState
   bool _showVideoGrid = false;
   bool _showTutorial = false; // Tutorial overlay state
   bool _showHints = true; // Toggle hints
+  bool _isSidebarOpen = false; // Controls GameActionsSidebar visibility
   GameHint? _currentHint; // Current active hint
   final Set<String> _highlightedCardIds = {};
   String? _previousTurnPlayerId; // Track for turn notification sound
@@ -322,30 +323,62 @@ class _MarriageMultiplayerScreenState
                             ),
 
                             // 2. HUD Layer - Left Sidebar (Actions)
-                            // Only visible/interactable if needed, or always visible?
-                            // Reference shows it as a slide-out or persistent left bar.
-                            // We'll place it center-left.
+                            // Collapsible Sidebar with Backdrop
+                            if (_isSidebarOpen)
+                              Positioned.fill(
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      setState(() => _isSidebarOpen = false),
+                                  child: Container(
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ),
+                              
+                            AnimatedPositioned(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                              left: _isSidebarOpen ? 0 : -220,
+                              top: 0,
+                              bottom: 0,
+                              width: 220,
+                              child: GameActionsSidebar(
+                                onShowSequence: () {
+                                  _handleShowSequence(state);
+                                  setState(() => _isSidebarOpen = false);
+                                },
+                                onShowDublee: () {
+                                  _handleShowDublee(state);
+                                  setState(() => _isSidebarOpen = false);
+                                },
+                                onFinishGame: isMyTurn
+                                    ? () {
+                                        _handleShow(state);
+                                        setState(() => _isSidebarOpen = false);
+                                      }
+                                    : null,
+                                onCancelAction: () {
+                                  // Handle cancel
+                                  setState(() => _isSidebarOpen = false);
+                                },
+                                onGetTunela: () {
+                                  // Handle get tunela
+                                  setState(() => _isSidebarOpen = false);
+                                },
+                                onQuitGame: () => context.go('/lobby'),
+                              ),
+                            ),
+
+                            // Menu Button (to open sidebar)
                             Positioned(
-                              left: 0,
-                              top: 100,
-                              bottom: 100, // Constrain height
-                              child: Center(
-                                child: GameActionsSidebar(
-                                  onShowSequence: () =>
-                                      _handleShowSequence(state),
-                                  onShowDublee: () => _handleShowDublee(
-                                    state,
-                                  ), // Optional feature
-                                  onFinishGame: isMyTurn
-                                      ? () => _handleShow(state)
-                                      : null,
-                                  onCancelAction: () {
-                                    /* Handle cancel logic */
-                                  },
-                                  onGetTunela: () {
-                                    /* Handle get tunela */
-                                  },
-                                  onQuitGame: () => context.go('/lobby'),
+                              top: 70, // Below TopBar
+                              left: 16,
+                              child: SafeArea(
+                                child: FloatingActionButton.small(
+                                  backgroundColor: const Color(0xFF2F4F4F),
+                                  foregroundColor: Colors.white,
+                                  onPressed: () => setState(() => _isSidebarOpen = true),
+                                  child: const Icon(Icons.menu),
                                 ),
                               ),
                             ),
@@ -353,8 +386,8 @@ class _MarriageMultiplayerScreenState
                             // 3. HUD Layer - Right Arc Controller
                             Positioned(
                               right: 0,
-                              top: 100,
-                              bottom: 150, // Avoid overlapping hand too much
+                              top: 100, // Reduced top margin
+                              bottom: 50, // Reduced bottom margin
                               child: Center(
                                 child: RightArcGameController(
                                   onShowCards: isMyTurn
@@ -362,14 +395,8 @@ class _MarriageMultiplayerScreenState
                                       : null,
                                   onSequence: () => _handleShowSequence(state),
                                   onDublee: () => _handleShowDublee(state),
-                                  onCancel: () {
-                                    /* Handle Cancel */
-                                  },
-                                  isShowEnabled:
-                                      isMyTurn &&
-                                      !state
-                                          .isDrawingPhase, // Only show after discard/drawing? Check rules.
-                                  // Actually SHOW is usually finishing the game.
+                                  onCancel: () {},
+                                  isShowEnabled: isMyTurn && !state.isDrawingPhase,
                                   isSequenceEnabled: true,
                                   isDubleeEnabled: true,
                                   isCancelEnabled: true,
@@ -377,13 +404,12 @@ class _MarriageMultiplayerScreenState
                               ),
                             ),
 
-                            // 4. HUD Layer - Game Log Overlay (Left)
+                            // 4. HUD Layer - Game Log Overlay (Left - pushed down if sidebar active?? No, sidebar overlays)
                             Positioned(
                               left: 16,
-                              top: 120, // Below top bars
+                              bottom: 120, // Moved to bottom-left to avoid top clutter
                               child: GameLogOverlay(
-                                logs:
-                                    const [], // TODO: Add activity log to MarriageGameState
+                                logs: const [],
                               ),
                             ),
 
@@ -402,13 +428,10 @@ class _MarriageMultiplayerScreenState
                                   child: VideoGridWidget(
                                     roomId: widget.roomId,
                                     userId: currentUser.uid,
-                                    userName:
-                                        currentUser.displayName ?? 'Player',
+                                    userName: currentUser.displayName ?? 'Player',
                                   ),
                                 ),
                               ),
-
-                            // Chat Overlay moved to top right
 
                             // Game Mode Banner (Moved from Center Area)
                             Positioned(
@@ -466,16 +489,16 @@ class _MarriageMultiplayerScreenState
                         ),
                       ),
 
-                      // Video/Audio Controls (Floating Top Right, below TopBar)
+                      // Video/Audio Controls (Responsive Row at Top Right)
                       Positioned(
-                        top: 70,
+                        top: 56, // Just below TopBar
                         right: 16,
-                        child: Column(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Chat Button (Top)
+                            // Chat Button
                             Container(
-                              margin: const EdgeInsets.only(bottom: 8),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
                               child: ChatOverlay(
                                 roomId: widget.roomId,
                                 userId: currentUser.uid,
@@ -486,44 +509,53 @@ class _MarriageMultiplayerScreenState
                                 ),
                               ),
                             ),
+                            // Video Toggle
                             Container(
-                              margin: const EdgeInsets.only(bottom: 8),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
                               decoration: BoxDecoration(
                                 color: Colors.black.withValues(alpha: 0.3),
                                 shape: BoxShape.circle,
                                 border: Border.all(color: Colors.white24),
                               ),
                               child: IconButton(
+                                constraints: const BoxConstraints.tightFor(width: 36, height: 36),
                                 icon: Icon(
                                   _showVideoGrid
                                       ? Icons.videocam
                                       : Icons.videocam_off,
                                   color: Colors.white,
-                                  size: 20,
+                                  size: 18,
                                 ),
+                                padding: EdgeInsets.zero,
                                 onPressed: () => setState(
                                   () => _showVideoGrid = !_showVideoGrid,
                                 ),
                               ),
                             ),
-                            AudioFloatingButton(
-                              roomId: widget.roomId,
-                              userId: currentUser.uid,
+                            // Audio Toggle
+                            Container(
+                               margin: const EdgeInsets.symmetric(horizontal: 4),
+                               child: AudioFloatingButton(
+                                roomId: widget.roomId,
+                                userId: currentUser.uid,
+                              ),
                             ),
                             // Help Button
                             Container(
-                              margin: const EdgeInsets.only(top: 8),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
                               decoration: BoxDecoration(
                                 color: CasinoColors.gold.withValues(alpha: 0.2),
                                 shape: BoxShape.circle,
                                 border: Border.all(color: CasinoColors.gold),
                               ),
                               child: IconButton(
+                                constraints: const BoxConstraints.tightFor(width: 36, height: 36),
                                 icon: const Icon(
                                   Icons.help_outline,
                                   color: CasinoColors.gold,
-                                  size: 22,
+                                  size: 20,
                                 ),
+                                padding: EdgeInsets.zero,
                                 onPressed: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
