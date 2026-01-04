@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/core/models/playing_card.dart';
+import 'package:clubroyale/features/game/ui/components/card_widget.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
 
@@ -41,7 +42,7 @@ void main() {
     // Wait, Flutter test finder might not find customized widgets easily if wrapped.
     // Draggable is used.
 
-    expect(find.text('AUTO GROUP'), findsOneWidget);
+    expect(find.text('GROUP'), findsOneWidget);
   });
 
   testWidgets('MarriageHandWidget interaction selects card', (
@@ -62,11 +63,13 @@ void main() {
       ),
     );
 
-    // Tap the card
-    // The card is inside Draggable -> GestureDetector
-    await tester.tap(
-      find.byType(GestureDetector).last,
-    ); // Last might be the card
+    // Tap the card - Finding by Key or specific widget is better
+    // Inside MarriageHandWidget, cards are LongPressDraggable -> GestureDetector -> Transform -> _buildCardWithBadges -> ... -> CardWidget
+    // Let's find the CardWidget (from core components)
+    // There is one card in the list
+    expect(find.byType(CardWidget), findsOneWidget);
+    
+    await tester.tap(find.byType(CardWidget));
     await tester.pump();
 
     expect(selectedId, card.id);

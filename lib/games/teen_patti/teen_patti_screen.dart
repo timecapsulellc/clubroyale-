@@ -24,6 +24,8 @@ import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
+import 'package:clubroyale/features/game/ui/components/unified_game_sidebar.dart';
+import 'package:clubroyale/features/game/ui/components/game_settings_modal.dart';
 
 class TeenPattiScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -39,7 +41,9 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
   bool _hasSeenCards = false;
   int _betAmount = 1;
   bool _isChatExpanded = false;
-  final bool _showVideoGrid = false;
+  bool _showVideoGrid = false;
+  // Pro Layout
+  bool _isSidebarOpen = false;
 
   // Tutorial state
   bool _showTutorial = true;
@@ -155,165 +159,158 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
         final myStatus = state.playerStatus[currentUser.uid] ?? 'blind';
 
         return Scaffold(
-          extendBodyBehindAppBar: true, // Allow table to show behind app bar
-          appBar: AppBar(
-            backgroundColor: Colors.transparent, // Let table show through
-            elevation: 0,
-            leading: Container(
-              margin: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.black26,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => context.go('/lobby'),
-              ),
-            ),
-            title: const Text(
-              'Teen Patti',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            centerTitle: true,
-            actions: [
-              // Help/Menu Button for consistency
-              Container(
-                key: _rulesKey,
-                margin: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black26,
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.help_outline, color: Colors.white),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (c) => AlertDialog(
-                        backgroundColor: CasinoColors.cardBackground,
-                        title: const Text(
-                          'Teen Patti Rules (Flash)',
-                          style: TextStyle(color: CasinoColors.gold),
-                        ),
-                        content: const SingleChildScrollView(
-                          child: Text(
-                            '1. Highest to Lowest Rankings:\n'
-                            '   • TRAIL (Set): 3 cards of same rank (AAA is highest)\n'
-                            '   • PURE SEQUENCE: 3 consecutive cards of same suit\n'
-                            '   • SEQUENCE: 3 consecutive cards\n'
-                            '   • COLOR: 3 cards of same suit\n'
-                            '   • PAIR: 2 cards of same rank\n'
-                            '   • HIGH CARD: Highest individual card\n\n'
-                            '2. Blind vs Seen:\n'
-                            '   • Blind player bets 1x.\n'
-                            '   • Seen player must bet 2x current stake.\n\n'
-                            '3. Show:\n'
-                            '   • Only possible when 2 players remain.',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(c),
-                            child: const Text('Got it'),
-                          ),
-                        ],
+          body: Stack(
+            children: [
+              // 1. Game Table Layer
+              TableLayout(
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 16),
+                      // Top spacer
+                      _buildGameModeBanner(state, currentUser.uid),
+                      _buildTurnIndicator(isMyTurn, myStatus),
+                      
+                      Expanded(
+                        flex: 2,
+                        child: _buildOpponentsArea(state, currentUser.uid),
                       ),
-                    );
-                  },
+                      
+                      Container(
+                        key: _potKey,
+                        child: _buildPotArea(state.pot),
+                      ),
+                      
+                      Expanded(
+                        flex: 3,
+                        child: Container(
+                          key: _cardsKey,
+                          child: _buildMyCards(myHand, myStatus),
+                        ),
+                      ),
+                      
+                      Container(
+                        key: _actionBarKey,
+                        child: _buildActionBar(isMyTurn, myStatus, state),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
-          body: TableLayout(
-            child: SafeArea(
-              child: Column(
-                children: [
-                  // _buildAppBar removed from body as we moved it to Scaffold.appBar
-                  SizedBox(height: kToolbarHeight),
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        Column(
-                          children: [
-                            // Game mode indicator
-                            _buildGameModeBanner(state, currentUser.uid),
-                            _buildTurnIndicator(isMyTurn, myStatus),
-                            Expanded(
-                              flex: 2,
-                              child: _buildOpponentsArea(
-                                state,
-                                currentUser.uid,
-                              ),
-                            ),
-                            Container(
-                              key: _potKey,
-                              child: _buildPotArea(state.pot),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: Container(
-                                key: _cardsKey,
-                                child: _buildMyCards(myHand, myStatus),
-                              ),
-                            ),
-                            Container(
-                              key: _actionBarKey,
-                              child: _buildActionBar(isMyTurn, myStatus, state),
-                            ),
-                          ],
-                        ),
-                        // Video Grid Overlay
-                        if (_showVideoGrid)
-                          Positioned(
-                            top: 60,
-                            right: 16,
-                            width: 200,
-                            height: 300,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black87,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: VideoGridWidget(
-                                roomId: widget.roomId,
-                                userId: currentUser.uid,
-                                userName: currentUser.displayName ?? 'Player',
-                              ),
-                            ),
-                          ),
-                        // Chat Overlay
-                        Positioned(
-                          bottom: 140, // Above hand
-                          left: 16,
-                          child: ChatOverlay(
-                            roomId: widget.roomId,
-                            userId: currentUser.uid,
-                            userName: currentUser.displayName ?? 'Player',
-                            isExpanded: _isChatExpanded,
-                            onToggle: () => setState(
-                              () => _isChatExpanded = !_isChatExpanded,
-                            ),
-                          ),
-                        ),
-                        // Tutorial Overlay
-                        if (_showTutorial)
-                          TutorialOverlay(
-                            steps: _tutorialSteps,
-                            onComplete: () =>
-                                setState(() => _showTutorial = false),
-                            onSkip: () => setState(() => _showTutorial = false),
-                          ),
-                      ],
+
+              // 2. Sidebar Backdrop
+               if (_isSidebarOpen)
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _isSidebarOpen = false),
+                    child: Container(color: Colors.black54),
+                  ),
+                ),
+
+              // 3. Sidebar
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                left: _isSidebarOpen ? 0 : -220,
+                top: 0,
+                bottom: 0,
+                width: 220,
+                child: UnifiedGameSidebar(
+                  roomId: widget.roomId,
+                  userId: currentUser.uid,
+                  headerContent: Column(
+                    children: [
+                       const Text('Teen Patti', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                       const SizedBox(height: 4),
+                       Text('Room: ${widget.roomId.substring(0, 4)}', style: const TextStyle(color: Colors.white54, fontSize: 10)),
+                    ],
+                  ),
+                  onSettings: () => GameSettingsModal.show(context, gameName: 'Teen Patti'),
+                  onHelp: () => _showRules(context),
+                  onQuitGame: () => context.go('/lobby'),
+                  onToggleChat: () => setState(() { _isSidebarOpen = false; _isChatExpanded = !_isChatExpanded; }),
+                  onToggleVideo: () => setState(() { _isSidebarOpen = false; _showVideoGrid = !_showVideoGrid; }),
+                ),
+              ),
+
+              // 4. Smart Menu Button
+              Positioned(
+                top: 16,
+                left: 16,
+                child: SafeArea(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.grid_view_rounded, color: Colors.white70),
+                      onPressed: () => setState(() => _isSidebarOpen = true),
+                      tooltip: 'Menu',
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
+
+              // 5. Overlays
+              if (_showVideoGrid)
+                Positioned(
+                  top: 60, right: 16, width: 200, height: 300,
+                  child: VideoGridWidget(roomId: widget.roomId, userId: currentUser.uid, userName: currentUser.displayName ?? 'Player'),
+                ),
+
+              if (_isChatExpanded)
+                Positioned(
+                  bottom: 160, left: 16,
+                  child: ChatOverlay(
+                    roomId: widget.roomId,
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName ?? 'Player',
+                    isExpanded: true,
+                    onToggle: () => setState(() => _isChatExpanded = false),
+                  ),
+                ),
+
+              if (_showTutorial)
+                TutorialOverlay(
+                  steps: _tutorialSteps,
+                  onComplete: () => setState(() => _showTutorial = false),
+                  onSkip: () => setState(() => _showTutorial = false),
+                ),
+            ],
           ),
         );
       },
     );
+  }
+
+  void _showRules(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          backgroundColor: CasinoColors.cardBackground,
+          title: const Text('Teen Patti Rules (Flash)', style: TextStyle(color: CasinoColors.gold)),
+          content: const SingleChildScrollView(
+            child: Text(
+              '1. Highest to Lowest Rankings:\n'
+              '   • TRAIL (Set): 3 cards of same rank (AAA is highest)\n'
+              '   • PURE SEQUENCE: 3 consecutive cards of same suit\n'
+              '   • SEQUENCE: 3 consecutive cards\n'
+              '   • COLOR: 3 cards of same suit\n'
+              '   • PAIR: 2 cards of same rank\n'
+              '   • HIGH CARD: Highest individual card\n\n'
+              '2. Blind vs Seen:\n'
+              '   • Blind player bets 1x.\n'
+              '   • Seen player must bet 2x current stake.\n\n'
+              '3. Show:\n'
+              '   • Only possible when 2 players remain.',
+              style: TextStyle(color: Colors.white70),
+            ),
+          ),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('Got it'))],
+        ),
+      );
   }
 
   Widget _buildPotBadge(int pot) {

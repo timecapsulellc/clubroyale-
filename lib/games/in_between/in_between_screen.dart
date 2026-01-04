@@ -20,10 +20,11 @@ import 'package:clubroyale/games/in_between/in_between_service.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
-import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:clubroyale/features/game/ui/components/table_layout.dart';
+import 'package:clubroyale/features/game/ui/components/unified_game_sidebar.dart';
+import 'package:clubroyale/features/game/ui/components/game_settings_modal.dart';
 
 class InBetweenScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -40,6 +41,8 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
   String? _lastResult;
   bool _isChatExpanded = false;
   bool _showVideoGrid = false;
+  // Pro Layout
+  bool _isSidebarOpen = false;
 
   // Tutorial state
   bool _showTutorial = true;
@@ -167,102 +170,17 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
         final maxBet = myChips < state.pot ? myChips : state.pot;
 
         return Scaffold(
-          extendBodyBehindAppBar: true,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.black26,
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => context.go('/lobby'),
-                ),
-              ),
-            ),
-            title: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  GameTerminology.inBetweenGame,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 12),
-                _buildChipsBadge(myChips),
-              ],
-            ),
-            centerTitle: true,
-            actions: [
-              // Help Button
-              Container(
-                key: _rulesKey,
-                child: IconButton(
-                  icon: const Icon(Icons.help_outline),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (c) => AlertDialog(
-                        backgroundColor: CasinoColors.cardBackground,
-                        title: Text(
-                          '${GameTerminology.inBetweenGame} Rules',
-                          style: const TextStyle(color: CasinoColors.gold),
-                        ),
-                        content: const Text(
-                          '1. Place a bet based on the probability.\n'
-                          '2. A "Low" and "High" card are dealt.\n'
-                          '3. A third "Middle" card is dealt.\n'
-                          '4. WIN if the Middle card is literally in-between.\n'
-                          '5. LOSE if outside the range.\n'
-                          '6. POST (Hit the Post): If Middle card matches High or Low, you lose 2x the bet!',
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(c),
-                            child: const Text('Got it'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  tooltip: 'Rules',
-                ),
-              ),
-              _buildPotBadge(state.pot),
-              // Video Toggle
-              IconButton(
-                icon: Icon(
-                  _showVideoGrid ? Icons.videocam_off : Icons.videocam,
-                ),
-                onPressed: () =>
-                    setState(() => _showVideoGrid = !_showVideoGrid),
-                tooltip: _showVideoGrid ? 'Hide Video' : 'Show Video',
-              ),
-              // Audio Mute/Unmute
-              AudioFloatingButton(
-                roomId: widget.roomId,
-                userId: currentUser.uid,
-              ),
-              const SizedBox(width: 8),
-            ],
-          ),
-          body: TableLayout(
-            child: Stack(
-              children: [
-                SafeArea(
+          body: Stack(
+            children: [
+              // 1. Game Table Layer
+              TableLayout(
+                child: SafeArea(
                   child: SingleChildScrollView(
                     child: SizedBox(
-                      height:
-                          MediaQuery.of(context).size.height -
-                          kToolbarHeight -
-                          20, // Ensure min height for layout
+                      height: MediaQuery.of(context).size.height,
                       child: Column(
                         children: [
-                          SizedBox(height: kToolbarHeight + 10),
+                          const SizedBox(height: 16),
                           // Game mode indicator
                           _buildGameModeBanner(state),
 
@@ -302,56 +220,124 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
                             key: _actionsKey,
                             child: _buildActionBar(isMyTurn, state),
                           ),
+                          
+                          // Bottom padding
+                          const SizedBox(height: 16),
                         ],
                       ),
                     ),
                   ),
                 ),
-                // Video Grid Overlay
-                if (_showVideoGrid)
-                  Positioned(
-                    top: 60,
-                    right: 16,
-                    width: 200,
-                    height: 300,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black87,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: VideoGridWidget(
-                        roomId: widget.roomId,
-                        userId: currentUser.uid,
-                        userName: currentUser.displayName ?? 'Player',
-                      ),
+              ),
+
+              // 2. Sidebar Backdrop
+              if (_isSidebarOpen)
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _isSidebarOpen = false),
+                    child: Container(color: Colors.black54),
+                  ),
+                ),
+
+              // 3. Sidebar
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                left: _isSidebarOpen ? 0 : -220,
+                top: 0,
+                bottom: 0,
+                width: 220,
+                child: UnifiedGameSidebar(
+                  roomId: widget.roomId,
+                  userId: currentUser.uid,
+                  headerContent: Column(
+                    children: [
+                       Text(GameTerminology.inBetweenGame, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                       const SizedBox(height: 4),
+                       Text('Room: ${widget.roomId.substring(0, 4)}', style: const TextStyle(color: Colors.white54, fontSize: 10)),
+                    ],
+                  ),
+                  onSettings: () => GameSettingsModal.show(context, gameName: 'In-Between'),
+                  onHelp: () => _showRules(context),
+                  onQuitGame: () => context.go('/lobby'),
+                  onToggleChat: () => setState(() { _isSidebarOpen = false; _isChatExpanded = !_isChatExpanded; }),
+                  onToggleVideo: () => setState(() { _isSidebarOpen = false; _showVideoGrid = !_showVideoGrid; }),
+                ),
+              ),
+
+              // 4. Smart Menu Button
+              Positioned(
+                top: 16,
+                left: 16,
+                child: SafeArea(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.grid_view_rounded, color: Colors.white70),
+                      onPressed: () => setState(() => _isSidebarOpen = true),
+                      tooltip: 'Menu',
                     ),
                   ),
-                // Chat Overlay
+                ),
+              ),
+
+              // 5. Overlays
+              if (_showVideoGrid)
                 Positioned(
-                  bottom: 140, // Above hand
-                  left: 16,
+                  top: 60, right: 16, width: 200, height: 300,
+                  child: VideoGridWidget(roomId: widget.roomId, userId: currentUser.uid, userName: currentUser.displayName ?? 'Player'),
+                ),
+                
+              if (_isChatExpanded)
+                Positioned(
+                  bottom: 140, left: 16,
                   child: ChatOverlay(
                     roomId: widget.roomId,
                     userId: currentUser.uid,
                     userName: currentUser.displayName ?? 'Player',
-                    isExpanded: _isChatExpanded,
-                    onToggle: () =>
-                        setState(() => _isChatExpanded = !_isChatExpanded),
+                    isExpanded: true,
+                    onToggle: () => setState(() => _isChatExpanded = false),
                   ),
                 ),
-                // Tutorial Overlay
-                if (_showTutorial)
-                  TutorialOverlay(
-                    steps: _tutorialSteps,
-                    onComplete: () => setState(() => _showTutorial = false),
-                    onSkip: () => setState(() => _showTutorial = false),
-                  ),
-              ],
-            ),
+
+              if (_showTutorial)
+                TutorialOverlay(
+                  steps: _tutorialSteps,
+                  onComplete: () => setState(() => _showTutorial = false),
+                  onSkip: () => setState(() => _showTutorial = false),
+                ),
+            ],
           ),
         );
       },
     );
+  }
+
+  void _showRules(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          backgroundColor: CasinoColors.cardBackground,
+          title: Text(
+            '${GameTerminology.inBetweenGame} Rules',
+            style: const TextStyle(color: CasinoColors.gold),
+          ),
+          content: const Text(
+            '1. Place a bet based on the probability.\n'
+            '2. A "Low" and "High" card are dealt.\n'
+            '3. A third "Middle" card is dealt.\n'
+            '4. WIN if the Middle card is literally in-between.\n'
+            '5. LOSE if outside the range.\n'
+            '6. POST (Hit the Post): If Middle card matches High or Low, you lose 2x the bet!',
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('Got it'))],
+        ),
+      );
   }
 
   Widget _buildChipsBadge(int chips) {

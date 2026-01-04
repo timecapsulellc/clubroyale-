@@ -71,6 +71,24 @@ class SoundService {
     setMusicMuted(muted);
   }
 
+  /// Set music volume (0.0 to 1.0)
+  static Future<void> setMusicVolume(double volume) async {
+    try {
+      await _bgmPlayer.setVolume(volume.clamp(0.0, 1.0));
+    } catch (e) {
+      debugPrint('Error setting music volume: $e');
+    }
+  }
+
+  /// Set SFX volume (0.0 to 1.0)
+  static Future<void> setSfxVolume(double volume) async {
+    try {
+      await _sfxPlayer.setVolume(volume.clamp(0.0, 1.0));
+    } catch (e) {
+      debugPrint('Error setting SFX volume: $e');
+    }
+  }
+
   // --- Music Control ---
 
   static Future<void> playLobbyMusic() async {

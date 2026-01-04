@@ -1,25 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 
-class GameActionsSidebar extends StatelessWidget {
+class GameActionsSidebar extends ConsumerWidget {
+  final String? roomId;
+  final String? userId;
   final VoidCallback? onShowSequence;
   final VoidCallback? onShowDublee;
   final VoidCallback? onFinishGame;
   final VoidCallback? onCancelAction;
   final VoidCallback? onGetTunela;
   final VoidCallback? onQuitGame;
+  final VoidCallback? onSettings;
+  final VoidCallback? onHelp;
+  final VoidCallback? onToggleChat;
+  final VoidCallback? onToggleVideo;
 
   const GameActionsSidebar({
     super.key,
+    this.roomId,
+    this.userId,
     this.onShowSequence,
     this.onShowDublee,
     this.onFinishGame,
     this.onCancelAction,
     this.onGetTunela,
     this.onQuitGame,
+    this.onSettings,
+    this.onHelp,
+    this.onToggleChat,
+    this.onToggleVideo,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       width: 200, // Fixed width matching reference
       decoration: BoxDecoration(
@@ -83,6 +97,29 @@ class GameActionsSidebar extends StatelessWidget {
               ),
             ),
           ),
+          
+          // Media Controls (Compact Row)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            color: const Color(0xFF2a4444),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _MediaIconButton(icon: Icons.chat, onTap: onToggleChat, tooltip: 'Chat'),
+                _MediaIconButton(icon: Icons.videocam, onTap: onToggleVideo, tooltip: 'Video'),
+                // Audio: Use AudioFloatingButton if roomId/userId available
+                if (roomId != null && userId != null)
+                  SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: AudioFloatingButton(roomId: roomId!, userId: userId!),
+                  )
+                else
+                  _MediaIconButton(icon: Icons.volume_up, onTap: null, tooltip: 'Audio'),
+                _MediaIconButton(icon: Icons.help_outline, onTap: onHelp, tooltip: 'Help'),
+              ],
+            ),
+          ),
 
           // Menu Items
           Expanded(
@@ -101,6 +138,8 @@ class GameActionsSidebar extends StatelessWidget {
                     label: 'GET TUNELA IN HAND',
                     onTap: onGetTunela,
                   ),
+                  const Divider(height: 1, color: Colors.white24),
+                  _SidebarButton(label: 'SETTINGS', onTap: onSettings),
                   const Divider(height: 1, color: Colors.white24),
                   _SidebarButton(label: 'QUIT GAME', onTap: onQuitGame),
                 ],
@@ -137,6 +176,31 @@ class _SidebarButton extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _MediaIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback? onTap;
+  final String tooltip;
+
+  const _MediaIconButton({
+    required this.icon,
+    this.onTap,
+    required this.tooltip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(icon, color: Colors.white70, size: 22),
+      onPressed: onTap,
+      tooltip: tooltip,
+      style: IconButton.styleFrom(
+        backgroundColor: Colors.black26,
+        padding: const EdgeInsets.all(8),
       ),
     );
   }

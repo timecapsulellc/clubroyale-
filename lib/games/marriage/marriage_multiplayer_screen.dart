@@ -21,13 +21,11 @@ import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 import 'package:clubroyale/core/card_engine/meld.dart';
 import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
-import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
-import 'package:clubroyale/games/marriage/widgets/marriage_table_layout.dart';
 import 'package:clubroyale/core/widgets/game_top_bar.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart'; // Import DiamondService
 import 'package:clubroyale/core/widgets/game_mode_banner.dart';
-import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
+import 'package:clubroyale/features/game/ui/components/game_log_widget.dart';
 import 'package:clubroyale/features/game/ui/components/table_layout.dart';
 import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
@@ -35,7 +33,6 @@ import 'package:clubroyale/games/marriage/marriage_config.dart';
 import 'package:clubroyale/games/marriage/services/services.dart';
 import 'package:clubroyale/games/marriage/widgets/hud/right_arc_game_controller.dart';
 import 'package:clubroyale/games/marriage/widgets/hud/game_actions_sidebar.dart';
-import 'package:clubroyale/games/marriage/widgets/hud/game_log_overlay.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_guided_tutorial.dart';
 import 'package:clubroyale/core/widgets/interactive_tutorial.dart';
 import 'package:clubroyale/games/marriage/widgets/professional_table_layout.dart';
@@ -72,6 +69,7 @@ class _MarriageMultiplayerScreenState
   GameHint? _currentHint; // Current active hint
   final Set<String> _highlightedCardIds = {};
   String? _previousTurnPlayerId; // Track for turn notification sound
+  final List<GameLogEntry> _gameLogs = []; // Game activity tracking
 
   // Services
   late final MarriageHintService _hintService;
@@ -365,6 +363,8 @@ class _MarriageMultiplayerScreenState
                               bottom: 0,
                               width: 220,
                               child: GameActionsSidebar(
+                                roomId: widget.roomId,
+                                userId: currentUser.uid,
                                 onShowSequence: () {
                                   _handleShowSequence(state);
                                   setState(() => _isSidebarOpen = false);
@@ -388,19 +388,41 @@ class _MarriageMultiplayerScreenState
                                   setState(() => _isSidebarOpen = false);
                                 },
                                 onQuitGame: () => context.go('/lobby'),
+                                onSettings: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const MarriageGuidebookScreen()),
+                                ),
+                                onHelp: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const MarriageGuidebookScreen()),
+                                ),
+                                onToggleChat: () => setState(() {
+                                    _isSidebarOpen = false;
+                                    _isChatExpanded = !_isChatExpanded;
+                                }),
+                                onToggleVideo: () => setState(() {
+                                    _isSidebarOpen = false;
+                                    _showVideoGrid = !_showVideoGrid;
+                                }),
                               ),
                             ),
 
-                            // Menu Button (to open sidebar)
+                            // Menu Button (Smart Overlay)
                             Positioned(
-                              top: 70, // Below TopBar
+                              top: 20,
                               left: 16,
                               child: SafeArea(
-                                child: FloatingActionButton.small(
-                                  backgroundColor: const Color(0xFF2F4F4F),
-                                  foregroundColor: Colors.white,
-                                  onPressed: () => setState(() => _isSidebarOpen = true),
-                                  child: const Icon(Icons.menu),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.3),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white24),
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.grid_view_rounded, color: Colors.white70),
+                                    onPressed: () => setState(() => _isSidebarOpen = true),
+                                    tooltip: 'Menu',
+                                  ),
                                 ),
                               ),
                             ),
@@ -428,13 +450,8 @@ class _MarriageMultiplayerScreenState
                             ),
 
                             // 4. HUD Layer - Game Log Overlay (Left - pushed down if sidebar active?? No, sidebar overlays)
-                            Positioned(
-                              left: 16,
-                              bottom: 120, // Moved to bottom-left to avoid top clutter
-                              child: GameLogOverlay(
-                                logs: const [],
-                              ),
-                            ),
+                            // 4. HUD Layer 
+                            // Empty placeholder removed
 
                             // Video Grid Overlay
                             if (_showVideoGrid)
@@ -452,6 +469,20 @@ class _MarriageMultiplayerScreenState
                                     roomId: widget.roomId,
                                     userId: currentUser.uid,
                                     userName: currentUser.displayName ?? 'Player',
+                                  ),
+                                ),
+                              ),
+
+                            // Game Log (Bottom Left)
+                            if (_gameLogs.isNotEmpty)
+                              Positioned(
+                                bottom: 150, // Above hand area
+                                left: 16,
+                                child: SafeArea(
+                                  child: GameLogWidget(
+                                    logs: _gameLogs,
+                                    height: 100,
+                                    width: 180,
                                   ),
                                 ),
                               ),
@@ -517,87 +548,20 @@ class _MarriageMultiplayerScreenState
                         ),
                       ),
 
-                      // Video/Audio Controls (Responsive Row at Top Right)
-                      Positioned(
-                        // Move to top-right edge if TopBar is hidden
-                        top: isLandscapeMobile ? 8 : 56,
-                        right: 16,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Chat Button
-                            Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              child: ChatOverlay(
-                                roomId: widget.roomId,
-                                userId: currentUser.uid,
-                                userName: currentUser.displayName ?? 'Player',
-                                isExpanded: _isChatExpanded,
-                                onToggle: () => setState(
-                                  () => _isChatExpanded = !_isChatExpanded,
-                                ),
-                              ),
-                            ),
-                            // Video Toggle
-                            Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white24),
-                              ),
-                              child: IconButton(
-                                constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-                                icon: Icon(
-                                  _showVideoGrid
-                                      ? Icons.videocam
-                                      : Icons.videocam_off,
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
-                                padding: EdgeInsets.zero,
-                                onPressed: () => setState(
-                                  () => _showVideoGrid = !_showVideoGrid,
-                                ),
-                              ),
-                            ),
-                            // Audio Toggle
-                            Container(
-                               margin: const EdgeInsets.symmetric(horizontal: 4),
-                               child: AudioFloatingButton(
-                                roomId: widget.roomId,
-                                userId: currentUser.uid,
-                              ),
-                            ),
-                            // Help Button
-                            Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              decoration: BoxDecoration(
-                                color: CasinoColors.gold.withValues(alpha: 0.2),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: CasinoColors.gold),
-                              ),
-                              child: IconButton(
-                                constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-                                icon: const Icon(
-                                  Icons.help_outline,
-                                  color: CasinoColors.gold,
-                                  size: 20,
-                                ),
-                                padding: EdgeInsets.zero,
-                                onPressed: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const MarriageGuidebookScreen(),
-                                  ),
-                                ),
-                                tooltip: 'How to Play',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Video/Audio/Chat - Hidden (Moved to Sidebar/SmartMenu)
+                      // Only show critical indicators if active
+                      if (_isChatExpanded)
+                         Positioned(
+                           top: 80,
+                           right: 16,
+                           child: ChatOverlay(
+                               roomId: widget.roomId,
+                               userId: currentUser.uid,
+                               userName: currentUser.displayName ?? 'Player',
+                               isExpanded: true,
+                               onToggle: () => setState(() => _isChatExpanded = false),
+                           ),
+                         ),
 
                       // Tutorial Overlay (shows for first-time players)
                       // Now handled by wrapper widget
@@ -1629,6 +1593,22 @@ class _MarriageMultiplayerScreenState
     SoundService.playTrickWon(); // Reuse win sound or add 'unlock'
   }
 
+  void _logGameEvent(String message, {IconData? icon, Color? color}) {
+    if (!mounted) return;
+    setState(() {
+      _gameLogs.add(GameLogEntry(
+        message: message,
+        icon: icon,
+        color: color,
+        timestamp: DateTime.now(),
+      ));
+      // Keep log size manageable
+      if (_gameLogs.length > 20) {
+        _gameLogs.removeAt(0);
+      }
+    });
+  }
+
   Future<void> _drawFromDeck() async {
     if (_isProcessing) return;
     // P0 FIX: No need to check _hasDrawn - service validates turnPhase
@@ -1645,6 +1625,8 @@ class _MarriageMultiplayerScreenState
           widget.roomId,
           userId,
         );
+
+        _logGameEvent('You drew a card', icon: Icons.add_circle_outline);
 
         // Play sound and haptics
         HapticService.cardDraw();

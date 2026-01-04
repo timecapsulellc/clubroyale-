@@ -13,6 +13,10 @@ import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 import 'package:clubroyale/core/widgets/turn_timer.dart';
 import 'package:clubroyale/features/game/ui/components/card_widget.dart';
 import 'package:clubroyale/features/game/ui/components/table_layout.dart';
+import 'package:clubroyale/features/game/ui/components/unified_game_sidebar.dart';
+import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
+import 'package:clubroyale/features/video/widgets/video_grid.dart';
+import 'package:clubroyale/features/game/ui/components/game_settings_modal.dart';
 
 class CallBreakMultiplayerScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -29,6 +33,11 @@ class _CallBreakMultiplayerScreenState
   bool _isProcessing = false;
   int _selectedBid = 1;
   final Map<String, Card> _cardCache = {};
+  
+  // Pro Layout State
+  bool _isSidebarOpen = false;
+  bool _isChatExpanded = false;
+  bool _showVideoGrid = false;
 
   // Bot Controllers
   final List<CallBreakBotController> _botControllers = [];
@@ -152,89 +161,133 @@ class _CallBreakMultiplayerScreenState
           if (a.suit == b.suit) return b.rank.value.compareTo(a.rank.value);
           return a.suit.index.compareTo(b.suit.index);
         });
+
         return Scaffold(
-          extendBodyBehindAppBar: true,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            title: Text('Call Break - Round ${state.currentRound}'),
-            centerTitle: true,
-            leading: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.black26,
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => context.go('/lobby'),
-                ),
-              ),
-            ),
-            actions: [
-              Container(
-                margin: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: Colors.black26,
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.help_outline),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (c) => AlertDialog(
-                        backgroundColor: CasinoColors.cardBackground,
-                        title: const Text(
-                          'Call Break Rules',
-                          style: TextStyle(color: CasinoColors.gold),
-                        ),
-                        content: const Text(
-                          '1. 4 Players, 13 cards each.\n'
-                          '2. Spades ♠️ are always Trump.\n'
-                          '3. Must follow suit. If unable, must play Trump. If unable, play any.\n'
-                          '4. Bid tricks at start. Must win at least bid amount.\n'
-                          '5. 5 Rounds total.',
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(c),
-                            child: const Text('Got it'),
-                          ),
-                        ],
+          body: Stack(
+            children: [
+              // 1. Game Table Layer
+              TableLayout(
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      // Top spacer replaced by padding
+                      const SizedBox(height: 16),
+                      
+                      // Game Mode Banner
+                      _buildGameModeBanner(state),
+
+                      // Scoreboard (Opponents)
+                      _buildScoreBoard(state, currentUser.uid),
+
+                      // Game Area (Center)
+                      Expanded(
+                        child: _buildGameArea(state, currentUser.uid, isMyTurn),
                       ),
-                    );
-                  },
+
+                      // My Hand
+                      _buildMyHand(myHand, isMyTurn, state, currentUser.uid),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
-          body: TableLayout(
-            child: SafeArea(
-              child: Column(
-                children: [
-                  SizedBox(height: kToolbarHeight),
-                  // Game Mode Banner
-                  _buildGameModeBanner(state),
 
-                  // Scoreboard (Opponents)
-                  _buildScoreBoard(state, currentUser.uid),
-
-                  // Game Area (Center)
-                  Expanded(
-                    child: _buildGameArea(state, currentUser.uid, isMyTurn),
+              // 2. Sidebar Backdrop
+              if (_isSidebarOpen)
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _isSidebarOpen = false),
+                    child: Container(color: Colors.black54),
                   ),
+                ),
 
-                  // My Hand
-                  _buildMyHand(myHand, isMyTurn, state, currentUser.uid),
-                ],
+              // 3. Sidebar
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                left: _isSidebarOpen ? 0 : -220,
+                top: 0,
+                bottom: 0,
+                width: 220,
+                child: UnifiedGameSidebar(
+                  roomId: widget.roomId,
+                  userId: currentUser.uid,
+                  headerContent: Column(
+                    children: [
+                      Text('Round ${state.currentRound}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Text('Room: ${widget.roomId.substring(0, 4)}', style: const TextStyle(color: Colors.white54, fontSize: 10)),
+                    ],
+                  ),
+                  gameActions: const [],
+                  onSettings: () => GameSettingsModal.show(context, gameName: 'Call Break'),
+                  onHelp: () => _showRules(context),
+                  onQuitGame: () => context.go('/lobby'),
+                  onToggleChat: () => setState(() { _isSidebarOpen = false; _isChatExpanded = !_isChatExpanded; }),
+                  onToggleVideo: () => setState(() { _isSidebarOpen = false; _showVideoGrid = !_showVideoGrid; }),
+                ),
               ),
-            ),
+
+              // 4. Smart Menu Button (Top Left)
+              Positioned(
+                top: 16,
+                left: 16,
+                child: SafeArea(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.grid_view_rounded, color: Colors.white70),
+                      onPressed: () => setState(() => _isSidebarOpen = true),
+                      tooltip: 'Menu',
+                    ),
+                  ),
+                ),
+              ),
+
+              // 5. Overlays (Chat, Video)
+              if (_showVideoGrid)
+                Positioned(
+                  top: 60, right: 16, width: 200, height: 300,
+                  child: VideoGridWidget(roomId: widget.roomId, userId: currentUser.uid, userName: currentUser.displayName ?? 'Player'),
+                ),
+
+              if (_isChatExpanded)
+                Positioned(
+                   bottom: 160, left: 16,
+                   child: ChatOverlay(
+                      roomId: widget.roomId, 
+                      userId: currentUser.uid, 
+                      userName: currentUser.displayName ?? 'Player', 
+                      isExpanded: true,
+                      onToggle: () => setState(() => _isChatExpanded = false),
+                   ),
+                ),
+            ],
           ),
         );
       },
+    );
+  }
+
+  void _showRules(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (c) => AlertDialog(
+        backgroundColor: CasinoColors.cardBackground,
+        title: const Text('Call Break Rules', style: TextStyle(color: CasinoColors.gold)),
+        content: const Text(
+          '1. 4 Players, 13 cards each.\n'
+          '2. Spades ♠️ are always Trump.\n'
+          '3. Must follow suit. If unable, must play Trump. If unable, play any.\n'
+          '4. Bid tricks at start. Must win at least bid amount.\n'
+          '5. 5 Rounds total.',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('Got it'))],
+      ),
     );
   }
 

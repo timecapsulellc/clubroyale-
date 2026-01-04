@@ -205,50 +205,13 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
       children: [
-        // Controls (Sort)
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0, bottom: 8),
-          child: Row(
-            children: [
-              OutlinedButton.icon(
-                onPressed: _autoSort,
-                icon: const Icon(
-                  Icons.auto_awesome,
-                  size: 16,
-                  color: AppTheme.gold,
-                ),
-                label: const Text(
-                  'AUTO GROUP',
-                  style: TextStyle(color: AppTheme.gold, fontSize: 12),
-                ),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppTheme.gold),
-                  visualDensity: VisualDensity.compact,
-                ),
-              ),
-              const Spacer(),
-              const Text(
-                'Drag cards to group them',
-                style: TextStyle(
-                  color: Colors.white54,
-                  fontSize: 10,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-              const SizedBox(width: 16),
-            ],
-          ),
-        ),
-
         // Horizontal Scrollable Hand
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 0), // Top pad for sort button space
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -290,6 +253,34 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                 },
               ),
             ],
+          ),
+        ),
+
+        // Floating Sort Button (Minimalist)
+        Positioned(
+          top: 0,
+          left: 16,
+          child: GestureDetector(
+            onTap: _autoSort,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.black45,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white24),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.auto_awesome, color: AppTheme.gold, size: 12),
+                  SizedBox(width: 4),
+                  Text(
+                    'GROUP',
+                    style: TextStyle(color: AppTheme.gold, fontSize: 10, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ],

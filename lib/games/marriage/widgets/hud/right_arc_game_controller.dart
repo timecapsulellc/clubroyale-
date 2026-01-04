@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class RightArcGameController extends StatelessWidget {
@@ -46,18 +45,27 @@ class RightArcGameController extends StatelessWidget {
             clipBehavior: Clip.none,
             children: [
               // Background "Arc" visual
+              // Background "Arc" visual (Solid Semi-Circle)
               Positioned(
-                right: -radius * 0.6,
-                top: centerY - (radius * 2.5),
+                right: -radius * 0.8, // Push further right to create arc effect
+                top: centerY - (radius * 3.0),
                 child: Container(
-                  width: radius * 2,
-                  height: radius * 5,
+                  width: radius * 3.5, // Larger circle
+                  height: radius * 6.0,
                   decoration: BoxDecoration(
+                    color: const Color(0xFF1E1E1E), // Solid dark grey like reference
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: Colors.white.withValues(alpha: 0.15),
                       width: 2,
                     ),
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
                   ),
                 ),
               ),
