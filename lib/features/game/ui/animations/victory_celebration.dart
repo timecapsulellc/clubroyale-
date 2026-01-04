@@ -309,10 +309,6 @@ class ConfettiOverlay extends StatelessWidget {
               Colors.orange,
             ][index % 6];
 
-            return Positioned(
-              left: startX,
-              top: -20,
-              child:
             final shape = index % 3 == 0 ? BoxShape.circle : BoxShape.rectangle;
 
             return Positioned(

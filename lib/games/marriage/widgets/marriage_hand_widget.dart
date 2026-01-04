@@ -13,6 +13,8 @@ class MarriageHandWidget extends StatefulWidget {
   final List<PlayingCard> cards;
   final String? selectedCardId;
   final Function(String?) onCardSelected;
+  final VoidCallback? onCardDoubleTap;
+  final bool isMyTurn;
   final PlayingCard? tiplu;
   final MarriageGameConfig config;
   final double scale;
@@ -22,6 +24,8 @@ class MarriageHandWidget extends StatefulWidget {
     required this.cards,
     required this.selectedCardId,
     required this.onCardSelected,
+    this.onCardDoubleTap,
+    this.isMyTurn = false,
     this.tiplu,
     this.config = MarriageGameConfig.nepaliStandard,
     this.scale = 1.0,
@@ -258,7 +262,7 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                 onWillAcceptWithDetails: (details) => true,
                 onAcceptWithDetails: (details) {
                   _moveCardToNewGroup(details.data);
-                  HapticService.mediumImpact();
+                  HapticService.meldFormed(); // Medium impact
                   SoundService.playCardPlace();
                 },
                 builder: (context, candidates, rejects) {
@@ -417,7 +421,7 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                       _groups[groupIndex].add(card);
                       
                       // Feedback
-                      HapticService.mediumImpact();
+                      HapticService.meldFormed();
                       SoundService.playCardPlace();
                     });
                   },
@@ -464,9 +468,10 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                     },
                     child: GestureDetector(
                       onTap: () {
-                        HapticService.selectionClick();
+                        HapticService.cardTap();
                         widget.onCardSelected(group[i].id);
                       },
+                      onDoubleTap: widget.isMyTurn ? widget.onCardDoubleTap : null,
                       behavior: HitTestBehavior.opaque,
                       child: Transform.scale(
                         scale: widget.scale,

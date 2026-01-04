@@ -159,6 +159,10 @@ class _MarriageMultiplayerScreenState
     );
   }
 
+  void _onCardSelected(String? id) {
+    setState(() => _selectedCardId = id);
+  }
+
   PlayingCard? _getCard(String id) => _cardCache[id];
 
   String _getBotName(String botId) {
@@ -324,11 +328,10 @@ class _MarriageMultiplayerScreenState
                                     ),
                                     MarriageHandWidget(
                                       key: _tutorialKeys['player_hand'],
-                                      handCards:
-                                          state.playerHands[currentUser.uid] ?? [],
+                                      cards: List<PlayingCard>.from(
+                                          state.playerHands[currentUser.uid] ?? []),
                                       selectedCardId: _selectedCardId,
-                                      highlightedCardIds: _highlightedCardIds,
-                                      onCardTap: _onCardTap,
+                                      onCardSelected: _onCardSelected,
                                       onCardDoubleTap: _discardCard,
                                       isMyTurn: isMyTurn,
                                       scale: isLandscapeMobile ? 0.8 : 1.0,
