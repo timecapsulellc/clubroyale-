@@ -13,7 +13,7 @@ void main() {
       final deck = Deck();
       deck.reset();
       final originalFirst = deck.cards.first;
-      
+
       // Shuffle and check it changed
       deck.shuffle();
       // At least one card should be different (statistically near-certain)
@@ -23,10 +23,10 @@ void main() {
     test('drawCard removes and returns a card', () {
       final deck = Deck();
       deck.reset();
-      
+
       final initialLength = deck.length;
       final card = deck.drawCard();
-      
+
       expect(card, isNotNull);
       expect(deck.length, initialLength - 1);
     });
@@ -34,9 +34,9 @@ void main() {
     test('drawCards returns multiple cards', () {
       final deck = Deck();
       deck.reset();
-      
+
       final cards = deck.drawCards(5);
-      
+
       expect(cards.length, 5);
       expect(deck.length, 47); // 52 - 5
     });
@@ -51,7 +51,7 @@ void main() {
     test('compareTo correctly compares ranks', () {
       const ace = PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace);
       const king = PlayingCard(suit: CardSuit.hearts, rank: CardRank.king);
-      
+
       // Ace > King (ace value = 14, king value = 13)
       expect(ace.rank.value > king.rank.value, isTrue);
     });
@@ -59,7 +59,7 @@ void main() {
     test('equality works correctly', () {
       const card1 = PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace);
       const card2 = PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace);
-      
+
       expect(card1, equals(card2));
     });
   });

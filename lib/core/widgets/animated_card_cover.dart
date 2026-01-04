@@ -59,8 +59,9 @@ class _AnimatedCardCoverState extends State<AnimatedCardCover>
         child: AnimatedBuilder(
           animation: _controller,
           builder: (context, child) {
-            if (_controller.value == 0 || _controller.value == 1)
+            if (_controller.value == 0 || _controller.value == 1) {
               return const SizedBox.shrink();
+            }
 
             return CustomPaint(
               painter: _ShimmerPainter(_controller.value),

@@ -11,10 +11,14 @@ class CasinoColors {
 
   // Purple Table Colors
   // Green Felt Table Colors (New Premium Theme)
-  static const Color tableGreenDark = Color(0xFF0D3B2E); // Deep radial green (Edge)
+  static const Color tableGreenDark = Color(
+    0xFF0D3B2E,
+  ); // Deep radial green (Edge)
   static const Color tableGreenMid = Color(0xFF165B47); // Warning/Mid green
-  static const Color tableGreenLight = Color(0xFF1F7A5E); // Center spotlight green
-  
+  static const Color tableGreenLight = Color(
+    0xFF1F7A5E,
+  ); // Center spotlight green
+
   // Legacy Purple Table Colors (Keep for other modes if needed, or deprecate)
   static const Color feltGreenDark = Color(0xFF1f1035); // Purple dark
   static const Color feltGreenMid = Color(0xFF3b2066); // Purple mid
@@ -73,11 +77,7 @@ class CasinoColors {
   static const LinearGradient classicGreenTableGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [
-      Color(0xFF1B5E20),
-      Color(0xFF0D4B14),
-      Color(0xFF042808),
-    ],
+    colors: [Color(0xFF1B5E20), Color(0xFF0D4B14), Color(0xFF042808)],
     stops: [0.0, 0.5, 1.0],
   );
 
@@ -123,47 +123,47 @@ class CasinoColors {
   // Common Text Theme
   static TextTheme get _textTheme => TextTheme(
     displayLarge: GoogleFonts.oswald(
-      fontSize: 57, 
+      fontSize: 57,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
     displayMedium: GoogleFonts.oswald(
-      fontSize: 45, 
+      fontSize: 45,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
     displaySmall: GoogleFonts.oswald(
-      fontSize: 36, 
+      fontSize: 36,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
     headlineLarge: GoogleFonts.oswald(
-      fontSize: 32, 
+      fontSize: 32,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
     headlineMedium: GoogleFonts.oswald(
-      fontSize: 28, 
+      fontSize: 28,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
     titleLarge: GoogleFonts.roboto(
-      fontSize: 22, 
+      fontSize: 22,
       fontWeight: FontWeight.w500,
       color: Colors.white,
     ),
     titleMedium: GoogleFonts.roboto(
-      fontSize: 16, 
+      fontSize: 16,
       fontWeight: FontWeight.w500,
       color: Colors.white,
     ),
     bodyLarge: GoogleFonts.roboto(
-      fontSize: 16, 
+      fontSize: 16,
       fontWeight: FontWeight.normal,
       color: Colors.white,
     ),
     bodyMedium: GoogleFonts.roboto(
-      fontSize: 14, 
+      fontSize: 14,
       fontWeight: FontWeight.normal,
       color: Colors.white70,
     ),
@@ -196,7 +196,10 @@ class CasinoColors {
         foregroundColor: darkPurple,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.bold),
+        textStyle: GoogleFonts.roboto(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     ),
   );
@@ -228,7 +231,10 @@ class CasinoColors {
         foregroundColor: tableGreenDark, // Dark text on gold
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.bold),
+        textStyle: GoogleFonts.roboto(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     ),
   );

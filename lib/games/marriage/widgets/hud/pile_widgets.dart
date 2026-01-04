@@ -27,25 +27,33 @@ class DrawPileWidget extends StatelessWidget {
           // Tap to draw label (only when it's draw phase and can draw)
           if (isDrawPhase && canDraw)
             Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: CasinoColors.gold,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                'TAP TO DRAW',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: CasinoColors.gold,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'TAP TO DRAW',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                )
+                .animate(onPlay: (c) => c.repeat(reverse: true))
+                .fadeIn()
+                .scale(
+                  begin: const Offset(0.95, 0.95),
+                  end: const Offset(1, 1),
+                  duration: 500.ms,
                 ),
-              ),
-            ).animate(onPlay: (c) => c.repeat(reverse: true))
-             .fadeIn()
-             .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1), duration: 500.ms),
-          
+
           // Deck stack
           Stack(
             children: [
@@ -185,24 +193,32 @@ class DiscardPileWidget extends StatelessWidget {
             )
           else if (canPickup)
             Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.blue.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                'OR TAP HERE',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'OR TAP HERE',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+                .animate(onPlay: (c) => c.repeat(reverse: true))
+                .fadeIn()
+                .scale(
+                  begin: const Offset(0.95, 0.95),
+                  end: const Offset(1, 1),
+                  duration: 600.ms,
                 ),
-              ),
-            ).animate(onPlay: (c) => c.repeat(reverse: true))
-             .fadeIn()
-             .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1), duration: 600.ms),
-          
+
           // Discard pile
           Container(
             width: 75,
@@ -211,7 +227,7 @@ class DiscardPileWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               color: Colors.black26,
               border: Border.all(
-                color: isBlocked 
+                color: isBlocked
                     ? Colors.red.withValues(alpha: 0.5)
                     : (canPickup ? Colors.blue : Colors.white24),
                 width: canPickup ? 2 : 1,

@@ -25,10 +25,10 @@ class _GameTimerWidgetState extends State<GameTimerWidget> {
   @override
   void didUpdateWidget(GameTimerWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // Play warning tick in final 5 seconds (only on player's turn)
-    if (widget.isMyTurn && 
-        widget.remainingSeconds <= 5 && 
+    if (widget.isMyTurn &&
+        widget.remainingSeconds <= 5 &&
         widget.remainingSeconds > 0 &&
         widget.remainingSeconds != _lastTickPlayed) {
       _lastTickPlayed = widget.remainingSeconds;
@@ -39,11 +39,11 @@ class _GameTimerWidgetState extends State<GameTimerWidget> {
   @override
   Widget build(BuildContext context) {
     final progress = widget.remainingSeconds / widget.totalSeconds;
-    
+
     // Urgency states
     final isWarning = progress < 0.5 && progress >= 0.2;
     final isCritical = progress < 0.2;
-    
+
     Color color = Colors.green;
     if (isWarning) color = Colors.orange;
     if (isCritical) color = Colors.red;
@@ -55,7 +55,7 @@ class _GameTimerWidgetState extends State<GameTimerWidget> {
         color: Colors.black.withValues(alpha: isCritical ? 0.7 : 0.5),
         shape: BoxShape.circle,
         border: Border.all(
-          color: color.withValues(alpha: isCritical ? 0.9 : 0.5), 
+          color: color.withValues(alpha: isCritical ? 0.9 : 0.5),
           width: isCritical ? 3 : 2,
         ),
         boxShadow: isCritical

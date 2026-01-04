@@ -182,7 +182,7 @@ class ProfessionalTableLayout extends StatelessWidget {
   List<double> _getOptimalPositions(int count) {
     // Angles in radians, measured from 3 o'clock position
     // -π/2 = top, π = left, 0 = right
-    
+
     switch (count) {
       case 1:
         return [-math.pi / 2]; // Top center
@@ -194,7 +194,7 @@ class ProfessionalTableLayout extends StatelessWidget {
       case 3:
         return [
           -math.pi * 0.8, // Left
-          -math.pi / 2,   // Top
+          -math.pi / 2, // Top
           -math.pi * 0.2, // Right
         ];
       case 4:
@@ -208,41 +208,44 @@ class ProfessionalTableLayout extends StatelessWidget {
         return [
           math.pi * 0.85, // Far left
           -math.pi * 0.75, // Upper-left
-          -math.pi / 2,   // Top
+          -math.pi / 2, // Top
           -math.pi * 0.25, // Upper-right
           -math.pi * 0.15, // Far right
         ];
       case 6:
         return [
-          math.pi * 0.9,  // Left-bottom
-          math.pi * 0.7,  // Left-top
+          math.pi * 0.9, // Left-bottom
+          math.pi * 0.7, // Left-top
           -math.pi * 0.7, // Top-left
           -math.pi * 0.3, // Top-right
           -math.pi * 0.1, // Right-top
-          0.1,            // Right-bottom
+          0.1, // Right-bottom
         ];
       case 7:
         return [
-          math.pi * 0.9,  // Left-bottom
-          math.pi * 0.7,  // Left-mid
+          math.pi * 0.9, // Left-bottom
+          math.pi * 0.7, // Left-mid
           -math.pi * 0.8, // Upper-left
-          -math.pi / 2,   // Top
+          -math.pi / 2, // Top
           -math.pi * 0.2, // Upper-right
-          0.0,            // Right-mid
-          0.1,            // Right-bottom
+          0.0, // Right-mid
+          0.1, // Right-bottom
         ];
       default:
         // For 8+ players, distribute evenly
         final positions = <double>[];
-        final startAngle = math.pi * 0.9;  // Start from left-bottom
-        final endAngle = 0.1;              // End at right-bottom
-        final totalArc = startAngle - endAngle + math.pi; // Going around the top
+        final startAngle = math.pi * 0.9; // Start from left-bottom
+        final endAngle = 0.1; // End at right-bottom
+        final totalArc =
+            startAngle - endAngle + math.pi; // Going around the top
         final step = totalArc / (count + 1);
-        
+
         for (int i = 0; i < count; i++) {
           var angle = startAngle - (step * (i + 1));
           // Normalize to -π to π range
-          while (angle < -math.pi) angle += 2 * math.pi;
+          while (angle < -math.pi) {
+            angle += 2 * math.pi;
+          }
           positions.add(angle);
         }
         return positions;
@@ -269,11 +272,7 @@ class TableRailBorder extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF5a3a20),
-            Color(0xFF3d2410),
-            Color(0xFF5a3a20),
-          ],
+          colors: [Color(0xFF5a3a20), Color(0xFF3d2410), Color(0xFF5a3a20)],
         ),
         boxShadow: [
           BoxShadow(

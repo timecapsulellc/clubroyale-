@@ -12,15 +12,24 @@ void main() {
           cards: [
             PlayedCard(
               playerId: 'p1',
-              card: const PlayingCard(suit: CardSuit.hearts, rank: CardRank.five),
+              card: const PlayingCard(
+                suit: CardSuit.hearts,
+                rank: CardRank.five,
+              ),
             ),
             PlayedCard(
               playerId: 'p2',
-              card: const PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace),
+              card: const PlayingCard(
+                suit: CardSuit.hearts,
+                rank: CardRank.ace,
+              ),
             ),
             PlayedCard(
               playerId: 'p3',
-              card: const PlayingCard(suit: CardSuit.hearts, rank: CardRank.king),
+              card: const PlayingCard(
+                suit: CardSuit.hearts,
+                rank: CardRank.king,
+              ),
             ),
             PlayedCard(
               playerId: 'p4',
@@ -39,19 +48,31 @@ void main() {
           cards: [
             PlayedCard(
               playerId: 'p1',
-              card: const PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace),
+              card: const PlayingCard(
+                suit: CardSuit.hearts,
+                rank: CardRank.ace,
+              ),
             ),
             PlayedCard(
               playerId: 'p2',
-              card: const PlayingCard(suit: CardSuit.spades, rank: CardRank.two), // Trump
+              card: const PlayingCard(
+                suit: CardSuit.spades,
+                rank: CardRank.two,
+              ), // Trump
             ),
             PlayedCard(
               playerId: 'p3',
-              card: const PlayingCard(suit: CardSuit.hearts, rank: CardRank.king),
+              card: const PlayingCard(
+                suit: CardSuit.hearts,
+                rank: CardRank.king,
+              ),
             ),
             PlayedCard(
               playerId: 'p4',
-              card: const PlayingCard(suit: CardSuit.diamonds, rank: CardRank.ace),
+              card: const PlayingCard(
+                suit: CardSuit.diamonds,
+                rank: CardRank.ace,
+              ),
             ),
           ],
         );
@@ -66,19 +87,31 @@ void main() {
           cards: [
             PlayedCard(
               playerId: 'p1',
-              card: const PlayingCard(suit: CardSuit.hearts, rank: CardRank.ace),
+              card: const PlayingCard(
+                suit: CardSuit.hearts,
+                rank: CardRank.ace,
+              ),
             ),
             PlayedCard(
               playerId: 'p2',
-              card: const PlayingCard(suit: CardSuit.spades, rank: CardRank.five),
+              card: const PlayingCard(
+                suit: CardSuit.spades,
+                rank: CardRank.five,
+              ),
             ),
             PlayedCard(
               playerId: 'p3',
-              card: const PlayingCard(suit: CardSuit.spades, rank: CardRank.jack),
+              card: const PlayingCard(
+                suit: CardSuit.spades,
+                rank: CardRank.jack,
+              ),
             ),
             PlayedCard(
               playerId: 'p4',
-              card: const PlayingCard(suit: CardSuit.spades, rank: CardRank.two),
+              card: const PlayingCard(
+                suit: CardSuit.spades,
+                rank: CardRank.two,
+              ),
             ),
           ],
         );

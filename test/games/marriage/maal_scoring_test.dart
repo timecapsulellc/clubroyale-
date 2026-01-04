@@ -9,8 +9,8 @@ void main() {
     late MarriageMaalCalculator calculator;
     // We need to define Tiplu for the calculator
     // Tiplu: 8 of Spades
-    final tiplu = Card(suit: Suit.spades, rank: Rank.eight); 
-    
+    final tiplu = Card(suit: Suit.spades, rank: Rank.eight);
+
     setUp(() {
       calculator = MarriageMaalCalculator(
         tiplu: tiplu,
@@ -57,32 +57,40 @@ void main() {
       expect(calculator.getMaalType(card), MaalType.none);
       expect(calculator.getMaalValue(MaalType.none), 0);
     });
-    
+
     test('Calculates total points correctly', () {
       final hand = [
         Card(suit: Suit.spades, rank: Rank.eight), // Tiplu (3)
-        Card(suit: Suit.spades, rank: Rank.nine),  // Poplu (2)
-        Card(suit: Suit.clubs, rank: Rank.eight),  // Alter (5)
-        Card(suit: Suit.hearts, rank: Rank.two),   // None (0)
+        Card(suit: Suit.spades, rank: Rank.nine), // Poplu (2)
+        Card(suit: Suit.clubs, rank: Rank.eight), // Alter (5)
+        Card(suit: Suit.hearts, rank: Rank.two), // None (0)
       ];
-      
+
       expect(calculator.calculateMaalPoints(hand), 3 + 2 + 5 + 0);
     });
-    
+
     test('Handles Ace Wrapping for Poplu/Jhiplu', () {
-         // Case: Tiplu is Ace (1) -> Jhiplu should be King (13)
-         final tipluAce = Card(suit: Suit.spades, rank: Rank.ace);
-         final calcAce = MarriageMaalCalculator(tiplu: tipluAce);
-         
-         final jhipluKing = Card(suit: Suit.spades, rank: Rank.king);
-         expect(calcAce.getMaalType(jhipluKing), MaalType.jhiplu, reason: 'Ace Tiplu should have King Jhiplu');
-         
-         // Case: Tiplu is King (13) -> Poplu should be Ace (1)
-         final tipluKing = Card(suit: Suit.spades, rank: Rank.king);
-         final calcKing = MarriageMaalCalculator(tiplu: tipluKing);
-         
-         final popluAce = Card(suit: Suit.spades, rank: Rank.ace);
-         expect(calcKing.getMaalType(popluAce), MaalType.poplu, reason: 'King Tiplu should have Ace Poplu');
+      // Case: Tiplu is Ace (1) -> Jhiplu should be King (13)
+      final tipluAce = Card(suit: Suit.spades, rank: Rank.ace);
+      final calcAce = MarriageMaalCalculator(tiplu: tipluAce);
+
+      final jhipluKing = Card(suit: Suit.spades, rank: Rank.king);
+      expect(
+        calcAce.getMaalType(jhipluKing),
+        MaalType.jhiplu,
+        reason: 'Ace Tiplu should have King Jhiplu',
+      );
+
+      // Case: Tiplu is King (13) -> Poplu should be Ace (1)
+      final tipluKing = Card(suit: Suit.spades, rank: Rank.king);
+      final calcKing = MarriageMaalCalculator(tiplu: tipluKing);
+
+      final popluAce = Card(suit: Suit.spades, rank: Rank.ace);
+      expect(
+        calcKing.getMaalType(popluAce),
+        MaalType.poplu,
+        reason: 'King Tiplu should have Ace Poplu',
+      );
     });
   });
 }

@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:clubroyale/config/casino_theme.dart';
 
 class RightArcGameController extends StatelessWidget {
   final VoidCallback? onShowCards; // "SHOW" or "Show Cards"
@@ -31,7 +30,7 @@ class RightArcGameController extends StatelessWidget {
     // Let's use a custom layout or just a Stack with precise positioning.
 
     // Center point of the arc is roughly off-screen to the right-center.
-    
+
     return SizedBox(
       width: 120, // Width of the control area
       height: 350, // Height of the control area
@@ -41,15 +40,18 @@ class RightArcGameController extends StatelessWidget {
         children: [
           // Background "Arc" visual (optional, wireframe in reference)
           Positioned(
-             right: -50,
-             child: Container(
-               width: 150,
-               height: 400,
-               decoration: BoxDecoration(
-                 border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 2),
-                 shape: BoxShape.circle,
-               ),
-             ),
+            right: -50,
+            child: Container(
+              width: 150,
+              height: 400,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  width: 2,
+                ),
+                shape: BoxShape.circle,
+              ),
+            ),
           ),
 
           // Buttons positioned along the arc
@@ -57,7 +59,6 @@ class RightArcGameController extends StatelessWidget {
           // Upper-Mid: SEQ (Sequence)
           // Lower-Mid: SHOW (Show Cards / Finish)
           // Bottom: CAN (Cancel)
-
           _buildArcPositioned(
             angleDegrees: -45, // Top
             child: _ArcButton(
@@ -75,7 +76,7 @@ class RightArcGameController extends StatelessWidget {
               isEnabled: isSequenceEnabled,
             ),
           ),
-          
+
           _buildArcPositioned(
             angleDegrees: 15, // Lower Mid (Main action really)
             child: _ArcButton(
@@ -106,25 +107,37 @@ class RightArcGameController extends StatelessWidget {
   }) {
     // Radius of our virtual arc
     const double radius = 80;
-    
+
     // Convert angle to radians
     final angle = angleDegrees * (math.pi / 180);
-    
+
     // Calculate x, y based on angle relative to center-right
     // 0 degrees is directly Left of the center point (since arc is on Right)
     // Wait, let's simplify.
     // We just want vertically distributed with slight x-offset.
-    
+
     // Simple approach: Use Positioned relative to the container.
     // Container is 120w x 350h. Center is (60, 175).
-    
+
     double yOffset = 0;
     double xOffset = 0;
-    
-    if (angleDegrees == -45) { yOffset = -120; xOffset = 20; }
-    if (angleDegrees == -15) { yOffset = -40; xOffset = 0; }
-    if (angleDegrees == 15) { yOffset = 60; xOffset = 0; }
-    if (angleDegrees == 45) { yOffset = 140; xOffset = 20; }
+
+    if (angleDegrees == -45) {
+      yOffset = -120;
+      xOffset = 20;
+    }
+    if (angleDegrees == -15) {
+      yOffset = -40;
+      xOffset = 0;
+    }
+    if (angleDegrees == 15) {
+      yOffset = 60;
+      xOffset = 0;
+    }
+    if (angleDegrees == 45) {
+      yOffset = 140;
+      xOffset = 20;
+    }
 
     return Positioned(
       right: 16 + xOffset, // Pushed against right edge
@@ -152,7 +165,7 @@ class _ArcButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = isLarge ? 70.0 : 55.0;
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -167,9 +180,15 @@ class _ArcButton extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: isEnabled 
-                  ? [Colors.black.withValues(alpha: 0.6), Colors.black.withValues(alpha: 0.8)]
-                  : [Colors.black.withValues(alpha: 0.3), Colors.black.withValues(alpha: 0.4)],
+              colors: isEnabled
+                  ? [
+                      Colors.black.withValues(alpha: 0.6),
+                      Colors.black.withValues(alpha: 0.8),
+                    ]
+                  : [
+                      Colors.black.withValues(alpha: 0.3),
+                      Colors.black.withValues(alpha: 0.4),
+                    ],
             ),
             border: Border.all(
               color: isEnabled ? Colors.white : Colors.white24,
@@ -181,22 +200,27 @@ class _ArcButton extends StatelessWidget {
                       color: Colors.black.withValues(alpha: 0.5),
                       blurRadius: 4,
                       offset: const Offset(2, 2),
-                    )
+                    ),
                   ]
                 : null,
           ),
           alignment: Alignment.center,
-          child: labelVertical 
+          child: labelVertical
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: label.split('').map((c) => Text(
-                    c,
-                     style: TextStyle(
-                      color: isEnabled ? Colors.white : Colors.white38,
-                      fontWeight: FontWeight.bold,
-                      fontSize: isLarge ? 14 : 12,
-                    ),
-                  )).toList(),
+                  children: label
+                      .split('')
+                      .map(
+                        (c) => Text(
+                          c,
+                          style: TextStyle(
+                            color: isEnabled ? Colors.white : Colors.white38,
+                            fontWeight: FontWeight.bold,
+                            fontSize: isLarge ? 14 : 12,
+                          ),
+                        ),
+                      )
+                      .toList(),
                 )
               : Text(
                   label,

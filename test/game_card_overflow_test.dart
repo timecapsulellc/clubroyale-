@@ -3,7 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/core/widgets/game_card_graphic.dart';
 
 void main() {
-  testWidgets('GameCardGraphic renders without overflow at small sizes', (WidgetTester tester) async {
+  testWidgets('GameCardGraphic renders without overflow at small sizes', (
+    WidgetTester tester,
+  ) async {
     // Test Marriage card at dashboard size (approx 40)
     // This previously caused a 2.8px overflow in the face cards
     await tester.pumpWidget(
@@ -19,12 +21,12 @@ void main() {
         ),
       ),
     );
-    
+
     await tester.pumpAndSettle();
     expect(find.byType(GameCardGraphic), findsOneWidget);
 
     // Test Teen Patti card
-     await tester.pumpWidget(
+    await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
           body: Center(

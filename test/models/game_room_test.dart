@@ -19,12 +19,7 @@ void main() {
           'bootAmount': 0,
         },
         'players': [
-          {
-            'id': 'user1',
-            'name': 'Player 1',
-            'profile': null,
-            'isReady': true,
-          },
+          {'id': 'user1', 'name': 'Player 1', 'profile': null, 'isReady': true},
           {
             'id': 'user2',
             'name': 'Player 2',
@@ -123,9 +118,7 @@ void main() {
       final room = GameRoom(
         name: 'Test Room',
         hostId: 'user1',
-        players: [
-          const Player(id: 'user1', name: 'Player 1', isReady: true),
-        ],
+        players: [const Player(id: 'user1', name: 'Player 1', isReady: true)],
         scores: {'user1': 0},
       );
 
@@ -176,10 +169,7 @@ void main() {
     });
 
     test('should handle missing isReady in JSON (defaults to false)', () {
-      final json = {
-        'id': 'user1',
-        'name': 'Player 1',
-      };
+      final json = {'id': 'user1', 'name': 'Player 1'};
 
       final player = Player.fromJson(json);
 

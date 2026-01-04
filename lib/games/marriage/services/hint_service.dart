@@ -9,14 +9,12 @@ import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/meld.dart';
 import 'package:clubroyale/games/marriage/marriage_bot.dart';
 
-
-
 /// Type of hint that can be shown to the player
 enum HintType {
-  drawSource,     // Whether to draw from deck or discard
-  discardChoice,  // Which card to discard
-  visitReady,     // When player can visit
-  declareReady,   // When player can declare/finish
+  drawSource, // Whether to draw from deck or discard
+  discardChoice, // Which card to discard
+  visitReady, // When player can visit
+  declareReady, // When player can declare/finish
   meldSuggestion, // Cards that form potential melds
 }
 
@@ -44,7 +42,7 @@ class GameHint {
 /// AI Hint Service - Provides intelligent gameplay suggestions
 class MarriageHintService {
   final MarriageBotStrategy _strategy;
-  
+
   MarriageHintService({
     MarriageBotDifficulty difficulty = MarriageBotDifficulty.hard,
   }) : _strategy = MarriageBotStrategy(difficulty: difficulty);
@@ -64,22 +62,21 @@ class MarriageHintService {
 
     // Draw Phase Hints
     if (isDrawPhase) {
-      hints.add(_getDrawHint(
-        hand: hand,
-        topDiscard: topDiscard,
-        tiplu: tiplu,
-        hasVisited: hasVisited,
-        canPickFromDiscard: canPickFromDiscard,
-        deckCount: deckCount,
-      ));
+      hints.add(
+        _getDrawHint(
+          hand: hand,
+          topDiscard: topDiscard,
+          tiplu: tiplu,
+          hasVisited: hasVisited,
+          canPickFromDiscard: canPickFromDiscard,
+          deckCount: deckCount,
+        ),
+      );
     }
 
     // Discard Phase Hints
     if (isDiscardPhase) {
-      hints.add(_getDiscardHint(
-        hand: hand,
-        tiplu: tiplu,
-      ));
+      hints.add(_getDiscardHint(hand: hand, tiplu: tiplu));
     }
 
     // Visit Suggestion (if eligible)
@@ -116,31 +113,24 @@ class MarriageHintService {
     required int deckCount,
   }) {
     // Priority: Declare > Visit > Draw/Discard
-    
+
     // Can we win?
     if (_strategy.shouldDeclare(
       hand: hand,
       tiplu: tiplu,
       hasVisited: hasVisited,
     )) {
-      return _getDeclareHint(
-        hand: hand,
-        tiplu: tiplu,
-        hasVisited: hasVisited,
-      );
+      return _getDeclareHint(hand: hand, tiplu: tiplu, hasVisited: hasVisited);
     }
 
     // Can we visit?
-    if (!hasVisited && _strategy.shouldAttemptVisit(
-      hand: hand,
-      tiplu: tiplu,
-      requiredSequences: 3,
-    )) {
-      return _getVisitHint(
-        hand: hand,
-        tiplu: tiplu,
-        hasVisited: hasVisited,
-      );
+    if (!hasVisited &&
+        _strategy.shouldAttemptVisit(
+          hand: hand,
+          tiplu: tiplu,
+          requiredSequences: 3,
+        )) {
+      return _getVisitHint(hand: hand, tiplu: tiplu, hasVisited: hasVisited);
     }
 
     // Normal turn actions
@@ -156,10 +146,7 @@ class MarriageHintService {
     }
 
     if (isDiscardPhase) {
-      return _getDiscardHint(
-        hand: hand,
-        tiplu: tiplu,
-      );
+      return _getDiscardHint(hand: hand, tiplu: tiplu);
     }
 
     return null;
@@ -186,7 +173,7 @@ class MarriageHintService {
       return GameHint(
         type: HintType.drawSource,
         title: '🃏 Draw from Deck',
-        description: deckCount > 10 
+        description: deckCount > 10
             ? 'Plenty of cards in deck. Draw fresh!'
             : 'Tap the face-down deck to draw a new card.',
         icon: Icons.layers,
@@ -194,7 +181,7 @@ class MarriageHintService {
         actionLabel: 'Tap Deck',
       );
     } else {
-      final discardName = topDiscard != null 
+      final discardName = topDiscard != null
           ? '${topDiscard.rank.symbol} of ${topDiscard.suit.symbol}'
           : 'Card';
       return GameHint(
@@ -210,10 +197,7 @@ class MarriageHintService {
   }
 
   /// Generate discard phase hint
-  GameHint _getDiscardHint({
-    required List<Card> hand,
-    required Card? tiplu,
-  }) {
+  GameHint _getDiscardHint({required List<Card> hand, required Card? tiplu}) {
     final toDiscard = _strategy.chooseDiscard(
       hand: hand,
       tiplu: tiplu,
@@ -221,7 +205,7 @@ class MarriageHintService {
     );
 
     final cardName = '${toDiscard.rank.symbol}${toDiscard.suit.symbol}';
-    
+
     return GameHint(
       type: HintType.discardChoice,
       title: '🗑️ Discard $cardName',
@@ -249,7 +233,8 @@ class MarriageHintService {
       return const GameHint(
         type: HintType.visitReady,
         title: '🎉 You Can Visit!',
-        description: 'You have 3 pure sequences! Tap VISIT to unlock Maal scoring.',
+        description:
+            'You have 3 pure sequences! Tap VISIT to unlock Maal scoring.',
         icon: Icons.verified,
         color: Colors.green,
         actionLabel: 'Tap VISIT',
@@ -292,27 +277,35 @@ class MarriageHintService {
     final melds = MeldDetector.findAllMelds(hand, tiplu: tiplu);
 
     if (melds.isEmpty) {
-      hints.add(const GameHint(
-        type: HintType.meldSuggestion,
-        title: '📝 Build Melds',
-        description: 'Collect 3+ cards of same suit in sequence (Run) or same rank (Tunnel).',
-        icon: Icons.lightbulb_outline,
-        color: Colors.cyan,
-      ));
+      hints.add(
+        const GameHint(
+          type: HintType.meldSuggestion,
+          title: '📝 Build Melds',
+          description:
+              'Collect 3+ cards of same suit in sequence (Run) or same rank (Tunnel).',
+          icon: Icons.lightbulb_outline,
+          color: Colors.cyan,
+        ),
+      );
     } else {
       // Show how many melds they have
-      final pureCount = melds.where((m) => 
-        m.type == MeldType.run || m.type == MeldType.tunnel
-      ).length;
+      final pureCount = melds
+          .where((m) => m.type == MeldType.run || m.type == MeldType.tunnel)
+          .length;
 
-      hints.add(GameHint(
-        type: HintType.meldSuggestion,
-        title: '✅ ${melds.length} Melds Found',
-        description: '$pureCount sequences detected. Need 3 pure sequences to visit!',
-        icon: Icons.check_circle,
-        color: Colors.teal,
-        highlightCardIds: melds.expand((m) => m.cards.map((c) => c.id)).toList(),
-      ));
+      hints.add(
+        GameHint(
+          type: HintType.meldSuggestion,
+          title: '✅ ${melds.length} Melds Found',
+          description:
+              '$pureCount sequences detected. Need 3 pure sequences to visit!',
+          icon: Icons.check_circle,
+          color: Colors.teal,
+          highlightCardIds: melds
+              .expand((m) => m.cards.map((c) => c.id))
+              .toList(),
+        ),
+      );
     }
 
     return hints;
@@ -324,11 +317,7 @@ class HintTooltip extends StatelessWidget {
   final GameHint hint;
   final VoidCallback? onDismiss;
 
-  const HintTooltip({
-    super.key,
-    required this.hint,
-    this.onDismiss,
-  });
+  const HintTooltip({super.key, required this.hint, this.onDismiss});
 
   @override
   Widget build(BuildContext context) {
@@ -369,15 +358,15 @@ class HintTooltip extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     hint.description,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                   if (hint.actionLabel != null) ...[
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white24,
                         borderRadius: BorderRadius.circular(20),
@@ -428,7 +417,7 @@ class HintButton extends StatefulWidget {
   State<HintButton> createState() => _HintButtonState();
 }
 
-class _HintButtonState extends State<HintButton> 
+class _HintButtonState extends State<HintButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _pulse;
@@ -440,9 +429,10 @@ class _HintButtonState extends State<HintButton>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
-    _pulse = Tween<double>(begin: 1.0, end: 1.15).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _pulse = Tween<double>(
+      begin: 1.0,
+      end: 1.15,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -460,8 +450,8 @@ class _HintButtonState extends State<HintButton>
           scale: widget.currentHint != null ? _pulse.value : 1.0,
           child: FloatingActionButton.small(
             heroTag: 'hint_button',
-            backgroundColor: widget.hintsEnabled 
-                ? Colors.amber 
+            backgroundColor: widget.hintsEnabled
+                ? Colors.amber
                 : Colors.grey.shade600,
             onPressed: widget.onToggle,
             child: Icon(

@@ -11,11 +11,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PlayingCardWidget(
-              card: card,
-              width: 60,
-              height: 90,
-            ),
+            body: PlayingCardWidget(card: card, width: 60, height: 90),
           ),
         ),
       );
@@ -140,11 +136,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PlayingCardWidget(
-              card: card,
-              width: 100,
-              height: 150,
-            ),
+            body: PlayingCardWidget(card: card, width: 100, height: 150),
           ),
         ),
       );
@@ -161,11 +153,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: PlayingCardWidget(
-              card: null,
-              width: 60,
-              height: 90,
-            ),
+            body: PlayingCardWidget(card: null, width: 60, height: 90),
           ),
         ),
       );

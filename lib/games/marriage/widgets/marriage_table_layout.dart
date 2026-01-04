@@ -126,23 +126,23 @@ class MarriageTableLayout extends StatelessWidget {
     // Total arc based on max players? Or dynamic?
     // Reference 3 shows 3 bots at Top-Left, Top, Top-Right. Typical 5 player game.
     // We stick to distributing available opponents evenly across the arc.
-    
+
     // If we have just 1 opponent, put them at Top (-Pi/2)
     // If we have 4, distribute evenly.
 
     double step;
     if (count == 1) {
-       startAngle = -math.pi / 2;
-       endAngle = -math.pi / 2;
-       step = 0;
+      startAngle = -math.pi / 2;
+      endAngle = -math.pi / 2;
+      step = 0;
     } else {
-       step = (startAngle - endAngle) / (count + 1);
+      step = (startAngle - endAngle) / (count + 1);
     }
 
     for (int i = 0; i < count; i++) {
       double angle;
       if (count == 1) {
-        angle = startAngle; 
+        angle = startAngle;
       } else {
         angle = startAngle - (step * (i + 1));
       }

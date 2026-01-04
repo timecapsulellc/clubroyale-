@@ -34,9 +34,13 @@ void main() {
     test('PlayingCard comparison with trump suit', () {
       const spadeAce = PlayingCard(suit: CardSuit.spades, rank: CardRank.ace);
       const heartKing = PlayingCard(suit: CardSuit.hearts, rank: CardRank.king);
-      
+
       // Spades are trump, led with hearts
-      final result = spadeAce.compareTo(heartKing, trumpSuit: CardSuit.spades, ledSuit: CardSuit.hearts);
+      final result = spadeAce.compareTo(
+        heartKing,
+        trumpSuit: CardSuit.spades,
+        ledSuit: CardSuit.hearts,
+      );
       expect(result, 1); // Trump wins
     });
 

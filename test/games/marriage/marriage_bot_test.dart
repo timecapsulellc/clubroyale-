@@ -8,7 +8,7 @@ void main() {
     late MarriageBotStrategy easyBot;
     late MarriageBotStrategy mediumBot;
     late MarriageBotStrategy hardBot;
-    
+
     setUp(() {
       easyBot = MarriageBotStrategy(difficulty: MarriageBotDifficulty.easy);
       mediumBot = MarriageBotStrategy(difficulty: MarriageBotDifficulty.medium);
@@ -20,7 +20,7 @@ void main() {
         Card(rank: Rank.five, suit: Suit.hearts),
         Card(rank: Rank.six, suit: Suit.hearts),
       ];
-      
+
       final result = mediumBot.shouldDrawFromDeck(
         hand: hand,
         topDiscard: Card(rank: Rank.seven, suit: Suit.hearts),
@@ -28,15 +28,13 @@ void main() {
         hasVisited: false,
         canPickFromDiscard: false,
       );
-      
+
       expect(result, isTrue);
     });
 
     test('Bot draws from deck when no discard available', () {
-      final hand = <Card>[
-        Card(rank: Rank.five, suit: Suit.hearts),
-      ];
-      
+      final hand = <Card>[Card(rank: Rank.five, suit: Suit.hearts)];
+
       final result = mediumBot.shouldDrawFromDeck(
         hand: hand,
         topDiscard: null,
@@ -44,19 +42,19 @@ void main() {
         hasVisited: false,
         canPickFromDiscard: true,
       );
-      
+
       expect(result, isTrue);
     });
-    
+
     test('Medium bot considers meld potential when drawing', () {
       final hand = <Card>[
         Card(rank: Rank.five, suit: Suit.hearts),
         Card(rank: Rank.six, suit: Suit.hearts),
       ];
-      
+
       // Seven of hearts would help form a run
       final helpfulDiscard = Card(rank: Rank.seven, suit: Suit.hearts);
-      
+
       final result = mediumBot.shouldDrawFromDeck(
         hand: hand,
         topDiscard: helpfulDiscard,
@@ -64,7 +62,7 @@ void main() {
         hasVisited: false,
         canPickFromDiscard: true,
       );
-      
+
       // Medium bot should pick from discard when it helps a meld
       expect(result, isFalse);
     });
@@ -79,14 +77,16 @@ void main() {
         Card(rank: Rank.two, suit: Suit.diamonds),
         Card(rank: Rank.three, suit: Suit.clubs),
       ];
-      
-      final mediumBot = MarriageBotStrategy(difficulty: MarriageBotDifficulty.medium);
+
+      final mediumBot = MarriageBotStrategy(
+        difficulty: MarriageBotDifficulty.medium,
+      );
       final discard = mediumBot.chooseDiscard(
         hand: hand,
         tiplu: tiplu,
         lastDrawnCard: null,
       );
-      
+
       // Should not discard the wildcard (King)
       expect(discard.rank, isNot(equals(Rank.king)));
     });
@@ -97,14 +97,16 @@ void main() {
         Card(rank: Rank.two, suit: Suit.diamonds),
         Card(rank: Rank.three, suit: Suit.clubs),
       ];
-      
-      final mediumBot = MarriageBotStrategy(difficulty: MarriageBotDifficulty.medium);
+
+      final mediumBot = MarriageBotStrategy(
+        difficulty: MarriageBotDifficulty.medium,
+      );
       final discard = mediumBot.chooseDiscard(
         hand: hand,
         tiplu: null,
         lastDrawnCard: null,
       );
-      
+
       // Should return a valid card from the hand
       expect(hand.contains(discard), isTrue);
     });
@@ -127,14 +129,16 @@ void main() {
         Card(rank: Rank.nine, suit: Suit.diamonds),
         Card(rank: Rank.ten, suit: Suit.diamonds),
       ];
-      
-      final mediumBot = MarriageBotStrategy(difficulty: MarriageBotDifficulty.medium);
+
+      final mediumBot = MarriageBotStrategy(
+        difficulty: MarriageBotDifficulty.medium,
+      );
       final shouldVisit = mediumBot.shouldAttemptVisit(
         hand: hand,
         tiplu: null,
         requiredSequences: 3,
       );
-      
+
       // Medium bot should visit when eligible
       expect(shouldVisit, isTrue);
     });

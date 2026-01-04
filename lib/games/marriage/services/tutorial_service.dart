@@ -37,7 +37,8 @@ class MarriageTutorial {
     TutorialStep(
       id: 'welcome',
       title: '🎴 Welcome to Marriage!',
-      description: 'Marriage (Royal Meld) is a strategic card game where you collect melds to win. '
+      description:
+          'Marriage (Royal Meld) is a strategic card game where you collect melds to win. '
           'Let\'s learn the basics!',
       icon: Icons.waving_hand,
       position: Alignment.center,
@@ -45,7 +46,8 @@ class MarriageTutorial {
     TutorialStep(
       id: 'objective',
       title: '🎯 Your Goal',
-      description: 'Form all your cards into valid MELDS (groups of 3+ cards). '
+      description:
+          'Form all your cards into valid MELDS (groups of 3+ cards). '
           'A meld is either a RUN (same suit, consecutive) or a TUNNEL (same rank, different suits).',
       icon: Icons.flag,
       position: Alignment.center,
@@ -53,7 +55,8 @@ class MarriageTutorial {
     TutorialStep(
       id: 'your_hand',
       title: '🃏 Your Hand',
-      description: 'These are your cards. Arrange them into melds by drawing and discarding.',
+      description:
+          'These are your cards. Arrange them into melds by drawing and discarding.',
       icon: Icons.back_hand,
       highlightElement: 'player_hand',
       position: Alignment.bottomCenter,
@@ -61,7 +64,8 @@ class MarriageTutorial {
     TutorialStep(
       id: 'deck',
       title: '📚 The Deck',
-      description: 'Tap here to draw a new card. You must draw at the start of your turn.',
+      description:
+          'Tap here to draw a new card. You must draw at the start of your turn.',
       icon: Icons.layers,
       highlightElement: 'deck_pile',
       position: Alignment.center,
@@ -69,7 +73,8 @@ class MarriageTutorial {
     TutorialStep(
       id: 'discard',
       title: '🗑️ Discard Pile',
-      description: 'You can also draw the top card here (unless blocked). '
+      description:
+          'You can also draw the top card here (unless blocked). '
           'After drawing, you must discard one card.',
       icon: Icons.delete_outline,
       highlightElement: 'discard_pile',
@@ -78,7 +83,8 @@ class MarriageTutorial {
     TutorialStep(
       id: 'tiplu',
       title: '⭐ The Tiplu (Wild Card)',
-      description: 'The TIPLU is a special wild card that can substitute any card in melds. '
+      description:
+          'The TIPLU is a special wild card that can substitute any card in melds. '
           'Cards of the same rank are also valuable (Jhiplu, Poplu)!',
       icon: Icons.star,
       highlightElement: 'tiplu_indicator',
@@ -87,7 +93,8 @@ class MarriageTutorial {
     TutorialStep(
       id: 'visit',
       title: '✅ Visiting',
-      description: 'When you have 3 PURE sequences (no wildcards), you can VISIT. '
+      description:
+          'When you have 3 PURE sequences (no wildcards), you can VISIT. '
           'This unlocks Maal scoring and lets you use wildcards freely!',
       icon: Icons.verified,
       highlightElement: 'visit_button',
@@ -96,7 +103,8 @@ class MarriageTutorial {
     TutorialStep(
       id: 'maal',
       title: '💎 Maal Points',
-      description: 'After visiting, collect Maal cards (Tiplu: 4pts, Jhiplu: 3pts, Poplu: 2pts) '
+      description:
+          'After visiting, collect Maal cards (Tiplu: 4pts, Jhiplu: 3pts, Poplu: 2pts) '
           'for bonus points when you win!',
       icon: Icons.diamond,
       position: Alignment.center,
@@ -104,7 +112,8 @@ class MarriageTutorial {
     TutorialStep(
       id: 'finish',
       title: '🏆 Finishing',
-      description: 'When ALL your cards form valid melds, tap FINISH to declare and win! '
+      description:
+          'When ALL your cards form valid melds, tap FINISH to declare and win! '
           'But you must have visited first.',
       icon: Icons.emoji_events,
       highlightElement: 'finish_button',
@@ -113,7 +122,8 @@ class MarriageTutorial {
     TutorialStep(
       id: 'hints',
       title: '💡 Need Help?',
-      description: 'Tap the lightbulb button anytime for AI suggestions on your next move. '
+      description:
+          'Tap the lightbulb button anytime for AI suggestions on your next move. '
           'It will highlight recommended cards!',
       icon: Icons.lightbulb,
       highlightElement: 'hint_button',
@@ -122,7 +132,8 @@ class MarriageTutorial {
     TutorialStep(
       id: 'ready',
       title: '🎮 You\'re Ready!',
-      description: 'That\'s it! Draw, discard, build melds, visit, and finish. Good luck!',
+      description:
+          'That\'s it! Draw, discard, build melds, visit, and finish. Good luck!',
       icon: Icons.rocket_launch,
       position: Alignment.center,
     ),
@@ -211,14 +222,12 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
         Positioned.fill(
           child: GestureDetector(
             onTap: _nextStep,
-            child: Container(
-              color: Colors.black.withValues(alpha: 0.7),
-            ),
+            child: Container(color: Colors.black.withValues(alpha: 0.7)),
           ),
         ),
 
         // Highlight box for specific elements (if applicable)
-        if (step.highlightElement != null && 
+        if (step.highlightElement != null &&
             widget.elementKeys?[step.highlightElement] != null)
           _buildHighlight(widget.elementKeys![step.highlightElement]!),
 
@@ -280,10 +289,7 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
-            blurRadius: 20,
-          ),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 20),
         ],
       ),
       child: Column(
@@ -349,7 +355,10 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.amber,
                   foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
                 ),
                 child: Text(isLast ? 'Start Playing!' : 'Next'),
               ),
@@ -374,8 +383,8 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
             color: index == _currentStep
                 ? Colors.amber
                 : index < _currentStep
-                    ? Colors.amber.withValues(alpha: 0.5)
-                    : Colors.white24,
+                ? Colors.amber.withValues(alpha: 0.5)
+                : Colors.white24,
           ),
         ),
       ),
@@ -400,7 +409,10 @@ class TutorialReplayButton extends StatelessWidget {
           context: context,
           builder: (ctx) => AlertDialog(
             backgroundColor: Colors.grey.shade900,
-            title: const Text('Replay Tutorial?', style: TextStyle(color: Colors.white)),
+            title: const Text(
+              'Replay Tutorial?',
+              style: TextStyle(color: Colors.white),
+            ),
             content: const Text(
               'Would you like to see the tutorial again?',
               style: TextStyle(color: Colors.white70),

@@ -113,7 +113,9 @@ class ThemeColors {
     primary: Color(0xFFD4AF37), // Gold is primary for actions
     secondary: Color(0xFF1B7A4E), // Rich green secondary
     accent: Color(0xFFD4AF37), // Classic gold
-    background: Color(0xFF0D3B2E), // Deep radial green (Edge) - from CasinoColors
+    background: Color(
+      0xFF0D3B2E,
+    ), // Deep radial green (Edge) - from CasinoColors
     surface: Color(0xFF165B47), // Table green mid
     surfaceLight: Color(0xFF1F7A5E), // Table green light
     gold: Color(0xFFD4AF37), // Gold accents
@@ -248,18 +250,54 @@ class ThemeBuilder {
       brightness: Brightness.dark,
       primaryColor: colors.primary,
       scaffoldBackgroundColor: colors.background,
-      
+
       // Premium Typography
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.oswald(fontSize: 57, fontWeight: FontWeight.bold, color: colors.textPrimary),
-        displayMedium: GoogleFonts.oswald(fontSize: 45, fontWeight: FontWeight.bold, color: colors.textPrimary), // Headlines
-        displaySmall: GoogleFonts.oswald(fontSize: 36, fontWeight: FontWeight.bold, color: colors.textPrimary),
-        headlineLarge: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold, color: colors.textPrimary),
-        headlineMedium: GoogleFonts.oswald(fontSize: 28, fontWeight: FontWeight.bold, color: colors.textPrimary),
-        titleLarge: GoogleFonts.roboto(fontSize: 22, fontWeight: FontWeight.w500, color: colors.textPrimary), // AppBars/Dialog Titles
-        titleMedium: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w500, color: colors.textPrimary),
-        bodyLarge: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.normal, color: colors.textPrimary),
-        bodyMedium: GoogleFonts.roboto(fontSize: 14, fontWeight: FontWeight.normal, color: colors.textSecondary),
+        displayLarge: GoogleFonts.oswald(
+          fontSize: 57,
+          fontWeight: FontWeight.bold,
+          color: colors.textPrimary,
+        ),
+        displayMedium: GoogleFonts.oswald(
+          fontSize: 45,
+          fontWeight: FontWeight.bold,
+          color: colors.textPrimary,
+        ), // Headlines
+        displaySmall: GoogleFonts.oswald(
+          fontSize: 36,
+          fontWeight: FontWeight.bold,
+          color: colors.textPrimary,
+        ),
+        headlineLarge: GoogleFonts.oswald(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: colors.textPrimary,
+        ),
+        headlineMedium: GoogleFonts.oswald(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: colors.textPrimary,
+        ),
+        titleLarge: GoogleFonts.roboto(
+          fontSize: 22,
+          fontWeight: FontWeight.w500,
+          color: colors.textPrimary,
+        ), // AppBars/Dialog Titles
+        titleMedium: GoogleFonts.roboto(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: colors.textPrimary,
+        ),
+        bodyLarge: GoogleFonts.roboto(
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: colors.textPrimary,
+        ),
+        bodyMedium: GoogleFonts.roboto(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: colors.textSecondary,
+        ),
       ),
 
       colorScheme: ColorScheme.dark(
@@ -286,7 +324,10 @@ class ThemeBuilder {
           backgroundColor: colors.gold,
           foregroundColor: colors.background,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.bold),
+          textStyle: GoogleFonts.roboto(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -295,7 +336,10 @@ class ThemeBuilder {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: colors.gold,
-          textStyle: GoogleFonts.roboto(fontSize: 14, fontWeight: FontWeight.bold),
+          textStyle: GoogleFonts.roboto(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       iconTheme: IconThemeData(color: colors.textPrimary),
@@ -304,7 +348,10 @@ class ThemeBuilder {
         backgroundColor: colors.surface,
         selectedItemColor: colors.gold,
         unselectedItemColor: colors.textSecondary,
-        selectedLabelStyle: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold),
+        selectedLabelStyle: GoogleFonts.roboto(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
         unselectedLabelStyle: GoogleFonts.roboto(fontSize: 12),
       ),
     );

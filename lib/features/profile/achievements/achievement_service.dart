@@ -122,36 +122,41 @@ class AchievementService {
     required int currentStreak,
   }) async {
     // Win count achievements
-    if (totalWins >= 1)
+    if (totalWins >= 1) {
       await updateProgress(
         userId: userId,
         achievementId: 'first_win',
         progress: 1,
       );
-    if (totalWins >= 10)
+    }
+    if (totalWins >= 10) {
       await updateProgress(
         userId: userId,
         achievementId: 'win_10',
         progress: totalWins,
       );
-    if (totalWins >= 50)
+    }
+    if (totalWins >= 50) {
       await updateProgress(
         userId: userId,
         achievementId: 'win_50',
         progress: totalWins,
       );
-    if (totalWins >= 100)
+    }
+    if (totalWins >= 100) {
       await updateProgress(
         userId: userId,
         achievementId: 'win_100',
         progress: totalWins,
       );
-    if (totalWins >= 500)
+    }
+    if (totalWins >= 500) {
       await updateProgress(
         userId: userId,
         achievementId: 'win_500',
         progress: totalWins,
       );
+    }
 
     // Game-specific achievements
     switch (gameType) {
@@ -176,18 +181,20 @@ class AchievementService {
     }
 
     // Streak achievements
-    if (currentStreak >= 3)
+    if (currentStreak >= 3) {
       await updateProgress(
         userId: userId,
         achievementId: 'streak_3',
         progress: currentStreak,
       );
-    if (currentStreak >= 7)
+    }
+    if (currentStreak >= 7) {
       await updateProgress(
         userId: userId,
         achievementId: 'streak_7',
         progress: currentStreak,
       );
+    }
   }
 
   /// Check social achievements
@@ -196,37 +203,42 @@ class AchievementService {
     required int friendCount,
     required int gamesHosted,
   }) async {
-    if (friendCount >= 1)
+    if (friendCount >= 1) {
       await updateProgress(
         userId: userId,
         achievementId: 'first_friend',
         progress: 1,
       );
-    if (friendCount >= 10)
+    }
+    if (friendCount >= 10) {
       await updateProgress(
         userId: userId,
         achievementId: 'friends_10',
         progress: friendCount,
       );
-    if (friendCount >= 50)
+    }
+    if (friendCount >= 50) {
       await updateProgress(
         userId: userId,
         achievementId: 'friends_50',
         progress: friendCount,
       );
+    }
 
-    if (gamesHosted >= 5)
+    if (gamesHosted >= 5) {
       await updateProgress(
         userId: userId,
         achievementId: 'host_5',
         progress: gamesHosted,
       );
-    if (gamesHosted >= 25)
+    }
+    if (gamesHosted >= 25) {
       await updateProgress(
         userId: userId,
         achievementId: 'host_25',
         progress: gamesHosted,
       );
+    }
   }
 
   /// Check daily streak achievements

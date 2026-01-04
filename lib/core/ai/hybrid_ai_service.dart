@@ -40,8 +40,9 @@ class AIDecisionRequest {
     // Critical decisions that need LLM
     if (phase == 'bidding') return AIDecisionType.genkit;
     if (phase == 'trumpSelection') return AIDecisionType.genkit;
-    if (phase == 'declaring' && gameType == 'marriage')
+    if (phase == 'declaring' && gameType == 'marriage') {
       return AIDecisionType.genkit;
+    }
 
     // First card of a trick (strategic lead)
     if (gameState['currentTrick']?.isEmpty ?? true) {

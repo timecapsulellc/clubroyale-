@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/features/leaderboard/leaderboard_screen.dart';
 
 void main() {
-  // Note: Widget tests for LeaderboardScreen are skipped due to flutter_animate 
+  // Note: Widget tests for LeaderboardScreen are skipped due to flutter_animate
   // timer issues in test environment. The screen works correctly in production.
 
   group('LeaderboardEntry Calculations', () {

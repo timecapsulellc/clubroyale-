@@ -129,7 +129,10 @@ class CardWidget extends StatelessWidget {
               right: 0,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppTheme.gold,
                     borderRadius: BorderRadius.circular(8),
@@ -153,14 +156,10 @@ class CardWidget extends StatelessWidget {
     if (isSelected) {
       cardContent = Transform.translate(
         offset: const Offset(0, -8),
-        child: Transform.scale(
-          scale: 1.05,
-          child: cardContent,
-        ),
+        child: Transform.scale(scale: 1.05, child: cardContent),
       );
     }
 
     return cardContent;
   }
 }
-

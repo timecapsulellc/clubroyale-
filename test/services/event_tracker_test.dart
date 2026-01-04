@@ -66,10 +66,7 @@ void main() {
 
     test('trackDiamondsEarned does not throw', () async {
       expect(
-        () => eventTracker.trackDiamondsEarned(
-          amount: 100,
-          source: 'game_win',
-        ),
+        () => eventTracker.trackDiamondsEarned(amount: 100, source: 'game_win'),
         returnsNormally,
       );
     });

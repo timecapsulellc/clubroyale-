@@ -1,19 +1,36 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/core/card_engine/meld.dart';
 import 'package:clubroyale/core/models/playing_card.dart';
-import 'package:clubroyale/games/marriage/marriage_service.dart';
-import 'package:clubroyale/games/marriage/marriage_config.dart';
-
 
 void main() {
   group('Gap Verification', () {
     test('Gap #3: Ace High/Low Sequence Validation', () {
       // Setup cards
-      final ace = PlayingCard(suit: CardSuit.spades, rank: CardRank.ace, deckIndex: 0);
-      final two = PlayingCard(suit: CardSuit.spades, rank: CardRank.two, deckIndex: 0);
-      final three = PlayingCard(suit: CardSuit.spades, rank: CardRank.three, deckIndex: 0);
-      final queen = PlayingCard(suit: CardSuit.spades, rank: CardRank.queen, deckIndex: 0);
-      final king = PlayingCard(suit: CardSuit.spades, rank: CardRank.king, deckIndex: 0);
+      final ace = PlayingCard(
+        suit: CardSuit.spades,
+        rank: CardRank.ace,
+        deckIndex: 0,
+      );
+      final two = PlayingCard(
+        suit: CardSuit.spades,
+        rank: CardRank.two,
+        deckIndex: 0,
+      );
+      final three = PlayingCard(
+        suit: CardSuit.spades,
+        rank: CardRank.three,
+        deckIndex: 0,
+      );
+      final queen = PlayingCard(
+        suit: CardSuit.spades,
+        rank: CardRank.queen,
+        deckIndex: 0,
+      );
+      final king = PlayingCard(
+        suit: CardSuit.spades,
+        rank: CardRank.king,
+        deckIndex: 0,
+      );
 
       // 1. Low Ace (A-2-3) - Should be VALID
       final lowSeq = RunMeld([ace, two, three]);

@@ -1,4 +1,3 @@
-
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/widgets/skeleton_loading.dart';
 import 'package:clubroyale/features/onboarding/onboarding_screen.dart';
@@ -12,11 +11,7 @@ void main() {
   group('UI Verification Tests', () {
     testWidgets('SkeletonGameScreen renders correctly', (tester) async {
       // Pump the SkeletonGameScreen
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: SkeletonGameScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: SkeletonGameScreen()));
 
       // Verify the AppBar title
       expect(find.text('Game Room'), findsOneWidget);
@@ -30,7 +25,9 @@ void main() {
       expect(find.byType(SkeletonPlayerTile), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('BracketView renders matches with correct data', (tester) async {
+    testWidgets('BracketView renders matches with correct data', (
+      tester,
+    ) async {
       // Mock Data
       final brackets = <TournamentBracket>[
         TournamentBracket(
@@ -63,9 +60,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: CasinoColors.darkTheme,
-          home: Scaffold(
-            body: BracketView(brackets: brackets),
-          ),
+          home: Scaffold(body: BracketView(brackets: brackets)),
         ),
       );
 
@@ -84,7 +79,10 @@ void main() {
 
       // Verify Status Badges
       expect(find.text('LIVE'), findsOneWidget);
-      expect(find.byIcon(Icons.check_circle), findsOneWidget); // Winner checkmark
+      expect(
+        find.byIcon(Icons.check_circle),
+        findsOneWidget,
+      ); // Winner checkmark
       expect(find.byIcon(Icons.emoji_events), findsNWidgets(1)); // Trophy
     });
 
@@ -94,11 +92,7 @@ void main() {
       // Assuming straightforward UI rendering:
 
       await tester.pumpWidget(
-        const ProviderScope(
-            child: MaterialApp(
-            home: OnboardingScreen(),
-          ),
-        ),
+        const ProviderScope(child: MaterialApp(home: OnboardingScreen())),
       );
 
       // Pump to start animations
@@ -110,8 +104,8 @@ void main() {
 
       // Verify the Icon exists (this is the one we animated)
       expect(find.byIcon(Icons.favorite), findsOneWidget);
-      
-      // We can't easily verify the "float" animation without complex ticking, 
+
+      // We can't easily verify the "float" animation without complex ticking,
       // but successfully pumping means no crash in the animation setup.
       await tester.pump(const Duration(milliseconds: 500));
     });

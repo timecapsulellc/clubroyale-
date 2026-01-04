@@ -41,8 +41,8 @@ class PlayerSlotWidget extends StatelessWidget {
           color: Colors.black.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isCurrentTurn 
-                ? CasinoColors.gold 
+            color: isCurrentTurn
+                ? CasinoColors.gold
                 : (isMe ? Colors.blue : Colors.white24),
             width: isCurrentTurn ? 2 : 1,
           ),
@@ -97,7 +97,10 @@ class PlayerSlotWidget extends StatelessWidget {
                   top: -4,
                   right: -4,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: CasinoColors.gold,
                       borderRadius: BorderRadius.circular(10),
@@ -199,7 +202,9 @@ class PlayerSlotWidget extends StatelessWidget {
 
   Widget _buildMiniTimer() {
     final progress = timerSeconds! / timerTotal!;
-    final color = progress > 0.5 ? Colors.green : (progress > 0.2 ? Colors.orange : Colors.red);
+    final color = progress > 0.5
+        ? Colors.green
+        : (progress > 0.2 ? Colors.orange : Colors.red);
 
     return SizedBox(
       width: 24,
@@ -332,7 +337,11 @@ class PlayerSlotCompact extends StatelessWidget {
     if (isCurrentTurn) {
       slot = slot
           .animate(onPlay: (c) => c.repeat(reverse: true))
-          .scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05), duration: 800.ms);
+          .scale(
+            begin: const Offset(1, 1),
+            end: const Offset(1.05, 1.05),
+            duration: 800.ms,
+          );
     }
 
     return slot;

@@ -111,8 +111,10 @@ class GameModeSidebar extends StatelessWidget {
               ),
               if (isNew)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.red,
                     borderRadius: BorderRadius.circular(4),

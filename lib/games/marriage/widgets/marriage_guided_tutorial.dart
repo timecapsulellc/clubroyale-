@@ -16,7 +16,7 @@ class MarriageGuidedTutorial {
       // Step 1: Welcome
       InteractiveTutorialStep(
         title: '🎮 Let\'s Play Marriage!',
-        instruction: 
+        instruction:
             'Welcome! This guided tutorial will walk you through your first game.\n\n'
             'I\'ll show you exactly what to do with hand gestures. '
             'Follow along and you\'ll be a pro in no time!',

@@ -35,7 +35,7 @@ void main() {
     test('clearAssignments resets cache', () {
       abTestingService.forceVariant('cached_experiment', 'forced_value');
       abTestingService.clearAssignments();
-      
+
       // After clear, should get fresh value (may be same or different)
       final variant = abTestingService.getVariant('cached_experiment');
       expect(variant, isA<String>());
@@ -45,12 +45,18 @@ void main() {
   group('isVariant helper', () {
     test('isVariant returns true for matching variant', () {
       abTestingService.forceVariant('check_experiment', 'variant_a');
-      expect(abTestingService.isVariant('check_experiment', 'variant_a'), isTrue);
+      expect(
+        abTestingService.isVariant('check_experiment', 'variant_a'),
+        isTrue,
+      );
     });
 
     test('isVariant returns false for non-matching variant', () {
       abTestingService.forceVariant('check_experiment', 'variant_a');
-      expect(abTestingService.isVariant('check_experiment', 'variant_b'), isFalse);
+      expect(
+        abTestingService.isVariant('check_experiment', 'variant_b'),
+        isFalse,
+      );
     });
   });
 

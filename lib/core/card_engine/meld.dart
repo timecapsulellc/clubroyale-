@@ -54,8 +54,9 @@ abstract class Meld {
       case MeldType.dublee:
         return DubleeMeld(cards);
       case MeldType.marriage:
-        if (tiplu == null)
+        if (tiplu == null) {
           throw ArgumentError('Tiplu required for MarriageMeld');
+        }
         return MarriageMeld(cards, tiplu: tiplu);
       case MeldType.impureRun:
         return ImpureRunMeld(cards, tiplu: tiplu);
@@ -196,8 +197,9 @@ class DubleeMeld extends Meld {
     if (cards.length != 2) return false;
     final first = cards.first;
     // Must be same rank and suit
-    if (cards[1].rank != first.rank || cards[1].suit != first.suit)
+    if (cards[1].rank != first.rank || cards[1].suit != first.suit) {
       return false;
+    }
     // Must be from different decks (implied, as you can't have duplicate card objects likely)
     if (cards[1].deckIndex == first.deckIndex) return false;
     return true;
@@ -315,8 +317,9 @@ class ImpureRunMeld extends Meld {
   @override
   bool get isValid {
     if (cards.length < 3) return false;
-    if (wildcardCount == 0)
+    if (wildcardCount == 0) {
       return false; // Must have at least 1 wildcard for impure
+    }
     if (wildcardCount >= cards.length) return false; // Can't be all wildcards
 
     // Get non-wildcard cards to determine suit and expected sequence
@@ -760,8 +763,9 @@ class MeldDetector {
     PlayingCard? tiplu,
   ) {
     final meldIds = meld.cards.map((c) => c.id).toSet();
-    if (!meld.cards.every((c) => remaining.any((r) => r.id == c.id)))
+    if (!meld.cards.every((c) => remaining.any((r) => r.id == c.id))) {
       return false;
+    }
 
     final newRemaining = remaining
         .where((c) => !meldIds.contains(c.id))

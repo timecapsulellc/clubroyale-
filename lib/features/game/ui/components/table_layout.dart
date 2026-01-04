@@ -14,9 +14,7 @@ class TableLayout extends ConsumerWidget {
     final theme = ref.watch(selectedThemeProvider);
 
     return Container(
-      decoration: const BoxDecoration(
-        gradient: CasinoColors.greenFeltGradient,
-      ),
+      decoration: const BoxDecoration(gradient: CasinoColors.greenFeltGradient),
       child: SafeArea(
         child: Stack(
           alignment: Alignment.center,
@@ -29,4 +27,5 @@ class TableLayout extends ConsumerWidget {
     );
   }
 }
+
 // Removed legacy TableFeltPainter as we now use rich assets

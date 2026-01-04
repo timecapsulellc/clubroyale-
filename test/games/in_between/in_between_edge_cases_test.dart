@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/games/in_between/in_between_game.dart';
 
 /// In-Between Edge Case Tests
-/// 
+///
 /// Tests for edge cases in In-Between (Acey-Deucey) game logic:
 /// - Game initialization
 /// - Betting mechanics
@@ -11,7 +11,7 @@ void main() {
   group('InBetweenGame Initialization', () {
     late InBetweenGame game;
     final players = ['player1', 'player2'];
-    
+
     setUp(() {
       game = InBetweenGame();
       game.initialize(players);
@@ -37,7 +37,7 @@ void main() {
   group('InBetweenGame Betting', () {
     late InBetweenGame game;
     final players = ['p1', 'p2'];
-    
+
     setUp(() {
       game = InBetweenGame();
       game.initialize(players);
@@ -49,7 +49,7 @@ void main() {
       expect(probability, greaterThanOrEqualTo(0.0));
       expect(probability, lessThanOrEqualTo(1.0));
     });
-    
+
     test('Player can pass their turn', () {
       final currentPlayer = game.currentPlayerId;
       game.pass();
@@ -66,7 +66,7 @@ void main() {
 
   group('InBetweenGame End Conditions', () {
     late InBetweenGame game;
-    
+
     setUp(() {
       game = InBetweenGame();
       game.initialize(['p1', 'p2']);

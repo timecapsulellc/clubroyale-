@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
 /// Centralized haptic feedback service for consistent tactile responses
-/// 
+///
 /// Usage:
 /// ```dart
 /// HapticService.cardTap();

@@ -26,8 +26,8 @@ class LobbyMainMenu extends ConsumerWidget {
         color: CasinoColors.tableGreenDark.withValues(alpha: 0.5),
         border: Border(
           right: BorderSide(
-            color: CasinoColors.gold.withValues(alpha: 0.2), 
-            width: 1
+            color: CasinoColors.gold.withValues(alpha: 0.2),
+            width: 1,
           ),
         ),
       ),
@@ -81,38 +81,38 @@ class LobbyMainMenu extends ConsumerWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           _MainMenuButton(
             icon: Icons.person,
             label: "Single Player",
             onTap: onSinglePlayer,
           ),
           const SizedBox(height: 16),
-          
+
           _MainMenuButton(
             icon: Icons.wifi, // Symbolizes local/nearby
             label: "Local MultiPlayer",
             onTap: onLocalMultiplayer,
           ),
           const SizedBox(height: 16),
-          
+
           _MainMenuButton(
             icon: Icons.public,
             label: "Online Public Room",
             onTap: onOnlinePublic,
           ),
           const SizedBox(height: 16),
-          
+
           _MainMenuButton(
             icon: Icons.vpn_key, // Symbolizes private/code
             label: "Online Private Room",
             onTap: onOnlinePrivate,
           ),
-          
+
           const Spacer(),
-          
+
           // Version Text (like reference)
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
@@ -167,10 +167,7 @@ class _MainMenuButtonState extends State<_MainMenuButton> {
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
               colors: _isHovered
-                  ? [
-                      CasinoColors.tableGreenLight,
-                      CasinoColors.tableGreenMid,
-                    ]
+                  ? [CasinoColors.tableGreenLight, CasinoColors.tableGreenMid]
                   : [
                       const Color(0xFF0F3D29), // Darker Green
                       const Color(0xFF0A2F1F), // Even Darker
@@ -178,8 +175,8 @@ class _MainMenuButtonState extends State<_MainMenuButton> {
             ),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: _isHovered 
-                  ? CasinoColors.gold 
+              color: _isHovered
+                  ? CasinoColors.gold
                   : CasinoColors.gold.withValues(alpha: 0.5),
               width: 1.5,
             ),
@@ -189,7 +186,7 @@ class _MainMenuButtonState extends State<_MainMenuButton> {
                       color: CasinoColors.gold.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
-                    )
+                    ),
                   ]
                 : [],
           ),
@@ -202,19 +199,16 @@ class _MainMenuButtonState extends State<_MainMenuButton> {
                   color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  widget.icon,
-                  color: Colors.white,
-                  size: 24,
-                ),
+                child: Icon(widget.icon, color: Colors.white, size: 24),
               ),
               const SizedBox(width: 16),
-              
+
               // Text
               Expanded(
                 child: Text(
                   widget.label,
-                  style: GoogleFonts.zillaSlab( // Using serif-like font for "Classic" feel if available, else Roboto
+                  style: GoogleFonts.zillaSlab(
+                    // Using serif-like font for "Classic" feel if available, else Roboto
                     fontSize: 20,
                     fontWeight: FontWeight.bold, // Italic in reference?
                     fontStyle: FontStyle.italic,

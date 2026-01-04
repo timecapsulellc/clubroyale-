@@ -37,7 +37,7 @@ void main() {
       final transactions = settlementService.calculateSettlements(scores);
 
       expect(transactions.length, 2);
-      
+
       // Verify total amount received by A is 20
       final totalReceivedByA = transactions
           .where((t) => t.toPlayerId == 'A')
@@ -45,8 +45,14 @@ void main() {
       expect(totalReceivedByA, 20);
 
       // Verify B and C pay 10 each
-      expect(transactions.any((t) => t.fromPlayerId == 'B' && t.amount == 10), isTrue);
-      expect(transactions.any((t) => t.fromPlayerId == 'C' && t.amount == 10), isTrue);
+      expect(
+        transactions.any((t) => t.fromPlayerId == 'B' && t.amount == 10),
+        isTrue,
+      );
+      expect(
+        transactions.any((t) => t.fromPlayerId == 'C' && t.amount == 10),
+        isTrue,
+      );
     });
 
     test('should handle non-zero sum scores by centering around average', () {
@@ -68,12 +74,12 @@ void main() {
       // Sum: 0, Avg: 0
       // Creditors: A(50), B(20)
       // Debtors: C(-30), D(-40)
-      
+
       // Greedy approach might do:
       // D(-40) pays A(50) -> D pays 40 to A. A remains +10. D settled.
       // C(-30) pays A(10) -> C pays 10 to A. A settled. C remains -20.
       // C(-20) pays B(20) -> C pays 20 to B. Both settled.
-      
+
       final scores = {'A': 50, 'B': 20, 'C': -30, 'D': -40};
       final transactions = settlementService.calculateSettlements(scores);
 

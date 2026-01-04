@@ -17,70 +17,74 @@ class YourTurnBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!isVisible) return const SizedBox.shrink();
 
-    final phaseText = turnPhase == 'drawing' 
-        ? 'TAP DECK TO DRAW' 
+    final phaseText = turnPhase == 'drawing'
+        ? 'TAP DECK TO DRAW'
         : 'SELECT & DISCARD';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            CasinoColors.gold.withValues(alpha: 0.9),
-            CasinoColors.bronzeGold.withValues(alpha: 0.9),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: CasinoColors.gold.withValues(alpha: 0.5),
-            blurRadius: 20,
-            spreadRadius: 2,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                CasinoColors.gold.withValues(alpha: 0.9),
+                CasinoColors.bronzeGold.withValues(alpha: 0.9),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.3),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: CasinoColors.gold.withValues(alpha: 0.5),
+                blurRadius: 20,
+                spreadRadius: 2,
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // YOUR TURN text
-          Row(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.touch_app,
-                color: Colors.black87,
-                size: 20,
+              // YOUR TURN text
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.touch_app, color: Colors.black87, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'YOUR TURN',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
+              const SizedBox(height: 4),
+              // Phase instruction
               Text(
-                'YOUR TURN',
+                phaseText,
                 style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 2,
+                  color: Colors.black54,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          // Phase instruction
-          Text(
-            phaseText,
-            style: TextStyle(
-              color: Colors.black54,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1,
-            ),
-          ),
-        ],
-      ),
-    )
+        )
         .animate()
         .fadeIn(duration: 300.ms)
-        .slideY(begin: -0.5, end: 0, duration: 300.ms, curve: Curves.easeOutBack)
+        .slideY(
+          begin: -0.5,
+          end: 0,
+          duration: 300.ms,
+          curve: Curves.easeOutBack,
+        )
         .then()
         .animate(onPlay: (c) => c.repeat(reverse: true))
         .scale(
@@ -107,18 +111,20 @@ class CurrentPlayerGlow extends StatelessWidget {
     if (!isCurrentPlayer) return child;
 
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: CasinoColors.gold.withValues(alpha: 0.6),
-            blurRadius: 16,
-            spreadRadius: 4,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: CasinoColors.gold.withValues(alpha: 0.6),
+                blurRadius: 16,
+                spreadRadius: 4,
+              ),
+            ],
           ),
-        ],
-      ),
-      child: child,
-    ).animate(onPlay: (c) => c.repeat(reverse: true)).custom(
+          child: child,
+        )
+        .animate(onPlay: (c) => c.repeat(reverse: true))
+        .custom(
           duration: 1000.ms,
           builder: (context, value, child) {
             return Container(
@@ -126,7 +132,9 @@ class CurrentPlayerGlow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: CasinoColors.gold.withValues(alpha: 0.3 + (value * 0.3)),
+                    color: CasinoColors.gold.withValues(
+                      alpha: 0.3 + (value * 0.3),
+                    ),
                     blurRadius: 12 + (value * 8),
                     spreadRadius: 2 + (value * 2),
                   ),
@@ -153,14 +161,14 @@ class TurnPhaseIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDrawing = phase == 'drawing';
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isMyTurn 
+          color: isMyTurn
               ? (isDrawing ? Colors.blue : Colors.orange)
               : Colors.grey,
           width: isMyTurn ? 2 : 1,
@@ -172,7 +180,7 @@ class TurnPhaseIndicator extends StatelessWidget {
           Icon(
             isDrawing ? Icons.download : Icons.upload,
             size: 14,
-            color: isMyTurn 
+            color: isMyTurn
                 ? (isDrawing ? Colors.blue : Colors.orange)
                 : Colors.grey,
           ),

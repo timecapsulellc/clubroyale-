@@ -88,7 +88,7 @@ class CardAssetPreloader {
   /// Preload essential assets only (fast)
   Future<void> preloadEssential(BuildContext context) async {
     if (_isPreloaded) return;
-    
+
     for (final path in _essentialAssets) {
       try {
         await precacheImage(AssetImage(path), context);
@@ -117,14 +117,16 @@ class CardAssetPreloader {
     }
 
     stopwatch.stop();
-    debugPrint('🃏 Preloaded $loaded cards in ${stopwatch.elapsedMilliseconds}ms ($failed failed)');
+    debugPrint(
+      '🃏 Preloaded $loaded cards in ${stopwatch.elapsedMilliseconds}ms ($failed failed)',
+    );
     _isPreloaded = true;
   }
 
   /// Preload in background without blocking UI
   void preloadInBackground(BuildContext context) {
     if (_isPreloaded) return;
-    
+
     // Use compute or run in microtask to not block UI
     Future.microtask(() async {
       await preloadAll(context);
@@ -169,7 +171,7 @@ class _AssetPreloadSplashState extends State<AssetPreloadSplash> {
 
   Future<void> _preload() async {
     final startTime = DateTime.now();
-    
+
     // Start preloading
     await _preloadWithProgress();
 
@@ -224,14 +226,10 @@ class _AssetPreloadSplashState extends State<AssetPreloadSplash> {
                 color: Colors.amber.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.casino,
-                size: 64,
-                color: Colors.amber,
-              ),
+              child: const Icon(Icons.casino, size: 64, color: Colors.amber),
             ),
             const SizedBox(height: 32),
-            
+
             // App name
             const Text(
               'ClubRoyale',
@@ -245,13 +243,10 @@ class _AssetPreloadSplashState extends State<AssetPreloadSplash> {
             const SizedBox(height: 8),
             const Text(
               'Loading game assets...',
-              style: TextStyle(
-                color: Colors.white54,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.white54, fontSize: 14),
             ),
             const SizedBox(height: 40),
-            
+
             // Progress bar
             SizedBox(
               width: 200,
@@ -265,10 +260,7 @@ class _AssetPreloadSplashState extends State<AssetPreloadSplash> {
                   const SizedBox(height: 8),
                   Text(
                     '${(_progress * 100).toInt()}%',
-                    style: const TextStyle(
-                      color: Colors.white38,
-                      fontSize: 12,
-                    ),
+                    style: const TextStyle(color: Colors.white38, fontSize: 12),
                   ),
                 ],
               ),

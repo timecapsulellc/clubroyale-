@@ -2,13 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/games/teen_patti/teen_patti_game.dart';
 
 /// Teen Patti Edge Case Tests
-/// 
+///
 /// Tests for Teen Patti game logic
 void main() {
   group('TeenPattiGame Initialization', () {
     late TeenPattiGame game;
     final players = ['player1', 'player2', 'player3'];
-    
+
     setUp(() {
       game = TeenPattiGame();
       game.initialize(players);
@@ -43,7 +43,7 @@ void main() {
   group('TeenPattiGame Player Actions', () {
     late TeenPattiGame game;
     final players = ['p1', 'p2', 'p3'];
-    
+
     setUp(() {
       game = TeenPattiGame();
       game.initialize(players);

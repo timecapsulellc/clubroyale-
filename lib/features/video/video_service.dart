@@ -171,8 +171,9 @@ class VideoService extends ChangeNotifier {
   }
 
   Future<void> enableCamera() async {
-    if (_localParticipant == null || _localRole == ParticipantRole.spectator)
+    if (_localParticipant == null || _localRole == ParticipantRole.spectator) {
       return;
+    }
 
     try {
       await _localParticipant!.setCameraEnabled(true);
@@ -205,8 +206,9 @@ class VideoService extends ChangeNotifier {
   }
 
   Future<void> enableMicrophone() async {
-    if (_localParticipant == null || _localRole == ParticipantRole.spectator)
+    if (_localParticipant == null || _localRole == ParticipantRole.spectator) {
       return;
+    }
 
     try {
       await _localParticipant!.setMicrophoneEnabled(true);

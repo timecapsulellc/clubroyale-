@@ -19,7 +19,7 @@ class GameLogOverlay extends StatelessWidget {
         children: visibleLogs.map((log) {
           // Parse rudimentary markdown styling from reference image logic?
           // Reference: "Bot 1: picked card from deck" (Yellow/White)
-          
+
           final parts = log.split(':');
           final name = parts.isNotEmpty ? parts[0] : '';
           final action = parts.length > 1 ? parts.sublist(1).join(':') : '';
@@ -34,11 +34,16 @@ class GameLogOverlay extends StatelessWidget {
             ),
             child: RichText(
               text: TextSpan(
-                style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                ),
                 children: [
                   TextSpan(
                     text: name,
-                    style: const TextStyle(color: Color(0xFFFFD700)), // Gold name
+                    style: const TextStyle(
+                      color: Color(0xFFFFD700),
+                    ), // Gold name
                   ),
                   TextSpan(
                     text: action.isEmpty ? '' : ':$action',

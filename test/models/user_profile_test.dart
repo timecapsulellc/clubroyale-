@@ -1,4 +1,3 @@
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/features/profile/user_profile.dart';
 
@@ -19,10 +18,7 @@ void main() {
     });
 
     test('should create UserProfile with null avatarUrl', () {
-      final json = {
-        'id': 'user1',
-        'displayName': 'John Doe',
-      };
+      final json = {'id': 'user1', 'displayName': 'John Doe'};
 
       final profile = UserProfile.fromJson(json);
 
@@ -46,10 +42,7 @@ void main() {
     });
 
     test('should convert UserProfile without avatar to JSON', () {
-      const profile = UserProfile(
-        id: 'user1',
-        displayName: 'John Doe',
-      );
+      const profile = UserProfile(id: 'user1', displayName: 'John Doe');
 
       final json = profile.toJson();
 
@@ -59,10 +52,7 @@ void main() {
     });
 
     test('should create copy with modified fields', () {
-      const original = UserProfile(
-        id: 'user1',
-        displayName: 'Original Name',
-      );
+      const original = UserProfile(id: 'user1', displayName: 'Original Name');
 
       final modified = original.copyWith(
         displayName: 'New Name',
@@ -95,15 +85,9 @@ void main() {
     });
 
     test('should handle inequality for different data', () {
-      const profile1 = UserProfile(
-        id: 'user1',
-        displayName: 'John Doe',
-      );
+      const profile1 = UserProfile(id: 'user1', displayName: 'John Doe');
 
-      const profile2 = UserProfile(
-        id: 'user2',
-        displayName: 'Jane Doe',
-      );
+      const profile2 = UserProfile(id: 'user2', displayName: 'Jane Doe');
 
       expect(profile1, isNot(equals(profile2)));
     });

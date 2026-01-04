@@ -5,7 +5,7 @@ import 'package:clubroyale/games/in_between/in_between_game.dart';
 import 'package:clubroyale/features/agents/models/bot_personality.dart';
 
 /// Bot Integration Tests
-/// 
+///
 /// Tests for bot integration across all games
 void main() {
   group('BotPersonality System', () {
@@ -32,13 +32,15 @@ void main() {
       final winReaction = personality.getReaction('win');
       expect(winReaction, isNotEmpty);
       expect(winReaction, contains(personality.avatarEmoji));
-      
+
       final loseReaction = personality.getReaction('lose');
       expect(loseReaction, isNotEmpty);
     });
 
     test('Can filter by personality type', () {
-      final conservative = BotPersonality.all.where((p) => p.type == BotPersonalityType.conservative).toList();
+      final conservative = BotPersonality.all
+          .where((p) => p.type == BotPersonalityType.conservative)
+          .toList();
       expect(conservative.length, greaterThan(0));
       for (final p in conservative) {
         expect(p.type, equals(BotPersonalityType.conservative));
@@ -72,9 +74,13 @@ void main() {
 
     test('Bot personality affects betting decisions', () {
       // Aggressive personality should bet more
-      final aggressive = BotPersonality.all.firstWhere((p) => p.type == BotPersonalityType.aggressive);
-      final conservative = BotPersonality.all.firstWhere((p) => p.type == BotPersonalityType.conservative);
-      
+      final aggressive = BotPersonality.all.firstWhere(
+        (p) => p.type == BotPersonalityType.aggressive,
+      );
+      final conservative = BotPersonality.all.firstWhere(
+        (p) => p.type == BotPersonalityType.conservative,
+      );
+
       expect(aggressive.aggression, greaterThan(conservative.aggression));
       expect(aggressive.bluffRate, greaterThan(conservative.bluffRate));
     });
@@ -88,9 +94,13 @@ void main() {
     });
 
     test('Bot risk tolerance affects betting', () {
-      final aggressive = BotPersonality.all.firstWhere((p) => p.type == BotPersonalityType.aggressive);
-      final analytical = BotPersonality.all.firstWhere((p) => p.type == BotPersonalityType.analytical);
-      
+      final aggressive = BotPersonality.all.firstWhere(
+        (p) => p.type == BotPersonalityType.aggressive,
+      );
+      final analytical = BotPersonality.all.firstWhere(
+        (p) => p.type == BotPersonalityType.analytical,
+      );
+
       expect(aggressive.riskTolerance, greaterThan(analytical.riskTolerance));
     });
 
@@ -98,7 +108,7 @@ void main() {
       final game = InBetweenGame();
       game.initialize(['p1', 'p2']); // Need 2 players minimum
       game.startRound();
-      
+
       final probability = game.getWinProbability();
       expect(probability, inInclusiveRange(0.0, 1.0));
     });

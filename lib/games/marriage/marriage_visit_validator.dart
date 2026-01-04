@@ -173,8 +173,9 @@ class MarriageVisitValidator {
     if (card.rank == tiplu!.rank && card.suit == tiplu!.suit) return true;
 
     // Jhiplu: same rank, opposite color
-    if (card.rank == tiplu!.rank && card.suit.isRed != tiplu!.suit.isRed)
+    if (card.rank == tiplu!.rank && card.suit.isRed != tiplu!.suit.isRed) {
       return true;
+    }
 
     // Poplu: next rank, same suit
     final popluValue = tiplu!.rank.value == 13 ? 1 : tiplu!.rank.value + 1;

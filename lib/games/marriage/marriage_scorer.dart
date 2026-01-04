@@ -62,8 +62,9 @@ class MarriageScorer {
         int deadwood = calculateDeadwood(hands[pid]!);
 
         // Cap penalty (e.g. 100 points max)
-        if (deadwood > config.fullCountPenalty)
+        if (deadwood > config.fullCountPenalty) {
           deadwood = config.fullCountPenalty;
+        }
         gamePoints[pid] = deadwood;
       }
     }
@@ -204,8 +205,9 @@ class MarriageScorer {
     List<PlayingCard> hand,
     List<Meld> melds,
   ) {
-    if (hand.isNotEmpty)
+    if (hand.isNotEmpty) {
       return (false, 'Hand must be empty (all cards melded)');
+    }
 
     // Must have at least one pure sequence/tunnel?
     // Standard rule: 3 pure sequences to visit, then anything to end.

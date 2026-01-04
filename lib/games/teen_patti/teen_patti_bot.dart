@@ -102,8 +102,9 @@ class TeenPattiBotStrategy {
         // Hard: strategically vary bets to confuse
         final variation = _random.nextDouble();
         if (variation < 0.6) return minBet;
-        if (variation < 0.85)
+        if (variation < 0.85) {
           return (minBet * 1.5).round().clamp(minBet, maxBet);
+        }
         return (minBet * 2).clamp(minBet, maxBet);
     }
   }
@@ -173,8 +174,9 @@ class TeenPattiBotStrategy {
   }) {
     // Can only sideshow if seen and previous player is also seen
     if (player.status != PlayerStatus.seen) return false;
-    if (previousPlayer == null || previousPlayer.status != PlayerStatus.seen)
+    if (previousPlayer == null || previousPlayer.status != PlayerStatus.seen) {
       return false;
+    }
 
     final handStrength = evaluateHand(hand);
 

@@ -11,7 +11,9 @@ class MockAiService extends Mock implements AiService {}
 
 void main() {
   group('Marriage Game New Widgets Tests', () {
-    testWidgets('VisitButtonWidget renders correctly in locked state', (tester) async {
+    testWidgets('VisitButtonWidget renders correctly in locked state', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -30,7 +32,9 @@ void main() {
       expect(find.byIcon(Icons.lock_outline), findsOneWidget);
     });
 
-    testWidgets('VisitButtonWidget renders correctly in ready state', (tester) async {
+    testWidgets('VisitButtonWidget renders correctly in ready state', (
+      tester,
+    ) async {
       bool tapped = false;
       await tester.pumpWidget(
         MaterialApp(
@@ -48,19 +52,19 @@ void main() {
 
       expect(find.text('VISIT'), findsOneWidget);
       expect(find.byIcon(Icons.lock_open), findsOneWidget);
-      
+
       // Test interaction
       await tester.tap(find.text('VISIT'));
       expect(tapped, isTrue);
     });
 
-    testWidgets('VisitButtonWidget renders correctly in visited state', (tester) async {
+    testWidgets('VisitButtonWidget renders correctly in visited state', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: VisitButtonWidget(
-              state: VisitButtonState.visited,
-            ),
+            body: VisitButtonWidget(state: VisitButtonState.visited),
           ),
         ),
       );
@@ -73,16 +77,17 @@ void main() {
     testWidgets('MaalIndicator renders points correctly', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: MaalIndicator(points: 15, hasMarriage: true),
-          ),
+          home: Scaffold(body: MaalIndicator(points: 15, hasMarriage: true)),
         ),
       );
       await tester.pumpAndSettle();
 
       expect(find.text('15'), findsOneWidget);
       expect(find.text('Maal'), findsOneWidget);
-      expect(find.byIcon(Icons.volunteer_activism), findsOneWidget); // Bonus icon
+      expect(
+        find.byIcon(Icons.volunteer_activism),
+        findsOneWidget,
+      ); // Bonus icon
     });
 
     testWidgets('GameTimerWidget renders countdown', (tester) async {

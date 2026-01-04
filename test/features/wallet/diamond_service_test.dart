@@ -1,7 +1,8 @@
 /// Diamond Service Tests
-/// 
+///
 /// Unit tests for the financial diamond service.
 library;
+
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -22,7 +23,7 @@ void main() {
     test('deduct should not allow negative balance', () {
       const balance = 50;
       const deductAmount = 100;
-      
+
       // Should fail the check
       final canDeduct = balance >= deductAmount;
       expect(canDeduct, isFalse);
@@ -31,11 +32,11 @@ void main() {
     test('diamond amounts must be positive integers', () {
       const validAmounts = [1, 10, 100, 1000];
       const invalidAmounts = [-1, 0, -100];
-      
+
       for (final amount in validAmounts) {
         expect(amount > 0, isTrue, reason: '$amount should be valid');
       }
-      
+
       for (final amount in invalidAmounts) {
         expect(amount > 0, isFalse, reason: '$amount should be invalid');
       }
@@ -47,13 +48,13 @@ void main() {
       // Simulate rate limiter with max 3 actions per window
       const maxActions = 3;
       var actionCount = 0;
-      
+
       for (var i = 0; i < maxActions; i++) {
         if (actionCount < maxActions) {
           actionCount++;
         }
       }
-      
+
       expect(actionCount, equals(maxActions));
     });
 
@@ -61,7 +62,7 @@ void main() {
       const maxActions = 3;
       var actionCount = 0;
       var blocked = 0;
-      
+
       for (var i = 0; i < 5; i++) {
         if (actionCount < maxActions) {
           actionCount++;
@@ -69,7 +70,7 @@ void main() {
           blocked++;
         }
       }
-      
+
       expect(actionCount, equals(3));
       expect(blocked, equals(2));
     });
@@ -84,7 +85,7 @@ void main() {
         'purchase',
         'referral',
       ];
-      
+
       for (final type in validTypes) {
         expect(type.isNotEmpty, isTrue);
       }
@@ -93,7 +94,7 @@ void main() {
     test('transaction requires userId', () {
       const userId = 'user123';
       const nullUserId = null;
-      
+
       expect(userId.isNotEmpty, isTrue);
       expect(nullUserId == null, isTrue);
     });

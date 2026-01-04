@@ -72,13 +72,13 @@ class _MaalIndicatorState extends State<MaalIndicator> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '${widget.points}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                )
+                      '${widget.points}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    )
                     .animate(key: ValueKey(widget.points))
                     .scale(duration: 300.ms, curve: Curves.easeOutBack),
                 const SizedBox(width: 4),
@@ -106,9 +106,7 @@ class _MaalIndicatorState extends State<MaalIndicator> {
               margin: const EdgeInsets.only(top: 4),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.pink, Colors.purple],
-                ),
+                gradient: LinearGradient(colors: [Colors.pink, Colors.purple]),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Row(
@@ -184,4 +182,3 @@ class _MaalIndicatorState extends State<MaalIndicator> {
     );
   }
 }
-

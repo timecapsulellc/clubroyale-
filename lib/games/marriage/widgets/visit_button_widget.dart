@@ -52,10 +52,10 @@ class VisitButtonWidget extends StatelessWidget {
     // Determine which path is closer to completion
     final seqProgress = pureSequenceCount / 3; // Need 3 sequences
     final dubProgress = dubleeCount / 7; // Need 7 dublees
-    
+
     String progressText;
     Color progressColor;
-    
+
     if (seqProgress >= dubProgress) {
       progressText = '$pureSequenceCount/3 SEQ';
       progressColor = pureSequenceCount >= 2 ? Colors.orange : Colors.grey;

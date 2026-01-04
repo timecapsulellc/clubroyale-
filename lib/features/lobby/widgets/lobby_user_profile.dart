@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/features/auth/auth_service.dart';
 
-
 class LobbyUserProfile extends ConsumerWidget {
   const LobbyUserProfile({super.key});
 
@@ -27,8 +26,10 @@ class LobbyUserProfile extends ConsumerWidget {
               image: DecorationImage(
                 image: user?.photoURL != null
                     ? NetworkImage(user!.photoURL!)
-                    : const AssetImage('assets/images/avatars/default_avatar.png')
-                        as ImageProvider,
+                    : const AssetImage(
+                            'assets/images/avatars/default_avatar.png',
+                          )
+                          as ImageProvider,
                 fit: BoxFit.cover,
               ),
               boxShadow: [
@@ -50,16 +51,22 @@ class LobbyUserProfile extends ConsumerWidget {
                 // Name
                 Text(
                   user?.displayName ?? 'Guest Player',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith( // Oswald
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    // Oswald
                     color: Colors.white,
                     height: 1.0,
                     shadows: [const Shadow(color: Colors.black, blurRadius: 4)],
                   ),
                 ),
                 const SizedBox(height: 8),
-                
+
                 // Stats (Coins, Games, Level)
-                _buildStatRow(context, "Coins", "0", CasinoColors.gold), // Real data would plug here
+                _buildStatRow(
+                  context,
+                  "Coins",
+                  "0",
+                  CasinoColors.gold,
+                ), // Real data would plug here
                 _buildStatRow(context, "Games Played", "0", Colors.white70),
                 _buildStatRow(context, "Player Level", "0", Colors.white70),
               ],
@@ -70,7 +77,12 @@ class LobbyUserProfile extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatRow(BuildContext context, String label, String value, Color valueColor) {
+  Widget _buildStatRow(
+    BuildContext context,
+    String label,
+    String value,
+    Color valueColor,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 2),
       child: RichText(
@@ -79,7 +91,10 @@ class LobbyUserProfile extends ConsumerWidget {
           children: [
             TextSpan(
               text: "$label: ",
-              style: const TextStyle(color: CasinoColors.tableGreenMid, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: CasinoColors.tableGreenMid,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             TextSpan(
               text: value,

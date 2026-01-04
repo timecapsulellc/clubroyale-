@@ -38,37 +38,22 @@ class _FlyingCardAnimationState extends State<FlyingCardAnimation>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    );
+    _controller = AnimationController(vsync: this, duration: widget.duration);
 
     _positionAnimation = Tween<Offset>(
       begin: widget.startPosition,
       end: widget.endPosition,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
     _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 1.3),
-        weight: 30,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: 1.3, end: 1.0),
-        weight: 70,
-      ),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 70),
     ]).animate(_controller);
 
     _rotationAnimation = Tween<double>(
       begin: 0.0,
       end: 0.05, // Slight rotation for natural feel
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutBack,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
     _controller.forward().then((_) {
       widget.onComplete?.call();
@@ -115,8 +100,9 @@ class _FlyingCardAnimationState extends State<FlyingCardAnimation>
 /// Controller to manage flying card animations
 class CardAnimationController extends ChangeNotifier {
   final List<FlyingCardAnimation> _activeAnimations = [];
-  
-  List<FlyingCardAnimation> get activeAnimations => List.unmodifiable(_activeAnimations);
+
+  List<FlyingCardAnimation> get activeAnimations =>
+      List.unmodifiable(_activeAnimations);
 
   /// Animate card from deck to hand
   void animateDrawFromDeck({
@@ -177,10 +163,7 @@ class CardAnimationController extends ChangeNotifier {
 class CardAnimationOverlay extends StatelessWidget {
   final CardAnimationController controller;
 
-  const CardAnimationOverlay({
-    super.key,
-    required this.controller,
-  });
+  const CardAnimationOverlay({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -191,9 +174,7 @@ class CardAnimationOverlay extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        return Stack(
-          children: controller.activeAnimations,
-        );
+        return Stack(children: controller.activeAnimations);
       },
     );
   }
@@ -217,14 +198,14 @@ class DealingAnimation extends StatelessWidget {
     return Stack(
       children: List.generate(cardCount, (index) {
         return Container(
-          width: 50,
-          height: 70,
-          decoration: BoxDecoration(
-            color: const Color(0xFF2a1f4e),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: Colors.white10),
-          ),
-        )
+              width: 50,
+              height: 70,
+              decoration: BoxDecoration(
+                color: const Color(0xFF2a1f4e),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Colors.white10),
+              ),
+            )
             .animate(delay: staggerDelay * index)
             .fadeIn(duration: 150.ms)
             .slide(

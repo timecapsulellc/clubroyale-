@@ -15,10 +15,15 @@ import 'package:clubroyale/features/chat/chat_service.dart';
 
 // Mocks
 class MockMarriageService extends Mock implements MarriageService {}
+
 class MockAuthService extends Mock implements AuthService {}
+
 class MockUser extends Mock implements firebase_auth.User {}
+
 class MockDiamondService extends Mock implements DiamondService {}
+
 class MockAudioService extends Mock implements AudioService {}
+
 class MockChatService extends Mock implements ChatService {}
 
 void main() {
@@ -30,16 +35,18 @@ void main() {
   late MockChatService mockChatService;
 
   setUp(() {
-    registerFallbackValue(MarriageGameState(
-      tipluCardId: '',
-      playerHands: {},
-      deckCards: [],
-      discardPile: [],
-      currentPlayerId: '',
-      currentRound: 1,
-      phase: '',
-      config: const MarriageGameConfig(),
-    ));
+    registerFallbackValue(
+      MarriageGameState(
+        tipluCardId: '',
+        playerHands: {},
+        deckCards: [],
+        discardPile: [],
+        currentPlayerId: '',
+        currentRound: 1,
+        phase: '',
+        config: const MarriageGameConfig(),
+      ),
+    );
 
     mockMarriageService = MockMarriageService();
     mockAuthService = MockAuthService();
@@ -50,30 +57,41 @@ void main() {
 
     // Stub AudioService
     when(() => mockAudioService.isEnabled).thenReturn(false);
-    when(() => mockAudioService.state).thenReturn(AudioConnectionState.disconnected);
+    when(
+      () => mockAudioService.state,
+    ).thenReturn(AudioConnectionState.disconnected);
     when(() => mockAudioService.isMuted).thenReturn(false);
     when(() => mockAudioService.connectedPeers).thenReturn([]);
     when(() => mockAudioService.joinAudioRoom()).thenAnswer((_) async {});
     when(() => mockAudioService.toggleMute()).thenReturn(null);
 
     // Stub ChatService
-    when(() => mockChatService.messagesStream).thenAnswer((_) => Stream.value([]));
-    when(() => mockChatService.typingUsersStream).thenAnswer((_) => Stream.value([]));
+    when(
+      () => mockChatService.messagesStream,
+    ).thenAnswer((_) => Stream.value([]));
+    when(
+      () => mockChatService.typingUsersStream,
+    ).thenAnswer((_) => Stream.value([]));
 
     // Default mock behavior
     when(() => mockUser.uid).thenReturn('test_user_id');
     when(() => mockUser.displayName).thenReturn('Test Player');
     when(() => mockAuthService.currentUser).thenReturn(mockUser);
-    
+
     // Stub getRemainingTurnTime to prevent null error
     when(() => mockMarriageService.getRemainingTurnTime(any())).thenReturn(30);
 
     // Stub watchWallet
-    when(() => mockDiamondService.watchWallet(any()))
-        .thenAnswer((_) => Stream.value(const DiamondWallet(userId: 'test_user_id', balance: 1000)));
+    when(() => mockDiamondService.watchWallet(any())).thenAnswer(
+      (_) => Stream.value(
+        const DiamondWallet(userId: 'test_user_id', balance: 1000),
+      ),
+    );
   });
 
-  testWidgets('Marriage Multiplayer Screen UI Layout Verification', (tester) async {
+  testWidgets('Marriage Multiplayer Screen UI Layout Verification', (
+    tester,
+  ) async {
     // Set screen size to landscape 1080p
     tester.view.physicalSize = const Size(1920, 1080);
     tester.view.devicePixelRatio = 1.0;
@@ -96,8 +114,9 @@ void main() {
     );
 
     // 2. Mock Stream
-    when(() => mockMarriageService.watchGameState(any()))
-        .thenAnswer((_) => Stream.value(gameState));
+    when(
+      () => mockMarriageService.watchGameState(any()),
+    ).thenAnswer((_) => Stream.value(gameState));
 
     // 3. Pump Widget
     await tester.pumpWidget(
@@ -116,29 +135,39 @@ void main() {
     );
 
     // 4. Wait for Async/Animations
-    await tester.pump(); 
-    await tester.pump(const Duration(seconds: 1)); 
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
     // 5. Verify UI Elements (Redesign)
     debugPrint('Verifying UI elements...');
-    
+
     // Check Deck Labels
     expect(find.text('DECK'), findsOneWidget, reason: 'DECK label missing');
-    expect(find.text('DISCARD'), findsOneWidget, reason: 'DISCARD label missing');
+    expect(
+      find.text('DISCARD'),
+      findsOneWidget,
+      reason: 'DISCARD label missing',
+    );
     expect(find.text('FINISH'), findsWidgets, reason: 'FINISH label missing');
 
     // Check Player Hand Area Gradient Container
     // We can't easily verify gradient color, but we can verify the Container exists
     // by finding the one wrapping the Status Bar or Hand
     // For now, assume if TableLayout is present and labels are there, the redesign logic is active.
-    
+
     // Check Phase Indicator (My Turn)
-    expect(find.text('📥 DRAW'), findsOneWidget, reason: 'Draw phase indicator missing');
+    expect(
+      find.text('📥 DRAW'),
+      findsOneWidget,
+      reason: 'Draw phase indicator missing',
+    );
 
     debugPrint('✅ Marriage UI Widget Test Passed');
   });
 
-  testWidgets('Marriage Multiplayer - Multiple Opponents Layout', (tester) async {
+  testWidgets('Marriage Multiplayer - Multiple Opponents Layout', (
+    tester,
+  ) async {
     // Set screen size to landscape 1080p
     tester.view.physicalSize = const Size(1920, 1080);
     tester.view.devicePixelRatio = 1.0;
@@ -162,8 +191,9 @@ void main() {
       config: const MarriageGameConfig(),
     );
 
-    when(() => mockMarriageService.watchGameState(any()))
-        .thenAnswer((_) => Stream.value(multiplayerState));
+    when(
+      () => mockMarriageService.watchGameState(any()),
+    ).thenAnswer((_) => Stream.value(multiplayerState));
 
     await tester.pumpWidget(
       ProviderScope(
@@ -189,12 +219,28 @@ void main() {
     expect(find.text('FINISH'), findsWidgets);
 
     // Verify opponent names are displayed
-    expect(find.text('TrickMaster'), findsOneWidget, reason: 'TrickMaster bot name missing');
-    expect(find.text('CardShark'), findsOneWidget, reason: 'CardShark bot name missing');
-    expect(find.text('LuckyDice'), findsOneWidget, reason: 'LuckyDice bot name missing');
+    expect(
+      find.text('TrickMaster'),
+      findsOneWidget,
+      reason: 'TrickMaster bot name missing',
+    );
+    expect(
+      find.text('CardShark'),
+      findsOneWidget,
+      reason: 'CardShark bot name missing',
+    );
+    expect(
+      find.text('LuckyDice'),
+      findsOneWidget,
+      reason: 'LuckyDice bot name missing',
+    );
 
     // Verify it's NOT my turn (different indicator expected)
-    expect(find.text('Waiting...'), findsOneWidget, reason: 'Waiting indicator should show when not my turn');
+    expect(
+      find.text('Waiting...'),
+      findsOneWidget,
+      reason: 'Waiting indicator should show when not my turn',
+    );
 
     debugPrint('✅ Marriage Multiplayer Widget Test Passed');
   });
@@ -227,8 +273,9 @@ void main() {
       config: const MarriageGameConfig(),
     );
 
-    when(() => mockMarriageService.watchGameState(any()))
-        .thenAnswer((_) => Stream.value(eightPlayerState));
+    when(
+      () => mockMarriageService.watchGameState(any()),
+    ).thenAnswer((_) => Stream.value(eightPlayerState));
 
     await tester.pumpWidget(
       ProviderScope(
@@ -264,7 +311,11 @@ void main() {
     expect(find.text('Smart'), findsOneWidget);
 
     // Verify it's my turn with discard phase
-    expect(find.text('📤 DISCARD'), findsOneWidget, reason: 'Discard phase indicator should show');
+    expect(
+      find.text('📤 DISCARD'),
+      findsOneWidget,
+      reason: 'Discard phase indicator should show',
+    );
 
     debugPrint('✅ Marriage 8-Player Widget Test Passed');
   });

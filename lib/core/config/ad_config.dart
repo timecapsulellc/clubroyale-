@@ -1,11 +1,11 @@
 import 'dart:io';
 
 /// AdMob Configuration
-/// 
+///
 /// Production IDs can be set via dart-define at build time:
 /// flutter build apk --dart-define=ADMOB_ANDROID_APP_ID=ca-app-pub-XXX~XXX
 /// flutter build apk --dart-define=ADMOB_ANDROID_REWARDED_ID=ca-app-pub-XXX/XXX
-/// 
+///
 /// If not set, Test IDs are used (safe for development).
 class AdConfig {
   // Environment variables (set via --dart-define)
@@ -49,7 +49,7 @@ class AdConfig {
   /// Check if using test IDs (for logging/debugging)
   static bool get isUsingTestIds {
     return _androidAppId.contains('3940256099942544') ||
-           _iosAppId.contains('3940256099942544');
+        _iosAppId.contains('3940256099942544');
   }
 
   static const int maxAdsPerDay = 6;

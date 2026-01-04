@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 /// Diamond Wallet Logic Tests
-/// 
+///
 /// Tests for diamond economy rules and validations.
 void main() {
   group('Diamond Transfer Rules', () {
@@ -30,7 +30,7 @@ void main() {
     test('balance cannot be negative', () {
       int balance = 100;
       int spend = 150;
-      
+
       bool canSpend = balance >= spend;
       expect(canSpend, isFalse);
     });
@@ -56,11 +56,11 @@ void main() {
       const dailyCap = 5000;
       int dailyEarned = 4500;
       int newEarning = 1000;
-      
-      int actualEarning = (dailyEarned + newEarning) > dailyCap 
-          ? dailyCap - dailyEarned 
+
+      int actualEarning = (dailyEarned + newEarning) > dailyCap
+          ? dailyCap - dailyEarned
           : newEarning;
-      
+
       expect(actualEarning, equals(500));
     });
 
@@ -68,11 +68,11 @@ void main() {
       const dailyCap = 5000;
       int dailyEarned = 5000;
       int newEarning = 100;
-      
-      int actualEarning = (dailyEarned + newEarning) > dailyCap 
-          ? dailyCap - dailyEarned 
+
+      int actualEarning = (dailyEarned + newEarning) > dailyCap
+          ? dailyCap - dailyEarned
           : newEarning;
-      
+
       expect(actualEarning, equals(0));
     });
   });
@@ -103,7 +103,7 @@ void main() {
     test('game win reward calculation', () {
       const baseReward = 100;
       const tierMultiplier = 1.5; // Gold tier
-      
+
       int reward = (baseReward * tierMultiplier).round();
       expect(reward, equals(150));
     });
@@ -111,17 +111,17 @@ void main() {
     test('daily login streak bonus', () {
       int streakDay = 7;
       int baseReward = 50;
-      
+
       int streakBonus = streakDay >= 7 ? 100 : (streakDay >= 3 ? 25 : 0);
       int totalReward = baseReward + streakBonus;
-      
+
       expect(totalReward, equals(150));
     });
 
     test('referral reward calculation', () {
       const referrerReward = 500;
       const refereeReward = 200;
-      
+
       expect(referrerReward, greaterThan(refereeReward));
     });
   });
@@ -130,7 +130,7 @@ void main() {
     test('transfer to self is blocked', () {
       String senderId = 'user-123';
       String receiverId = 'user-123';
-      
+
       bool isSelfTransfer = senderId == receiverId;
       expect(isSelfTransfer, isTrue);
     });
@@ -141,17 +141,18 @@ void main() {
         DateTime.now().subtract(const Duration(seconds: 20)),
         DateTime.now().subtract(const Duration(seconds: 10)),
       ];
-      
-      bool isRapid = recentTransfers.length >= 3 && 
+
+      bool isRapid =
+          recentTransfers.length >= 3 &&
           recentTransfers.last.difference(recentTransfers.first).inMinutes < 1;
-      
+
       expect(isRapid, isTrue);
     });
 
     test('large transfer requires verification', () {
       int amount = 5000;
       const verificationThreshold = 1000;
-      
+
       bool requiresVerification = amount >= verificationThreshold;
       expect(requiresVerification, isTrue);
     });
@@ -160,10 +161,15 @@ void main() {
 
 double _getTierMultiplier(String tier) {
   switch (tier) {
-    case 'bronze': return 1.1;
-    case 'silver': return 1.25;
-    case 'gold': return 1.5;
-    case 'diamond': return 2.0;
-    default: return 1.0;
+    case 'bronze':
+      return 1.1;
+    case 'silver':
+      return 1.25;
+    case 'gold':
+      return 1.5;
+    case 'diamond':
+      return 2.0;
+    default:
+      return 1.0;
   }
 }

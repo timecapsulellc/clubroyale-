@@ -22,19 +22,13 @@ void main() {
 
     test('captureMessage does not throw when disabled', () async {
       await expectLater(
-        SentryService.captureMessage(
-          'Test message',
-          level: SentryLevel.info,
-        ),
+        SentryService.captureMessage('Test message', level: SentryLevel.info),
         completes,
       );
     });
 
     test('setUser does not throw when disabled', () async {
-      await expectLater(
-        SentryService.setUser(null),
-        completes,
-      );
+      await expectLater(SentryService.setUser(null), completes);
     });
 
     test('addBreadcrumb does not throw when disabled', () {

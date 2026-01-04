@@ -68,11 +68,12 @@ class MyFriendsTab extends ConsumerWidget {
     return StreamBuilder<List<String>>(
       stream: friendIdsStream,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting)
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const ContextualLoader(
             message: 'Loading friends...',
             icon: Icons.people,
           );
+        }
         final ids = snapshot.data ?? [];
 
         if (ids.isEmpty) {
@@ -190,12 +191,14 @@ class FriendRequestsTab extends ConsumerWidget {
     return StreamBuilder<List<FriendRequest>>(
       stream: requestsStream,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting)
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
+        }
         final requests = snapshot.data ?? [];
 
-        if (requests.isEmpty)
+        if (requests.isEmpty) {
           return const Center(child: Text('No pending requests'));
+        }
 
         return ListView.builder(
           itemCount: requests.length,

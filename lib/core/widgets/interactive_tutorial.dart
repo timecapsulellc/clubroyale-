@@ -67,7 +67,12 @@ class TutorialHandPointer extends StatelessWidget {
         // Swipe left animation
         return hand
             .animate(onPlay: (controller) => controller.repeat())
-            .moveX(begin: 0, end: -40, duration: 600.ms, curve: Curves.easeInOut)
+            .moveX(
+              begin: 0,
+              end: -40,
+              duration: 600.ms,
+              curve: Curves.easeInOut,
+            )
             .fadeOut(delay: 400.ms, duration: 200.ms)
             .then(delay: 300.ms);
 
@@ -83,12 +88,25 @@ class TutorialHandPointer extends StatelessWidget {
         // Drag and drop animation
         return hand
             .animate(onPlay: (controller) => controller.repeat())
-            .scale(begin: const Offset(1, 1), end: const Offset(0.9, 0.9), duration: 200.ms)
+            .scale(
+              begin: const Offset(1, 1),
+              end: const Offset(0.9, 0.9),
+              duration: 200.ms,
+            )
             .then()
             .moveX(begin: 0, end: 60, duration: 500.ms, curve: Curves.easeInOut)
-            .moveY(begin: 0, end: -30, duration: 500.ms, curve: Curves.easeInOut)
+            .moveY(
+              begin: 0,
+              end: -30,
+              duration: 500.ms,
+              curve: Curves.easeInOut,
+            )
             .then()
-            .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1), duration: 200.ms)
+            .scale(
+              begin: const Offset(0.9, 0.9),
+              end: const Offset(1, 1),
+              duration: 200.ms,
+            )
             .fadeOut(delay: 100.ms, duration: 200.ms)
             .then(delay: 400.ms);
 
@@ -113,14 +131,7 @@ class TutorialHandPointer extends StatelessWidget {
 }
 
 /// Types of gestures the tutorial hand can demonstrate
-enum TutorialGestureType {
-  tap,
-  swipeRight,
-  swipeLeft,
-  swipeUp,
-  dragDrop,
-  hold,
-}
+enum TutorialGestureType { tap, swipeRight, swipeLeft, swipeUp, dragDrop, hold }
 
 /// Interactive Tutorial Step with action requirement
 class InteractiveTutorialStep {
@@ -129,7 +140,8 @@ class InteractiveTutorialStep {
   final GlobalKey? targetKey;
   final TutorialGestureType gestureType;
   final Offset? handOffset; // Offset from target center
-  final bool Function()? actionValidator; // Returns true when action is complete
+  final bool Function()?
+  actionValidator; // Returns true when action is complete
   final String? highlightCardId; // Specific card to highlight
   final bool waitForAction; // If true, waits for user action before proceeding
 
@@ -157,7 +169,7 @@ class InteractiveTutorialController extends ChangeNotifier {
   int get currentIndex => _currentIndex;
   bool get isActive => _isActive;
   bool get isComplete => _currentIndex >= steps.length;
-  InteractiveTutorialStep? get currentStep => 
+  InteractiveTutorialStep? get currentStep =>
       isComplete ? null : steps[_currentIndex];
 
   void nextStep() {
@@ -237,8 +249,8 @@ class InteractiveTutorialOverlay extends StatelessWidget {
         // Find target position
         Rect? targetRect;
         if (step.targetKey?.currentContext != null) {
-          final renderBox = step.targetKey!.currentContext!
-              .findRenderObject() as RenderBox?;
+          final renderBox =
+              step.targetKey!.currentContext!.findRenderObject() as RenderBox?;
           if (renderBox != null) {
             final position = renderBox.localToGlobal(Offset.zero);
             targetRect = Rect.fromLTWH(
@@ -255,9 +267,7 @@ class InteractiveTutorialOverlay extends StatelessWidget {
             // 1. Semi-transparent overlay (touchable area for advancing)
             GestureDetector(
               onTap: step.waitForAction ? null : controller.nextStep,
-              child: Container(
-                color: Colors.black54,
-              ),
+              child: Container(color: Colors.black54),
             ),
 
             // 2. Highlight punch-out for target
@@ -290,23 +300,26 @@ class InteractiveTutorialOverlay extends StatelessWidget {
       top: targetRect.top - 8,
       width: targetRect.width + 16,
       height: targetRect.height + 16,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: CasinoColors.gold, width: 3),
-          boxShadow: [
-            BoxShadow(
-              color: CasinoColors.gold.withValues(alpha: 0.5),
-              blurRadius: 12,
-              spreadRadius: 2,
-            ),
-          ],
-        ),
-      ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(
-            begin: const Offset(1, 1),
-            end: const Offset(1.03, 1.03),
-            duration: 600.ms,
-          ),
+      child:
+          Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: CasinoColors.gold, width: 3),
+                  boxShadow: [
+                    BoxShadow(
+                      color: CasinoColors.gold.withValues(alpha: 0.5),
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+              )
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .scale(
+                begin: const Offset(1, 1),
+                end: const Offset(1.03, 1.03),
+                duration: 600.ms,
+              ),
     );
   }
 
@@ -317,8 +330,8 @@ class InteractiveTutorialOverlay extends StatelessWidget {
     Size screenSize,
   ) {
     // Position card away from target
-    final isTopHalf = targetRect != null 
-        ? targetRect.center.dy < screenSize.height / 2 
+    final isTopHalf = targetRect != null
+        ? targetRect.center.dy < screenSize.height / 2
         : false;
 
     return Positioned(
@@ -406,7 +419,8 @@ class InteractiveTutorialOverlay extends StatelessWidget {
                       if (!step.waitForAction)
                         ElevatedButton(
                           onPressed: () {
-                            if (controller.currentIndex == controller.steps.length - 1) {
+                            if (controller.currentIndex ==
+                                controller.steps.length - 1) {
                               controller.complete();
                               onComplete();
                             } else {
@@ -418,7 +432,8 @@ class InteractiveTutorialOverlay extends StatelessWidget {
                             foregroundColor: Colors.black,
                           ),
                           child: Text(
-                            controller.currentIndex == controller.steps.length - 1
+                            controller.currentIndex ==
+                                    controller.steps.length - 1
                                 ? 'Start Playing!'
                                 : 'Next',
                           ),

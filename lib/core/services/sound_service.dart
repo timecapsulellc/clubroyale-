@@ -210,7 +210,10 @@ class SoundService {
   static Future<void> playCardDeal() async {
     HapticFeedback.lightImpact();
     try {
-      await _sfxPlayer.play(AssetSource('sounds/cards/card_deal.ogg'), volume: 0.7);
+      await _sfxPlayer.play(
+        AssetSource('sounds/cards/card_deal.ogg'),
+        volume: 0.7,
+      );
     } catch (_) {
       await playCardSlide();
     }
@@ -220,7 +223,10 @@ class SoundService {
   static Future<void> playCardFlip() async {
     HapticFeedback.lightImpact();
     try {
-      await _sfxPlayer.play(AssetSource('sounds/cards/card_flip.ogg'), volume: 0.8);
+      await _sfxPlayer.play(
+        AssetSource('sounds/cards/card_flip.ogg'),
+        volume: 0.8,
+      );
     } catch (_) {
       await playCardSlide();
     }
@@ -230,7 +236,10 @@ class SoundService {
   static Future<void> playCardPickup() async {
     HapticFeedback.selectionClick();
     try {
-      await _sfxPlayer.play(AssetSource('sounds/cards/card_pickup.ogg'), volume: 0.7);
+      await _sfxPlayer.play(
+        AssetSource('sounds/cards/card_pickup.ogg'),
+        volume: 0.7,
+      );
     } catch (_) {
       await playCardSlide();
     }
@@ -240,7 +249,10 @@ class SoundService {
   static Future<void> playCardPlace() async {
     HapticFeedback.lightImpact();
     try {
-      await _sfxPlayer.play(AssetSource('sounds/cards/card_place.ogg'), volume: 0.8);
+      await _sfxPlayer.play(
+        AssetSource('sounds/cards/card_place.ogg'),
+        volume: 0.8,
+      );
     } catch (_) {
       await playCardSlide();
     }
@@ -250,7 +262,10 @@ class SoundService {
   static Future<void> playYourTurn() async {
     HapticFeedback.mediumImpact();
     try {
-      await _sfxPlayer.play(AssetSource('sounds/ui/notification.ogg'), volume: 0.6);
+      await _sfxPlayer.play(
+        AssetSource('sounds/ui/notification.ogg'),
+        volume: 0.6,
+      );
     } catch (_) {
       await _playSound('sounds/ding.mp3', volume: 0.5);
     }

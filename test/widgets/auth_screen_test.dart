@@ -8,11 +8,7 @@ void main() {
     // Helper to build the widget with proper settling for animations
     Future<void> buildAuthScreen(WidgetTester tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: AuthScreen(),
-          ),
-        ),
+        const ProviderScope(child: MaterialApp(home: AuthScreen())),
       );
       // Allow animations to complete (flutter_animate uses timers)
       // Pump multiple frames to let animations settle
@@ -32,14 +28,16 @@ void main() {
       expect(find.textContaining('Ultimate Card Game'), findsOneWidget);
     });
 
-    testWidgets('should display Enter the Club button', (WidgetTester tester) async {
+    testWidgets('should display Enter the Club button', (
+      WidgetTester tester,
+    ) async {
       await buildAuthScreen(tester);
       expect(find.textContaining('Enter the Club'), findsOneWidget);
     });
 
     testWidgets('should display feature cards', (WidgetTester tester) async {
       await buildAuthScreen(tester);
-      
+
       // Feature cards from _buildFeaturesGrid (lines 434-493)
       expect(find.text('4 Players'), findsOneWidget);
       expect(find.text('Real-time'), findsOneWidget);
@@ -47,7 +45,9 @@ void main() {
       expect(find.text('Leaderboard'), findsOneWidget);
     });
 
-    testWidgets('should display chip logo with CR text', (WidgetTester tester) async {
+    testWidgets('should display chip logo with CR text', (
+      WidgetTester tester,
+    ) async {
       await buildAuthScreen(tester);
       // Current chip logo has 'CR' text in center
       expect(find.text('CR'), findsOneWidget);
@@ -55,7 +55,7 @@ void main() {
 
     testWidgets('should have test mode button', (WidgetTester tester) async {
       await buildAuthScreen(tester);
-      
+
       // Quick Test Mode button - Removed for Production
       expect(find.text('Quick Test Mode'), findsNothing);
     });

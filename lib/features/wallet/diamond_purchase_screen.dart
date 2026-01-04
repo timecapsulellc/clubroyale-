@@ -419,7 +419,11 @@ class DiamondPurchaseScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            child: const Icon(Icons.diamond, size: 48, color: CasinoColors.gold),
+            child: const Icon(
+              Icons.diamond,
+              size: 48,
+              color: CasinoColors.gold,
+            ),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -438,7 +442,11 @@ class DiamondPurchaseScreen extends ConsumerWidget {
           ),
           const Text(
             'Diamonds',
-            style: TextStyle(color: CasinoColors.gold, fontSize: 14, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: CasinoColors.gold,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -463,7 +471,11 @@ class DiamondPurchaseScreen extends ConsumerWidget {
               children: [
                 Text(
                   '100% FREE',
-                  style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
                 Text(
                   'Diamonds cannot be purchased. Earn them by playing!',

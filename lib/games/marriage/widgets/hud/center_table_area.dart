@@ -75,7 +75,7 @@ class CenterTableArea extends StatelessWidget {
               _buildDiscardPile(isDrawPhase),
             ],
           ),
-          
+
           // Tiplu indicator (if revealed)
           if (tiplu != null) ...[
             const SizedBox(height: 12),
@@ -183,17 +183,23 @@ class CenterTableArea extends StatelessWidget {
           // Tap instruction
           if (canDraw)
             Container(
-              margin: const EdgeInsets.only(top: 6),
-              child: const Text(
-                'TAP',
-                style: TextStyle(
-                  color: CasinoColors.gold,
-                  fontSize: 9,
-                  fontWeight: FontWeight.bold,
+                  margin: const EdgeInsets.only(top: 6),
+                  child: const Text(
+                    'TAP',
+                    style: TextStyle(
+                      color: CasinoColors.gold,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+                .animate(onPlay: (c) => c.repeat(reverse: true))
+                .fadeIn()
+                .scale(
+                  begin: const Offset(0.9, 0.9),
+                  end: const Offset(1, 1),
+                  duration: 500.ms,
                 ),
-              ),
-            ).animate(onPlay: (c) => c.repeat(reverse: true))
-             .fadeIn().scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1), duration: 500.ms),
         ],
       ),
     );
@@ -201,14 +207,19 @@ class CenterTableArea extends StatelessWidget {
     if (canDraw) {
       deck = deck
           .animate(onPlay: (c) => c.repeat(reverse: true))
-          .scale(begin: const Offset(1, 1), end: const Offset(1.02, 1.02), duration: 800.ms);
+          .scale(
+            begin: const Offset(1, 1),
+            end: const Offset(1.02, 1.02),
+            duration: 800.ms,
+          );
     }
 
     return deck;
   }
 
   Widget _buildDiscardPile(bool isDrawPhase) {
-    final canDraw = canDrawFromDiscard && isMyTurn && isDrawPhase && !isDiscardBlocked;
+    final canDraw =
+        canDrawFromDiscard && isMyTurn && isDrawPhase && !isDiscardBlocked;
 
     return GestureDetector(
       onTap: canDraw ? onDiscardTap : null,
@@ -220,8 +231,8 @@ class CenterTableArea extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 6),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             decoration: BoxDecoration(
-              color: isDiscardBlocked 
-                  ? Colors.red[900] 
+              color: isDiscardBlocked
+                  ? Colors.red[900]
                   : (canDraw ? Colors.blue : Colors.grey[800]),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -235,7 +246,9 @@ class CenterTableArea extends StatelessWidget {
                 Text(
                   isDiscardBlocked ? 'BLOCKED' : 'DISCARD',
                   style: TextStyle(
-                    color: isDiscardBlocked ? Colors.white : (canDraw ? Colors.white : Colors.white60),
+                    color: isDiscardBlocked
+                        ? Colors.white
+                        : (canDraw ? Colors.white : Colors.white60),
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
@@ -253,7 +266,7 @@ class CenterTableArea extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               color: Colors.black.withValues(alpha: 0.3),
               border: Border.all(
-                color: isDiscardBlocked 
+                color: isDiscardBlocked
                     ? Colors.red.withValues(alpha: 0.5)
                     : (canDraw ? Colors.blue : Colors.white24),
                 width: canDraw ? 2 : 1,
@@ -262,34 +275,34 @@ class CenterTableArea extends StatelessWidget {
             child: Container(
               key: discardKey,
               child: topDiscard != null
-                ? Center(
-                    child: CardWidget(
-                      card: topDiscard!,
-                      isFaceUp: true,
-                      width: 55,
-                      height: 80,
-                    ),
-                  )
-                : Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.layers,
-                          color: Colors.white.withValues(alpha: 0.3),
-                          size: 20,
-                        ),
-                        Text(
-                          '$discardCount',
-                          style: TextStyle(
+                  ? Center(
+                      child: CardWidget(
+                        card: topDiscard!,
+                        isFaceUp: true,
+                        width: 55,
+                        height: 80,
+                      ),
+                    )
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.layers,
                             color: Colors.white.withValues(alpha: 0.3),
-                            fontSize: 10,
+                            size: 20,
                           ),
-                        ),
-                      ],
+                          Text(
+                            '$discardCount',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.3),
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-          ),
+            ),
           ),
 
           // Tap instruction
@@ -354,10 +367,7 @@ class CenterTableArea extends StatelessWidget {
           const SizedBox(width: 6),
           const Text(
             '(3 pts)',
-            style: TextStyle(
-              color: Colors.amber,
-              fontSize: 9,
-            ),
+            style: TextStyle(color: Colors.amber, fontSize: 9),
           ),
         ],
       ),

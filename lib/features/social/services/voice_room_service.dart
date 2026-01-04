@@ -103,8 +103,9 @@ class VoiceRoomService extends ChangeNotifier {
     }
 
     if (_state == VoiceRoomState.connecting ||
-        _state == VoiceRoomState.connected)
+        _state == VoiceRoomState.connected) {
       return;
+    }
 
     _state = VoiceRoomState.connecting;
     _role = asListener ? VoiceRole.listener : VoiceRole.speaker;

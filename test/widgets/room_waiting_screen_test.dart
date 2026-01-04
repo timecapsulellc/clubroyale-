@@ -9,50 +9,62 @@ void main() {
         name: 'Test Room',
         hostId: 'user1',
         roomCode: '123456',
-        players: [
-          const Player(id: 'user1', name: 'Player 1', isReady: false),
-        ],
+        players: [const Player(id: 'user1', name: 'Player 1', isReady: false)],
         scores: {'user1': 0},
       );
 
       // Note: This test will need mock providers to work properly
       // For now, documenting the test structure
-      
+
       expect(true, true); // Placeholder
     });
 
-    testWidgets('should show player count correctly', (WidgetTester tester) async {
+    testWidgets('should show player count correctly', (
+      WidgetTester tester,
+    ) async {
       // Test that displays "2/4" when 2 players in a 4-player room
       expect(true, true); // Placeholder
     });
 
-    testWidgets('should display ready status for each player', (WidgetTester tester) async {
+    testWidgets('should display ready status for each player', (
+      WidgetTester tester,
+    ) async {
       // Test that shows green "Ready" chip for ready players
       // and gray "Not Ready" chip for unready players
       expect(true, true); // Placeholder
     });
 
-    testWidgets('should show ready button for non-host players', (WidgetTester tester) async {
+    testWidgets('should show ready button for non-host players', (
+      WidgetTester tester,
+    ) async {
       // Test that non-host sees "Ready" / "Not Ready" button
       expect(true, true); // Placeholder
     });
 
-    testWidgets('should show start button for host when all ready', (WidgetTester tester) async {
+    testWidgets('should show start button for host when all ready', (
+      WidgetTester tester,
+    ) async {
       // Test that host sees enabled "Start Game" button when all ready
       expect(true, true); // Placeholder
     });
 
-    testWidgets('should disable start button when not all ready', (WidgetTester tester) async {
+    testWidgets('should disable start button when not all ready', (
+      WidgetTester tester,
+    ) async {
       // Test that "Start Game" button is disabled when players not ready
       expect(true, true); // Placeholder
     });
 
-    testWidgets('should show host badge on host player', (WidgetTester tester) async {
+    testWidgets('should show host badge on host player', (
+      WidgetTester tester,
+    ) async {
       // Test that host has a gold star badge
       expect(true, true); // Placeholder
     });
 
-    testWidgets('should display game settings correctly', (WidgetTester tester) async {
+    testWidgets('should display game settings correctly', (
+      WidgetTester tester,
+    ) async {
       // Test that shows point value and total rounds
       expect(true, true); // Placeholder
     });
@@ -66,7 +78,7 @@ void main() {
       // 3. Test ready status updates propagate in real-time
       // 4. Test navigation to game screen on start
       // 5. Test leave room functionality
-      
+
       expect(true, true);
     });
   });

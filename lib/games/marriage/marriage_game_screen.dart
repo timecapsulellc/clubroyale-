@@ -176,8 +176,9 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     setState(() => _remainingSeconds = _config.turnTimeoutSeconds);
 
     _turnTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_showTutorial || _isAnimating)
+      if (_showTutorial || _isAnimating) {
         return; // Pause timer during tutorial and animations
+      }
       if (!mounted) {
         timer.cancel();
         return;
@@ -366,8 +367,9 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
               onComplete: () {
                 if (mounted) {
                   setState(() {
-                    if (_animations.isNotEmpty)
+                    if (_animations.isNotEmpty) {
                       _animations.removeAt(0); // Cleanup older
+                    }
                   });
                 }
               },

@@ -46,9 +46,7 @@ class _VictoryCelebrationState extends State<VictoryCelebration> {
         // Dark overlay
         GestureDetector(
           onTap: widget.onDismiss,
-          child: Container(
-            color: Colors.black.withValues(alpha: 0.7),
-          ),
+          child: Container(color: Colors.black.withValues(alpha: 0.7)),
         ),
 
         // Confetti (only for winner who is me)
@@ -56,28 +54,34 @@ class _VictoryCelebrationState extends State<VictoryCelebration> {
 
         // Main content
         Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Trophy icon
-              _buildTrophy(),
-              const SizedBox(height: 20),
+          child:
+              Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Trophy icon
+                      _buildTrophy(),
+                      const SizedBox(height: 20),
 
-              // Winner announcement
-              _buildWinnerBanner(),
-              const SizedBox(height: 24),
+                      // Winner announcement
+                      _buildWinnerBanner(),
+                      const SizedBox(height: 24),
 
-              // Score breakdown
-              _buildScoreCard(),
-              const SizedBox(height: 24),
+                      // Score breakdown
+                      _buildScoreCard(),
+                      const SizedBox(height: 24),
 
-              // Continue button
-              _buildContinueButton(),
-            ],
-          )
-              .animate()
-              .fadeIn(duration: 400.ms)
-              .slideY(begin: 0.2, end: 0, duration: 400.ms, curve: Curves.easeOutBack),
+                      // Continue button
+                      _buildContinueButton(),
+                    ],
+                  )
+                  .animate()
+                  .fadeIn(duration: 400.ms)
+                  .slideY(
+                    begin: 0.2,
+                    end: 0,
+                    duration: 400.ms,
+                    curve: Curves.easeOutBack,
+                  ),
         ),
       ],
     );
@@ -85,30 +89,30 @@ class _VictoryCelebrationState extends State<VictoryCelebration> {
 
   Widget _buildTrophy() {
     return Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: widget.isMe
-              ? [CasinoColors.gold, CasinoColors.bronzeGold]
-              : [Colors.grey, Colors.grey[700]!],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: (widget.isMe ? CasinoColors.gold : Colors.grey)
-                .withValues(alpha: 0.5),
-            blurRadius: 20,
-            spreadRadius: 4,
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: widget.isMe
+                  ? [CasinoColors.gold, CasinoColors.bronzeGold]
+                  : [Colors.grey, Colors.grey[700]!],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: (widget.isMe ? CasinoColors.gold : Colors.grey)
+                    .withValues(alpha: 0.5),
+                blurRadius: 20,
+                spreadRadius: 4,
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Icon(
-        widget.isMe ? Icons.emoji_events : Icons.sentiment_dissatisfied,
-        size: 50,
-        color: Colors.white,
-      ),
-    )
+          child: Icon(
+            widget.isMe ? Icons.emoji_events : Icons.sentiment_dissatisfied,
+            size: 50,
+            color: Colors.white,
+          ),
+        )
         .animate(onPlay: (c) => c.repeat(reverse: true))
         .scale(
           begin: const Offset(1, 1),
@@ -132,10 +136,7 @@ class _VictoryCelebrationState extends State<VictoryCelebration> {
         if (!widget.isMe)
           Text(
             '${widget.winnerName} Wins!',
-            style: const TextStyle(
-              fontSize: 18,
-              color: Colors.white70,
-            ),
+            style: const TextStyle(fontSize: 18, color: Colors.white70),
           ),
       ],
     );
@@ -256,16 +257,11 @@ class _VictoryCelebrationState extends State<VictoryCelebration> {
         backgroundColor: CasinoColors.gold,
         foregroundColor: Colors.black,
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
       child: const Text(
         'CONTINUE',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          letterSpacing: 1,
-        ),
+        style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
       ),
     );
   }
@@ -316,29 +312,30 @@ class ConfettiOverlay extends StatelessWidget {
             return Positioned(
               left: startX,
               top: -20,
-              child: Container(
-                width: size,
-                height: size * 1.5,
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              )
-                  .animate(delay: Duration(milliseconds: delay))
-                  .fadeIn(duration: 200.ms)
-                  .slideY(
-                    begin: 0,
-                    end: (constraints.maxHeight + 40) / size,
-                    duration: Duration(milliseconds: duration),
-                    curve: Curves.linear,
-                  )
-                  .rotate(
-                    begin: 0,
-                    end: 2 + Random.nextDouble() * 2,
-                    duration: Duration(milliseconds: duration),
-                  )
-                  .then()
-                  .fadeOut(),
+              child:
+                  Container(
+                        width: size,
+                        height: size * 1.5,
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      )
+                      .animate(delay: Duration(milliseconds: delay))
+                      .fadeIn(duration: 200.ms)
+                      .slideY(
+                        begin: 0,
+                        end: (constraints.maxHeight + 40) / size,
+                        duration: Duration(milliseconds: duration),
+                        curve: Curves.linear,
+                      )
+                      .rotate(
+                        begin: 0,
+                        end: 2 + Random.nextDouble() * 2,
+                        duration: Duration(milliseconds: duration),
+                      )
+                      .then()
+                      .fadeOut(),
             );
           }),
         );
@@ -387,10 +384,7 @@ class DefeatOverlay extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 '-$pointsLost points',
-                style: const TextStyle(
-                  fontSize: 18,
-                  color: Colors.red,
-                ),
+                style: const TextStyle(fontSize: 18, color: Colors.red),
               ),
               const SizedBox(height: 24),
               const Text(

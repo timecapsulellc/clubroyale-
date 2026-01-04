@@ -1,4 +1,3 @@
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clubroyale/features/wallet/models/user_tier.dart';
 import 'package:clubroyale/features/wallet/diamond_wallet.dart';
@@ -45,19 +44,19 @@ void main() {
   group('Governance Voting Power', () {
     test('Calculate Voting Power - Gameplay Only (Weight 2.0)', () {
       final wallet = DiamondWallet(
-         userId: 'test_user',
-         balance: 1000,
-         tier: UserTier.basic,
-         diamondsByOrigin: {
-           'gameplayWin': 1000, // Weight 2.0
-         },
-         dailyEarned: 0,
-         dailyTransferred: 0,
-         dailyReceived: 0,
-         loginStreak: 0,
-         lastDailyLoginClaim: DateTime.now(),
+        userId: 'test_user',
+        balance: 1000,
+        tier: UserTier.basic,
+        diamondsByOrigin: {
+          'gameplayWin': 1000, // Weight 2.0
+        },
+        dailyEarned: 0,
+        dailyTransferred: 0,
+        dailyReceived: 0,
+        loginStreak: 0,
+        lastDailyLoginClaim: DateTime.now(),
       );
-      
+
       final power = GovernanceService.calculateVotingPowerForWallet(wallet);
       expect(power, 2000.0); // 1000 * 2.0
     });
@@ -68,22 +67,19 @@ void main() {
       // Total Tracked = 1000
       // Avg Weight = 1.25
       // Balance = 1000 => Power = 1250
-      
+
       final wallet = DiamondWallet(
-         userId: 'test_user',
-         balance: 1000,
-         tier: UserTier.basic,
-         diamondsByOrigin: {
-           'gameplayWin': 500,
-           'purchase': 500,
-         },
-         dailyEarned: 0,
-         dailyTransferred: 0,
-         dailyReceived: 0,
-         loginStreak: 0,
-         lastDailyLoginClaim: DateTime.now(),
+        userId: 'test_user',
+        balance: 1000,
+        tier: UserTier.basic,
+        diamondsByOrigin: {'gameplayWin': 500, 'purchase': 500},
+        dailyEarned: 0,
+        dailyTransferred: 0,
+        dailyReceived: 0,
+        loginStreak: 0,
+        lastDailyLoginClaim: DateTime.now(),
       );
-      
+
       final power = GovernanceService.calculateVotingPowerForWallet(wallet);
       expect(power, 1250.0);
     });

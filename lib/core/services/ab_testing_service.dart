@@ -22,10 +22,11 @@ class ABTestingService {
   FirebaseFirestore? _firestoreInstance;
 
   FirebaseFirestore get _firestore {
-    if (isTestMode)
+    if (isTestMode) {
       throw StateError(
         'ABTestingService used in test mode without proper setup',
       );
+    }
     return _firestoreInstance ??= FirebaseFirestore.instance;
   }
 
