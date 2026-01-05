@@ -24,6 +24,7 @@ import 'package:clubroyale/features/lobby/widgets/lobby_main_menu.dart';
 
 import '../auth/auth_service.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
+import 'package:clubroyale/features/lobby/widgets/welcome_dialog.dart';
 
 /// Track if we've already granted dev diamonds this session
 bool _devDiamondsGranted = false;
@@ -63,70 +64,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   }
 
   void _showWelcomeDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E2C),
-        title: const Text(
-          '🎉 Welcome to ClubRoyale!',
-          style: TextStyle(color: CasinoColors.gold),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'It looks like it\'s your first time here.\n\n'
-              'ClubRoyale features the authentic Nepali Marriage card game. '
-              'Would you like a quick interactive tutorial?',
-              style: TextStyle(color: Colors.white),
-            ),
-            const SizedBox(height: 16),
-             Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black26,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.3)),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.school, color: CasinoColors.gold, size: 20),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Learn rules: Tiplu, Maal, Tunnels, and Kidnap!',
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Mark as seen so we don't annoy them again
-              ref.read(settingsServiceProvider.notifier).setHasSeenTutorial(true);
-              Navigator.pop(context);
-            },
-            child: const Text('Skip for Now', style: TextStyle(color: Colors.grey)),
-          ),
-          FilledButton(
-            onPressed: () {
-              // Mark as seen
-              ref.read(settingsServiceProvider.notifier).setHasSeenTutorial(true);
-              Navigator.pop(context);
-              // Start tutorial
-              context.push('/marriage/practice?tutorial=true');
-            },
-            style: FilledButton.styleFrom(backgroundColor: CasinoColors.gold),
-            child: const Text('Start Tutorial', style: TextStyle(color: Colors.black)),
-          ),
-        ],
-      ),
-    );
+    WelcomeDialog.show(context);
   }
 
   @override
