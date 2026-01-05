@@ -477,19 +477,23 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
     // Calculate Fan Transformation
     final centerIndex = (totalCount - 1) / 2.0;
     final relativePos = index - centerIndex;
+    final isSelected = widget.selectedCardId == card.id;
 
-    // Rotation: -0.06 to 0.06 radians per card step
-    final double angle = relativePos * 0.06;
+    // Rotation: -0.05 to 0.05 radians per card step (Smoother)
+    final double angle = relativePos * 0.05;
 
     // Y-Offset: Arch effect (edges lower than center)
-    final double yArcOffset = (relativePos * relativePos) * 2.0;
+    final double yArcOffset = (relativePos * relativePos) * 1.5;
+    
+    // Lift Offset for selection
+    final double liftOffset = isSelected ? -20.0 : 0.0;
 
-    // X-Offset: slightly tighter overlap for fanned look
-    final double xOffset = index * 42.0 * widget.scale;
+    // X-Offset: tighter overlap for fanned look (35.0)
+    final double xOffset = index * 35.0 * widget.scale;
 
     return Positioned(
       left: xOffset,
-      top: yArcOffset + 10, // Base offset + arc
+      top: yArcOffset + 10 + liftOffset, // Base + arc + selection lift
       child: Transform.rotate(
         angle: angle,
         child: LongPressDraggable<PlayingCard>(

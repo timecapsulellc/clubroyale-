@@ -44,7 +44,7 @@ class MarriageHUDOverlay extends StatelessWidget {
                           gradient: LinearGradient(
                             colors: [
                               Colors.transparent,
-                              Colors.amber.withOpacity(0.6),
+                              Colors.amber.withValues(alpha: 0.6),
                               Colors.transparent,
                             ],
                           ),
@@ -76,17 +76,17 @@ class MarriageHUDOverlay extends StatelessWidget {
             ),
           ),
 
-        // 2. Enhanced Maal Counter (Top Right, below status)
+        // 2. Enhanced Maal Counter (Bottom Left - Floating Badge)
         Positioned(
-          top: 70, // Below AppBar
-          right: 16,
+          bottom: 120, // Above hand area
+          left: 16,
           child: _MaalCounterChip(points: maalPoints),
         ),
 
-        // 3. Quick Emote Button (Left side to avoid hand overlap)
+        // 3. Quick Emote Button (Left side, above Maal)
         Positioned(
-          bottom: 250, // Higher to clear the action bar and hand
-          left: 16, // Moved to left side
+          bottom: 190, 
+          left: 16,
           child: FloatingActionButton.small(
             backgroundColor: Colors.black54,
             onPressed: onEmoteTap,
@@ -109,47 +109,61 @@ class _MaalCounterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [
+            Colors.black.withValues(alpha: 0.8),
+            Colors.black.withValues(alpha: 0.6),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: points > 0 ? Colors.amber : Colors.white24,
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: (points > 0 ? Colors.amber : Colors.black).withValues(
-              alpha: 0.3,
-            ),
-            blurRadius: 8,
+            color: (points > 0 ? Colors.amber : Colors.black).withValues(alpha: 0.2),
+            blurRadius: 10,
+            spreadRadius: 1,
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          Text(
+            'YOUR MAAL',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.7),
+              fontSize: 8,
+              letterSpacing: 1.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
                 Icons.stars,
                 color: points > 0 ? Colors.amber : Colors.grey,
-                size: 16,
-              )
-              .animate(target: points > 0 ? 1 : 0)
-              .scale(
-                begin: const Offset(1, 1),
-                end: const Offset(1.2, 1.2),
-                duration: 200.ms,
-              )
-              .then()
-              .scale(end: const Offset(1, 1)),
-          const SizedBox(width: 8),
-          Text(
-            '$points Maal',
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '$points pts',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
           ),
         ],
       ),

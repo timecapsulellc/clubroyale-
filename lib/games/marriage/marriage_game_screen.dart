@@ -38,6 +38,7 @@ import 'package:clubroyale/core/widgets/tutorial_overlay.dart'; // Import Tutori
 import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
 import 'package:clubroyale/games/marriage/widgets/action_sidebar.dart';
+import 'package:clubroyale/games/marriage/widgets/circular_opponent_widget.dart';
 
 // ... (existing imports)
 
@@ -718,8 +719,16 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   List<Widget> _buildOpponentsList() {
     return _botIds.map((botId) {
       final isCurrentTurn = _game.currentPlayerId == botId;
-      return GameOpponentWidget(
-        // Use widget directly, not OpponentRow
+      
+      // Calculate turn progress if it's this bot's turn
+      // Since we don't have exact bot timer, we can approximate or just show active
+      final double? progress = isCurrentTurn ? (_remainingSeconds / _config.turnTimeoutSeconds) : null;
+      
+      // Estimate card count (simplified logic: starts 21, goes down as they meld)
+      // For now, static or random for visual proof
+      final int estimatedCards = 15; // Placeholder
+
+      return CircularOpponentWidget(
         opponent: GameOpponent(
           id: botId,
           name: _getBotName(botId),
@@ -727,7 +736,9 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           isCurrentTurn: isCurrentTurn,
           status: isCurrentTurn ? 'Thinking...' : null,
         ),
-        size: 50, // Slightly smaller for 8 players
+        size: 56, // Premium size
+        cardCount: estimatedCards, // Badge
+        turnProgress: progress, // Timer ring
       );
     }).toList();
   }
