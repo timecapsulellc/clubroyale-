@@ -458,7 +458,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     final melds = _cachedMelds;
 
     return Scaffold(
-      backgroundColor: AppTheme.tableGreen,
+      backgroundColor: const Color(0xFF0D3B2E), // Deep casino green (from CasinoColors.tableGreenDark)
       appBar: AppBar(
         backgroundColor: Colors.black.withValues(alpha: 0.5),
         title: Row(
@@ -884,6 +884,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       key: _handKey,
       cards: hand,
       selectedCardId: _selectedCardId,
+      isMyTurn: _game.currentPlayerId == _playerId, // Enable tap interaction
       onCardSelected: (id) {
         setState(() {
           // Toggle selection
@@ -894,6 +895,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           }
         });
       },
+      onCardDoubleTap: () => _discardCard(), // Double-tap to discard
       tiplu: _game.tiplu,
       config: _config,
     );
