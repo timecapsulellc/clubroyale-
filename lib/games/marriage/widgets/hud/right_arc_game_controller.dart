@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-class RightArcGameController extends StatelessWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:clubroyale/core/services/localization_service.dart';
+
+class RightArcGameController extends ConsumerWidget {
   final VoidCallback? onShowCards; // "SHOW" or "Show Cards"
   final VoidCallback? onSequence; // "SEQ" or "Show Sequence"
   final VoidCallback? onDublee; // "DUB" or "Show Dublee" - Optional
@@ -23,7 +26,8 @@ class RightArcGameController extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     // We want an arc on the right side.
     // The reference shows buttons arranged roughly in a semi-circle.
     // Let's use a custom layout or just a Stack with precise positioning.
@@ -84,7 +88,7 @@ class RightArcGameController extends StatelessWidget {
                 centerY: centerY,
                 radius: radius,
                 child: _ArcButton(
-                  label: 'DUB',
+                  label: 'btn_dublee'.tr(ref),
                   onTap: onDublee,
                   isEnabled: isDubleeEnabled,
                 ),
@@ -95,7 +99,7 @@ class RightArcGameController extends StatelessWidget {
                 centerY: centerY,
                 radius: radius,
                 child: _ArcButton(
-                  label: 'SEQ',
+                  label: 'btn_sequence'.tr(ref),
                   onTap: onSequence,
                   isEnabled: isSequenceEnabled,
                 ),
@@ -106,9 +110,12 @@ class RightArcGameController extends StatelessWidget {
                 centerY: centerY,
                 radius: radius,
                 child: _ArcButton(
-                  label: 'SHOW',
-                  labelVertical: true,
+                  label: 'btn_show'.tr(ref),
+                  labelVertical: false, 
                   isLarge: true,
+                  onTap: onShowCards,
+                  isEnabled: isShowEnabled,
+                ),
                   onTap: onShowCards,
                   isEnabled: isShowEnabled,
                 ),
@@ -119,7 +126,7 @@ class RightArcGameController extends StatelessWidget {
                 centerY: centerY,
                 radius: radius,
                 child: _ArcButton(
-                  label: 'CAN',
+                  label: 'btn_cancel'.tr(ref),
                   onTap: onCancel,
                   isEnabled: isCancelEnabled,
                 ),
@@ -250,10 +257,11 @@ class _ArcButton extends StatelessWidget {
                 )
               : Text(
                   label,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: isEnabled ? Colors.white : Colors.white38,
                     fontWeight: FontWeight.bold,
-                    fontSize: isLarge ? 14 : 12,
+                    fontSize: isLarge ? 12 : 10, // Adjusted for potentially longer text
                   ),
                 ),
         ),

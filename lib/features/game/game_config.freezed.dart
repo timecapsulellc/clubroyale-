@@ -21,7 +21,8 @@ mixin _$GameConfig {
  int get maxPlayers;/// Whether guests see ads (host can pay to disable)
  bool get allowAds;/// Total rounds in the game
  int get totalRounds;/// Entry fee in chips/units (optional boot amount)
- int get bootAmount;
+ int get bootAmount;/// Game-specific rule variants (e.g. Marriage rules: tunnelPachaunu, kidnap)
+ Map<String, dynamic> get variants;
 /// Create a copy of GameConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -34,16 +35,16 @@ $GameConfigCopyWith<GameConfig> get copyWith => _$GameConfigCopyWithImpl<GameCon
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GameConfig&&(identical(other.pointValue, pointValue) || other.pointValue == pointValue)&&(identical(other.maxPlayers, maxPlayers) || other.maxPlayers == maxPlayers)&&(identical(other.allowAds, allowAds) || other.allowAds == allowAds)&&(identical(other.totalRounds, totalRounds) || other.totalRounds == totalRounds)&&(identical(other.bootAmount, bootAmount) || other.bootAmount == bootAmount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GameConfig&&(identical(other.pointValue, pointValue) || other.pointValue == pointValue)&&(identical(other.maxPlayers, maxPlayers) || other.maxPlayers == maxPlayers)&&(identical(other.allowAds, allowAds) || other.allowAds == allowAds)&&(identical(other.totalRounds, totalRounds) || other.totalRounds == totalRounds)&&(identical(other.bootAmount, bootAmount) || other.bootAmount == bootAmount)&&const DeepCollectionEquality().equals(other.variants, variants));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,pointValue,maxPlayers,allowAds,totalRounds,bootAmount);
+int get hashCode => Object.hash(runtimeType,pointValue,maxPlayers,allowAds,totalRounds,bootAmount,const DeepCollectionEquality().hash(variants));
 
 @override
 String toString() {
-  return 'GameConfig(pointValue: $pointValue, maxPlayers: $maxPlayers, allowAds: $allowAds, totalRounds: $totalRounds, bootAmount: $bootAmount)';
+  return 'GameConfig(pointValue: $pointValue, maxPlayers: $maxPlayers, allowAds: $allowAds, totalRounds: $totalRounds, bootAmount: $bootAmount, variants: $variants)';
 }
 
 
@@ -54,7 +55,7 @@ abstract mixin class $GameConfigCopyWith<$Res>  {
   factory $GameConfigCopyWith(GameConfig value, $Res Function(GameConfig) _then) = _$GameConfigCopyWithImpl;
 @useResult
 $Res call({
- double pointValue, int maxPlayers, bool allowAds, int totalRounds, int bootAmount
+ double pointValue, int maxPlayers, bool allowAds, int totalRounds, int bootAmount, Map<String, dynamic> variants
 });
 
 
@@ -71,14 +72,15 @@ class _$GameConfigCopyWithImpl<$Res>
 
 /// Create a copy of GameConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? pointValue = null,Object? maxPlayers = null,Object? allowAds = null,Object? totalRounds = null,Object? bootAmount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? pointValue = null,Object? maxPlayers = null,Object? allowAds = null,Object? totalRounds = null,Object? bootAmount = null,Object? variants = null,}) {
   return _then(_self.copyWith(
 pointValue: null == pointValue ? _self.pointValue : pointValue // ignore: cast_nullable_to_non_nullable
 as double,maxPlayers: null == maxPlayers ? _self.maxPlayers : maxPlayers // ignore: cast_nullable_to_non_nullable
 as int,allowAds: null == allowAds ? _self.allowAds : allowAds // ignore: cast_nullable_to_non_nullable
 as bool,totalRounds: null == totalRounds ? _self.totalRounds : totalRounds // ignore: cast_nullable_to_non_nullable
 as int,bootAmount: null == bootAmount ? _self.bootAmount : bootAmount // ignore: cast_nullable_to_non_nullable
-as int,
+as int,variants: null == variants ? _self.variants : variants // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>,
   ));
 }
 
@@ -163,10 +165,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double pointValue,  int maxPlayers,  bool allowAds,  int totalRounds,  int bootAmount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double pointValue,  int maxPlayers,  bool allowAds,  int totalRounds,  int bootAmount,  Map<String, dynamic> variants)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GameConfig() when $default != null:
-return $default(_that.pointValue,_that.maxPlayers,_that.allowAds,_that.totalRounds,_that.bootAmount);case _:
+return $default(_that.pointValue,_that.maxPlayers,_that.allowAds,_that.totalRounds,_that.bootAmount,_that.variants);case _:
   return orElse();
 
 }
@@ -184,10 +186,10 @@ return $default(_that.pointValue,_that.maxPlayers,_that.allowAds,_that.totalRoun
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double pointValue,  int maxPlayers,  bool allowAds,  int totalRounds,  int bootAmount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double pointValue,  int maxPlayers,  bool allowAds,  int totalRounds,  int bootAmount,  Map<String, dynamic> variants)  $default,) {final _that = this;
 switch (_that) {
 case _GameConfig():
-return $default(_that.pointValue,_that.maxPlayers,_that.allowAds,_that.totalRounds,_that.bootAmount);case _:
+return $default(_that.pointValue,_that.maxPlayers,_that.allowAds,_that.totalRounds,_that.bootAmount,_that.variants);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +206,10 @@ return $default(_that.pointValue,_that.maxPlayers,_that.allowAds,_that.totalRoun
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double pointValue,  int maxPlayers,  bool allowAds,  int totalRounds,  int bootAmount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double pointValue,  int maxPlayers,  bool allowAds,  int totalRounds,  int bootAmount,  Map<String, dynamic> variants)?  $default,) {final _that = this;
 switch (_that) {
 case _GameConfig() when $default != null:
-return $default(_that.pointValue,_that.maxPlayers,_that.allowAds,_that.totalRounds,_that.bootAmount);case _:
+return $default(_that.pointValue,_that.maxPlayers,_that.allowAds,_that.totalRounds,_that.bootAmount,_that.variants);case _:
   return null;
 
 }
@@ -219,7 +221,7 @@ return $default(_that.pointValue,_that.maxPlayers,_that.allowAds,_that.totalRoun
 @JsonSerializable()
 
 class _GameConfig implements GameConfig {
-  const _GameConfig({this.pointValue = 10, this.maxPlayers = 8, this.allowAds = true, this.totalRounds = 5, this.bootAmount = 0});
+  const _GameConfig({this.pointValue = 10, this.maxPlayers = 8, this.allowAds = true, this.totalRounds = 5, this.bootAmount = 0, final  Map<String, dynamic> variants = const {}}): _variants = variants;
   factory _GameConfig.fromJson(Map<String, dynamic> json) => _$GameConfigFromJson(json);
 
 /// Point value in units (user mentally maps to currency)
@@ -233,6 +235,15 @@ class _GameConfig implements GameConfig {
 @override@JsonKey() final  int totalRounds;
 /// Entry fee in chips/units (optional boot amount)
 @override@JsonKey() final  int bootAmount;
+/// Game-specific rule variants (e.g. Marriage rules: tunnelPachaunu, kidnap)
+ final  Map<String, dynamic> _variants;
+/// Game-specific rule variants (e.g. Marriage rules: tunnelPachaunu, kidnap)
+@override@JsonKey() Map<String, dynamic> get variants {
+  if (_variants is EqualUnmodifiableMapView) return _variants;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_variants);
+}
+
 
 /// Create a copy of GameConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -247,16 +258,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GameConfig&&(identical(other.pointValue, pointValue) || other.pointValue == pointValue)&&(identical(other.maxPlayers, maxPlayers) || other.maxPlayers == maxPlayers)&&(identical(other.allowAds, allowAds) || other.allowAds == allowAds)&&(identical(other.totalRounds, totalRounds) || other.totalRounds == totalRounds)&&(identical(other.bootAmount, bootAmount) || other.bootAmount == bootAmount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GameConfig&&(identical(other.pointValue, pointValue) || other.pointValue == pointValue)&&(identical(other.maxPlayers, maxPlayers) || other.maxPlayers == maxPlayers)&&(identical(other.allowAds, allowAds) || other.allowAds == allowAds)&&(identical(other.totalRounds, totalRounds) || other.totalRounds == totalRounds)&&(identical(other.bootAmount, bootAmount) || other.bootAmount == bootAmount)&&const DeepCollectionEquality().equals(other._variants, _variants));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,pointValue,maxPlayers,allowAds,totalRounds,bootAmount);
+int get hashCode => Object.hash(runtimeType,pointValue,maxPlayers,allowAds,totalRounds,bootAmount,const DeepCollectionEquality().hash(_variants));
 
 @override
 String toString() {
-  return 'GameConfig(pointValue: $pointValue, maxPlayers: $maxPlayers, allowAds: $allowAds, totalRounds: $totalRounds, bootAmount: $bootAmount)';
+  return 'GameConfig(pointValue: $pointValue, maxPlayers: $maxPlayers, allowAds: $allowAds, totalRounds: $totalRounds, bootAmount: $bootAmount, variants: $variants)';
 }
 
 
@@ -267,7 +278,7 @@ abstract mixin class _$GameConfigCopyWith<$Res> implements $GameConfigCopyWith<$
   factory _$GameConfigCopyWith(_GameConfig value, $Res Function(_GameConfig) _then) = __$GameConfigCopyWithImpl;
 @override @useResult
 $Res call({
- double pointValue, int maxPlayers, bool allowAds, int totalRounds, int bootAmount
+ double pointValue, int maxPlayers, bool allowAds, int totalRounds, int bootAmount, Map<String, dynamic> variants
 });
 
 
@@ -284,14 +295,15 @@ class __$GameConfigCopyWithImpl<$Res>
 
 /// Create a copy of GameConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? pointValue = null,Object? maxPlayers = null,Object? allowAds = null,Object? totalRounds = null,Object? bootAmount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? pointValue = null,Object? maxPlayers = null,Object? allowAds = null,Object? totalRounds = null,Object? bootAmount = null,Object? variants = null,}) {
   return _then(_GameConfig(
 pointValue: null == pointValue ? _self.pointValue : pointValue // ignore: cast_nullable_to_non_nullable
 as double,maxPlayers: null == maxPlayers ? _self.maxPlayers : maxPlayers // ignore: cast_nullable_to_non_nullable
 as int,allowAds: null == allowAds ? _self.allowAds : allowAds // ignore: cast_nullable_to_non_nullable
 as bool,totalRounds: null == totalRounds ? _self.totalRounds : totalRounds // ignore: cast_nullable_to_non_nullable
 as int,bootAmount: null == bootAmount ? _self.bootAmount : bootAmount // ignore: cast_nullable_to_non_nullable
-as int,
+as int,variants: null == variants ? _self._variants : variants // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>,
   ));
 }
 

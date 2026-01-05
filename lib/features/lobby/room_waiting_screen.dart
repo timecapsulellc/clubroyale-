@@ -1226,16 +1226,14 @@ class _RoomWaitingScreenState extends ConsumerState<RoomWaitingScreen> {
       if (room.gameType == 'marriage') {
         final marriageService = ref.read(marriageServiceProvider);
 
-        // Read the Marriage-specific config from Firestore
-        final gameDoc = await FirebaseFirestore.instance
-            .collection('games')
-            .doc(widget.roomId)
-            .get();
-        final marriageConfigJson =
-            gameDoc.data()?['marriageConfig'] as Map<String, dynamic>?;
-        final marriageConfig = marriageConfigJson != null
-            ? MarriageGameConfig.fromJson(marriageConfigJson)
-            : const MarriageGameConfig();
+        // Create config from room variants
+        final variants = room.config.variants;
+        final marriageConfig = MarriageGameConfig(
+          tunnelPachaunu: variants['tunnelPachaunu'] as bool? ?? false,
+          enableKidnap: variants['enableKidnap'] as bool? ?? true,
+          enableMurder: variants['enableMurder'] as bool? ?? false,
+          // Preserve other defaults or map more fields if needed
+        );
 
         await marriageService.startGame(
           widget.roomId,

@@ -35,8 +35,12 @@ class UserSettings {
     this.musicVolume = 0.5,
     this.hapticEnabled = true,
     this.themeMode = 'system',
+    this.themeMode = 'system',
     this.notificationsEnabled = true,
+    this.hasSeenTutorial = false,
   });
+
+  final bool hasSeenTutorial;
 
   UserSettings copyWith({
     bool? soundEnabled,
@@ -46,6 +50,7 @@ class UserSettings {
     bool? hapticEnabled,
     String? themeMode,
     bool? notificationsEnabled,
+    bool? hasSeenTutorial,
   }) {
     return UserSettings(
       soundEnabled: soundEnabled ?? this.soundEnabled,
@@ -55,6 +60,7 @@ class UserSettings {
       hapticEnabled: hapticEnabled ?? this.hapticEnabled,
       themeMode: themeMode ?? this.themeMode,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      hasSeenTutorial: hasSeenTutorial ?? this.hasSeenTutorial,
     );
   }
 }
@@ -68,6 +74,7 @@ class SettingsService extends AsyncNotifier<UserSettings> {
   static const _keyHaptic = 'haptic_enabled';
   static const _keyTheme = 'theme_mode';
   static const _keyNotifications = 'notifications_enabled';
+  static const _keyTutorial = 'has_seen_tutorial';
 
   @override
   Future<UserSettings> build() async {
@@ -85,11 +92,18 @@ class SettingsService extends AsyncNotifier<UserSettings> {
         hapticEnabled: prefs.getBool(_keyHaptic) ?? true,
         themeMode: prefs.getString(_keyTheme) ?? 'system',
         notificationsEnabled: prefs.getBool(_keyNotifications) ?? true,
+        hasSeenTutorial: prefs.getBool(_keyTutorial) ?? false,
       );
     } catch (e) {
       debugPrint('Error loading settings: $e');
       return const UserSettings();
     }
+  }
+
+  Future<void> setHasSeenTutorial(bool seen) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyTutorial, seen);
+    state = AsyncValue.data(state.value!.copyWith(hasSeenTutorial: seen));
   }
 
   Future<void> setSoundEnabled(bool enabled) async {

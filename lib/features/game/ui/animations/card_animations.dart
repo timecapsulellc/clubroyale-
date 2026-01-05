@@ -145,6 +145,102 @@ class CardAnimationController extends ChangeNotifier {
       },
     );
     _activeAnimations.add(animation);
+    _activeAnimations.add(animation);
+    notifyListeners();
+  }
+
+  /// Optimize dealing for multiple players (Phase 5)
+  /// Uses "Packet Dealing" to avoid animating 168+ cards individually
+  void dealCards({
+    required int playerCount,
+    required int myPlayerIndex,
+    required Offset deckPosition,
+    required List<Offset> playerPositions,
+    VoidCallback? onComplete,
+  }) async {
+    // Deal in 3 rounds (packets of 7 cards)
+    const packets = 3;
+    const cardsPerPacket = 7;
+    const packetDelay = Duration(milliseconds: 600);
+    const flightDuration = Duration(milliseconds: 500);
+
+    for (int packet = 0; packet < packets; packet++) {
+      // Stagger each packet round
+      await Future.delayed(packetDelay * packet);
+      
+      for (int i = 0; i < playerCount; i++) {
+        // Skip invalid positions
+        if (i >= playerPositions.length) continue;
+
+        final isMe = i == myPlayerIndex;
+        final targetPos = playerPositions[i];
+        
+        // For ME: Animate a stream of individual cards (looks premium)
+        // For OTHERS: Animate a single "Packet" stack (saves performance)
+        
+        if (isMe) {
+             _animateStreamToMe(
+               count: cardsPerPacket,
+               start: deckPosition,
+               end: targetPos,
+               delayOffset: packet * 100, // Vary delay slightly
+             );
+        } else {
+             _animatePacketToOpponent(
+               start: deckPosition,
+               end: targetPos,
+               duration: flightDuration,
+             );
+        }
+      }
+    }
+    
+    // Cleanup after all animations roughly done
+    Future.delayed(packetDelay * packets + const Duration(seconds: 1), () {
+      _activeAnimations.clear();
+      notifyListeners();
+      onComplete?.call();
+    });
+  }
+
+  void _animateStreamToMe({
+    required int count,
+    required Offset start,
+    required Offset end,
+    required int delayOffset,
+  }) {
+    for (int c = 0; c < count; c++) {
+      Future.delayed(Duration(milliseconds: c * 50), () {
+        final animation = FlyingCardAnimation(
+          card: PlayingCard(suit: Suit.spades, rank: Rank.ace), // Dummy back
+          startPosition: start,
+          endPosition: end,
+          showFace: false, // Face down deal
+          duration: const Duration(milliseconds: 400),
+          onComplete: () => _activeAnimations.removeWhere((a) => a.startPosition == start), // Cleanup handled by clearAll mostly
+        );
+        _activeAnimations.add(animation);
+        notifyListeners();
+      });
+    }
+  }
+
+  void _animatePacketToOpponent({
+    required Offset start,
+    required Offset end,
+    required Duration duration,
+  }) {
+    // A packet looks just like a card but represents many
+    // We could add a "Stack" visual if we had a widget for it, 
+    // but a single card back flying represents the packet well enough for optimization.
+    final animation = FlyingCardAnimation(
+      card: PlayingCard(suit: Suit.spades, rank: Rank.ace), // Dummy back
+      startPosition: start,
+      endPosition: end,
+      showFace: false,
+      duration: duration,
+    );
+    _activeAnimations.add(animation);
     notifyListeners();
   }
 

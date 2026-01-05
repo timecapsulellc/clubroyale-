@@ -37,12 +37,23 @@ class MarriageScorer {
       // Maal - use null-safe access
       int mp = _maalCalculator!.calculateMaalPoints(hands[pid]!);
 
-      // Add Tunnel points (not in hand Maal calc usually, strictly Meld bonus)
-      // Tunnels are worth 5 points
+      // Add Tunnel points
+      // CHECK: Tunnel Pachaunu Rule
+      // If enabled, Tunnel points are ONLY awarded if player has at least 1 Pure Sequence.
+      // (Or is the winner/declarer, who naturally has pure sequences).
       if (melds[pid] != null) {
+        bool hasPure = hasPureSequence(melds[pid]!);
+        bool shouldAwardTunnel = true;
+        
+        if (config.tunnelPachaunu && !hasPure && pid != winnerId) {
+           shouldAwardTunnel = false;
+        }
+
         for (final m in melds[pid]!) {
           if (m.type == MeldType.tunnel) {
-            mp += 5; // Standard tunnel value
+            if (shouldAwardTunnel) {
+              mp += 5; // Standard tunnel value
+            }
           }
         }
       }

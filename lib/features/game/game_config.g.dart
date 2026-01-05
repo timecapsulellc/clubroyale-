@@ -12,6 +12,7 @@ _GameConfig _$GameConfigFromJson(Map<String, dynamic> json) => _GameConfig(
   allowAds: json['allowAds'] as bool? ?? true,
   totalRounds: (json['totalRounds'] as num?)?.toInt() ?? 5,
   bootAmount: (json['bootAmount'] as num?)?.toInt() ?? 0,
+  variants: json['variants'] as Map<String, dynamic>? ?? const {},
 );
 
 Map<String, dynamic> _$GameConfigToJson(_GameConfig instance) =>
@@ -21,4 +22,5 @@ Map<String, dynamic> _$GameConfigToJson(_GameConfig instance) =>
       'allowAds': instance.allowAds,
       'totalRounds': instance.totalRounds,
       'bootAmount': instance.bootAmount,
+      'variants': instance.variants,
     };

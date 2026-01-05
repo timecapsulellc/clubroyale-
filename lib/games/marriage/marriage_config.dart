@@ -137,6 +137,10 @@ abstract class MarriageGameConfig with _$MarriageGameConfig {
     /// Enable Man (printed Joker) as Maal.
     @Default(true) bool isManEnabled,
 
+    /// Tunnel Pachaunu: Tunnel points (5/15/25) are VOIDED if player
+    /// fails to make at least 1 pure sequence (Phase 1).
+    @Default(false) bool tunnelPachaunu,
+
     // === Kidnap/Murder Rules ===
 
     /// Kidnap: If winner and opponent not visited, opponent's Maal goes to winner.

@@ -11,9 +11,11 @@ import 'package:clubroyale/core/config/diamond_config.dart';
 import 'package:clubroyale/features/wallet/diamond_service.dart';
 import 'package:clubroyale/features/feedback/feedback_dialog.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
+import 'package:clubroyale/core/services/localization_service.dart'; // Import LocalizationService
 import 'package:share_plus/share_plus.dart';
 import 'dart:math';
 
+import 'package:clubroyale/features/lobby/variant_switch_helper.dart'; // Helper widget
 import 'package:flutter/foundation.dart';
 
 import 'package:clubroyale/config/casino_theme.dart';
@@ -39,6 +41,92 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     super.initState();
     // Start lobby music when entering lobby
     SoundService.playLobbyMusic();
+
+    // Check for first-time user
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkFirstTimeUser();
+    });
+  }
+
+  Future<void> _checkFirstTimeUser() async {
+    final settings = ref.read(settingsServiceProvider);
+    
+    // Wait for settings to load if async
+    if (settings.isLoading) return; // Should be loaded by now or handled by provider
+
+    // Access async data
+    settings.whenData((userData) {
+      if (!userData.hasSeenTutorial) {
+        _showWelcomeDialog();
+      }
+    });
+  }
+
+  void _showWelcomeDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E2C),
+        title: const Text(
+          '🎉 Welcome to ClubRoyale!',
+          style: TextStyle(color: CasinoColors.gold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'It looks like it\'s your first time here.\n\n'
+              'ClubRoyale features the authentic Nepali Marriage card game. '
+              'Would you like a quick interactive tutorial?',
+              style: TextStyle(color: Colors.white),
+            ),
+            const SizedBox(height: 16),
+             Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.black26,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.3)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.school, color: CasinoColors.gold, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Learn rules: Tiplu, Maal, Tunnels, and Kidnap!',
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Mark as seen so we don't annoy them again
+              ref.read(settingsServiceProvider.notifier).setHasSeenTutorial(true);
+              Navigator.pop(context);
+            },
+            child: const Text('Skip for Now', style: TextStyle(color: Colors.grey)),
+          ),
+          FilledButton(
+            onPressed: () {
+              // Mark as seen
+              ref.read(settingsServiceProvider.notifier).setHasSeenTutorial(true);
+              Navigator.pop(context);
+              // Start tutorial
+              context.push('/marriage/practice?tutorial=true');
+            },
+            style: FilledButton.styleFrom(backgroundColor: CasinoColors.gold),
+            child: const Text('Start Tutorial', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -155,25 +243,33 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                                 children: [
                                   _buildUtilityIcon(
                                     Icons.feedback_outlined,
-                                    'Feedback',
+                                    'feedback'.tr(ref),
                                     () => FeedbackDialog.show(context),
                                   ),
                                   const SizedBox(width: 12),
                                   _buildUtilityIcon(
                                     Icons.privacy_tip_outlined,
-                                    'Privacy',
-                                    () {},
+                                    'privacy'.tr(ref),
+                                    () => _showPrivacyDialog(context),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  // Help / Tutorial Button
+                                  _buildUtilityIcon(
+                                    Icons.help_outline,
+                                    'tutorial'.tr(ref),
+                                    () => context.push('/marriage/practice?tutorial=true'),
                                   ),
                                   const SizedBox(width: 12),
                                   _buildUtilityIcon(
                                     Icons.settings_outlined,
-                                    'Settings',
-                                    () => context.push('/settings'),
-                                  ),
-                                  const SizedBox(width: 12),
+                                    'settings'.tr(ref),
+                                    () {
+                                      // Implementation
+                                    },
+                                  ),const SizedBox(width: 12),
                                   _buildUtilityIcon(
                                     Icons.apps_rounded,
-                                    'Other Games',
+                                    'other_games'.tr(ref),
                                     () {
                                       ScaffoldMessenger.of(
                                         context,
@@ -189,7 +285,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                                   const SizedBox(width: 12),
                                   _buildUtilityIcon(
                                     Icons.account_circle_outlined,
-                                    'Account',
+                                    'account'.tr(ref),
                                     () => context.push('/profile'),
                                   ),
                                 ],
@@ -223,7 +319,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                                       Expanded(
                                         child: _QuickActionButton(
                                           icon: Icons.add_rounded,
-                                          label: 'Create',
+                                          label: 'create'.tr(ref),
                                           color: CasinoColors.tableGreenMid,
                                           onTap: () => _showCreateGameDialog(
                                             context,
@@ -236,7 +332,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                                       Expanded(
                                         child: _QuickActionButton(
                                           icon: Icons.pin_rounded,
-                                          label: 'Join Code',
+                                          label: 'join_code'.tr(ref),
                                           color: CasinoColors.gold,
                                           onTap: () => _showJoinByCodeDialog(
                                             context,
@@ -259,7 +355,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                                     16,
                                   ),
                                   child: Text(
-                                    'ACTIVE TABLES',
+                                  child: Text(
+                                    'active_tables'.tr(ref),
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleMedium
@@ -400,11 +497,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 right: 24,
                 child: Row(
                   children: [
-                    _buildSecondaryButton(Icons.help_outline, 'Learn', () {}),
+                    _buildSecondaryButton(Icons.help_outline, 'learn'.tr(ref), () {}),
                     const SizedBox(width: 16),
                     _buildSecondaryButton(
                       Icons.leaderboard,
-                      'Rankings',
+                      'rankings'.tr(ref),
                       () => context.push('/rankings'),
                     ),
                   ],
@@ -478,9 +575,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             _playNow(context, ref);
           },
           icon: const Icon(Icons.bolt, size: 26),
-          label: const Text(
-            'PLAY NOW',
-            style: TextStyle(
+          label: Text(
+            'play_now'.tr(ref),
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
@@ -615,6 +712,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     double pointValue = 10;
     int totalRounds = 5;
     String gameType = initialGameType;
+    
+    // Marriage Variant Defaults
+    bool tunnelPachaunu = false;
+    bool enableKidnap = true;
+    bool enableMurder = false;
 
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
@@ -762,6 +864,48 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 ),
 
                 const SizedBox(height: 16),
+                  // Marriage Game Variants
+                  if (gameType == 'marriage') ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      'Rule Variants',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.amber.shade400,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _VariantSwitch(
+                      label: 'Tunnel Pachaunu',
+                      description: 'Points for tunnels are multiplied',
+                      detailedExplanation:
+                          'When enabled, if a player has Tunnels (three identical cards), their points are multiplied by the card value immediately. This is a high-risk, high-reward variant.',
+                      value: tunnelPachaunu,
+                      onChanged: (v) => setState(() => tunnelPachaunu = v),
+                    ),
+                    _VariantSwitch(
+                      label: 'Kidnap Penalty',
+                      description: 'Unvisited players pay double',
+                      detailedExplanation:
+                          'If a player has not "Visited" (shown 3 pure sequences) when the game ends, they must pay a penalty to the winner. Usually double the normal amount.',
+                      value: enableKidnap,
+                      onChanged: (v) {
+                        setState(() {
+                          enableKidnap = v;
+                        });
+                      },
+                    ),
+                    _VariantSwitch(
+                      label: 'Murder Penalty',
+                      description: 'Burn Maal points if unvisited',
+                      detailedExplanation:
+                          'Strict Rule: If you haven\'t visited when the game ends, all your Maal (Point Cards) are burned and count as 0. You get no points for them.',
+                      value: enableMurder,
+                      onChanged: (v) => setState(() => enableMurder = v),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
                 // Cost indicator
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -797,10 +941,18 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             FilledButton.icon(
               onPressed: () {
                 Navigator.pop(context, {
+                  // Config Result
                   'gameType': gameType,
                   'config': GameConfig(
                     pointValue: pointValue,
                     totalRounds: totalRounds,
+                    variants: {
+                      if (gameType == 'marriage') ...{
+                        'tunnelPachaunu': tunnelPachaunu,
+                        'enableKidnap': enableKidnap,
+                        'enableMurder': enableMurder,
+                      }
+                    },
                   ),
                 });
               },

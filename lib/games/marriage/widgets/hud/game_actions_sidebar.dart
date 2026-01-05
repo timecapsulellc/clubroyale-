@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
+import 'package:clubroyale/games/marriage/widgets/hud/primary_set_progress.dart';
 
 class GameActionsSidebar extends ConsumerWidget {
   final String? roomId;
@@ -15,6 +16,7 @@ class GameActionsSidebar extends ConsumerWidget {
   final VoidCallback? onHelp;
   final VoidCallback? onToggleChat;
   final VoidCallback? onToggleVideo;
+  final int? pureSetCount;
 
   const GameActionsSidebar({
     super.key,
@@ -30,6 +32,7 @@ class GameActionsSidebar extends ConsumerWidget {
     this.onHelp,
     this.onToggleChat,
     this.onToggleVideo,
+    this.pureSetCount,
   });
 
   @override
@@ -97,6 +100,13 @@ class GameActionsSidebar extends ConsumerWidget {
               ),
             ),
           ),
+          
+          // Primary Sets Progress
+          if (pureSetCount != null)
+             Padding(
+               padding: const EdgeInsets.all(8.0),
+               child: PrimarySetProgress(count: pureSetCount!),
+             ),
           
           // Media Controls (Compact Row)
           Container(

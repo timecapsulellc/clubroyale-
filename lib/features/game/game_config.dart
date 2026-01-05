@@ -22,6 +22,9 @@ abstract class GameConfig with _$GameConfig {
 
     /// Entry fee in chips/units (optional boot amount)
     @Default(0) int bootAmount,
+
+    /// Game-specific rule variants (e.g. Marriage rules: tunnelPachaunu, kidnap)
+    @Default({}) Map<String, dynamic> variants,
   }) = _GameConfig;
 
   factory GameConfig.fromJson(Map<String, dynamic> json) =>

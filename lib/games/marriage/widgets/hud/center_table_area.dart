@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/ui/components/card_widget.dart';
+import 'package:clubroyale/games/marriage/widgets/hud/discard_pile_viewer.dart';
 
 /// Professional center table area with deck, discard, and tiplu display
 class CenterTableArea extends StatelessWidget {
   final int deckCount;
   final PlayingCard? topDiscard;
+  final List<PlayingCard>? discardPile; // Full list for viewer
   final PlayingCard? tiplu;
   final int discardCount;
   final bool canDrawFromDeck;
@@ -22,6 +25,7 @@ class CenterTableArea extends StatelessWidget {
     super.key,
     required this.deckCount,
     this.topDiscard,
+    this.discardPile,
     this.tiplu,
     required this.discardCount,
     this.canDrawFromDeck = false,
@@ -76,11 +80,9 @@ class CenterTableArea extends StatelessWidget {
             ],
           ),
 
-          // Tiplu indicator (if revealed)
-          if (tiplu != null) ...[
-            const SizedBox(height: 12),
-            _buildTipluIndicator(),
-          ],
+          // Tiplu indicator (Always shown, flips on reveal)
+          const SizedBox(height: 12),
+          _buildTipluIndicator(),
         ],
       ),
     );
@@ -223,6 +225,11 @@ class CenterTableArea extends StatelessWidget {
 
     return GestureDetector(
       onTap: canDraw ? onDiscardTap : null,
+      onLongPress: () {
+        if (discardPile != null && discardPile!.isNotEmpty) {
+          DiscardPileViewer.show(context, discardPile!);
+        }
+      },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -324,53 +331,76 @@ class CenterTableArea extends StatelessWidget {
   }
 
   Widget _buildTipluIndicator() {
-    return Container(
-      key: tipluKey,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.amber.withValues(alpha: 0.3),
-            Colors.orange.withValues(alpha: 0.3),
-          ],
+    // Determine card widget to show: Face Down or Tiplu Face Up
+    // Note: tiplu parameter is null if not revealed/visited
+    final Widget cardWidget;
+    if (tiplu != null) {
+      cardWidget = CardWidget(
+        key: const ValueKey('tiplu_revealed'),
+        card: tiplu!,
+        isFaceUp: true,
+        width: 45,
+        height: 65,
+        glowColor: CasinoColors.gold,
+      );
+    } else {
+      cardWidget = CardWidget(
+        key: const ValueKey('tiplu_hidden'),
+        card: PlayingCard(rank: CardRank.ace, suit: CardSuit.spades), // Dummy
+        isFaceUp: false, // Force Face Down styling
+        width: 45,
+        height: 65,
+      );
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 600),
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            // Flip Effect
+            final rotateAnim = Tween(begin: 3.14, end: 0.0).animate(animation);
+            return AnimatedBuilder(
+              animation: rotateAnim,
+              child: child,
+              builder: (context, child) {
+                final isUnder = (ValueKey(tiplu != null) != child?.key);
+                var tilt = ((animation.value - 0.5).abs() - 0.5) * 0.003;
+                tilt *= isUnder ? -1.0 : 1.0;
+                final value = isUnder
+                    ? math.min(rotateAnim.value, 3.14 / 2)
+                    : rotateAnim.value;
+                return Transform(
+                  transform: Matrix4.rotationY(value)..setEntry(3, 0, tilt),
+                  alignment: Alignment.center,
+                  child: child,
+                );
+              },
+            );
+          },
+          layoutBuilder: (widget, list) => Stack(children: [widget!, ...list]),
+          switchInCurve: Curves.easeInBack,
+          switchOutCurve: Curves.easeOutBack,
+          child: cardWidget,
         ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: CasinoColors.gold.withValues(alpha: 0.5)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'TIPLU: ',
-            style: TextStyle(
-              color: Colors.amber,
-              fontSize: 11,
+        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            tiplu != null ? 'TIPLU' : 'HIDDEN',
+            style: const TextStyle(
+              color: CasinoColors.gold,
+              fontSize: 9,
               fontWeight: FontWeight.bold,
-              letterSpacing: 1,
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              '${tiplu!.rank.symbol}${tiplu!.suit.symbol}',
-              style: TextStyle(
-                color: tiplu!.suit.isRed ? Colors.red : Colors.black,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(width: 6),
-          const Text(
-            '(3 pts)',
-            style: TextStyle(color: Colors.amber, fontSize: 9),
-          ),
-        ],
-      ),
-    ).animate().fadeIn().slideY(begin: 0.2, end: 0);
+        ),
+      ],
+    );
   }
 }

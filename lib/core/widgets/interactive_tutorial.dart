@@ -262,35 +262,69 @@ class InteractiveTutorialOverlay extends StatelessWidget {
           }
         }
 
-        return Stack(
-          children: [
-            // 1. Semi-transparent overlay (touchable area for advancing)
-            GestureDetector(
-              onTap: step.waitForAction ? null : controller.nextStep,
-              child: Container(color: Colors.black54),
-            ),
+          // Calculate hole punch rectangles (Top, Bottom, Left, Right)
+          // If no target, cover entire screen
+          final fullScreen = Rect.fromLTWH(0, 0, screenSize.width, screenSize.height);
+          final hole = targetRect ?? Rect.zero;
 
-            // 2. Highlight punch-out for target
-            if (targetRect != null) _buildHighlight(targetRect),
+          // Define the 4 blocking rectangles around the hole
+          final topRect = Rect.fromLTRB(0, 0, screenSize.width, hole.top);
+          final bottomRect = Rect.fromLTRB(0, hole.bottom, screenSize.width, screenSize.height);
+          final leftRect = Rect.fromLTRB(0, hole.top, hole.left, hole.bottom);
+          final rightRect = Rect.fromLTRB(hole.right, hole.top, screenSize.width, hole.bottom);
 
-            // 3. Animated Hand Pointer
-            if (targetRect != null)
-              TutorialHandPointer(
-                position: Offset(
-                  targetRect.center.dx + (step.handOffset?.dx ?? 0),
-                  targetRect.center.dy + (step.handOffset?.dy ?? 0),
+          return Stack(
+            children: [
+              // 1. Blocking Overlays (The "Hole Punch")
+              // Only block touches if we have a target. If no target (text only), standard overlay
+              if (targetRect == null)
+                GestureDetector(
+                   onTap: controller.nextStep,
+                   child: Container(color: Colors.black54),
+                )
+              else ...[
+                _buildBlocker(topRect, controller, step),
+                _buildBlocker(bottomRect, controller, step),
+                _buildBlocker(leftRect, controller, step),
+                _buildBlocker(rightRect, controller, step),
+              ],
+
+              // 2. Highlight punch-out for target (Visual Ring)
+              if (targetRect != null) _buildHighlight(targetRect),
+
+              // 3. Animated Hand Pointer
+              if (targetRect != null)
+                TutorialHandPointer(
+                  position: Offset(
+                    targetRect.center.dx + (step.handOffset?.dx ?? 0),
+                    targetRect.center.dy + (step.handOffset?.dy ?? 0),
+                  ),
+                  gestureType: step.gestureType,
                 ),
-                gestureType: step.gestureType,
-              ),
 
-            // 4. Instruction Card
-            _buildInstructionCard(context, step, targetRect, screenSize),
+              // 4. Instruction Card
+              _buildInstructionCard(context, step, targetRect, screenSize),
 
-            // 5. Progress dots
-            _buildProgressDots(),
-          ],
-        );
+              // 5. Progress dots
+              _buildProgressDots(),
+            ],
+          );
       },
+    );
+  }
+
+  Widget _buildBlocker(Rect rect, InteractiveTutorialController controller, InteractiveTutorialStep step) {
+    return Positioned.fromRect(
+      rect: rect,
+      child: GestureDetector(
+        // If waitForAction is TRUE, we swallow taps (acting as a barrier).
+        // If FALSE (text only step), we advance to next step.
+        // Actually for target steps, usually tapping OUTSIDE the target shouldn't advance if we expect them to look at it?
+        // Let's say: Tapping outside ALWAYS advances UNLESS waitForAction is true.
+        onTap: step.waitForAction ? () {} : controller.nextStep,
+        behavior: HitTestBehavior.opaque, // Catch all touches in this rect
+        child: Container(color: Colors.black54),
+      ),
     );
   }
 

@@ -24,6 +24,12 @@ enum BotPersonalityType {
 
   /// Calculates everything, optimal plays
   analytical,
+
+  /// Focuses on Tunnels (Triple identical cards) - High Risk/Reward
+  tunnelHunter,
+
+  /// Prioritizes Maal (Point cards) over winning quickly
+  maalCollector,
 }
 
 class BotPersonality {
@@ -128,6 +134,36 @@ class BotPersonality {
       riskTolerance: 0.5,
       patience: 0.6,
       thinkingDelayMs: 1800,
+    ),
+
+    // 6. TunnelTony (Tunnel Hunter / Expert)
+    const BotPersonality(
+      id: 'tunnel_tony',
+      name: 'TunnelTony',
+      avatarEmoji: '🚇',
+      type: BotPersonalityType.tunnelHunter,
+      difficulty: AIDifficulty.expert,
+      catchphrase: 'Triple or nothing!',
+      aggression: 0.8,
+      bluffRate: 0.7,
+      riskTolerance: 0.9, // Very high risk for tunnels
+      patience: 0.4,
+      thinkingDelayMs: 1600,
+    ),
+
+    // 7. MaalMira (Maal Collector / Hard)
+    const BotPersonality(
+      id: 'maal_mira',
+      name: 'MaalMira',
+      avatarEmoji: '💰',
+      type: BotPersonalityType.maalCollector,
+      difficulty: AIDifficulty.hard,
+      catchphrase: 'Points matter more than winning.',
+      aggression: 0.2,
+      bluffRate: 0.3,
+      riskTolerance: 0.4,
+      patience: 0.9, // Waits for maal
+      thinkingDelayMs: 2200,
     ),
   ];
 

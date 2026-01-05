@@ -365,9 +365,12 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
         }
       } else {
         labelText = 'INVALID';
-        labelColor = Colors.red.withValues(alpha: 0.8);
+        labelColor = Colors.redAccent.withValues(alpha: 0.9); // More visible Red
       }
     }
+
+    // Visual Alert for Invalid Groups (Red Border)
+    final isInvalid = labelText == 'INVALID';
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -380,6 +383,7 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
           decoration: BoxDecoration(
             color: labelText.isNotEmpty ? labelColor : Colors.transparent,
             borderRadius: BorderRadius.circular(4),
+            border: isInvalid ? Border.all(color: Colors.red, width: 1.5) : null,
           ),
           child: Text(
             labelText,
@@ -496,9 +500,26 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
 
     if (calculator != null) {
       final type = calculator.getMaalType(card);
-      if (type != MaalType.none) {
-        glowColor = Colors.amberAccent; // Simplified glo
-        badgeIcon = const Icon(Icons.star, color: Colors.amber, size: 10);
+      switch (type) {
+        case MaalType.tiplu:
+          glowColor = AppTheme.gold;
+          badgeIcon = const Icon(Icons.stars, color: AppTheme.gold, size: 14); // Major Maal
+          break;
+        case MaalType.poplu:
+        case MaalType.jhiplu:
+          glowColor = Colors.cyanAccent;
+          badgeIcon = const Icon(Icons.star, color: Colors.cyanAccent, size: 12);
+          break;
+        case MaalType.alter:
+          glowColor = Colors.amber;
+          badgeIcon = const Icon(Icons.monetization_on, color: Colors.amber, size: 12);
+          break;
+        case MaalType.man:
+          glowColor = Colors.purpleAccent;
+          badgeIcon = const Icon(Icons.person, color: Colors.purpleAccent, size: 12);
+          break;
+        case MaalType.none:
+          break;
       }
     }
 

@@ -57,7 +57,7 @@ class ProfessionalTableLayout extends StatelessWidget {
               top: railWidth,
               right: railWidth,
               bottom: handHeight, // Hand overlaps slightly or touches bottom of rail
-              child: _buildTableRail(),
+              child: const RepaintBoundary(child: _TableRail()),
             ),
 
             // 2. Felt Surface
@@ -66,17 +66,19 @@ class ProfessionalTableLayout extends StatelessWidget {
               top: railWidth + 4,
               right: railWidth + 4,
               bottom: handHeight + 4,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: CasinoColors.greenFeltGradient,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+              child: RepaintBoundary(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: CasinoColors.greenFeltGradient,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -124,7 +126,11 @@ class ProfessionalTableLayout extends StatelessWidget {
     );
   }
 
-  Widget _buildTableRail() {
+class _TableRail extends StatelessWidget {
+  const _TableRail();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -156,6 +162,7 @@ class ProfessionalTableLayout extends StatelessWidget {
       ),
     );
   }
+}
 
   List<Widget> _buildOpponentPositions({
     required double width,

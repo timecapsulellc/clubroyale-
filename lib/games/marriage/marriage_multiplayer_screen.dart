@@ -87,6 +87,9 @@ class _MarriageMultiplayerScreenState
     'hint_button': GlobalKey(),
   };
 
+  // Keys for opponent slots (for dealing animation targets)
+  final Map<String, GlobalKey> _opponentKeys = {};
+
   // PlayingCard lookup cache
   final Map<String, PlayingCard> _cardCache = {};
 
@@ -108,8 +111,45 @@ class _MarriageMultiplayerScreenState
 
     // Play dealing animation on load (optional)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // _cardAnimController.dealCards(); // Not implemented yet
+       _playDealingAnimation();
     });
+  }
+  
+  void _playDealingAnimation() {
+      // Find deck position
+      final deckContext = _tutorialKeys['deck_pile']?.currentContext;
+      if (deckContext == null) return;
+      
+      final RenderBox deckBox = deckContext.findRenderObject() as RenderBox;
+      final deckPos = deckBox.localToGlobal(Offset.zero);
+      
+      // Collect player positions
+      final playerPositions = <Offset>[];
+      // 1. My position (Hand)
+      final handContext = _tutorialKeys['player_hand']?.currentContext;
+      if (handContext != null) {
+          final RenderBox handBox = handContext.findRenderObject() as RenderBox;
+          playerPositions.add(handBox.localToGlobal(Offset.zero) + const Offset(100, 50)); 
+      }
+      
+      // 2. Opponent positions
+      for (final key in _opponentKeys.values) {
+          final context = key.currentContext;
+          if (context != null) {
+              final RenderBox box = context.findRenderObject() as RenderBox;
+              playerPositions.add(box.localToGlobal(Offset.zero));
+          }
+      }
+      
+      if (playerPositions.isEmpty) return;
+      
+      // Trigger optimized animation
+      _cardAnimController.dealCards(
+          playerCount: playerPositions.length,
+          myPlayerIndex: 0, // Me is always 0 in this list logic
+          deckPosition: deckPos,
+          playerPositions: playerPositions,
+      );
   }
 
   @override
@@ -368,6 +408,17 @@ class _MarriageMultiplayerScreenState
                               child: GameActionsSidebar(
                                 roomId: widget.roomId,
                                 userId: currentUser.uid,
+                                pureSetCount: () {
+                                  // Calculate pure sets on the fly
+                                  final cards = myHand
+                                      .map((id) => _getCard(id))
+                                      .whereType<PlayingCard>()
+                                      .toList();
+                                  final melds = MeldDetector.findAllMelds(cards, tiplu: tiplu);
+                                  return melds.where((m) =>
+                                      (m is RunMeld && m.isValid) ||
+                                      (m is TunnelMeld && m.isValid)).length;
+                                }(),
                                 onShowSequence: () {
                                   _handleShowSequence(state);
                                   setState(() => _isSidebarOpen = false);
@@ -524,9 +575,22 @@ class _MarriageMultiplayerScreenState
                               builder: (context, walletSnapshot) {
                                 final balance =
                                     walletSnapshot.data?.balance ?? 0;
-                                final maalPoints = state.getMaalPoints(
-                                  currentUser.uid,
-                                );
+
+                                // P1 FIX: Live Maal Calculation
+                                // Instead of showing 0 until visited, show current potential value
+                                int liveMaalPoints = 0;
+                                if (tiplu != null) {
+                                  final calculator = MarriageMaalCalculator(
+                                    tiplu: tiplu,
+                                    config: state.config,
+                                  );
+                                  // Use the cached cards from myHand lookup
+                                  final handCards = (state.playerHands[currentUser.uid] ?? [])
+                                      .map((id) => _getCard(id))
+                                      .whereType<PlayingCard>()
+                                      .toList();
+                                  liveMaalPoints = calculator.calculateMaalPoints(handCards);
+                                }
 
                                 return GameTopBar(
                                   roomName: GameTerminology.royalMeldGame,
@@ -536,7 +600,7 @@ class _MarriageMultiplayerScreenState
                                         ? 6
                                         : widget.roomId.length,
                                   ),
-                                  points: 'Maal: $maalPoints',
+                                  points: 'Maal: $liveMaalPoints',
                                   balance: '💎 $balance',
                                   onExit: () => context.go('/lobby'),
                                   onSettings: () => Navigator.push(
@@ -992,6 +1056,10 @@ class _MarriageMultiplayerScreenState
     return CenterTableArea(
       deckCount: state.deckCards.length,
       topDiscard: topDiscard,
+      discardPile: state.discardPile
+          .map((id) => _getCard(id))
+          .whereType<PlayingCard>()
+          .toList(),
       discardCount: state.discardPile.length,
       tiplu: state.tipluCardId.isNotEmpty ? _getCard(state.tipluCardId) : null,
       isMyTurn: isMyTurn,
@@ -1025,12 +1093,16 @@ class _MarriageMultiplayerScreenState
     return rotatedPlayers.map((playerId) {
       final hand = state.playerHands[playerId] ?? [];
       final isTurn = state.currentPlayerId == playerId;
-      final profile = _getBotName(playerId); // Only name, need avatar logic
+      final profile = _getBotName(playerId); // Or real name if human
       final hasVisited = state.hasVisited(playerId);
+      final action = state.playerActions?[playerId];
       final timer = isTurn && state.config.turnTimeoutSeconds > 0
           ? ref.read(marriageServiceProvider).getRemainingTurnTime(state) /
                 state.config.turnTimeoutSeconds
           : 0.0;
+
+      // Assign persistent key for animation targeting
+      _opponentKeys[playerId] ??= GlobalKey();
 
       // Determine action status for bubble
       OpponentAction? action;
@@ -1042,9 +1114,11 @@ class _MarriageMultiplayerScreenState
       // Ideally we'd track "Drawing..." state too via specific updates
 
       return Stack(
-        alignment: Alignment.topCenter,
+        key: _opponentKeys[playerId], // Key for animation target
         clipBehavior: Clip.none,
+        alignment: Alignment.center,
         children: [
+          // Slot
           isCompact
               ? PlayerSlotCompact(
                   playerName: profile,
@@ -1404,8 +1478,13 @@ class _MarriageMultiplayerScreenState
       key: key, // Pass key down
       cards: cards,
       selectedCardId: _selectedCardId,
-      onCardSelected: (id) =>
-          setState(() => _selectedCardId = id == _selectedCardId ? null : id),
+      onCardSelected: (id) {
+        setState(() => _selectedCardId = id == _selectedCardId ? null : id);
+        // Step 6: Validate tutorial action
+        if (_isTutorialActive && _selectedCardId != null) {
+          _guidedTutorialController.validateAction();
+        }
+      },
       tiplu: tiplu,
       config: config,
     );
@@ -1629,6 +1708,11 @@ class _MarriageMultiplayerScreenState
           widget.roomId,
           userId,
         );
+        
+        // Tutorial Step 4: Validate Draw
+        if (_isTutorialActive) {
+          _guidedTutorialController.validateAction();
+        }
 
         _logGameEvent('You drew a card', icon: Icons.add_circle_outline);
 
@@ -1785,6 +1869,10 @@ class _MarriageMultiplayerScreenState
       final userId = authService.currentUser?.uid;
 
       if (userId != null) {
+        if (_isTutorialActive) {
+          _guidedTutorialController.validateAction();
+        }
+
         await marriageService.discardCard(
           widget.roomId,
           userId,

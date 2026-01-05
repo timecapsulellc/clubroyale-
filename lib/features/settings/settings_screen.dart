@@ -6,6 +6,9 @@ import 'package:clubroyale/core/widgets/theme_selector.dart';
 import 'package:clubroyale/features/settings/widgets/terminology_toggle.dart';
 import 'package:clubroyale/core/services/feature_flags.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
+import 'package:clubroyale/core/services/localization_service.dart';
+import 'package:clubroyale/core/config/game_settings.dart';
+import 'package:clubroyale/core/config/game_terminology.dart';
 
 /// Settings Screen - Premium Edition
 ///
@@ -14,19 +17,21 @@ import 'package:clubroyale/core/services/sound_service.dart';
 /// - Quick Action Grid (Wallet, Profile)
 /// - Premium List Tiles
 /// - Feature-specific settings (Strict Mode, Social)
+/// - Feature-specific settings (Strict Mode, Social)
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeColors = ref.watch(themeColorsProvider);
+    final currentLocale = ref.watch(localeProvider); // Watch locale for rebuilds
 
     return Scaffold(
       backgroundColor: themeColors.background,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          _buildSliverAppBar(context, themeColors),
+          _buildSliverAppBar(context, themeColors, ref), // Pass ref
 
           SliverToBoxAdapter(
             child: Padding(
@@ -35,12 +40,17 @@ class SettingsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 1. Prime Actions (Wallet & Profile)
-                  _buildPrimeActionsGrid(context, themeColors),
+                  _buildPrimeActionsGrid(context, themeColors, ref),
                   const SizedBox(height: 32),
 
                   // 2. Gameplay Settings (The Core Experience)
-                  _buildSectionTitle('GAMEPLAY', themeColors),
+                  _buildSectionTitle('section_gameplay'.tr(ref), themeColors),
                   const SizedBox(height: 16),
+                  
+                  // LANGUAGE TOGGLE
+                  _buildLanguageToggle(context, ref, themeColors),
+                  const SizedBox(height: 12),
+                  
                   TerminologyToggle(
                     onChanged: () => _showRestartSnackBar(context),
                   ),
@@ -57,7 +67,7 @@ class SettingsScreen extends ConsumerWidget {
 
                   // 3. Social & Privacy
                   if (featureFlags.socialEnabled) ...[
-                    _buildSectionTitle('SOCIAL', themeColors),
+                    _buildSectionTitle('section_social'.tr(ref), themeColors),
                     const SizedBox(height: 16),
                     _buildSwitchTile(
                       title: 'Public Story Visibility',
@@ -80,7 +90,7 @@ class SettingsScreen extends ConsumerWidget {
                   const SizedBox(height: 32),
 
                   // 4. Audio Settings
-                  _buildSectionTitle('AUDIO', themeColors),
+                  _buildSectionTitle('section_audio'.tr(ref), themeColors),
                   const SizedBox(height: 16),
                   StatefulBuilder(
                     builder: (context, setState) {
@@ -117,14 +127,14 @@ class SettingsScreen extends ConsumerWidget {
                   const SizedBox(height: 32),
 
                   // 5. Appearance
-                  _buildSectionTitle('APPEARANCE', themeColors),
+                  _buildSectionTitle('section_appearance'.tr(ref), themeColors),
                   const SizedBox(height: 16),
                   const ThemeSelectorWidget(),
 
                   const SizedBox(height: 32),
 
                   // 5. Support & Legal
-                  _buildSectionTitle('SUPPORT', themeColors),
+                  _buildSectionTitle('section_support'.tr(ref), themeColors),
                   const SizedBox(height: 16),
                   _buildNavigationTile(
                     icon: Icons.school,
@@ -152,7 +162,7 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSliverAppBar(BuildContext context, ThemeColors themeColors) {
+  Widget _buildSliverAppBar(BuildContext context, ThemeColors themeColors, WidgetRef ref) {
     return SliverAppBar(
       expandedHeight: 120,
       backgroundColor: themeColors.background,
@@ -160,7 +170,8 @@ class SettingsScreen extends ConsumerWidget {
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
         title: Text(
-          'SETTINGS',
+       title: Text(
+          'settings'.tr(ref).toUpperCase(),
           style: TextStyle(
             fontFamily: 'Oswald',
             fontWeight: FontWeight.bold,
@@ -200,13 +211,13 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPrimeActionsGrid(BuildContext context, ThemeColors themeColors) {
+  Widget _buildPrimeActionsGrid(BuildContext context, ThemeColors themeColors, WidgetRef ref) {
     return Row(
       children: [
         Expanded(
           child: _buildActionCard(
             context,
-            title: 'WALLET',
+            title: 'wallet'.tr(ref),
             subtitle: 'Manage Diamonds',
             icon: Icons.account_balance_wallet,
             color: const Color(0xFFD4AF37), // Gold
@@ -217,7 +228,7 @@ class SettingsScreen extends ConsumerWidget {
         Expanded(
           child: _buildActionCard(
             context,
-            title: 'PROFILE',
+            title: 'profile'.tr(ref),
             subtitle: 'Edit Avatar',
             icon: Icons.person,
             color: const Color(0xFF2E7D32), // Green
@@ -418,6 +429,73 @@ class SettingsScreen extends ConsumerWidget {
         backgroundColor: Colors.black87,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+  }
+
+  Widget _buildLanguageToggle(BuildContext context, WidgetRef ref, ThemeColors themeColors) {
+    final currentLocale = ref.watch(localeProvider);
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Row(
+        children: [
+           Icon(Icons.language, color: themeColors.gold),
+           const SizedBox(width: 12),
+           Expanded(
+             child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'language'.tr(ref),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                  Text(
+                    currentLocale == AppLocale.ne ? 'Nepali' : 'English',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+             ),
+           ),
+           ToggleButtons(
+             isSelected: [currentLocale == AppLocale.en, currentLocale == AppLocale.ne],
+             onPressed: (index) async {
+               final newLocale = index == 0 ? AppLocale.en : AppLocale.ne;
+               await ref.read(localeProvider.notifier).setLocale(newLocale);
+               
+               // Auto-sync Game Terminology based on Language
+               if (newLocale == AppLocale.ne) {
+                 await ref.read(gameSettingsProvider.notifier).setRegion(GameRegion.southAsia);
+               } else {
+                  // Optional: stay on current region or reset to global?
+                  // Keeping current region lets users play in English but with "Marriage" terms if they want
+               }
+             },
+             borderRadius: BorderRadius.circular(8),
+             selectedColor: Colors.black,
+             fillColor: themeColors.gold,
+             color: Colors.white70,
+             renderBorder: false,
+             constraints: const BoxConstraints(minHeight: 36, minWidth: 48),
+             children: const [
+               Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Text('EN', style: TextStyle(fontWeight: FontWeight.bold))),
+               Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Text('नेपाली', style: TextStyle(fontWeight: FontWeight.bold))), 
+             ],
+           ),
+        ],
       ),
     );
   }

@@ -251,9 +251,43 @@ class MarriageBotStrategy {
     Card? tiplu, {
     required bool preferHighValue,
   }) {
-    // Never discard wildcards
+    // 1. Never discard wildcards
     final nonWild = candidates.where((c) => !_isWildCard(c, tiplu)).toList();
-    final pool = nonWild.isNotEmpty ? nonWild : candidates;
+    var pool = nonWild.isNotEmpty ? nonWild : candidates;
+
+    // 2. Personality Overrides
+    if (personality?.type == BotPersonalityType.tunnelHunter) {
+      // Tunnel Hunter: Avoid discarding cards that have a pair in hand/melds
+      // (Simplified: just avoid breaking pairs in hand)
+      // Actually, we should filter out cards that are part of a PAIR
+      final pairRanks = <Rank>{};
+      for (final c in candidates) {
+        if (candidates.where((o) => o != c && o.rank == c.rank).isNotEmpty) {
+           pairRanks.add(c.rank);
+        }
+      }
+      // If we have non-pair cards, restrict pool to them
+      final nonPair = pool.where((c) => !pairRanks.contains(c.rank)).toList();
+      if (nonPair.isNotEmpty) {
+        pool = nonPair;
+      }
+    } else if (personality?.type == BotPersonalityType.maalCollector) {
+      // Maal Collector: Avoid discarding cards that COULD be Maal
+      // (e.g., same suit as Tiplu, or close rank)
+      if (tiplu != null) {
+        final nonPotentialMaal = pool.where((c) {
+          // Keep same suit (Alter/Man potential)
+          if (c.suit == tiplu.suit) return false;
+          // Keep same rank (Jhiplu potential)
+          if (c.rank == tiplu.rank) return false;
+          return true;
+        }).toList();
+        
+        if (nonPotentialMaal.isNotEmpty) {
+          pool = nonPotentialMaal;
+        }
+      }
+    }
 
     // Find cards not in any meld
     final allCards = List<Card>.from(pool);

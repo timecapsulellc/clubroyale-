@@ -6,6 +6,7 @@
 library;
 
 import 'package:clubroyale/games/base_game.dart';
+import 'package:meta/meta.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
 import 'package:clubroyale/core/card_engine/meld.dart';
@@ -61,6 +62,15 @@ class MarriageGame implements BaseGame {
   final Set<String> _visitedPlayers = {}; // Players who have opened/unlocked
   int _currentRound = 0;
   static const int totalRounds = 5;
+
+  @visibleForTesting
+  Pile get drawPile => _deck;
+
+  @visibleForTesting
+  Pile get discardPile => _discardPile;
+
+  @visibleForTesting
+  Map<String, Hand> get playerHands => Map.unmodifiable(_hands);
 
   @override
   GamePhase get currentPhase => _currentPhase;
