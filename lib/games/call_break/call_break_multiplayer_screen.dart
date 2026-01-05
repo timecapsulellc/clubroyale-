@@ -12,6 +12,7 @@ import 'package:clubroyale/core/widgets/game_mode_banner.dart';
 import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 import 'package:clubroyale/core/widgets/turn_timer.dart';
 import 'package:clubroyale/features/game/ui/components/card_widget.dart';
+import 'package:clubroyale/features/game/ui/components/card_preview_overlay.dart';
 import 'package:clubroyale/features/game/ui/components/table_layout.dart';
 import 'package:clubroyale/features/game/ui/components/unified_game_sidebar.dart';
 import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
@@ -575,10 +576,13 @@ class _CallBreakMultiplayerScreenState
                   : null,
               child: Opacity(
                 opacity: canPlay ? 1.0 : 0.6,
-                child: CardWidget(
+                child: CardWithPreview(
                   card: card,
-                  isFaceUp: true,
-                  isSelected: false,
+                  child: CardWidget(
+                    card: card,
+                    isFaceUp: true,
+                    isSelected: false,
+                  ),
                 ),
               ),
             ),

@@ -63,33 +63,61 @@ class PlayerSlotWidget extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                // Avatar circle
+                // Avatar circle with premium gold border
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _getAvatarColor(),
+                    // Outer gold ring
                     border: Border.all(
-                      color: hasVisited ? Colors.green : Colors.white30,
-                      width: 2,
+                      color: CasinoColors.gold,
+                      width: 3,
                     ),
                     boxShadow: [
+                      // Gold glow effect
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        blurRadius: 4,
+                        color: CasinoColors.gold.withValues(alpha: 0.4),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                      // Drop shadow
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),
-                  child: avatarUrl != null
-                      ? ClipOval(
-                          child: Image.network(
-                            avatarUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _buildAvatarIcon(),
-                          ),
-                        )
-                      : _buildAvatarIcon(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _getAvatarColor(),
+                      // Inner border for visited indicator
+                      border: hasVisited
+                          ? Border.all(color: Colors.green, width: 2)
+                          : null,
+                    ),
+                    child: avatarUrl != null
+                        ? ClipOval(
+                            child: Image.network(
+                              avatarUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => _buildAvatarIcon(),
+                            ),
+                          )
+                        : _buildAvatarIcon(),
+                  ),
+                )
+                .animate(
+                  target: isCurrentTurn ? 1 : 0,
+                  onPlay: isCurrentTurn ? (c) => c.repeat(reverse: true) : null,
+                )
+                .scale(
+                  begin: const Offset(1, 1), 
+                  end: const Offset(1.1, 1.1),
+                  duration: 800.ms,
+                  curve: Curves.easeInOut,
                 ),
 
                 // Card count badge (top-right)

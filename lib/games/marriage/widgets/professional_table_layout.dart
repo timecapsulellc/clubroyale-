@@ -60,38 +60,58 @@ class ProfessionalTableLayout extends StatelessWidget {
               child: const RepaintBoundary(child: _TableRail()),
             ),
 
-            // 2. Felt Surface
+            // 2. Felt Surface with Vignette
             Positioned(
               left: railWidth + 4,
               top: railWidth + 4,
               right: railWidth + 4,
               bottom: handHeight + 4,
               child: RepaintBoundary(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: const RadialGradient(
-                      center: Alignment.center,
-                      radius: 0.8,
-                      colors: [
-                        Color(0xFF006400), // Brighter center (Spotlight)
-                        Color(0xFF004d00), // Darker edge
-                      ],
-                      stops: [0.2, 1.0],
-                    ),
-                    borderRadius: BorderRadius.all(Radius.elliptical(width, height)),
-                    border: Border.all(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.5),
-                        blurRadius: 10, // Softer shadow
-                        spreadRadius: 2,
+                child: Stack(
+                  children: [
+                    // Base felt gradient
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: const RadialGradient(
+                          center: Alignment.center,
+                          radius: 0.8,
+                          colors: [
+                            Color(0xFF006400), // Brighter center (Spotlight)
+                            Color(0xFF004d00), // Darker edge
+                          ],
+                          stops: [0.2, 1.0],
+                        ),
+                        borderRadius: BorderRadius.all(Radius.elliptical(width, height)),
+                        border: Border.all(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.5),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                          ),
+                        ],
                       ),
-                      // Inner shadow for depth (simulated with standard shadow for now)
-                    ],
-                  ),
+                    ),
+                    // Vignette overlay for premium casino atmosphere
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.elliptical(width, height)),
+                        gradient: RadialGradient(
+                          center: Alignment.center,
+                          radius: 1.2,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.15),
+                            Colors.black.withValues(alpha: 0.35),
+                          ],
+                          stops: const [0.4, 0.7, 1.0],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

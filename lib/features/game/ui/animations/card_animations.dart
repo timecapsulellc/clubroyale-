@@ -31,7 +31,6 @@ class FlyingCardAnimation extends StatefulWidget {
 class _FlyingCardAnimationState extends State<FlyingCardAnimation>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<Offset> _positionAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _rotationAnimation;
 
@@ -40,20 +39,15 @@ class _FlyingCardAnimationState extends State<FlyingCardAnimation>
     super.initState();
     _controller = AnimationController(vsync: this, duration: widget.duration);
 
-    _positionAnimation = Tween<Offset>(
-      begin: widget.startPosition,
-      end: widget.endPosition,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
-
     _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 30),
-      TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 70),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.2), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.2, end: 1.0), weight: 50),
     ]).animate(_controller);
 
     _rotationAnimation = Tween<double>(
       begin: 0.0,
-      end: 0.05, // Slight rotation for natural feel
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+      end: 6.28, // Full rotation for visual flair
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward().then((_) {
       widget.onComplete?.call();
@@ -76,18 +70,40 @@ class _FlyingCardAnimationState extends State<FlyingCardAnimation>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
+        final t = _controller.value;
+        // Quadratic Bezier Curve: B(t) = (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
+        final p0 = widget.startPosition;
+        final p2 = widget.endPosition;
+        
+        // Calculate Control Point P1 (Midpoint + Offset for Arc)
+        // Offset direction depends on start/end to avoid off-screen
+        final mid = (p0 + p2) / 2;
+        final dist = (p0 - p2).distance;
+        // Add random slight variation or fixed curve
+        final p1 = Offset(mid.dx, mid.dy - (dist * 0.2)); // Arc upwards
+
+        final x = (1 - t) * (1 - t) * p0.dx + 2 * (1 - t) * t * p1.dx + t * t * p2.dx;
+        final y = (1 - t) * (1 - t) * p0.dy + 2 * (1 - t) * t * p1.dy + t * t * p2.dy;
+
+        // Apply custom curve to time for speed variation
+        // Using EaseInOutCubic manually on 't' if needed, but Controller is linear by default
+        // Let's use the eased value from a CurvedAnimation if we wanted, 
+        // but simple linear 't' with Bezier path looks physically reasonably natural for cards.
+        
         return Positioned(
-          left: _positionAnimation.value.dx,
-          top: _positionAnimation.value.dy,
+          left: x,
+          top: y,
           child: Transform.scale(
             scale: _scaleAnimation.value,
             child: Transform.rotate(
-              angle: _rotationAnimation.value,
+              angle: _rotationAnimation.value * (t * 0.5), // Rotate slightly during flight
               child: CardWidget(
                 card: widget.card,
                 isFaceUp: widget.showFace,
                 width: 70,
                 height: 100,
+                // Add shadow for depth during flight
+                glowColor: Colors.black.withValues(alpha: 0.3),
               ),
             ),
           ),

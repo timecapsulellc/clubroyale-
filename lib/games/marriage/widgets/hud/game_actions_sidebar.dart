@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:clubroyale/games/marriage/widgets/hud/primary_set_progress.dart';
 
@@ -50,42 +52,7 @@ class GameActionsSidebar extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header - Maal Card Placeholder
-          Container(
-            height: 140, // Adjust based on card size
-            decoration: BoxDecoration(
-              color: const Color(0xFF1a2f2f),
-              border: Border(
-                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-              ),
-            ),
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Maal Card',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // Placeholder for Maal Card Image
-                Container(
-                  width: 50,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Center(
-                    child: Icon(Icons.style, color: Colors.green, size: 20),
-                  ),
-                ),
-              ],
-            ),
-          ),
+
 
           // Action Header
           Container(
@@ -140,7 +107,11 @@ class GameActionsSidebar extends ConsumerWidget {
                   const Divider(height: 1, color: Colors.white24),
                   _SidebarButton(label: 'SHOW DUBLEE', onTap: onShowDublee),
                   const Divider(height: 1, color: Colors.white24),
-                  _SidebarButton(label: 'FINISH GAME', onTap: onFinishGame),
+                  _SidebarButton(
+                    label: 'FINISH GAME', 
+                    onTap: onFinishGame,
+                    isRecommended: onFinishGame != null, // Pulse if available
+                  ),
                   const Divider(height: 1, color: Colors.white24),
                   _SidebarButton(label: 'CANCEL ACTION', onTap: onCancelAction),
                   const Divider(height: 1, color: Colors.white24),
@@ -165,27 +136,50 @@ class GameActionsSidebar extends ConsumerWidget {
 class _SidebarButton extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
+  final bool isRecommended;
 
-  const _SidebarButton({required this.label, this.onTap});
+  const _SidebarButton({
+    required this.label, 
+    this.onTap,
+    this.isRecommended = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final isEnabled = onTap != null;
+    Widget content = Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      alignment: Alignment.centerLeft,
+      color: isRecommended 
+          ? CasinoColors.gold.withValues(alpha: 0.15) 
+          : Colors.transparent,
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isEnabled 
+                    ? (isRecommended ? CasinoColors.gold : Colors.white) 
+                    : Colors.white38,
+                fontWeight: isRecommended ? FontWeight.bold : FontWeight.normal,
+                fontSize: 13,
+              ),
+            ),
+          ),
+          if (isRecommended && isEnabled)
+            Icon(Icons.arrow_left, color: CasinoColors.gold, size: 20)
+                .animate(onPlay: (c) => c.repeat(reverse: true))
+                .moveX(begin: 0, end: -4, duration: 600.ms),
+        ],
+      )
+    );
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-          alignment: Alignment.centerLeft,
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
-            ),
-          ),
-        ),
+        child: content,
       ),
     );
   }

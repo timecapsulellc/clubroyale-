@@ -37,7 +37,12 @@ import 'package:clubroyale/games/marriage/widgets/marriage_guided_tutorial.dart'
 import 'package:clubroyale/core/widgets/interactive_tutorial.dart';
 import 'package:clubroyale/games/marriage/widgets/professional_table_layout.dart';
 import 'package:clubroyale/games/marriage/widgets/hud/player_slot_widget.dart';
+import 'package:clubroyale/games/marriage/widgets/hud/maal_indicator_hud.dart';
 import 'package:clubroyale/games/marriage/widgets/hud/center_table_area.dart';
+import 'package:clubroyale/games/marriage/widgets/hud/game_log_overlay.dart';
+import 'package:clubroyale/games/marriage/widgets/marriage_score_table.dart';
+import 'package:clubroyale/games/marriage/widgets/player_sets_zoom_modal.dart';
+import 'package:clubroyale/games/marriage/widgets/played_sets_widget.dart';
 import 'package:clubroyale/games/marriage/widgets/hud/action_indicators.dart';
 import 'package:clubroyale/features/game/ui/animations/card_animations.dart';
 import 'package:clubroyale/features/game/ui/animations/victory_celebration.dart';
@@ -360,6 +365,27 @@ class _MarriageMultiplayerScreenState
                                 child: Column(
                                   children: [
                                     /* _buildMeldSuggestions - Moved elsewhere or removed */
+                                    Builder(
+                                      builder: (context) {
+                                        final myDeclaredMelds = state.playerDeclaredMelds[currentUser.uid] ?? [];
+                                        final List<List<PlayingCard>> myPlayedSets = [];
+                                        for (final meldMap in myDeclaredMelds) {
+                                          final ids = (meldMap['cardIds'] as List?)?.cast<String>() ?? [];
+                                          final cards = ids.map((id) => _getCard(id)).whereType<PlayingCard>().toList();
+                                          if (cards.isNotEmpty) myPlayedSets.add(cards);
+                                        }
+
+                                        if (myPlayedSets.isEmpty) return const SizedBox.shrink();
+
+                                        return Padding(
+                                          padding: const EdgeInsets.only(bottom: 8),
+                                          child: PlayedSetsWidget(
+                                            sets: myPlayedSets, 
+                                            scale: 0.6,
+                                          ),
+                                        );
+                                      }
+                                    ),
                                     _buildCompactStatusBar(
                                       state,
                                       currentUser.uid,
@@ -461,6 +487,31 @@ class _MarriageMultiplayerScreenState
                                     _isSidebarOpen = false;
                                     _showVideoGrid = !_showVideoGrid;
                                 }),
+                              ),
+                            ),
+
+                            // 4b. Maal Indicator (Top Left HUD)
+                            if (state.phase != 'dealing')
+                              Positioned(
+                                top: 120,
+                                left: 16,
+                                child: MaalIndicatorHUD(
+                                  tiplu: state.tipluCardId.isNotEmpty 
+                                      ? _getCard(state.tipluCardId) 
+                                      : null,
+                                  tipluKey: _tutorialKeys['tiplu_indicator'],
+                                  onTap: () {
+                                     // Optional: Show breakdown or details
+                                  },
+                                ),
+                              ),
+
+                            // 5. Game Log Overlay (Bottom Left)
+                            Positioned(
+                              left: 16,
+                              bottom: 120, 
+                              child: GameLogOverlay(
+                                logs: _gameLogs.map((l) => l.message).toList(),
                               ),
                             ),
 
@@ -1066,6 +1117,7 @@ class _MarriageMultiplayerScreenState
       deckKey: _tutorialKeys['deck_pile'],
       discardKey: _tutorialKeys['discard_pile'],
       tipluKey: _tutorialKeys['tiplu_indicator'],
+      showTiplu: false, // Moved to HUD
       isDiscardBlocked: false,
     );
   }
@@ -1099,6 +1151,18 @@ class _MarriageMultiplayerScreenState
       // Assign persistent key for animation targeting
       _opponentKeys[playerId] ??= GlobalKey();
 
+      // Get declared sets for this player
+      final declaredMelds = state.playerDeclaredMelds[playerId] ?? [];
+      final List<List<PlayingCard>> playedSets = [];
+      for (final meldMap in declaredMelds) {
+          // Handle 'cards' or 'cardIds' based on storage
+          final ids = (meldMap['cardIds'] as List?)?.cast<String>() ?? [];
+          final cards = ids.map((id) => _getCard(id)).whereType<PlayingCard>().toList();
+          if (cards.isNotEmpty) {
+             playedSets.add(cards);
+          }
+      }
+
       // Determine action status for bubble
       OpponentAction? action;
       if (isTurn) {
@@ -1114,21 +1178,41 @@ class _MarriageMultiplayerScreenState
         alignment: Alignment.center,
         children: [
           // Slot
-          isCompact
-              ? PlayerSlotCompact(
-                  playerName: profile,
-                  cardCount: hand.length,
-                  isCurrentTurn: isTurn,
-                  hasVisited: hasVisited,
-                )
-              : PlayerSlotWidget(
-                  playerName: profile,
-                  cardCount: hand.length,
-                  isCurrentTurn: isTurn,
-                  hasVisited: hasVisited,
-                  maalPoints: state.getMaalPoints(playerId),
-                  onTap: () {},
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              isCompact
+                  ? PlayerSlotCompact(
+                      playerName: profile,
+                      cardCount: hand.length,
+                      isCurrentTurn: isTurn,
+                      hasVisited: hasVisited,
+                    )
+                  : PlayerSlotWidget(
+                      playerName: profile,
+                      cardCount: hand.length,
+                      isCurrentTurn: isTurn,
+                      hasVisited: hasVisited,
+                      maalPoints: state.getMaalPoints(playerId),
+                      onTap: () => PlayerSetsZoomModal.show(
+                        context,
+                        playerName: profile,
+                        declaredSets: playedSets,
+                        maalPoints: state.getMaalPoints(playerId),
+                      ),
+                    ),
+              
+              // Played Sets (Melds)
+              if (playedSets.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: PlayedSetsWidget(
+                    sets: playedSets,
+                    scale: isCompact ? 0.4 : 0.5,
+                  ),
                 ),
+            ],
+          ),
 
           // Action Bubble
           if (action != null)
@@ -2040,108 +2124,13 @@ class _MarriageMultiplayerScreenState
                     ),
                   ),
 
-                  // Score breakdown header
-                  const Text(
-                    'Score Breakdown',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                  // Score Table
+                  MarriageScoreTable(
+                    scores: scores.cast<String, int>(),
+                    scoreDetails: details,
+                    declarerId: declarerId,
+                    currentUserId: ref.read(authServiceProvider).currentUser?.uid ?? '',
                   ),
-                  const Divider(color: Colors.white24),
-
-                  // Player scores
-                  ...scores.entries.map((entry) {
-                    final playerId = entry.key;
-                    final score = entry.value as int;
-                    final playerDetails =
-                        details[playerId] as Map<String, dynamic>? ?? {};
-                    final isDeclarer = playerDetails['isDeclarer'] == true;
-                    final hasPure = playerDetails['hasPureSequence'] == true;
-                    final hasDublee = playerDetails['hasDublee'] == true;
-                    final marriages =
-                        playerDetails['marriageCount'] as int? ?? 0;
-
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 12,
-                      ),
-                      margin: const EdgeInsets.only(bottom: 8),
-                      decoration: BoxDecoration(
-                        color: isDeclarer
-                            ? Colors.green.withValues(alpha: 0.1)
-                            : Colors.grey.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isDeclarer
-                              ? Colors.green.withValues(alpha: 0.5)
-                              : Colors.white24,
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                isDeclarer ? Icons.star : Icons.person,
-                                color: isDeclarer
-                                    ? CasinoColors.gold
-                                    : Colors.white54,
-                                size: 16,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'Player ${playerId.substring(0, 6)}...',
-                                  style: TextStyle(
-                                    color: isDeclarer
-                                        ? Colors.white
-                                        : Colors.white70,
-                                    fontWeight: isDeclarer
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                score >= 0 ? '+$score' : '$score',
-                                style: TextStyle(
-                                  color: score <= 0
-                                      ? Colors.green
-                                      : Colors.red.shade300,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ],
-                          ),
-                          // Bonuses/penalties
-                          if (hasPure ||
-                              hasDublee ||
-                              marriages > 0 ||
-                              isDeclarer)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Wrap(
-                                spacing: 6,
-                                children: [
-                                  if (hasPure)
-                                    _buildBadge('Pure ✓', Colors.blue),
-                                  if (hasDublee)
-                                    _buildBadge('Dublee +25', Colors.purple),
-                                  if (marriages > 0)
-                                    _buildBadge(
-                                      'Marriage x$marriages',
-                                      Colors.pink,
-                                    ),
-                                  if (isDeclarer)
-                                    _buildBadge('Winner', Colors.green),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                    );
-                  }),
                 ],
               ),
             ),

@@ -38,7 +38,10 @@ class CenterTableArea extends StatelessWidget {
     this.deckKey,
     this.discardKey,
     this.tipluKey,
+    this.showTiplu = true,
   });
+
+  final bool showTiplu;
 
   final GlobalKey? deckKey;
   final GlobalKey? discardKey;
@@ -80,9 +83,11 @@ class CenterTableArea extends StatelessWidget {
             ],
           ),
 
-          // Tiplu indicator (Always shown, flips on reveal)
-          const SizedBox(height: 12),
-          _buildTipluIndicator(),
+          // Tiplu indicator (Conditionally shown)
+          if (showTiplu) ...[
+            const SizedBox(height: 12),
+            _buildTipluIndicator(),
+          ],
         ],
       ),
     );
@@ -265,50 +270,63 @@ class CenterTableArea extends StatelessWidget {
             ),
           ),
 
-          // Discard pile
-          Container(
-            width: 60,
-            height: 85,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.black.withValues(alpha: 0.3),
-              border: Border.all(
-                color: isDiscardBlocked
-                    ? Colors.red.withValues(alpha: 0.5)
-                    : (canDraw ? Colors.blue : Colors.white24),
-                width: canDraw ? 2 : 1,
-              ),
-            ),
-            child: Container(
-              key: discardKey,
-              child: topDiscard != null
-                  ? Center(
-                      child: CardWidget(
-                        card: topDiscard!,
-                        isFaceUp: true,
-                        width: 55,
-                        height: 80,
-                      ),
-                    )
-                  : Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.layers,
-                            color: Colors.white.withValues(alpha: 0.3),
-                            size: 20,
-                          ),
-                          Text(
-                            '$discardCount',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
-                      ),
+          // Discard pile - Fanned display for realism
+          SizedBox(
+            width: 100, // Wider to accommodate fanned cards
+            height: 95,
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                // Base container
+                Container(
+                  width: 70,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.black.withValues(alpha: 0.2),
+                    border: Border.all(
+                      color: isDiscardBlocked
+                          ? Colors.red.withValues(alpha: 0.5)
+                          : (canDraw ? Colors.blue : Colors.white12),
+                      width: 1,
                     ),
+                  ),
+                ),
+                // Fanned cards (last 5)
+                if (discardPile != null && discardPile!.isNotEmpty)
+                  ..._buildFannedDiscardCards(canDraw)
+                else if (topDiscard != null)
+                  // Fallback to single card if no pile data
+                  Container(
+                    key: discardKey,
+                    child: CardWidget(
+                      card: topDiscard!,
+                      isFaceUp: true,
+                      width: 55,
+                      height: 80,
+                    ),
+                  )
+                else
+                  // Empty pile placeholder
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.layers,
+                        color: Colors.white.withValues(alpha: 0.3),
+                        size: 20,
+                      ),
+                      Text(
+                        '$discardCount',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.3),
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
             ),
           ),
 
@@ -402,5 +420,62 @@ class CenterTableArea extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// Builds fanned discard pile cards (last 5) with rotation and offset
+  List<Widget> _buildFannedDiscardCards(bool canDraw) {
+    final pile = discardPile!;
+    final count = pile.length;
+    final displayCount = count > 5 ? 5 : count;
+    final startIndex = count - displayCount;
+    
+    return List.generate(displayCount, (i) {
+      final actualIndex = startIndex + i;
+      final card = pile[actualIndex];
+      final isTopCard = i == displayCount - 1;
+      
+      // Rotation: slight random-looking angles centered around 0
+      final rotationAngles = [-0.08, -0.04, 0.02, -0.03, 0.0];
+      final angle = displayCount > i ? rotationAngles[i % 5] : 0.0;
+      
+      // Offset: fan out horizontally
+      final xOffset = (i - (displayCount - 1) / 2) * 8.0;
+      final yOffset = i * 1.0; // Slight vertical stacking
+      
+      // Opacity: older cards more faded
+      final opacity = 0.5 + (i * 0.1);
+      
+      return Positioned(
+        left: 20 + xOffset,
+        top: 5 + yOffset,
+        child: Transform.rotate(
+          angle: angle,
+          child: Opacity(
+            opacity: isTopCard ? 1.0 : opacity,
+            child: Container(
+              key: isTopCard ? discardKey : null,
+              decoration: isTopCard && canDraw
+                  ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blue.withValues(alpha: 0.4),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    )
+                  : null,
+              child: CardWidget(
+                card: card,
+                isFaceUp: true,
+                width: 50,
+                height: 72,
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 }

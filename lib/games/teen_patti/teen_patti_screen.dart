@@ -16,6 +16,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clubroyale/features/game/ui/components/table_layout.dart';
+import 'package:clubroyale/features/game/ui/components/card_widget.dart';
+import 'package:clubroyale/features/game/ui/components/card_preview_overlay.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/core/card_engine/deck.dart';
@@ -495,39 +498,20 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
   }
 
   Widget _buildCardFace(Card card) {
-    return Container(
-      width: 80,
-      height: 120,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: CasinoColors.gold.withValues(alpha: 0.3),
-            blurRadius: 10,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            card.rank.symbol,
-            style: TextStyle(
-              color: card.suit.isRed ? Colors.red : Colors.black,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            card.suit.symbol,
-            style: TextStyle(
-              color: card.suit.isRed ? Colors.red : Colors.black,
-              fontSize: 28,
-            ),
-          ),
-        ],
+    // Convert core Card to PlayingCard for shared widget
+    final playingCard = PlayingCard(
+      suit: CardSuit.values.firstWhere((s) => s.name == card.suit.name.toLowerCase()),
+      rank: CardRank.values.firstWhere((r) => r.symbol == card.rank.symbol),
+    );
+    
+    return CardWithPreview(
+      card: playingCard,
+      child: CardWidget(
+        card: playingCard,
+        isFaceUp: true,
+        width: 80,
+        height: 120,
+        glowColor: CasinoColors.gold.withValues(alpha: 0.3),
       ),
     );
   }

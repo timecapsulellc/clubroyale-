@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/ui/components/card_widget.dart';
+import 'package:clubroyale/features/game/ui/components/card_preview_overlay.dart';
 import 'package:clubroyale/core/card_engine/meld.dart';
+import 'package:clubroyale/games/marriage/marriage_service.dart';
 
 import 'package:clubroyale/core/theme/app_theme.dart';
 import 'package:clubroyale/core/services/haptic_service.dart';
@@ -462,55 +464,75 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                 ),
               ),
 
-              // Render Cards
-              for (int i = 0; i < group.length; i++)
-                Positioned(
-                  left: i * 45.0 * widget.scale, // Scaled offset
-                  top: 0,
-                  child: LongPressDraggable<PlayingCard>(
-                    data: group[i],
-                    delay: const Duration(milliseconds: 150),
-                    hapticFeedbackOnStart: true,
-                    feedback: Material(
-                      elevation: 8,
-                      borderRadius: BorderRadius.circular(8),
-                      child: Transform.scale(
-                        scale: 1.15 * widget.scale, // Feedback also scaled
-                        child: CardWidget(card: group[i], isFaceUp: true),
-                      ),
-                    ),
-                    childWhenDragging: Opacity(
-                      opacity: 0.3,
-                      child: Transform.scale(
-                        scale: widget.scale,
-                        alignment: Alignment.topLeft,
-                        child: CardWidget(card: group[i], isFaceUp: true),
-                      ),
-                    ),
-                    onDragStarted: () {
-                      HapticService.cardTap(); // Selection feeling
-                    },
-                    child: GestureDetector(
-                      onTap: () {
-                        HapticService.cardTap();
-                        widget.onCardSelected(group[i].id);
-                      },
-                      onDoubleTap: widget.isMyTurn ? widget.onCardDoubleTap : null,
-                      behavior: HitTestBehavior.opaque,
-                      child: Transform.scale(
-                        scale: widget.scale,
-                        alignment: Alignment.topLeft,
-                        child: _buildCardWithBadges(group[i]),
-                      ),
-                    ),
-                  ),
-                ),
+              // Render Cards with Arc/Fan Effect (using helper for calculation)
+              ...List.generate(group.length, (i) => _buildArcCard(i, group.length, group[i])),
             ],
           ),
         ),
       ],
     );
   }
+
+  Widget _buildArcCard(int index, int totalCount, PlayingCard card) {
+    // Calculate Fan Transformation
+    final centerIndex = (totalCount - 1) / 2.0;
+    final relativePos = index - centerIndex;
+
+    // Rotation: -0.06 to 0.06 radians per card step
+    final double angle = relativePos * 0.06;
+
+    // Y-Offset: Arch effect (edges lower than center)
+    final double yArcOffset = (relativePos * relativePos) * 2.0;
+
+    // X-Offset: slightly tighter overlap for fanned look
+    final double xOffset = index * 42.0 * widget.scale;
+
+    return Positioned(
+      left: xOffset,
+      top: yArcOffset + 10, // Base offset + arc
+      child: Transform.rotate(
+        angle: angle,
+        child: LongPressDraggable<PlayingCard>(
+          data: card,
+          delay: const Duration(milliseconds: 150),
+          hapticFeedbackOnStart: true,
+          feedback: Material(
+            elevation: 8,
+            borderRadius: BorderRadius.circular(8),
+            child: Transform.scale(
+              scale: 1.15 * widget.scale,
+              child: CardWidget(card: card, isFaceUp: true),
+            ),
+          ),
+          childWhenDragging: Opacity(
+            opacity: 0.3,
+            child: Transform.scale(
+              scale: widget.scale,
+              alignment: Alignment.topLeft,
+              child: CardWidget(card: card, isFaceUp: true),
+            ),
+          ),
+          onDragStarted: () {
+            HapticService.cardTap();
+          },
+          child: GestureDetector(
+            onTap: () {
+              HapticService.cardTap();
+              widget.onCardSelected(card.id);
+            },
+            onDoubleTap: widget.isMyTurn ? widget.onCardDoubleTap : null,
+            behavior: HitTestBehavior.opaque,
+            child: Transform.scale(
+              scale: widget.scale,
+              alignment: Alignment.topLeft,
+              child: _buildCardWithBadges(card),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildCardWithBadges(PlayingCard card) {
     final isSelected = widget.selectedCardId == card.id;
@@ -548,12 +570,15 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
       }
     }
 
-    return CardWidget(
+    return CardWithPreview(
       card: card,
-      isFaceUp: true,
-      isSelected: isSelected,
-      glowColor: glowColor,
-      cornerBadge: badgeIcon,
+      child: CardWidget(
+        card: card,
+        isFaceUp: true,
+        isSelected: isSelected,
+        glowColor: glowColor,
+        cornerBadge: badgeIcon,
+      ),
     );
   }
 }

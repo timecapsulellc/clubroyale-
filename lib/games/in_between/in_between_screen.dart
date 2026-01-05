@@ -23,6 +23,9 @@ import 'package:clubroyale/features/chat/widgets/chat_overlay.dart';
 import 'package:clubroyale/features/video/widgets/video_grid.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:clubroyale/features/game/ui/components/table_layout.dart';
+import 'package:clubroyale/features/game/ui/components/card_widget.dart';
+import 'package:clubroyale/features/game/ui/components/card_preview_overlay.dart';
+import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/ui/components/unified_game_sidebar.dart';
 import 'package:clubroyale/features/game/ui/components/game_settings_modal.dart';
 
@@ -551,43 +554,27 @@ class _InBetweenScreenState extends ConsumerState<InBetweenScreen> {
   }
 
   Widget _buildCardWidget(Card card, String label, {bool isMiddle = false}) {
+    // Convert core Card to PlayingCard for shared widget
+    final playingCard = PlayingCard(
+      suit: CardSuit.values.firstWhere((s) => s.name == card.suit.name.toLowerCase()),
+      rank: CardRank.values.firstWhere((r) => r.symbol == card.rank.symbol),
+    );
+    
+    final cardWidth = isMiddle ? 120.0 : 100.0;
+    final cardHeight = isMiddle ? 175.0 : 145.0;
+    
     return Column(
       children: [
-        Container(
-          width: isMiddle ? 120 : 100,
-          height: isMiddle ? 175 : 145,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: isMiddle
-                    ? CasinoColors.gold.withValues(alpha: 0.5)
-                    : Colors.black.withValues(alpha: 0.3),
-                blurRadius: isMiddle ? 16 : 8,
-                spreadRadius: isMiddle ? 2 : 0,
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                card.rank.symbol,
-                style: TextStyle(
-                  color: card.suit.isRed ? Colors.red : Colors.black,
-                  fontSize: isMiddle ? 48 : 36,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                card.suit.symbol,
-                style: TextStyle(
-                  color: card.suit.isRed ? Colors.red : Colors.black,
-                  fontSize: isMiddle ? 36 : 28,
-                ),
-              ),
-            ],
+        CardWithPreview(
+          card: playingCard,
+          child: CardWidget(
+            card: playingCard,
+            isFaceUp: true,
+            width: cardWidth,
+            height: cardHeight,
+            glowColor: isMiddle
+                ? CasinoColors.gold.withValues(alpha: 0.5)
+                : Colors.black.withValues(alpha: 0.3),
           ),
         ).animate().fadeIn().scale(),
         const SizedBox(height: 8),
