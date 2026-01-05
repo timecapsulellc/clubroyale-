@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/ui/components/card_widget.dart';
+import 'package:clubroyale/core/localization/marriage_strings.dart';
 
 /// Modal dialog showing a player's declared sets in a zoomed view.
 class PlayerSetsZoomModal extends StatelessWidget {
@@ -86,7 +87,7 @@ class PlayerSetsZoomModal extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        'Maal: $maalPoints',
+                        '${LocalizedStrings.maal}: $maalPoints',
                         style: const TextStyle(
                           color: Colors.purpleAccent,
                           fontSize: 12,
@@ -118,7 +119,7 @@ class PlayerSetsZoomModal extends StatelessWidget {
                               size: 48),
                           const SizedBox(height: 12),
                           Text(
-                            'No sets declared yet',
+                            LocalizedStrings.noSets,
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.5),
                               fontSize: 14,

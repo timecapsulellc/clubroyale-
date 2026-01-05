@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/ui/components/card_widget.dart';
+import 'package:clubroyale/core/localization/marriage_strings.dart';
 
 class MaalIndicatorHUD extends StatelessWidget {
   final PlayingCard? tiplu;
@@ -64,7 +65,7 @@ class MaalIndicatorHUD extends StatelessWidget {
                 const Icon(Icons.stars, size: 12, color: Colors.black87),
                 const SizedBox(width: 4),
                 Text(
-                  'MAAL',
+                  LocalizedStrings.maal.toUpperCase(),
                   style: const TextStyle(
                     color: Colors.black87,
                     fontSize: 10,

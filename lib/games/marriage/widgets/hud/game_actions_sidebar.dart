@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/features/rtc/widgets/audio_controls.dart';
 import 'package:clubroyale/games/marriage/widgets/hud/primary_set_progress.dart';
+import 'package:clubroyale/core/localization/marriage_strings.dart';
 
 class GameActionsSidebar extends ConsumerWidget {
   final String? roomId;
@@ -19,6 +20,7 @@ class GameActionsSidebar extends ConsumerWidget {
   final VoidCallback? onToggleChat;
   final VoidCallback? onToggleVideo;
   final int? pureSetCount;
+  final int? dubleeCount; // Number of dublees in hand
 
   const GameActionsSidebar({
     super.key,
@@ -35,6 +37,7 @@ class GameActionsSidebar extends ConsumerWidget {
     this.onToggleChat,
     this.onToggleVideo,
     this.pureSetCount,
+    this.dubleeCount,
   });
 
   @override
@@ -59,9 +62,9 @@ class GameActionsSidebar extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: 8),
             color: const Color(0xFF3a5f5f),
             alignment: Alignment.center,
-            child: const Text(
-              'Game Actions',
-              style: TextStyle(
+            child: Text(
+              LocalizedStrings.gameActions,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
@@ -82,8 +85,8 @@ class GameActionsSidebar extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _MediaIconButton(icon: Icons.chat, onTap: onToggleChat, tooltip: 'Chat'),
-                _MediaIconButton(icon: Icons.videocam, onTap: onToggleVideo, tooltip: 'Video'),
+                _MediaIconButton(icon: Icons.chat, onTap: onToggleChat, tooltip: LocalizedStrings.chat),
+                _MediaIconButton(icon: Icons.videocam, onTap: onToggleVideo, tooltip: LocalizedStrings.video),
                 // Audio: Use AudioFloatingButton if roomId/userId available
                 if (roomId != null && userId != null)
                   SizedBox(
@@ -92,8 +95,8 @@ class GameActionsSidebar extends ConsumerWidget {
                     child: AudioFloatingButton(roomId: roomId!, userId: userId!),
                   )
                 else
-                  _MediaIconButton(icon: Icons.volume_up, onTap: null, tooltip: 'Audio'),
-                _MediaIconButton(icon: Icons.help_outline, onTap: onHelp, tooltip: 'Help'),
+                  _MediaIconButton(icon: Icons.volume_up, onTap: null, tooltip: LocalizedStrings.audio),
+                _MediaIconButton(icon: Icons.help_outline, onTap: onHelp, tooltip: LocalizedStrings.help),
               ],
             ),
           ),
@@ -103,26 +106,32 @@ class GameActionsSidebar extends ConsumerWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  _SidebarButton(label: 'SHOW SEQUENCE', onTap: onShowSequence),
-                  const Divider(height: 1, color: Colors.white24),
-                  _SidebarButton(label: 'SHOW DUBLEE', onTap: onShowDublee),
+                  _SidebarButton(label: LocalizedStrings.showSequence, onTap: onShowSequence),
                   const Divider(height: 1, color: Colors.white24),
                   _SidebarButton(
-                    label: 'FINISH GAME', 
+                    label: dubleeCount != null && dubleeCount! >= 7 
+                        ? LocalizedStrings.show7Dublees 
+                        : LocalizedStrings.showDublee,
+                    onTap: onShowDublee,
+                    isRecommended: dubleeCount != null && dubleeCount! >= 7,
+                  ),
+                  const Divider(height: 1, color: Colors.white24),
+                  _SidebarButton(
+                    label: LocalizedStrings.finishGame, 
                     onTap: onFinishGame,
                     isRecommended: onFinishGame != null, // Pulse if available
                   ),
                   const Divider(height: 1, color: Colors.white24),
-                  _SidebarButton(label: 'CANCEL ACTION', onTap: onCancelAction),
+                  _SidebarButton(label: LocalizedStrings.cancelAction, onTap: onCancelAction),
                   const Divider(height: 1, color: Colors.white24),
                   _SidebarButton(
-                    label: 'GET TUNELA IN HAND',
+                    label: LocalizedStrings.getTunela,
                     onTap: onGetTunela,
                   ),
                   const Divider(height: 1, color: Colors.white24),
-                  _SidebarButton(label: 'SETTINGS', onTap: onSettings),
+                  _SidebarButton(label: LocalizedStrings.settings, onTap: onSettings),
                   const Divider(height: 1, color: Colors.white24),
-                  _SidebarButton(label: 'QUIT GAME', onTap: onQuitGame),
+                  _SidebarButton(label: LocalizedStrings.quitGame, onTap: onQuitGame),
                 ],
               ),
             ),

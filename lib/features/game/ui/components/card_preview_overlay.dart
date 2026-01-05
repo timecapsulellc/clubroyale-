@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/models/playing_card.dart';
 import 'package:clubroyale/features/game/ui/components/card_widget.dart';
+import 'package:clubroyale/core/localization/marriage_strings.dart';
 
 /// An overlay widget that displays an enlarged card preview.
 /// Shown on long-press of a card for better visibility.
@@ -39,7 +40,7 @@ class CardPreviewOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: 'Card preview: ${card.rank.name} of ${card.suit.name}. Tap to close.',
+      label: 'Card preview: ${card.rank.name} of ${card.suit.name}. ${LocalizedStrings.tapToClose}',
       child: GestureDetector(
         onTap: onDismiss,
         onPanStart: (_) => onDismiss(),
@@ -75,7 +76,7 @@ class CardPreviewOverlay extends StatelessWidget {
 
                 // Dismiss hint
                 Text(
-                  'Tap anywhere to close',
+                  LocalizedStrings.tapToClose,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 12,

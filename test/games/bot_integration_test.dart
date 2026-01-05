@@ -10,7 +10,7 @@ import 'package:clubroyale/features/agents/models/bot_personality.dart';
 void main() {
   group('BotPersonality System', () {
     test('All personality types exist', () {
-      expect(BotPersonalityType.values.length, equals(5));
+      expect(BotPersonalityType.values.length, equals(7));
     });
 
     test('Can get random personality', () {
