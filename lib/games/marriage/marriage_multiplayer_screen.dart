@@ -31,7 +31,7 @@ import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart
 import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
 import 'package:clubroyale/games/marriage/marriage_config.dart';
 import 'package:clubroyale/games/marriage/services/services.dart';
-import 'package:clubroyale/games/marriage/widgets/hud/right_arc_game_controller.dart';
+import 'package:clubroyale/games/marriage/widgets/hud/game_actions_hud.dart';
 import 'package:clubroyale/games/marriage/widgets/hud/game_actions_sidebar.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_guided_tutorial.dart';
 import 'package:clubroyale/core/widgets/interactive_tutorial.dart';
@@ -483,26 +483,18 @@ class _MarriageMultiplayerScreenState
                             ),
 
                             // 3. HUD Layer - Right Arc Controller
-                            Positioned(
-                              right: 0,
-                              // Push closer to edge on mobile landscape
-                              top: isLandscapeMobile ? 20 : 100,
-                              // In portrait, hand takes ~42% of height. Constraint arc to top area.
-                              bottom: isLandscapeMobile ? 20 : (screenSize.height * 0.42),
-                              child: Center(
-                                child: RightArcGameController(
-                                  onShowCards: isMyTurn
-                                      ? () => _handleShow(state)
-                                      : null,
-                                  onSequence: () => _handleShowSequence(state),
-                                  onDublee: () => _handleShowDublee(state),
-                                  onCancel: () {},
-                                  isShowEnabled: isMyTurn && !state.isDrawingPhase,
-                                  isSequenceEnabled: true,
-                                  isDubleeEnabled: true,
-                                  isCancelEnabled: true,
-                                ),
-                              ),
+                            // 3. HUD Layer - Vertical Game Actions (Right Side)
+                            GameActionsHUD(
+                              onShowCards: isMyTurn
+                                  ? () => _handleShow(state)
+                                  : null,
+                              onSequence: () => _handleShowSequence(state),
+                              onDublee: () => _handleShowDublee(state),
+                              onCancel: () {},
+                              isShowEnabled: isMyTurn && !state.isDrawingPhase,
+                              isSequenceEnabled: true,
+                              isDubleeEnabled: true,
+                              isCancelEnabled: false,
                             ),
 
                             // 4. HUD Layer - Game Log Overlay (Left - pushed down if sidebar active?? No, sidebar overlays)

@@ -69,14 +69,27 @@ class ProfessionalTableLayout extends StatelessWidget {
               child: RepaintBoundary(
                 child: Container(
                   decoration: BoxDecoration(
-                    gradient: CasinoColors.greenFeltGradient,
-                    borderRadius: BorderRadius.circular(20),
+                    gradient: const RadialGradient(
+                      center: Alignment.center,
+                      radius: 0.8,
+                      colors: [
+                        Color(0xFF006400), // Brighter center (Spotlight)
+                        Color(0xFF004d00), // Darker edge
+                      ],
+                      stops: [0.2, 1.0],
+                    ),
+                    borderRadius: BorderRadius.all(Radius.elliptical(width, height)),
+                    border: Border.all(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      width: 2,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.5),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+                        blurRadius: 10, // Softer shadow
+                        spreadRadius: 2,
                       ),
+                      // Inner shadow for depth (simulated with standard shadow for now)
                     ],
                   ),
                 ),
@@ -258,30 +271,25 @@ class _TableRail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: const BorderRadius.all(Radius.circular(1000)), // Stadium-like
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
             Color(0xFF5a3a20), // Lighter wood
-            Color(0xFF3d2410), // Dark wood
+            Color(0xFF2d1a0b), // Deep Dark wood (Reference style)
             Color(0xFF5a3a20), // Lighter wood
           ],
         ),
         border: Border.all(
-          color: const Color(0xFF8b6914).withValues(alpha: 0.5),
-          width: 2,
+          color: const Color(0xFF8b6914).withValues(alpha: 0.3), // Subtler gold rim
+          width: 4, // Thicker rim like reference
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.6),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-          BoxShadow(
-            color: CasinoColors.gold.withValues(alpha: 0.1),
-            blurRadius: 8,
-            spreadRadius: -2,
+            color: Colors.black.withValues(alpha: 0.8),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
