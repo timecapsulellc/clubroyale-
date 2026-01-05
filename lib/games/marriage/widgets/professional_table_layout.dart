@@ -27,14 +27,27 @@ class ProfessionalTableLayout extends StatelessWidget {
         final width = constraints.maxWidth;
         final height = constraints.maxHeight;
 
-        // Optimizing for mobile landscape (constrained height)
-        // Hand takes significantly less vertical space (25%)
+        // Detect platform context for optimal layout
+        final isDesktop = width > 1000 && height > 600;
         final isLandscapeMobile = width > height && height < 500;
+        final isTablet = !isDesktop && !isLandscapeMobile && width > 600;
         
-        final handHeightRatio = isLandscapeMobile ? 0.25 : 0.42;
+        // Hand takes different ratios based on screen type
+        // Desktop: 35% (more space for cards), Mobile: 25%, Tablet: 38%
+        final double handHeightRatio;
+        if (isDesktop) {
+          handHeightRatio = 0.35;
+        } else if (isLandscapeMobile) {
+          handHeightRatio = 0.25;
+        } else if (isTablet) {
+          handHeightRatio = 0.38;
+        } else {
+          handHeightRatio = 0.42; // Portrait mobile
+        }
+        
         final handHeight = height * handHeightRatio;
         final tableHeight = height * (1.0 - handHeightRatio);
-        final railWidth = 12.0;
+        final railWidth = isDesktop ? 16.0 : 12.0;
 
         return Stack(
           children: [
@@ -82,6 +95,7 @@ class ProfessionalTableLayout extends StatelessWidget {
               tableHeight: tableHeight,
               railWidth: railWidth,
               isMobile: isLandscapeMobile,
+              isDesktop: isDesktop,
             ),
 
             // 5. My Hand (fixed at bottom)
@@ -148,6 +162,7 @@ class ProfessionalTableLayout extends StatelessWidget {
     required double tableHeight,
     required double railWidth,
     required bool isMobile,
+    bool isDesktop = false,
   }) {
     if (opponents.isEmpty) return [];
 
@@ -171,7 +186,9 @@ class ProfessionalTableLayout extends StatelessWidget {
 
       // Adjust widget size based on player count and screen size
       double baseSize = count > 5 ? 60.0 : 80.0;
-      if (isMobile) {
+      if (isDesktop) {
+        baseSize *= 1.2; // Scale UP for larger desktop screens
+      } else if (isMobile) {
         baseSize *= 0.85; // Scale down for mobile
       }
       final slotSize = baseSize;

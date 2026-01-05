@@ -32,13 +32,22 @@ class RightArcGameController extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Calculate responsive radius based on height
+          // Calculate responsive radius based on height AND width
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isMobilePortrait = screenWidth < 600;
+        
         final height = constraints.maxHeight > 0 ? constraints.maxHeight : 350.0;
-        final radius = (height * 0.4).clamp(60.0, 100.0);
+        
+        // On mobile portrait, be much more conservative with radius
+        // The previous (height * 0.4) was resulting in ~270px visible width on 360px screens
+        final radius = isMobilePortrait 
+            ? (height * 0.25).clamp(50.0, 70.0) 
+            : (height * 0.4).clamp(60.0, 100.0);
+            
         final centerY = height / 2;
         
         return SizedBox(
-          width: 120,
+          width: isMobilePortrait ? 100 : 120, // Reduced width on mobile
           height: height,
           child: Stack(
             alignment: Alignment.centerRight,
@@ -47,7 +56,7 @@ class RightArcGameController extends StatelessWidget {
               // Background "Arc" visual
               // Background "Arc" visual (Solid Semi-Circle)
               Positioned(
-                right: -radius * 0.8, // Push further right to create arc effect
+                right: isMobilePortrait ? -radius * 1.2 : -radius * 0.8, // Push further right on mobile
                 top: centerY - (radius * 3.0),
                 child: Container(
                   width: radius * 3.5, // Larger circle

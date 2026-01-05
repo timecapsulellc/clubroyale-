@@ -317,24 +317,27 @@ class _MarriageMultiplayerScreenState
                                   bottom: isLandscapeMobile ? 0 : 8,
                                 ),
                                 child: Column(
-                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     /* _buildMeldSuggestions - Moved elsewhere or removed */
                                     _buildCompactStatusBar(
                                       state,
                                       currentUser.uid,
                                     ),
-                                    MarriageHandWidget(
-                                      key: _tutorialKeys['player_hand'],
-                                      cards: List<PlayingCard>.from(
-                                          state.playerHands[currentUser.uid] ?? []),
-                                      selectedCardId: _selectedCardId,
-                                      onCardSelected: _onCardSelected,
-                                      onCardDoubleTap: _discardCard,
-                                      isMyTurn: isMyTurn,
-                                      scale: isLandscapeMobile ? 0.8 : 1.0,
-                                      tiplu: tiplu,
-                                      config: state.config,
+                                    Expanded(
+                                      child: MarriageHandWidget(
+                                        key: _tutorialKeys['player_hand'],
+                                        cards: myHand
+                                            .map((id) => _getCard(id))
+                                            .whereType<PlayingCard>()
+                                            .toList(),
+                                        selectedCardId: _selectedCardId,
+                                        onCardSelected: _onCardSelected,
+                                        onCardDoubleTap: _discardCard,
+                                        isMyTurn: isMyTurn,
+                                        scale: isLandscapeMobile ? 0.8 : 1.0,
+                                        tiplu: tiplu,
+                                        config: state.config,
+                                      ),
                                     ),
                                     // Legacy action bar removed
                                   ],
@@ -432,7 +435,8 @@ class _MarriageMultiplayerScreenState
                               right: 0,
                               // Push closer to edge on mobile landscape
                               top: isLandscapeMobile ? 20 : 100,
-                              bottom: isLandscapeMobile ? 20 : 50,
+                              // In portrait, hand takes ~42% of height. Constraint arc to top area.
+                              bottom: isLandscapeMobile ? 20 : (screenSize.height * 0.42),
                               child: Center(
                                 child: RightArcGameController(
                                   onShowCards: isMyTurn

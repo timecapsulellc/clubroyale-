@@ -205,7 +205,11 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // Debug: Track if cards are being received
+    debugPrint('🃏 MarriageHandWidget: ${widget.cards.length} cards, ${_groups.length} groups');
+    
     return Stack(
+      alignment: Alignment.topLeft,
       children: [
         // Horizontal Scrollable Hand
         SingleChildScrollView(

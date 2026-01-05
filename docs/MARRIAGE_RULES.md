@@ -163,11 +163,19 @@ The Maal value of a hand is dynamic and calculated *after* the Tiplu is revealed
 
 ---
 
-## 7. Verified Implementation Status (Dec 29, 2025)
-
-The following logic has been audited and confirmed in `lib/games/marriage/marriage_game.dart`:
-
-- [x] **Vesting / Strict Discard**: Implemented in `drawFromDiscard`. If `config.mustVisitToPickDiscard` is true, looking at the discard pile throws an error unless `isVisited(player)` is true.
-- [x] **Joker Block**: Implemented in `drawFromDiscard`. If `config.jokerBlocksDiscard` is true and the top card is a Wild/Joker, the pile is locked.
-- [x] **Kidnap Logic**: Implemented in `MarriageScorer`. Points are successfully transferred from unvisited losers to the winner.
-- [x] **Tunnel Win**: Validated in `MarriageVisitValidator`. 3 Tunnels can trigger an immediate win (if enabled).
+## 7. Verified Implementation Status (Jan 5, 2026)
+ 
+ The following logic has been audited and confirmed in `lib/games/`:
+ 
+ ### Marriage (Royal Meld)
+ - [x] **Vesting / Strict Discard**: Implemented in `drawFromDiscard`.
+ - [x] **Joker Block**: Implemented in `drawFromDiscard`.
+ - [x] **Kidnap Logic**: Verified in `MarriageScorer`. Points transfer correctly from unvisited losers.
+ - [x] **Tunnel Win**: Validated. 3 Tunnels triggers immediate win.
+ - [x] **Maal System**: Tiplu, Poplu, Jhiplu, Alter, Man verified.
+ - [x] **Dublee**: Logic for 7+1 pairs verified.
+ 
+ ### Other Games
+ - [x] **Call Break**: Scoring (underbid penalty, overtrick bonus) verified.
+ - [x] **Teen Patti**: Hand integrity (Trail > Pure > Sequence...) verified.
+ - [x] **In-Between**: Edge cases (A-A boundary, Post rule) verified.
