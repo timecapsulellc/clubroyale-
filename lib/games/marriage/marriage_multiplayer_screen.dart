@@ -378,6 +378,8 @@ class _MarriageMultiplayerScreenState
                                         scale: isLandscapeMobile ? 0.8 : 1.0,
                                         tiplu: tiplu,
                                         config: state.config,
+                                        isLoading: state.phase == 'dealing' || 
+                                            (state.phase == 'playing' && myHand.isEmpty),
                                       ),
                                     ),
                                     // Legacy action bar removed
@@ -1459,6 +1461,7 @@ class _MarriageMultiplayerScreenState
     Key? key,
     Card? tiplu,
     required MarriageGameConfig config,
+    bool isLoading = false,
   }) {
     // Convert IDs to Cards
     final cards = cardIds
@@ -1478,8 +1481,11 @@ class _MarriageMultiplayerScreenState
           _guidedTutorialController?.validateAction();
         }
       },
+      onCardDoubleTap: _discardCard,
+      isMyTurn: isMyTurn,
       tiplu: tiplu,
       config: config,
+      isLoading: isLoading,
     );
   }
 

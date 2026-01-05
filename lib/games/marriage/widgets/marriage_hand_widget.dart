@@ -9,6 +9,8 @@ import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/games/marriage/marriage_maal_calculator.dart'; // For Maal badges
 import 'package:clubroyale/games/marriage/marriage_config.dart';
 
+import 'package:clubroyale/features/game/ui/components/skeleton_game_card.dart';
+
 class MarriageHandWidget extends StatefulWidget {
   final List<PlayingCard> cards;
   final String? selectedCardId;
@@ -18,6 +20,7 @@ class MarriageHandWidget extends StatefulWidget {
   final PlayingCard? tiplu;
   final MarriageGameConfig config;
   final double scale;
+  final bool isLoading;
 
   const MarriageHandWidget({
     super.key,
@@ -29,6 +32,7 @@ class MarriageHandWidget extends StatefulWidget {
     this.tiplu,
     this.config = MarriageGameConfig.nepaliStandard,
     this.scale = 1.0,
+    this.isLoading = false,
   });
 
   @override
@@ -205,6 +209,27 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
 
   @override
   Widget build(BuildContext context) {
+     if (widget.isLoading) {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: List.generate(
+            13, // Show 13 skeletons
+            (index) => Padding(
+              padding: const EdgeInsets.only(right: 8), // Tighter overlap or spacing?
+              // For skeletons, spacing is better than overlap to show amount
+              child: SkeletonGameCard(
+                scale: widget.scale,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    
     // Debug: Track if cards are being received
     debugPrint('🃏 MarriageHandWidget: ${widget.cards.length} cards, ${_groups.length} groups');
     
