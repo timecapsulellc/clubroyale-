@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/theme/app_theme.dart';
 import 'package:clubroyale/core/utils/screen_orientation_helper.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
@@ -36,6 +37,7 @@ import 'dart:async';
 import 'package:clubroyale/core/widgets/tutorial_overlay.dart'; // Import TutorialOverlay
 import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
+import 'package:clubroyale/games/marriage/widgets/action_sidebar.dart';
 
 // ... (existing imports)
 
@@ -458,7 +460,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     final melds = _cachedMelds;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D3B2E), // Deep casino green (from CasinoColors.tableGreenDark)
+      backgroundColor: CasinoColors.tableGreenMid, // Bhoos-style deep green felt
       appBar: AppBar(
         backgroundColor: Colors.black.withValues(alpha: 0.5),
         title: Row(
@@ -637,12 +639,26 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                       const SizedBox(
                         height: 10,
                       ), // Spacing between suggestions and hand
-                      // Hand
+                      // Hand (no action bar - moved to sidebar)
                       _buildMyHand(myHand),
-                      // Actions
-                      _buildActionBar(),
                     ],
                   ),
+                ),
+              ),
+
+              // Right Sidebar for Actions (Bhoos-style)
+              Positioned(
+                right: 0,
+                top: 120,
+                child: MarriageActionSidebar(
+                  isMyTurn: _game.currentPlayerId == _playerId,
+                  canDiscard: _selectedCardId != null && _game.currentPlayerId == _playerId,
+                  canVisit: _visitStatus == VisitButtonState.ready,
+                  canDeclare: _game.currentPlayerId == _playerId,
+                  onDiscard: _discardCard,
+                  onVisit: _handleVisit,
+                  onDeclare: _tryDeclare,
+                  visitLabel: _visitLabel,
                 ),
               ),
 

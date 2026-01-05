@@ -10,13 +10,13 @@ class CasinoColors {
   static const Color richPurple = Color(0xFF4A1C6F); // ClubRoyale royal purple
 
   // Purple Table Colors
-  // Green Felt Table Colors (New Premium Theme)
+  // Green Felt Table Colors (Premium Theme - Bhoos Reference)
   static const Color tableGreenDark = Color(
-    0xFF0D3B2E,
-  ); // Deep radial green (Edge)
-  static const Color tableGreenMid = Color(0xFF165B47); // Warning/Mid green
+    0xFF094531,
+  ); // Deep radial green (Edge) - Bhoos style
+  static const Color tableGreenMid = Color(0xFF0B5A3E); // Primary felt green
   static const Color tableGreenLight = Color(
-    0xFF1F7A5E,
+    0xFF0E6D4A,
   ); // Center spotlight green
 
   // Legacy Purple Table Colors (Keep for other modes if needed, or deprecate)
