@@ -659,7 +659,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                   onDiscard: _discardCard,
                   onVisit: _handleVisit,
                   onDeclare: _tryDeclare,
-                  visitLabel: _visitLabel,
+                  visitLabel: _visitLabel == 'VISIT' ? 'DUB' : _visitLabel,
                 ),
               ),
 
@@ -786,23 +786,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Deck
-            GestureDetector(
-              onTap: canDrawFromDeck ? _drawFromDeck : null,
-              child: Container(
-                key: _deckKey,
-                child: CardWidget(
-                  card: PlayingCard(rank: CardRank.ace, suit: CardSuit.spades),
-                  isFaceUp: false,
-                  isSelectable: canDrawFromDeck,
-                  isSelected: false,
-                  width: 90,
-                  height: 130,
-                ),
-              ),
-            ),
-            const SizedBox(width: 20),
-            // Discard Pile
+            // Discard Pile (Left - Bhoos Style)
             GestureDetector(
               onTap: canDrawFromDiscard ? _drawFromDiscard : null,
               child: Stack(
@@ -849,6 +833,46 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                       ),
                     ),
                 ],
+              ),
+            ),
+            
+            const SizedBox(width: 40), // Gap
+
+            // Deck (Right - Bhoos Style)
+            GestureDetector(
+              onTap: canDrawFromDeck ? _drawFromDeck : null,
+              child: Container(
+                key: _deckKey,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Tiplu/Joker peek (underneath)
+                    if (_game.tiplu != null)
+                      Positioned(
+                        left: 10, 
+                        top: 0,
+                        child: Transform.rotate(
+                          angle: 0.15,
+                          child: CardWidget(
+                            card: _game.tiplu!,
+                            isFaceUp: true,
+                            width: 90,
+                            height: 130,
+                          ),
+                        ),
+                      ),
+                      
+                    // Main Deck
+                    CardWidget(
+                      card: PlayingCard(rank: CardRank.ace, suit: CardSuit.spades),
+                      isFaceUp: false,
+                      isSelectable: canDrawFromDeck,
+                      isSelected: false,
+                      width: 90,
+                      height: 130,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

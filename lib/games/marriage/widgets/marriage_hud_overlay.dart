@@ -76,16 +76,16 @@ class MarriageHUDOverlay extends StatelessWidget {
             ),
           ),
 
-        // 2. Enhanced Maal Counter (Bottom Left - Floating Badge)
+        // 2. Enhanced Maal Counter (Top Right - Match Reference)
         Positioned(
-          bottom: 120, // Above hand area
-          left: 16,
+          top: 80, // Below AppBar
+          right: 16,
           child: _MaalCounterChip(points: maalPoints),
         ),
 
-        // 3. Quick Emote Button (Left side, above Maal)
+        // 3. Quick Emote Button (Left - Bottom)
         Positioned(
-          bottom: 190, 
+          bottom: 120, 
           left: 16,
           child: FloatingActionButton.small(
             backgroundColor: Colors.black54,

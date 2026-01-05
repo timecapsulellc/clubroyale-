@@ -48,10 +48,10 @@ class MarriageTableLayout extends StatelessWidget {
         // So Loop from PI (Left) -> -PI/2 (Top) -> 0 (Right).
 
         final centerX = width / 2;
-        final centerY = height * 0.45; // Shift down slightly
+        final centerY = height * 0.55; // Lower center for upper arc
 
-        final radiusX = width * 0.42; // Wider
-        final radiusY = height * 0.38; // Slightly taller arc
+        final radiusX = width * 0.45; // Wide spread
+        final radiusY = height * 0.40; // Top reaches ~15% height
 
         // Calculate max height for the hand area to prevent overflow
         final maxHandHeight = height * 0.40;
@@ -117,34 +117,33 @@ class MarriageTableLayout extends StatelessWidget {
 
     // If we have many players, we might need to go slightly below the equator
 
-    // Updated to match reference:
-    // Start Angle: ~200 degrees (Left-Down) -> ~-20 degrees (Right-Down)
-    // This wraps the opponents around the top half
-    double startAngle = math.pi + 0.3; // ~200 deg
-    double endAngle = -0.3; // ~-20 deg
+    // Updated for Bhoos Layout: Top Row Semi-Circle
+    // We want opponents positioned strictly along the top arc.
+    // Angles in Flutter (Y down):
+    // -Pi (Left) -> -Pi/2 (Top) -> 0 (Right)
+    
+    // Top-Left start: ~ -2.6 rad (-150 deg)
+    // Top-Right end: ~ -0.5 rad (-30 deg)
+    double startAngle = -2.6; 
+    double endAngle = -0.5;
 
-    // Total arc based on max players? Or dynamic?
-    // Reference 3 shows 3 bots at Top-Left, Top, Top-Right. Typical 5 player game.
-    // We stick to distributing available opponents evenly across the arc.
-
-    // If we have just 1 opponent, put them at Top (-Pi/2)
-    // If we have 4, distribute evenly.
-
+    // Distribute available opponents evenly across this arc
     double step;
-    if (count == 1) {
+    if (count <= 1) {
+      // Single opponent at Top-Center
       startAngle = -math.pi / 2;
       endAngle = -math.pi / 2;
       step = 0;
     } else {
-      step = (startAngle - endAngle) / (count + 1);
+      step = (endAngle - startAngle) / (count - 1);
     }
 
     for (int i = 0; i < count; i++) {
       double angle;
-      if (count == 1) {
+      if (count <= 1) {
         angle = startAngle;
       } else {
-        angle = startAngle - (step * (i + 1));
+        angle = startAngle + (step * i);
       }
 
       // Calculate position

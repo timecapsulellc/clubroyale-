@@ -486,10 +486,10 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
     final double yArcOffset = (relativePos * relativePos) * 1.5;
     
     // Lift Offset for selection
-    final double liftOffset = isSelected ? -20.0 : 0.0;
+    final double liftOffset = isSelected ? -30.0 : 0.0;
 
-    // X-Offset: tighter overlap for fanned look (35.0)
-    final double xOffset = index * 35.0 * widget.scale;
+    // X-Offset: tighter overlap for fanned look (25.0 - Bhoos match)
+    final double xOffset = index * 25.0 * widget.scale;
 
     return Positioned(
       left: xOffset,
