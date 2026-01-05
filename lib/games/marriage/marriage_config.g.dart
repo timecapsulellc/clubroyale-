@@ -51,6 +51,7 @@ _MarriageGameConfig _$MarriageGameConfigFromJson(Map<String, dynamic> json) =>
       enableMurder: json['enableMurder'] as bool? ?? false,
       unvisitedPenalty: (json['unvisitedPenalty'] as num?)?.toInt() ?? 10,
       visitedPenalty: (json['visitedPenalty'] as num?)?.toInt() ?? 3,
+      isOpenMode: json['isOpenMode'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$MarriageGameConfigToJson(_MarriageGameConfig instance) =>
@@ -94,4 +95,5 @@ Map<String, dynamic> _$MarriageGameConfigToJson(_MarriageGameConfig instance) =>
       'enableMurder': instance.enableMurder,
       'unvisitedPenalty': instance.unvisitedPenalty,
       'visitedPenalty': instance.visitedPenalty,
+      'isOpenMode': instance.isOpenMode,
     };

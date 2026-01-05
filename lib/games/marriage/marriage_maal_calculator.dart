@@ -175,25 +175,39 @@ class MarriageMaalCalculator {
 
   /// Check if hand contains a Marriage Combo (Jhiplu + Tiplu + Poplu of same suit)
   /// Returns the bonus value if present, 0 otherwise.
-  int getMarriageComboBonus(List<Card> hand) {
+  /// 
+  /// Scoring:
+  /// - 1 Marriage (in hand) = 10 pts
+  /// - 2 Marriages (in hand) = 30 pts (NOT 20!)
+  /// - 1 Marriage (played to table) = 15 pts  
+  /// - 2 Marriages (played) = 35 pts
+  int getMarriageComboBonus(List<Card> hand, {bool isPlayed = false}) {
     if (!config.marriageBonus) return 0;
 
-    bool hasJhiplu = false;
-    bool hasTiplu = false;
-    bool hasPoplu = false;
+    // Count how many of each Maal type we have
+    int jhipluCount = 0;
+    int tipluCount = 0;
+    int popluCount = 0;
 
     for (final card in hand) {
       final type = getMaalType(card);
-      if (type == MaalType.jhiplu) hasJhiplu = true;
-      if (type == MaalType.tiplu) hasTiplu = true;
-      if (type == MaalType.poplu) hasPoplu = true;
+      if (type == MaalType.jhiplu) jhipluCount++;
+      if (type == MaalType.tiplu) tipluCount++;
+      if (type == MaalType.poplu) popluCount++;
     }
 
-    // Marriage: All three Maal cards of same suit (Tiplu's suit)
-    if (hasJhiplu && hasTiplu && hasPoplu) {
-      return config.marriageBonusValue;
+    // Count complete marriages (each needs 1 of each type)
+    final marriageCount = [jhipluCount, tipluCount, popluCount].reduce((a, b) => a < b ? a : b);
+
+    if (marriageCount == 0) return 0;
+    
+    if (marriageCount == 1) {
+      // 1 Marriage: 10 pts in hand, 15 pts if played
+      return isPlayed ? 15 : config.marriageBonusValue;
+    } else {
+      // 2+ Marriages: 30 pts in hand, 35 pts if played (NOT 20!)
+      return isPlayed ? 35 : 30;
     }
-    return 0;
   }
 
   /// Count Tunnels (3 identical cards: same rank AND suit) in hand.

@@ -20,7 +20,8 @@ void main() {
             body: VisitButtonWidget(
               state: VisitButtonState.locked,
               label: 'VISIT',
-              subLabel: 'Need 3 Sequences',
+              pureSequenceCount: 1,
+              dubleeCount: 2,
             ),
           ),
         ),
@@ -28,7 +29,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('VISIT'), findsOneWidget);
-      expect(find.text('Need 3 Sequences'), findsOneWidget);
+      // Widget shows progress, not subLabel in locked state
+      expect(find.text('1/3 SEQ'), findsOneWidget);
       expect(find.byIcon(Icons.lock_outline), findsOneWidget);
     });
 
@@ -42,7 +44,6 @@ void main() {
             body: VisitButtonWidget(
               state: VisitButtonState.ready,
               label: 'VISIT',
-              subLabel: 'Ready',
               onPressed: () => tapped = true,
             ),
           ),
@@ -53,8 +54,9 @@ void main() {
       expect(find.text('VISIT'), findsOneWidget);
       expect(find.byIcon(Icons.lock_open), findsOneWidget);
 
-      // Test interaction
-      await tester.tap(find.text('VISIT'));
+      // Test interaction - tap the button widget area
+      await tester.tap(find.byType(VisitButtonWidget));
+      await tester.pump();
       expect(tapped, isTrue);
     });
 

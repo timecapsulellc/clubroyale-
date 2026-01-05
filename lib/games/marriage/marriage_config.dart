@@ -154,6 +154,12 @@ abstract class MarriageGameConfig with _$MarriageGameConfig {
 
     /// Penalty for losing while visited.
     @Default(3) int visitedPenalty,
+
+    // === Open Mode (Training/Learning) ===
+
+    /// Open Mode: All player hands are visible to everyone.
+    /// Useful for learning, teaching, or spectator mode.
+    @Default(false) bool isOpenMode,
   }) = _MarriageGameConfig;
 
   factory MarriageGameConfig.fromJson(Map<String, dynamic> json) =>
