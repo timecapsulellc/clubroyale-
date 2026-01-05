@@ -7,6 +7,7 @@ library;
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/core/theme/app_theme.dart';
+import 'package:clubroyale/core/utils/screen_orientation_helper.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:clubroyale/games/base_game.dart';
 import 'package:clubroyale/core/card_engine/meld.dart' as meld_engine;
@@ -140,6 +141,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   @override
   void initState() {
     super.initState();
+    // Lock to landscape for game screen
+    ScreenOrientationHelper.lockLandscape();
     _remainingSeconds = _config.turnTimeoutSeconds;
     _initGame();
   }
@@ -147,6 +150,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   @override
   void dispose() {
     _stopTimer();
+    // Unlock orientation when leaving game
+    ScreenOrientationHelper.unlockOrientation();
     super.dispose();
   }
 

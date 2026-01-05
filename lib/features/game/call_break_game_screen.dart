@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:clubroyale/core/utils/error_helper.dart';
+import 'package:clubroyale/core/utils/screen_orientation_helper.dart';
 import 'package:clubroyale/core/utils/haptic_helper.dart';
 import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,11 +45,20 @@ class _CallBreakGameScreenState extends ConsumerState<CallBreakGameScreen> {
   bool _showVideoGrid = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Lock to landscape for game screen
+    ScreenOrientationHelper.lockLandscape();
+  }
+
+  @override
   void dispose() {
     // Stop bot service if it was running
     if (_botServiceStarted) {
       ref.read(botServiceProvider).stopMonitoring();
     }
+    // Unlock orientation when leaving game
+    ScreenOrientationHelper.unlockOrientation();
     super.dispose();
   }
 

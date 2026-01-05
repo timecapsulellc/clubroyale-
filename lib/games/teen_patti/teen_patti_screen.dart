@@ -6,6 +6,7 @@ library;
 import 'dart:math' as math;
 import 'package:flutter/material.dart' hide Card;
 import 'package:clubroyale/core/utils/haptic_helper.dart';
+import 'package:clubroyale/core/utils/screen_orientation_helper.dart';
 import 'package:clubroyale/core/widgets/contextual_loader.dart';
 import 'package:clubroyale/core/widgets/game_mode_banner.dart';
 import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
@@ -95,11 +96,15 @@ class _TeenPattiScreenState extends ConsumerState<TeenPattiScreen> {
   @override
   void initState() {
     super.initState();
+    // Lock to landscape for game screen
+    ScreenOrientationHelper.lockLandscape();
     _buildCardCache();
   }
 
   @override
   void dispose() {
+    // Unlock orientation when leaving game
+    ScreenOrientationHelper.unlockOrientation();
     super.dispose();
   }
 
