@@ -35,7 +35,7 @@ class UserSettings {
     this.musicVolume = 0.5,
     this.hapticEnabled = true,
     this.themeMode = 'system',
-    this.themeMode = 'system',
+
     this.notificationsEnabled = true,
     this.hasSeenTutorial = false,
   });

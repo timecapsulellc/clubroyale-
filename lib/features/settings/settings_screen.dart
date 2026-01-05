@@ -169,7 +169,7 @@ class SettingsScreen extends ConsumerWidget {
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-        title: Text(
+
        title: Text(
           'settings'.tr(ref).toUpperCase(),
           style: TextStyle(
@@ -499,4 +499,4 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
-}
+

@@ -116,9 +116,6 @@ class RightArcGameController extends ConsumerWidget {
                   onTap: onShowCards,
                   isEnabled: isShowEnabled,
                 ),
-                  onTap: onShowCards,
-                  isEnabled: isShowEnabled,
-                ),
               ),
 
               _buildArcPositioned(

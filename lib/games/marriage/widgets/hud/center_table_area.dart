@@ -76,7 +76,7 @@ class CenterTableArea extends StatelessWidget {
               _buildDeckPile(isDrawPhase),
               const SizedBox(width: 24),
               // Discard
-              _buildDiscardPile(isDrawPhase),
+              _buildDiscardPile(context, isDrawPhase),
             ],
           ),
 
@@ -219,7 +219,7 @@ class CenterTableArea extends StatelessWidget {
     return deck;
   }
 
-  Widget _buildDiscardPile(bool isDrawPhase) {
+  Widget _buildDiscardPile(BuildContext context, bool isDrawPhase) {
     final canDraw =
         canDrawFromDiscard && isMyTurn && isDrawPhase && !isDiscardBlocked;
 

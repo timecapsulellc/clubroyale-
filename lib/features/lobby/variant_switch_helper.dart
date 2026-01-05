@@ -1,12 +1,12 @@
-
-class _VariantSwitch extends StatelessWidget {
+import 'package:flutter/material.dart';
+class VariantSwitch extends StatelessWidget {
   final String label;
   final String description;
   final String? detailedExplanation; // New field for long explanation
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  const _VariantSwitch({
+  const VariantSwitch({
     required this.label,
     required this.description,
     this.detailedExplanation,

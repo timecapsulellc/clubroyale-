@@ -212,7 +212,7 @@ class CardAnimationController extends ChangeNotifier {
     for (int c = 0; c < count; c++) {
       Future.delayed(Duration(milliseconds: c * 50), () {
         final animation = FlyingCardAnimation(
-          card: PlayingCard(suit: Suit.spades, rank: Rank.ace), // Dummy back
+          card: PlayingCard(suit: CardSuit.spades, rank: CardRank.ace), // Dummy back
           startPosition: start,
           endPosition: end,
           showFace: false, // Face down deal
@@ -234,7 +234,7 @@ class CardAnimationController extends ChangeNotifier {
     // We could add a "Stack" visual if we had a widget for it, 
     // but a single card back flying represents the packet well enough for optimization.
     final animation = FlyingCardAnimation(
-      card: PlayingCard(suit: Suit.spades, rank: Rank.ace), // Dummy back
+      card: PlayingCard(suit: CardSuit.spades, rank: CardRank.ace), // Dummy back
       startPosition: start,
       endPosition: end,
       showFace: false,

@@ -12,6 +12,7 @@ import 'package:clubroyale/features/wallet/diamond_service.dart';
 import 'package:clubroyale/features/feedback/feedback_dialog.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:clubroyale/core/services/localization_service.dart'; // Import LocalizationService
+import 'package:clubroyale/core/services/settings_service.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:math';
 
@@ -293,7 +294,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                                     16,
                                   ),
                                   child: Text(
-                                  child: Text(
+
                                     'active_tables'.tr(ref),
                                     style: Theme.of(context)
                                         .textTheme
@@ -642,6 +643,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   }
 
   /// Shows dialog to create a game with configuration
+  void _showPrivacyDialog(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('privacy'.tr(ref) + ': Coming Soon')),
+    );
+  }
+
   Future<void> _showCreateGameDialog(
     BuildContext context,
     WidgetRef ref, {
@@ -813,7 +820,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    _VariantSwitch(
+                    VariantSwitch(
                       label: 'Tunnel Pachaunu',
                       description: 'Points for tunnels are multiplied',
                       detailedExplanation:
@@ -821,7 +828,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                       value: tunnelPachaunu,
                       onChanged: (v) => setState(() => tunnelPachaunu = v),
                     ),
-                    _VariantSwitch(
+                    VariantSwitch(
                       label: 'Kidnap Penalty',
                       description: 'Unvisited players pay double',
                       detailedExplanation:
@@ -833,7 +840,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                         });
                       },
                     ),
-                    _VariantSwitch(
+                    VariantSwitch(
                       label: 'Murder Penalty',
                       description: 'Burn Maal points if unvisited',
                       detailedExplanation:

@@ -126,43 +126,6 @@ class ProfessionalTableLayout extends StatelessWidget {
     );
   }
 
-class _TableRail extends StatelessWidget {
-  const _TableRail();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF5a3a20), // Lighter wood
-            Color(0xFF3d2410), // Dark wood
-            Color(0xFF5a3a20), // Lighter wood
-          ],
-        ),
-        border: Border.all(
-          color: const Color(0xFF8b6914).withValues(alpha: 0.5),
-          width: 2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.6),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-          BoxShadow(
-            color: CasinoColors.gold.withValues(alpha: 0.1),
-            blurRadius: 8,
-            spreadRadius: -2,
-          ),
-        ],
-      ),
-    );
-  }
-}
 
   List<Widget> _buildOpponentPositions({
     required double width,
@@ -285,6 +248,44 @@ class _TableRail extends StatelessWidget {
         }
         return positions;
     }
+  }
+}
+
+class _TableRail extends StatelessWidget {
+  const _TableRail();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF5a3a20), // Lighter wood
+            Color(0xFF3d2410), // Dark wood
+            Color(0xFF5a3a20), // Lighter wood
+          ],
+        ),
+        border: Border.all(
+          color: const Color(0xFF8b6914).withValues(alpha: 0.5),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.6),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: CasinoColors.gold.withValues(alpha: 0.1),
+            blurRadius: 8,
+            spreadRadius: -2,
+          ),
+        ],
+      ),
+    );
   }
 }
 

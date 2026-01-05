@@ -64,6 +64,7 @@ class _MarriageMultiplayerScreenState
   bool _isChatExpanded = false;
   bool _showVideoGrid = false;
   bool _showTutorial = false; // Tutorial overlay state
+  bool get _isTutorialActive => _showTutorial && _guidedTutorialController != null;
   bool _showHints = true; // Toggle hints
   bool _isSidebarOpen = false; // Controls GameActionsSidebar visibility
   GameHint? _currentHint; // Current active hint
@@ -1095,7 +1096,7 @@ class _MarriageMultiplayerScreenState
       final isTurn = state.currentPlayerId == playerId;
       final profile = _getBotName(playerId); // Or real name if human
       final hasVisited = state.hasVisited(playerId);
-      final action = state.playerActions?[playerId];
+
       final timer = isTurn && state.config.turnTimeoutSeconds > 0
           ? ref.read(marriageServiceProvider).getRemainingTurnTime(state) /
                 state.config.turnTimeoutSeconds
@@ -1482,7 +1483,7 @@ class _MarriageMultiplayerScreenState
         setState(() => _selectedCardId = id == _selectedCardId ? null : id);
         // Step 6: Validate tutorial action
         if (_isTutorialActive && _selectedCardId != null) {
-          _guidedTutorialController.validateAction();
+          _guidedTutorialController?.validateAction();
         }
       },
       tiplu: tiplu,
@@ -1711,7 +1712,7 @@ class _MarriageMultiplayerScreenState
         
         // Tutorial Step 4: Validate Draw
         if (_isTutorialActive) {
-          _guidedTutorialController.validateAction();
+          _guidedTutorialController?.validateAction();
         }
 
         _logGameEvent('You drew a card', icon: Icons.add_circle_outline);
@@ -1870,7 +1871,7 @@ class _MarriageMultiplayerScreenState
 
       if (userId != null) {
         if (_isTutorialActive) {
-          _guidedTutorialController.validateAction();
+          _guidedTutorialController?.validateAction();
         }
 
         await marriageService.discardCard(

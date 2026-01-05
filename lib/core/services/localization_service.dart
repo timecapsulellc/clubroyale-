@@ -7,14 +7,14 @@ enum AppLocale {
 }
 
 /// Provider for the current locale
-final localeProvider = StateNotifierProvider<LocaleNotifier, AppLocale>((ref) {
-  return LocaleNotifier();
-});
+final localeProvider = NotifierProvider<LocaleNotifier, AppLocale>(LocaleNotifier.new);
 
 /// Notifier to manage locale state
-class LocaleNotifier extends StateNotifier<AppLocale> {
-  LocaleNotifier() : super(AppLocale.en) {
+class LocaleNotifier extends Notifier<AppLocale> {
+  @override
+  AppLocale build() {
     _loadLocale();
+    return AppLocale.en;
   }
 
   static const _keyLocale = 'app_locale';
