@@ -8,7 +8,7 @@
     "background_color": "#1a0a2e",
     "theme_color": "#6b21a8",
     "description": "Play Marriage, Call Break, and more card games with friends online. Create rooms, invite friends, and track scores!",
-    "orientation": "portrait-primary",
+    "orientation": "any",
     "prefer_related_applications": false,
     "categories": [
         "games",
@@ -31,6 +31,13 @@
             "type": "image/png",
             "form_factor": "narrow",
             "label": "Marriage Gameplay"
+        },
+        {
+            "src": "screenshots/desktop_gameplay.png",
+            "sizes": "1920x1080",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Desktop Gameplay"
         }
     ],
     "shortcuts": [
