@@ -263,8 +263,6 @@ class InteractiveTutorialOverlay extends StatelessWidget {
         }
 
           // Calculate hole punch rectangles (Top, Bottom, Left, Right)
-          // If no target, cover entire screen
-          final fullScreen = Rect.fromLTWH(0, 0, screenSize.width, screenSize.height);
           final hole = targetRect ?? Rect.zero;
 
           // Define the 4 blocking rectangles around the hole

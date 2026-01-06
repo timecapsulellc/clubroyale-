@@ -16,6 +16,7 @@ class ActionSidebarButton extends StatelessWidget {
   final Color textColor;
   final bool isActive;
   final bool showGlow;
+  final double size;
 
   const ActionSidebarButton({
     super.key,
@@ -26,6 +27,7 @@ class ActionSidebarButton extends StatelessWidget {
     this.textColor = Colors.white,
     this.isActive = false,
     this.showGlow = false,
+    this.size = 60,
   });
 
   @override
@@ -36,8 +38,8 @@ class ActionSidebarButton extends StatelessWidget {
       onTap: onPressed,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        width: 60,
-        height: 60,
+        width: size,
+        height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: isEnabled ? backgroundColor : Colors.grey.shade800,
@@ -95,6 +97,7 @@ class MarriageActionSidebar extends StatelessWidget {
   final VoidCallback? onDeclare;
   final VoidCallback? onShowSets;
   final String visitLabel;
+  final bool compact;
 
   const MarriageActionSidebar({
     super.key,
@@ -107,13 +110,19 @@ class MarriageActionSidebar extends StatelessWidget {
     this.onDeclare,
     this.onShowSets,
     this.visitLabel = 'VISIT',
+    this.compact = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final double buttonSize = compact ? 40 : 60;
+    final double spacing = compact ? 6 : 12;
+    final double iconSize = compact ? 18 : 24;
+    final double fontSize = compact ? 9 : 11;
+
     return Container(
-      width: 76,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      width: compact ? 56 : 76,
+      padding: EdgeInsets.symmetric(vertical: compact ? 8 : 16, horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.6),
         borderRadius: const BorderRadius.only(
@@ -141,8 +150,9 @@ class MarriageActionSidebar extends StatelessWidget {
             onPressed: canVisit ? onVisit : null,
             backgroundColor: const Color(0xFF9B59B6), // Purple for Visit
             isActive: canVisit,
+            size: buttonSize,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: spacing),
           
           // SHOW SETS button (like SEQ in reference)
           ActionSidebarButton(
@@ -150,8 +160,9 @@ class MarriageActionSidebar extends StatelessWidget {
             icon: Icons.view_list_rounded,
             onPressed: onShowSets,
             backgroundColor: const Color(0xFF3498DB), // Blue
+            size: buttonSize,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: spacing),
           
           // DECLARE / SHOW button
           ActionSidebarButton(
@@ -161,8 +172,9 @@ class MarriageActionSidebar extends StatelessWidget {
             backgroundColor: const Color(0xFF27AE60), // Green
             isActive: canDeclare,
             showGlow: canDeclare,
+            size: buttonSize,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: spacing),
           
           // DISCARD button (like CAN in reference)
           ActionSidebarButton(
@@ -170,6 +182,7 @@ class MarriageActionSidebar extends StatelessWidget {
             icon: Icons.close,
             onPressed: canDiscard ? onDiscard : null,
             backgroundColor: const Color(0xFFE74C3C), // Red
+            size: buttonSize,
           ),
         ],
       ),

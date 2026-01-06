@@ -21,71 +21,98 @@ class MarriageTableLayout extends StatelessWidget {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final height = constraints.maxHeight;
+        final isMobileLandscape = height < 500;
 
-        // Define ellipse properties
-        // We want an arc from approx 8 o'clock to 4 o'clock (clockwise)
-        // 0 radians is 3 o'clock (Right)
-        // Pi/2 is 6 o'clock (Bottom)
-        // Pi is 9 o'clock (Left)
-        // 3Pi/2 is 12 o'clock (Top)
+        // For mobile landscape, use a simpler layout with clear space division
+        if (isMobileLandscape) {
+          return _buildMobileLandscapeLayout(width, height);
+        }
 
-        // We want to place opponents from ~Left-Bottom to ~Right-Bottom going upwards/clockwise?
-
-        // Better visualization for a card table:
-        // "Me" is at Bottom Center.
-        // Opponents sit in a semi-circle/oval on the Top/Sides.
-        // Let's define the arc from Left (9 o'clock / Pi) -> Top (12 o'clock / 3Pi/2 / -Pi/2) -> Right (3 o'clock / 0)
-
-        // Let's us standard Flutter Coordinate system offset angle:
-        // 0 is Right.
-        // -Pi/2 is Top.
-        // Pi is Left.
-        // Pi/2 is Bottom.
-
-        // Arc start: Left-Side slightly down? say 160 degrees (approx 2.8 rad)
-        // Arc end: Right-Side slightly down? say 20 degrees (approx 0.35 rad)
-        // But we go "around" the top.
-        // So Loop from PI (Left) -> -PI/2 (Top) -> 0 (Right).
-
+        // Desktop/Tablet layout with ellipse positioning
         final centerX = width / 2;
-        final centerY = height * 0.55; // Lower center for upper arc
-
-        final radiusX = width * 0.45; // Wide spread
-        final radiusY = height * 0.40; // Top reaches ~15% height
-
-        // Calculate max height for the hand area to prevent overflow
-        final maxHandHeight = height * 0.40;
+        final centerY = height * 0.45;
+        final radiusX = width * 0.45;
+        final radiusY = height * 0.35;
 
         return Stack(
           children: [
             // 1. Center Area (Deck/Discard)
             Positioned(
               left: centerX - 160,
-              top: centerY - 100, // Centered (200/2)
+              top: centerY - 100,
               width: 320,
-              height: 200, // Increased from 180 to prevent overflow
+              height: 200,
               child: Center(child: centerArea),
             ),
 
             // 2. Opponents
             ..._buildOpponentPositions(centerX, centerY, radiusX, radiusY),
 
-            // 3. My Hand (Fixed at bottom with constrained height)
+            // 3. My Hand - 35% height at bottom
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: maxHandHeight),
-                child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: myHand,
-                ),
-              ),
+              height: height * 0.35,
+              child: myHand,
             ),
           ],
         );
       },
+    );
+  }
+
+  /// Optimized layout for mobile landscape (height < 500)
+  /// Matches reference app proportions:
+  /// - Opponents: 40px (compact row of avatars)
+  /// - Center: Flexible (deck/discard area)  
+  /// - Hand: 180px max (cards with grouping)
+  Widget _buildMobileLandscapeLayout(double width, double height) {
+    const opponentRowHeight = 40.0;
+    const maxHandHeight = 180.0;
+    
+    // Hand takes minimum of maxHandHeight or 45% of screen
+    final handHeight = (height * 0.45).clamp(120.0, maxHandHeight);
+    final centerAreaHeight = height - opponentRowHeight - handHeight;
+
+    return Column(
+      children: [
+        // Top Row: Opponents in horizontal row (compact, clipped to prevent overflow)
+        ClipRect(
+          child: SizedBox(
+            height: opponentRowHeight,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: opponents
+                  .map((o) => SizedBox(
+                        height: opponentRowHeight,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: o,
+                        ),
+                      ))
+                  .toList(),
+            ),
+          ),
+        ),
+
+        // Center Area: Deck/Discard (flexible height)
+        Expanded(
+          child: SizedBox(
+            width: width,
+            child: Center(
+              child: Transform.scale(scale: 0.7, child: centerArea),
+            ),
+          ),
+        ),
+
+        // Bottom: Hand Cards (capped at maxHandHeight)
+        SizedBox(
+          height: handHeight,
+          width: width,
+          child: ClipRect(child: myHand),
+        ),
+      ],
     );
   }
 

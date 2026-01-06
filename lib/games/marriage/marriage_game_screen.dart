@@ -460,116 +460,22 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     }
     final melds = _cachedMelds;
 
-    return Scaffold(
-      backgroundColor: CasinoColors.tableGreenMid, // Bhoos-style deep green felt
-      appBar: AppBar(
-        backgroundColor: Colors.black.withValues(alpha: 0.5),
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Use GameTerminology for game name
-            Text(
-              GameTerminology.royalMeldGame,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(width: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppTheme.gold.withValues(alpha: 0.5)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(2, 4),
-                  ),
-                ],
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Card back pattern
-                  Container(
-                    margin: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [AppTheme.teal, Colors.black],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.style,
-                        color: AppTheme.gold.withValues(alpha: 0.5),
-                        size: 32,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          // Wild Card indicator (Tiplu)
-          if (_game.tiplu != null)
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '${GameTerminology.wildCard}: ',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
-                  Text(
-                    _game.tiplu!.displayString,
-                    style: TextStyle(
-                      color: _game.tiplu!.suit.isRed
-                          ? Colors.red
-                          : Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              setState(() => _initGame());
-            },
-            tooltip: 'New Game',
-          ),
-          // Status Indicator (Simplified - Maal now in HUD)
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Row(
-              children: [
-                Icon(
-                  _hasVisited ? Icons.lock_open : Icons.lock,
-                  color: _hasVisited ? Colors.greenAccent : Colors.white24,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      body: TableLayout(
-        child: SafeArea(
+    return Directionality(
+      textDirection: TextDirection.ltr, // Force LTR for correct layout
+      child: Scaffold(
+        backgroundColor: CasinoColors.tableGreenMid, // Bhoos-style deep green felt
+        body: SafeArea(
           child: Stack(
             children: [
+              // Background (Felt Texture/Gradient)
+              Positioned.fill(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: CasinoColors.greenFeltGradient,
+                  ),
+                ),
+              ),
+
               // Header (Menu, Sound, Info)
               Positioned(
                 top: 8,
@@ -622,8 +528,8 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
               // New Elliptical Layout for 8 Players
               Padding(
                 padding: const EdgeInsets.only(
-                  top: 80,
-                ), // Increased top padding to avoid header overlap
+                  top: 50, // Reduced from 80 for mobile landscape space
+                ),
                 child: MarriageTableLayout(
                   centerArea: Padding(
                     padding: const EdgeInsets.only(
@@ -632,34 +538,38 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                     child: _buildCenterArea(),
                   ),
                   opponents: _buildOpponentsList(),
-                  myHand: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Meld suggestions
-                      if (melds.isNotEmpty) _buildMeldSuggestions(melds),
-                      const SizedBox(
-                        height: 10,
-                      ), // Spacing between suggestions and hand
-                      // Hand (no action bar - moved to sidebar)
-                      _buildMyHand(myHand),
-                    ],
-                  ),
+                  // Pass only the hand widget - no Column wrapper with meld suggestions
+                  // This ensures hand fits within allocated 180px max height
+                  myHand: _buildMyHand(myHand, scale: MediaQuery.of(context).size.height < 500 ? 0.65 : 1.0),
                 ),
               ),
+
+              // Meld Suggestions Overlay (above hand area, on mobile only show if not too small)
+              if (melds.isNotEmpty && MediaQuery.of(context).size.height >= 500)
+                Positioned(
+                  bottom: MediaQuery.of(context).size.height * 0.35 + 5, // Above hand area
+                  left: 0,
+                  right: 60, // Leave room for sidebar
+                  child: _buildMeldSuggestions(melds),
+                ),
 
               // Right Sidebar for Actions (Bhoos-style)
               Positioned(
                 right: 0,
-                top: 120,
-                child: MarriageActionSidebar(
-                  isMyTurn: _game.currentPlayerId == _playerId,
-                  canDiscard: _selectedCardId != null && _game.currentPlayerId == _playerId,
-                  canVisit: _visitStatus == VisitButtonState.ready,
-                  canDeclare: _game.currentPlayerId == _playerId,
-                  onDiscard: _discardCard,
-                  onVisit: _handleVisit,
-                  onDeclare: _tryDeclare,
-                  visitLabel: _visitLabel == 'VISIT' ? 'DUB' : _visitLabel,
+                top: MediaQuery.of(context).size.height < 400 ? 50 : 170, // Shift up on mobile
+                bottom: MediaQuery.of(context).size.height < 400 ? 0 : null, // Constrain bottom
+                child: Center(
+                  child: MarriageActionSidebar(
+                    isMyTurn: _game.currentPlayerId == _playerId,
+                    canDiscard: _selectedCardId != null && _game.currentPlayerId == _playerId,
+                    canVisit: _visitStatus == VisitButtonState.ready,
+                    canDeclare: _game.currentPlayerId == _playerId,
+                    onDiscard: _discardCard,
+                    onVisit: _handleVisit,
+                    onDeclare: _tryDeclare,
+                    visitLabel: _visitLabel == 'VISIT' ? 'DUB' : _visitLabel,
+                    compact: MediaQuery.of(context).size.height < 400, // Pass compact flag
+                  ),
                 ),
               ),
 
@@ -791,19 +701,34 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
               onTap: canDrawFromDiscard ? _drawFromDiscard : null,
               child: Stack(
                 children: [
-                  CardWidget(
-                    card:
-                        topDiscard ??
-                        PlayingCard(
-                          rank: CardRank.ace,
-                          suit: CardSuit.spades,
-                        ), // Show back styled dummy if no discard
-                    isFaceUp: topDiscard != null,
-                    isSelectable: canDrawFromDiscard,
-                    isSelected: false,
-                    width: 90,
-                    height: 130,
-                  ),
+                  topDiscard != null
+                      ? CardWidget(
+                          card: topDiscard!,
+                          isFaceUp: true,
+                          isSelectable: canDrawFromDiscard,
+                          isSelected: false,
+                          width: 90,
+                          height: 130,
+                        )
+                      : Container(
+                          width: 90,
+                          height: 130,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.white24,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.black12,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.layers_clear,
+                              color: Colors.white24,
+                              size: 32,
+                            ),
+                          ),
+                        ),
                   // Lock Overlay (if visit needed)
                   if (topDiscard != null && !visitRequirementMet && isMyTurn)
                     Positioned.fill(
@@ -849,7 +774,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                     // Tiplu/Joker peek (underneath)
                     if (_game.tiplu != null)
                       Positioned(
-                        left: 10, 
+                        left: 25, 
                         top: 0,
                         child: Transform.rotate(
                           angle: 0.15,
@@ -882,55 +807,63 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   }
 
   Widget _buildMeldSuggestions(List<meld_engine.Meld> melds) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      color: Colors.black.withValues(alpha: 0.4),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: melds.map((meld) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: _getMeldColor(meld.type).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: _getMeldColor(meld.type)),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _getMeldTypeName(meld.type),
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 10,
+    return ClipRect(
+      child: Container(
+        height: 75, // Fixed height to prevent overflow
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+        color: Colors.black.withValues(alpha: 0.4),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: melds.map((meld) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: _getMeldColor(meld.type).withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: _getMeldColor(meld.type)),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _getMeldTypeName(meld.type),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 9,
+                        ),
                       ),
-                    ),
-                    Row(
-                      children: meld.cards
-                          .map(
-                            (card) => CardWidget(
-                              card: card,
-                              isFaceUp: true,
-                              width: 30,
-                              height: 45,
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ],
+                      const SizedBox(height: 2),
+                      SizedBox(
+                        height: 42, // Constrained card row height
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: meld.cards
+                              .map(
+                                (card) => CardWidget(
+                                  card: card,
+                                  isFaceUp: true,
+                                  width: 26,
+                                  height: 40,
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildMyHand(List<PlayingCard> hand) {
+  Widget _buildMyHand(List<PlayingCard> hand, {double scale = 1.0}) {
     return MarriageHandWidget(
       key: _handKey,
       cards: hand,
@@ -949,6 +882,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       onCardDoubleTap: () => _discardCard(), // Double-tap to discard
       tiplu: _game.tiplu,
       config: _config,
+      scale: scale,
     );
   }
 

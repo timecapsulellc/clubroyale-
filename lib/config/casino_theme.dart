@@ -8,6 +8,7 @@ class CasinoColors {
   static const Color deepPurple = Color(0xFF2D1B4E); // ClubRoyale deep purple
   static const Color darkPurple = Color(0xFF1a0a2e); // Very dark purple
   static const Color richPurple = Color(0xFF4A1C6F); // ClubRoyale royal purple
+  static const Color background = darkPurple; // Alias for skeleton screens
 
   // Purple Table Colors
   // Green Felt Table Colors (Premium Theme - Bhoos Reference)

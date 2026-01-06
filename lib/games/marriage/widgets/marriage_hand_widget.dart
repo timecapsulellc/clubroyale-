@@ -235,14 +235,17 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
     // Debug: Track if cards are being received
     debugPrint('🃏 MarriageHandWidget: ${widget.cards.length} cards, ${_groups.length} groups');
     
-    return Stack(
-      alignment: Alignment.topLeft,
-      children: [
+    // Wrap in ClipRect to ensure widget respects allocated height
+    return ClipRect(
+      child: Stack(
+        alignment: Alignment.topLeft,
+        clipBehavior: Clip.hardEdge,
+        children: [
         // Horizontal Scrollable Hand
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 0), // Top pad for sort button space
+          padding: const EdgeInsets.fromLTRB(12, 16, 12, 0), // Compact padding
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -261,8 +264,8 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
                 },
                 builder: (context, candidates, rejects) {
                   return Container(
-                    width: 50,
-                    height: 145,
+                    width: 40,
+                    height: 100,
                     decoration: BoxDecoration(
                       color: candidates.isNotEmpty
                           ? Colors.white.withValues(alpha: 0.1)
@@ -315,7 +318,8 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
           ),
         ),
       ],
-    );
+      ),
+    ); // ClipRect
   }
 
   void _moveCardToNewGroup(PlayingCard card) {
@@ -402,10 +406,10 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Label
+        // Label (compact)
         Container(
-          height: 20,
-          margin: const EdgeInsets.only(bottom: 4),
+          height: 16,
+          margin: const EdgeInsets.only(bottom: 2),
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
             color: labelText.isNotEmpty ? labelColor : Colors.transparent,
@@ -422,13 +426,12 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
           ),
         ),
 
-        // Cards Stack (Fan)
-        // Using a custom stack to render overlapping cards
+        // Cards Stack (Fan) - Compact for mobile
         SizedBox(
-          height: 145 * widget.scale, // Scaled height
-          width: (40.0 + (group.length * 45.0)) * widget.scale, // Scaled width
+          height: 100 * widget.scale, // Compact height for mobile
+          width: (30.0 + (group.length * 22.0)) * widget.scale, // Tighter overlap
           child: Stack(
-            clipBehavior: Clip.none,
+            clipBehavior: Clip.hardEdge, // Clip cards to prevent overflow
             children: [
               // Drop Target for this group
               Positioned.fill(
@@ -482,14 +485,14 @@ class _MarriageHandWidgetState extends State<MarriageHandWidget> {
     // Rotation: -0.05 to 0.05 radians per card step (Smoother)
     final double angle = relativePos * 0.05;
 
-    // Y-Offset: Arch effect (edges lower than center)
-    final double yArcOffset = (relativePos * relativePos) * 1.5;
+    // Y-Offset: Subtle arch effect (reduced for compact layout)
+    final double yArcOffset = (relativePos * relativePos) * 0.8;
     
-    // Lift Offset for selection
-    final double liftOffset = isSelected ? -30.0 : 0.0;
+    // Lift Offset for selection (reduced)
+    final double liftOffset = isSelected ? -20.0 : 0.0;
 
-    // X-Offset: tighter overlap for fanned look (25.0 - Bhoos match)
-    final double xOffset = index * 25.0 * widget.scale;
+    // X-Offset: tighter overlap for compact view (20px per card)
+    final double xOffset = index * 20.0 * widget.scale;
 
     return Positioned(
       left: xOffset,

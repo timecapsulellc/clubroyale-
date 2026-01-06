@@ -73,7 +73,7 @@ class _FeedbackDialogState extends ConsumerState<FeedbackDialog> {
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
               filled: true,
-              fillColor: Colors.white.withOpacity(0.1),
+              fillColor: Colors.white.withValues(alpha: 0.1),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -103,9 +103,9 @@ class _FeedbackDialogState extends ConsumerState<FeedbackDialog> {
             maxLines: 5,
             decoration: InputDecoration(
               hintText: 'Describe your issue or idea...',
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
               filled: true,
-              fillColor: Colors.white.withOpacity(0.1),
+              fillColor: Colors.white.withValues(alpha: 0.1),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

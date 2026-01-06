@@ -78,7 +78,7 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
         // 1. Dimmed Background with Hole (Punch-out)
         ColorFiltered(
           colorFilter: ColorFilter.mode(
-            Colors.black.withOpacity(0.8),
+            Colors.black.withValues(alpha: 0.8),
             BlendMode.srcOut,
           ),
           child: Stack(
@@ -128,11 +128,11 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
                     )
                     .boxShadow(
                       begin: BoxShadow(
-                        color: CasinoColors.gold.withOpacity(0.5),
+                        color: CasinoColors.gold.withValues(alpha: 0.5),
                         blurRadius: 10,
                       ),
                       end: BoxShadow(
-                        color: CasinoColors.gold.withOpacity(0.0),
+                        color: CasinoColors.gold.withValues(alpha: 0.0),
                         blurRadius: 20,
                       ),
                     ),
@@ -184,7 +184,7 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
             border: Border.all(color: CasinoColors.gold),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),

@@ -69,7 +69,11 @@ class AchievementBadge extends StatelessWidget {
           .scaleXY(end: 1.1, duration: 1000.ms, curve: Curves.easeInOut)
           .then()
           .boxShadow(
-            color: color.withValues(alpha: 0.6),
+            begin: BoxShadow(
+              color: color.withValues(alpha: 0.6),
+              blurRadius: 8,
+              spreadRadius: 2,
+            ),
             end: BoxShadow(
               color: color.withValues(alpha: 0.0),
               blurRadius: 12,

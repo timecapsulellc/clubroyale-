@@ -11,7 +11,8 @@ class TableLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = ref.watch(selectedThemeProvider);
+    // Watch the selected theme (currently unused but needed for future theme switching)
+    final _ = ref.watch(selectedThemeProvider);
 
     return Container(
       decoration: const BoxDecoration(gradient: CasinoColors.greenFeltGradient),

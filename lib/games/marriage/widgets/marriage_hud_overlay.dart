@@ -78,7 +78,7 @@ class MarriageHUDOverlay extends StatelessWidget {
 
         // 2. Enhanced Maal Counter (Top Right - Match Reference)
         Positioned(
-          top: 80, // Below AppBar
+          top: 100, // Moved down to avoid Game Banner (was 80)
           right: 16,
           child: _MaalCounterChip(points: maalPoints),
         ),

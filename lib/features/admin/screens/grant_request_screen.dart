@@ -40,7 +40,7 @@ class _GrantRequestScreenState extends ConsumerState<GrantRequestScreen> {
     setState(() => _isLoading = true);
     try {
       final adminDiamondService = ref.read(adminDiamondServiceProvider);
-      final requestId = await adminDiamondService.createGrantRequest(
+      await adminDiamondService.createGrantRequest(
         adminEmail: user.email!,
         targetUserId: _userIdController.text.trim(),
         targetUserEmail: _userEmailController.text.trim(),

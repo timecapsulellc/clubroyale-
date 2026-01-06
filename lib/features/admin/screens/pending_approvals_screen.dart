@@ -13,7 +13,6 @@ class PendingApprovalsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authServiceProvider).currentUser;
-    final theme = Theme.of(context);
 
     if (user == null || !AdminConfig.isAdmin(user.email ?? '')) {
       return Scaffold(

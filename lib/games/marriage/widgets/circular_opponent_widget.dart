@@ -31,165 +31,144 @@ class CircularOpponentWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isTurn = opponent.isCurrentTurn;
     final status = opponent.status;
+    
+    // Compact size for mobile landscape (40px row height)
+    final compactSize = size.clamp(30.0, 36.0);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Avatar with Timer Ring
-        SizedBox(
-          width: size + 10,
-          height: size + 10,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Active Glow
-              if (isTurn)
-                Container(
-                  width: size + 10,
-                  height: size + 10,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.greenAccent.withValues(alpha: 0.6),
-                        blurRadius: 15,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                ),
-
-              // Timer Ring
-              if (isTurn && turnProgress != null)
-                SizedBox(
-                  width: size + 8,
-                  height: size + 8,
-                  child: CircularProgressIndicator(
-                    value: turnProgress,
-                    strokeWidth: 3,
-                    backgroundColor: Colors.grey.withValues(alpha: 0.3),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.greenAccent),
-                  ),
-                ),
-
-              // Avatar Circle
-              Container(
-                width: size,
-                height: size,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF2D1B4E), // Deep purple bg
-                  border: Border.all(
-                    color: isTurn ? Colors.greenAccent : CasinoColors.gold,
-                    width: isTurn ? 2 : 1.5,
-                  ),
-                  image: DecorationImage(
-                    image: AssetImage(_getAvatarAsset(opponent.name)),
-                    fit: BoxFit.cover,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    opponent.name.isNotEmpty ? opponent.name[0].toUpperCase() : '?',
-                    style: TextStyle(
-                      color: CasinoColors.gold,
-                      fontWeight: FontWeight.bold,
-                      fontSize: size * 0.4,
-                      shadows: const [
-                        Shadow(
-                          color: Colors.black,
-                          blurRadius: 2,
-                          offset: Offset(1, 1),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              // Card Count Badge
-              if (cardCount > 0)
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
+    return SizedBox(
+      height: 40,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Avatar with Timer Ring (compact)
+          SizedBox(
+            width: compactSize + 4,
+            height: compactSize + 4,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Active Glow
+                if (isTurn)
+                  Container(
+                    width: compactSize + 4,
+                    height: compactSize + 4,
                     decoration: BoxDecoration(
-                      color: CasinoColors.velvetRed,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 1),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 2,
-                          offset: const Offset(0, 1),
+                          color: Colors.greenAccent.withValues(alpha: 0.6),
+                          blurRadius: 8,
+                          spreadRadius: 1,
                         ),
                       ],
                     ),
-                    constraints: const BoxConstraints(
-                      minWidth: 20,
-                      minHeight: 20,
+                  ),
+
+                // Timer Ring
+                if (isTurn && turnProgress != null)
+                  SizedBox(
+                    width: compactSize + 2,
+                    height: compactSize + 2,
+                    child: CircularProgressIndicator(
+                      value: turnProgress,
+                      strokeWidth: 2,
+                      backgroundColor: Colors.grey.withValues(alpha: 0.3),
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.greenAccent),
                     ),
-                    child: Center(
-                      child: Text(
-                        '$cardCount',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  ),
+
+                // Avatar Circle
+                Container(
+                  width: compactSize,
+                  height: compactSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF2D1B4E),
+                    border: Border.all(
+                      color: isTurn ? Colors.greenAccent : CasinoColors.gold,
+                      width: isTurn ? 2 : 1,
+                    ),
+                    image: DecorationImage(
+                      image: AssetImage(_getAvatarAsset(opponent.name)),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      opponent.name.isNotEmpty ? opponent.name[0].toUpperCase() : '?',
+                      style: TextStyle(
+                        color: CasinoColors.gold,
+                        fontWeight: FontWeight.bold,
+                        fontSize: compactSize * 0.35,
+                        shadows: const [
+                          Shadow(color: Colors.black, blurRadius: 2, offset: Offset(1, 1)),
+                        ],
                       ),
                     ),
                   ),
                 ),
-            ],
-          ),
-        ),
 
-        // Name & Status
-        const SizedBox(height: 4),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.6),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: isTurn ? Colors.greenAccent.withValues(alpha: 0.5) : Colors.transparent,
-              width: 1,
+                // Card Count Badge
+                if (cardCount > 0)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: CasinoColors.velvetRed,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 0.5),
+                      ),
+                      constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                      child: Center(
+                        child: Text(
+                          '$cardCount',
+                          style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
-          child: Column(
-            children: [
-              Text(
-                opponent.name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+
+          const SizedBox(width: 4),
+
+          // Name Badge (compact)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isTurn ? Colors.greenAccent.withValues(alpha: 0.5) : Colors.transparent,
+                width: 1,
               ),
-              if (status != null && status.isNotEmpty)
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  status,
-                  style: TextStyle(
-                    color: isTurn ? Colors.greenAccent : Colors.white70,
-                    fontSize: 9,
-                    fontStyle: FontStyle.italic,
-                  ),
+                  opponent.name.length > 6 ? '${opponent.name.substring(0, 6)}...' : opponent.name,
+                  style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
                 ),
-            ],
+                if (status != null && status.isNotEmpty)
+                  Text(
+                    status,
+                    style: TextStyle(
+                      color: isTurn ? Colors.greenAccent : Colors.white70,
+                      fontSize: 7,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

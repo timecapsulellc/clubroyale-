@@ -27,17 +27,17 @@ class SocialBottomNav extends ConsumerWidget {
         child: Container(
           height: 75,
           decoration: BoxDecoration(
-            color: const Color(0xFF1a0a2e).withOpacity(0.95),
+            color: const Color(0xFF1a0a2e).withValues(alpha: 0.95),
             borderRadius: isFloating ? BorderRadius.circular(30) : null,
             border: Border(
               top: BorderSide(
-                color: const Color(0xFF7c3aed).withOpacity(0.3),
+                color: const Color(0xFF7c3aed).withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, -5),
               ),
@@ -129,14 +129,14 @@ class _CenterPlayButton extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFD4AF37).withOpacity(0.5),
+              color: const Color(0xFFD4AF37).withValues(alpha: 0.5),
               blurRadius: 15,
               spreadRadius: 2,
               offset: const Offset(0, 4),
             ),
             // Inner glow effect
             BoxShadow(
-              color: const Color(0xFFD4AF37).withOpacity(0.3),
+              color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
               blurRadius: 25,
               spreadRadius: 4,
             ),

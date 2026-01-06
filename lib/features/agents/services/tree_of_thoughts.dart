@@ -96,7 +96,6 @@ class ToTDecision {
 
 /// Tree of Thoughts Reasoning Engine
 class TreeOfThoughtsEngine {
-  final Random _random = Random();
 
   /// Make a decision using Tree of Thoughts reasoning
   ToTDecision decide({
@@ -173,7 +172,7 @@ class TreeOfThoughtsEngine {
     String action,
   ) {
     final thoughts = <Thought>[];
-    final cardsPlayed = context['cardsPlayed'] as int? ?? 0;
+    final _ = context['cardsPlayed'] as int? ?? 0; // Unused but kept for context
     final tricksWon = context['tricksWon'] as int? ?? 0;
     final bid = context['bid'] as int? ?? 0;
 
@@ -280,7 +279,7 @@ class TreeOfThoughtsEngine {
   ) {
     final thoughts = <Thought>[];
     final handStrength = context['handStrength'] as double? ?? 0.5;
-    final potSize = context['pot'] as int? ?? 100;
+    final _ = context['pot'] as int? ?? 100; // Unused but kept for context
     final playersRemaining = context['playersRemaining'] as int? ?? 2;
 
     if (action == 'bet' || action == 'raise') {

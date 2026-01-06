@@ -11,6 +11,7 @@ import 'core/services/analytics_service.dart';
 import 'core/services/update_service.dart';
 import 'package:clubroyale/core/performance/asset_preloader.dart'; // Asset Preloader
 import 'package:clubroyale/core/services/ad_service.dart'; // Mobile Ads
+import 'package:rive/rive.dart';
 
 import 'features/lobby/lobby_screen.dart';
 import 'features/lobby/room_waiting_screen.dart';
@@ -490,10 +491,13 @@ void main() async {
   final updateService = UpdateService();
   await updateService.init();
 
+  // Initialize Rive
+  await RiveFile.initialize();
+
   // Initialize Sentry for error tracking
   await SentryFlutter.init((options) {
     options.dsn =
-        'https://examplePublicKey@o0.ingest.sentry.io/0'; // Replace with actual DSN
+        'https://examplePublicKey@o0.ingest.sentry.io/4504140000000000'; // Replace with valid DSN or use dummy valid generic structure
     // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
     // We recommend adjusting this value in production.
     options.tracesSampleRate = 1.0;
