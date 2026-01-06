@@ -9,13 +9,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:clubroyale/config/casino_theme.dart';
 import 'package:clubroyale/core/theme/app_theme.dart';
 import 'package:clubroyale/core/utils/screen_orientation_helper.dart';
+import 'package:clubroyale/core/utils/game_responsive.dart';
 import 'package:clubroyale/core/config/game_terminology.dart';
 import 'package:clubroyale/games/base_game.dart';
 import 'package:clubroyale/core/card_engine/meld.dart' as meld_engine;
-import 'package:clubroyale/core/card_engine/pile.dart'; // For Card class
+import 'package:clubroyale/core/card_engine/pile.dart';
 import 'package:clubroyale/games/marriage/marriage_game.dart';
-import 'package:clubroyale/features/game/ui/components/table_layout.dart';
-import 'package:clubroyale/features/game/ui/components/game_log_overlay.dart';
 import 'package:clubroyale/features/game/ui/components/casino_button.dart';
 import 'package:clubroyale/features/game/ui/components/card_widget.dart';
 import 'package:clubroyale/features/ai/ai_service.dart';
@@ -23,6 +22,7 @@ import 'package:clubroyale/games/marriage/widgets/visit_button_widget.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_table_layout.dart';
 import 'package:clubroyale/games/marriage/widgets/game_timer_widget.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hud_overlay.dart';
+import 'package:clubroyale/games/marriage/widgets/hud/joker_display_panel.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/features/game/ui/screens/game_settlement_dialog.dart';
 import 'package:clubroyale/games/marriage/marriage_visit_validator.dart';
@@ -34,13 +34,11 @@ import 'package:clubroyale/core/widgets/game_mode_banner.dart';
 import 'package:clubroyale/core/widgets/game_opponent_widget.dart';
 import 'dart:async';
 
-import 'package:clubroyale/core/widgets/tutorial_overlay.dart'; // Import TutorialOverlay
+import 'package:clubroyale/core/widgets/tutorial_overlay.dart';
 import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
 import 'package:clubroyale/games/marriage/widgets/action_sidebar.dart';
 import 'package:clubroyale/games/marriage/widgets/circular_opponent_widget.dart';
-
-// ... (existing imports)
 
 class MarriageGameScreen extends ConsumerStatefulWidget {
   const MarriageGameScreen({super.key});
@@ -514,15 +512,12 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                 ),
               ),
 
-              // Game Logs (Left Side)
+              // Game Logs (Collapsed by default - expand on tap)
+              // Moved to top-left corner, minimized state
               Positioned(
-                top: 80,
+                top: 50,
                 left: 16,
-                child: GameLogOverlay(
-                  logs: _gameLogs.isEmpty
-                      ? const ['Game started...']
-                      : _gameLogs.take(5).toList(), // Show last 5 logs
-                ),
+                child: _buildMinimizedGameLog(),
               ),
 
               // New Elliptical Layout for 8 Players
@@ -544,13 +539,23 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                 ),
               ),
 
-              // Meld Suggestions Overlay (above hand area, on mobile only show if not too small)
-              if (melds.isNotEmpty && MediaQuery.of(context).size.height >= 500)
+              // Meld Suggestions Overlay (above hand area, positioned to not block)
+              // Only show on larger screens where there's room
+              if (melds.isNotEmpty && MediaQuery.of(context).size.height >= 550)
                 Positioned(
-                  bottom: MediaQuery.of(context).size.height * 0.35 + 5, // Above hand area
-                  left: 0,
-                  right: 60, // Leave room for sidebar
+                  bottom: MediaQuery.of(context).size.height * 0.38, // Higher to avoid hand overlap
+                  left: 80, // Clear of game log
+                  right: 80, // Clear of action sidebar
                   child: _buildMeldSuggestions(melds),
+                ),
+
+              // Primary Sets Progress (Top Center)
+              if (_hasVisited || melds.length >= 3)
+                Positioned(
+                  top: 8,
+                  left: MediaQuery.of(context).size.width * 0.35,
+                  right: MediaQuery.of(context).size.width * 0.35,
+                  child: _buildPrimarySetsProgress(melds),
                 ),
 
               // Right Sidebar for Actions (Bhoos-style)
@@ -591,6 +596,32 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                   compact: true,
                 ),
               ),
+
+              // Joker Display Panel (Shows after visit)
+              Positioned(
+                top: 90,
+                right: 16,
+                child: JokerDisplayPanel(
+                  tiplu: _game.tiplu,
+                  // poplu, jhiplu, alter to be computed from tiplu
+                  isRevealed: _hasVisited,
+                  currentMaalPoints: _maalPoints,
+                ),
+              ),
+
+              // Maal Points HUD (Bottom center, above hand - only show after visit)
+              if (_hasVisited && _maalPoints > 0)
+                Positioned(
+                  bottom: MediaQuery.of(context).size.height * 0.38 + 80,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: MaalPointsHUD(
+                      totalPoints: _maalPoints,
+                      marriageCount: _hasMarriageBonus ? 1 : 0,
+                    ),
+                  ),
+                ),
 
               // Flying Card Animations
               ..._animations,
@@ -885,6 +916,150 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       scale: scale,
     );
   }
+
+  /// Minimized game log that expands on tap
+  /// Positioned to not block player cards
+  bool _gameLogExpanded = false;
+  
+  Widget _buildMinimizedGameLog() {
+    if (_gameLogExpanded) {
+      // Expanded state - show full log
+      return GestureDetector(
+        onTap: () => setState(() => _gameLogExpanded = false),
+        child: Container(
+          width: 200,
+          constraints: const BoxConstraints(maxHeight: 150),
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'GAME LOG',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Icon(Icons.close, color: Colors.white54, size: 14),
+                ],
+              ),
+              const Divider(color: Colors.white24, height: 8),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _gameLogs.take(5).length,
+                  itemBuilder: (context, index) {
+                    return Text(
+                      _gameLogs[index],
+                      style: const TextStyle(
+                        color: Colors.white60,
+                        fontSize: 10,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    
+    // Minimized state - small badge
+    return GestureDetector(
+      onTap: () => setState(() => _gameLogExpanded = true),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.6),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white24),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.history, color: Colors.white54, size: 14),
+            const SizedBox(width: 6),
+            Text(
+              _gameLogs.isNotEmpty ? _gameLogs.first : 'Game started',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 10,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Primary sets progress indicator
+  Widget _buildPrimarySetsProgress(List<meld_engine.Meld> melds) {
+    // Count pure runs/sequences (primary sets)
+    final primaryCount = melds.where((m) => 
+        m.type == meld_engine.MeldType.run || 
+        m.type == meld_engine.MeldType.marriage).length;
+    final requiredCount = _config.sequencesRequiredToVisit;
+    final isReady = primaryCount >= requiredCount;
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: isReady ? Colors.green.withValues(alpha: 0.8) : Colors.black.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isReady ? Colors.greenAccent : Colors.white24,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Progress indicators
+          ...List.generate(requiredCount, (i) {
+            final isComplete = i < primaryCount;
+            return Container(
+              width: 20,
+              height: 20,
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isComplete ? Colors.greenAccent : Colors.white24,
+                border: Border.all(color: Colors.white54),
+              ),
+              child: isComplete 
+                  ? const Icon(Icons.check, color: Colors.black, size: 12)
+                  : Center(child: Text('${i + 1}', style: const TextStyle(color: Colors.white54, fontSize: 10))),
+            );
+          }),
+          const SizedBox(width: 8),
+          Text(
+            isReady ? 'READY TO VISIT!' : '$primaryCount/$requiredCount SETS',
+            style: TextStyle(
+              color: isReady ? Colors.white : Colors.white70,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _buildActionBar() {
     final isMyTurn = _game.currentPlayerId == _playerId;
