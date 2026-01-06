@@ -40,6 +40,8 @@ import 'package:clubroyale/core/widgets/tutorial_overlay.dart';
 import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
 import 'package:clubroyale/games/marriage/widgets/circular_opponent_widget.dart';
+import 'package:clubroyale/games/marriage/services/marriage_sound_effects.dart';
+import 'package:clubroyale/games/marriage/services/marriage_animations.dart';
 
 class MarriageGameScreen extends ConsumerStatefulWidget {
   const MarriageGameScreen({super.key});
@@ -181,6 +183,9 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   void _startTimer() {
     _stopTimer();
     setState(() => _remainingSeconds = _config.turnTimeoutSeconds);
+    
+    // Play turn notification sound
+    MarriageSoundEffects.onYourTurn();
 
     _turnTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_showTutorial || _isAnimating) {
@@ -194,6 +199,11 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
       setState(() {
         if (_remainingSeconds > 0) {
           _remainingSeconds--;
+          
+          // Warning sound at 5 seconds
+          if (_remainingSeconds == 5) {
+            MarriageSoundEffects.onTimerWarning();
+          }
         } else {
           // Timeout! Auto-play
           _stopTimer();
@@ -302,12 +312,14 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     final result = validator.attemptVisit(hand);
 
     if (result.canVisit) {
+      MarriageSoundEffects.onVisit(); // Play visit sound
       setState(() {
         _hasVisited = true;
         _visitStatus = VisitButtonState.visited;
 
         // If tunnel win (instant win), handle it
         if (result.visitType == VisitType.tunnel) {
+          MarriageSoundEffects.onGameWin();
           _showWinDialog(winnerName: 'You (Tunnel Win!)');
         }
       });
@@ -919,8 +931,10 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
           // Toggle selection
           if (_selectedCardId == id) {
             _selectedCardId = null;
+            MarriageSoundEffects.onCardDeselect();
           } else {
             _selectedCardId = id;
+            MarriageSoundEffects.onCardSelect();
           }
         });
       },
@@ -1128,6 +1142,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
 
   void _drawFromDeck() {
     if (_isProcessing) return;
+    MarriageSoundEffects.onCardDraw(); // Play draw sound
     setState(() {
       _isProcessing = true;
       _game.drawFromDeck(_playerId);
@@ -1140,6 +1155,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   void _drawFromDiscard() {
     if (_isProcessing || _game.topDiscard == null) return;
     final cardPicked = _game.topDiscard!;
+    MarriageSoundEffects.onCardDraw(); // Play draw sound
     setState(() {
       _isProcessing = true;
       _game.drawFromDiscard(_playerId);
@@ -1155,6 +1171,7 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     final hand = _game.getHand(_playerId);
     final card = hand.firstWhere((c) => c.id == _selectedCardId);
 
+    MarriageSoundEffects.onCardDiscard(); // Play discard sound
     setState(() {
       _game.playCard(_playerId, card);
       _addGameLog('You discarded ${card.displayString}');
@@ -1472,8 +1489,10 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
   void _tryDeclare() {
     final success = _game.declare(_playerId);
     if (success) {
+      MarriageSoundEffects.onDeclare(); // Play declare sound
       _showWinDialog(winnerName: 'You');
     } else {
+      MarriageSoundEffects.onError(); // Play error sound
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Cannot declare yet - complete all melds first!'),
