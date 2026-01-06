@@ -136,22 +136,85 @@ class CardWidget extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Rank display
                 Text(
-                  card.rank.symbol,
+                  card.isJoker ? '🃏' : card.rank.symbol,
                   style: TextStyle(
-                    color: card.suit.isRed ? Colors.red : Colors.black,
-                    fontSize: isLarge ? 32 : 26,
+                    color: card.isJoker ? Colors.purple : (card.suit.isRed ? Colors.red.shade700 : Colors.black),
+                    fontSize: isLarge ? 34 : 28,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'Roboto', // Ensure web-safe font
+                  ),
+                ),
+                const SizedBox(height: 2),
+                // Suit display - Use text with fallback
+                if (!card.isJoker)
+                  Text(
+                    card.suit.symbol,
+                    style: TextStyle(
+                      color: card.suit.isRed ? Colors.red.shade700 : Colors.black,
+                      fontSize: isLarge ? 28 : 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          
+          // Corner rank+suit (top-left)
+          Positioned(
+            top: 4,
+            left: 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  card.isJoker ? 'J' : card.rank.symbol,
+                  style: TextStyle(
+                    color: card.isJoker ? Colors.purple : (card.suit.isRed ? Colors.red.shade700 : Colors.black),
+                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  card.suit.symbol,
-                  style: TextStyle(
-                    color: card.suit.isRed ? Colors.red : Colors.black,
-                    fontSize: isLarge ? 26 : 20,
+                if (!card.isJoker)
+                  Text(
+                    card.suit.symbol,
+                    style: TextStyle(
+                      color: card.suit.isRed ? Colors.red.shade700 : Colors.black,
+                      fontSize: 10,
+                    ),
                   ),
-                ),
               ],
+            ),
+          ),
+          
+          // Corner rank+suit (bottom-right, rotated)
+          Positioned(
+            bottom: 4,
+            right: 4,
+            child: Transform.rotate(
+              angle: 3.14159, // 180 degrees
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    card.isJoker ? 'J' : card.rank.symbol,
+                    style: TextStyle(
+                      color: card.isJoker ? Colors.purple : (card.suit.isRed ? Colors.red.shade700 : Colors.black),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (!card.isJoker)
+                    Text(
+                      card.suit.symbol,
+                      style: TextStyle(
+                        color: card.suit.isRed ? Colors.red.shade700 : Colors.black,
+                        fontSize: 10,
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
           
