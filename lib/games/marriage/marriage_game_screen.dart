@@ -23,6 +23,8 @@ import 'package:clubroyale/games/marriage/widgets/marriage_table_layout.dart';
 import 'package:clubroyale/games/marriage/widgets/game_timer_widget.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hud_overlay.dart';
 import 'package:clubroyale/games/marriage/widgets/hud/joker_display_panel.dart';
+import 'package:clubroyale/games/marriage/controllers/marriage_ui_controller.dart';
+import 'package:clubroyale/games/marriage/widgets/table/felt_table_background.dart';
 import 'package:clubroyale/core/services/sound_service.dart';
 import 'package:clubroyale/features/game/ui/screens/game_settlement_dialog.dart';
 import 'package:clubroyale/games/marriage/marriage_visit_validator.dart';
@@ -37,7 +39,6 @@ import 'dart:async';
 import 'package:clubroyale/core/widgets/tutorial_overlay.dart';
 import 'package:clubroyale/games/marriage/screens/marriage_guidebook_screen.dart';
 import 'package:clubroyale/games/marriage/widgets/marriage_hand_widget.dart';
-import 'package:clubroyale/games/marriage/widgets/action_sidebar.dart';
 import 'package:clubroyale/games/marriage/widgets/circular_opponent_widget.dart';
 
 class MarriageGameScreen extends ConsumerStatefulWidget {
@@ -558,25 +559,38 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
                   child: _buildPrimarySetsProgress(melds),
                 ),
 
-              // Right Sidebar for Actions (Bhoos-style)
+              // Right Sidebar for Actions (Smart - shows only relevant buttons)
               Positioned(
                 right: 0,
-                top: MediaQuery.of(context).size.height < 400 ? 50 : 170, // Shift up on mobile
-                bottom: MediaQuery.of(context).size.height < 400 ? 0 : null, // Constrain bottom
+                top: MediaQuery.of(context).size.height < 400 ? 50 : 170,
+                bottom: MediaQuery.of(context).size.height < 400 ? 0 : null,
                 child: Center(
-                  child: MarriageActionSidebar(
+                  child: SmartActionSidebar(
                     isMyTurn: _game.currentPlayerId == _playerId,
                     canDiscard: _selectedCardId != null && _game.currentPlayerId == _playerId,
                     canVisit: _visitStatus == VisitButtonState.ready,
-                    canDeclare: _game.currentPlayerId == _playerId,
+                    canDeclare: _game.currentPlayerId == _playerId && _canDeclare(),
                     onDiscard: _discardCard,
                     onVisit: _handleVisit,
                     onDeclare: _tryDeclare,
+                    onShowSets: () => _showPlayerSets(),
                     visitLabel: _visitLabel == 'VISIT' ? 'DUB' : _visitLabel,
-                    compact: MediaQuery.of(context).size.height < 400, // Pass compact flag
+                    compact: MediaQuery.of(context).size.height < 400,
+                    phase: _getCurrentGamePhase(),
                   ),
                 ),
               ),
+
+              // Phase Action Hint (shows contextual guidance)
+              if (_game.currentPlayerId == _playerId)
+                Positioned(
+                  top: MediaQuery.of(context).size.height * 0.22,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: PhaseActionHint(phase: _getCurrentGamePhase()),
+                  ),
+                ),
 
               // Polished HUD Overlay (Turn Indicator, Maal, Emotes)
               MarriageHUDOverlay(
@@ -1478,6 +1492,168 @@ class _MarriageGameScreenState extends ConsumerState<MarriageGameScreen> {
     if (id == _playerId) return 'You';
     return _getBotName(id);
   }
+
+  /// Calculate current game phase for UI state management
+  MarriageGamePhase _getCurrentGamePhase() {
+    if (_game.isFinished || _game.currentPhase == GamePhase.finished) {
+      return MarriageGamePhase.gameEnded;
+    }
+    
+    final isMyTurn = _game.currentPlayerId == _playerId;
+    
+    if (!isMyTurn) {
+      return MarriageGamePhase.waiting;
+    }
+    
+    // Check if we need to draw
+    final hand = _game.getHand(_playerId);
+    if (hand.length == 21) {
+      return MarriageGamePhase.drawPhase;
+    }
+    
+    // Check if cards are selected
+    if (_selectedCardId != null) {
+      return MarriageGamePhase.formingSets;
+    }
+    
+    // Check if can declare
+    if (_hasVisited && _canDeclare()) {
+      return MarriageGamePhase.canDeclare;
+    }
+    
+    // Check if has visited
+    if (_hasVisited) {
+      return MarriageGamePhase.postVisit;
+    }
+    
+    // Check if can visit
+    if (_visitStatus == VisitButtonState.ready) {
+      return MarriageGamePhase.canVisit;
+    }
+    
+    return MarriageGamePhase.playPhase;
+  }
+
+  /// Check if player can declare (all cards in valid sets)
+  bool _canDeclare() {
+    if (!_hasVisited) return false;
+    
+    final hand = _game.getHand(_playerId);
+    if (hand.isEmpty) return false;
+    
+    // Check if all cards can form valid melds using the game's method
+    final melds = _game.findMelds(_playerId);
+    
+    // Count cards in valid melds
+    int cardsInMelds = 0;
+    for (final meld in melds) {
+      cardsInMelds += meld.cards.length;
+    }
+    
+    // Can declare if all cards are in valid melds (minus one for discard)
+    return cardsInMelds >= (hand.length - 1);
+  }
+
+  /// Show player's formed sets in a modal
+  void _showPlayerSets() {
+    final hand = _game.getHand(_playerId);
+    if (hand.isEmpty) return;
+    
+    final melds = _game.findMelds(_playerId);
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.grey[900],
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'YOUR SETS',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white54),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const Divider(color: Colors.white24),
+            const SizedBox(height: 12),
+            if (melds.isEmpty)
+              const Center(
+                child: Text(
+                  'No valid sets formed yet.\nSelect cards and tap an action to form sets.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white54),
+                ),
+              )
+            else
+              SizedBox(
+                height: 120,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: melds.length,
+                  itemBuilder: (context, index) {
+                    final meld = melds[index];
+                    return Container(
+                      margin: const EdgeInsets.only(right: 16),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: _getMeldColor(meld.type).withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: _getMeldColor(meld.type)),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _getMeldTypeName(meld.type),
+                            style: TextStyle(
+                              color: _getMeldColor(meld.type),
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: meld.cards.map((card) => Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 2),
+                              child: CardWidget(
+                                card: card,
+                                width: 36,
+                                height: 52,
+                                isFaceUp: true,
+                              ),
+                            )).toList(),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
 
   Color _getMeldColor(meld_engine.MeldType type) {
     switch (type) {
