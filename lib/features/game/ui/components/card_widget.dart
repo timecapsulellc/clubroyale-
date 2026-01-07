@@ -133,31 +133,38 @@ class CardWidget extends StatelessWidget {
         children: [
           // Card face content
           Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Rank display
-                Text(
-                  card.isJoker ? '🃏' : card.rank.symbol,
-                  style: TextStyle(
-                    color: card.isJoker ? Colors.purple : (card.suit.isRed ? Colors.red.shade700 : Colors.black),
-                    fontSize: isLarge ? 34 : 28,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'Roboto', // Ensure web-safe font
-                  ),
-                ),
-                const SizedBox(height: 2),
-                // Suit display - Use text with fallback
-                if (!card.isJoker)
-                  Text(
-                    card.suit.symbol,
-                    style: TextStyle(
-                      color: card.suit.isRed ? Colors.red.shade700 : Colors.black,
-                      fontSize: isLarge ? 28 : 22,
-                      fontWeight: FontWeight.bold,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Rank display
+                    Text(
+                      card.isJoker ? '🃏' : card.rank.symbol,
+                      style: TextStyle(
+                        color: card.isJoker ? Colors.purple : (card.suit.isRed ? Colors.red.shade700 : Colors.black),
+                        fontSize: isLarge ? 34 : 28,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'Roboto', // Ensure web-safe font
+                      ),
                     ),
-                  ),
-              ],
+                    const SizedBox(height: 2),
+                    // Suit display - Use text with fallback
+                    if (!card.isJoker)
+                      Text(
+                        card.suit.symbol,
+                        style: TextStyle(
+                          color: card.suit.isRed ? Colors.red.shade700 : Colors.black,
+                          fontSize: isLarge ? 28 : 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
           ),
           
