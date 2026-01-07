@@ -1,5 +1,23 @@
 # ClubRoyale Changelog
 
+## [2026-01-07] Chief Engineer Card Engine Update
+
+### ✨ New Features
+- **ExpertStrategy AI** (Difficulty 5): Tree of Thoughts reasoning, Maal awareness, opponent tracking
+- **Card Engine Unit Tests**: 18 comprehensive tests for Pile, Deck, Hand, and PlayerStrategy
+
+### 🔧 Polish
+- Fixed deprecated Matrix4 scale/translate methods
+- Enhanced CardWidget with corner rank/suit pips
+- PWA desktop orientation support
+
+### ✅ Testing
+- All game mechanics: 126/129 passing (98%)
+- Card engine: 18/18 passing
+- Browser automation: PWA verified on mobile/desktop
+
+---
+
 ## [2026-01-03] Chief Architect Audit Pipeline
 
 ### ✨ New Features

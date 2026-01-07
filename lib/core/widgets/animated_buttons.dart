@@ -233,9 +233,9 @@ class _AnimatedCardState extends State<AnimatedCard> {
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        transform: Matrix4.identity()
-          ..scale(_isPressed ? 0.98 : 1.0)
-          ..translate(0.0, _isPressed ? 2.0 : 0.0),
+        transform: _isPressed 
+            ? (Matrix4.diagonal3Values(0.98, 0.98, 1.0)..setTranslationRaw(0.0, 2.0, 0.0))
+            : Matrix4.identity(),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
